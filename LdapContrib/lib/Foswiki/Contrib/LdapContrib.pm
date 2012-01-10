@@ -491,6 +491,8 @@ sub getAccount {
   #writeDebug("called getAccount($login)");
   return undef if $this->{excludeMap}{$login};
 
+  $login = lc($login);
+
   my $loginFilter = $this->{loginFilter};
   $loginFilter = "($loginFilter)" unless $loginFilter =~ /^\(.*\)$/;
   my $filter = '(&'.$loginFilter.'('.$this->{loginAttribute}.'='.$login.'))';
@@ -1071,6 +1073,8 @@ sub cacheUserFromEntry {
     writeDebug("no loginName for $dn ... skipping");
     return 0;
   }
+  
+  $loginName = lc($loginName);
   $loginName = $this->fromUtf8($loginName);
 
   # 2. normalize
@@ -1744,6 +1748,8 @@ sub getWikiNameOfLogin {
 
   #writeDebug("called getWikiNameOfLogin($loginName)");
 
+  $loginName = lc($loginName);
+
   $data ||= $this->{data};
 
   unless ($this->{preCache}) {
@@ -1824,7 +1830,8 @@ returns the Distinguished Name of the LDAP record of the given name
 
 sub getDnOfLogin {
   my ($this, $loginName, $data) = @_;
-
+  
+  $loginName = lc($loginName);
   return unless $loginName;
 
   $data ||= $this->{data};
