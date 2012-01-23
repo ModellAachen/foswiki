@@ -164,6 +164,7 @@ sub new {
       || 'sub',
 
     loginAttribute=>$Foswiki::cfg{Ldap}{LoginAttribute} || 'uid',
+    caseSensitivity=>$Foswiki::cfg{Ldap}{CaseSensitivity} || 'on',
     allowChangePassword=>$Foswiki::cfg{Ldap}{AllowChangePassword} || 0,
 
     wikiNameAttribute=>$Foswiki::cfg{Ldap}{WikiNameAttributes} 
