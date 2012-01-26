@@ -1,6 +1,5 @@
 Foswiki::Contrib::WikiWorkbenchContrib,>=0.50,perl,Required
-Foswiki::Plugins::IfDefinedPlugin,>=1.01,perl,Required
-Foswiki::Plugins::JQueryPlugin,>=1.00,perl,Required
+Foswiki::Plugins::JQueryPlugin,>=4.20,perl,Required
 Foswiki::Plugins::FilterPlugin,>=1.40,perl,Required
 Foswiki::Plugins::FlexWebListPlugin,>=1.20,perl,Required
 Foswiki::Plugins::GluePlugin,>=2.00,perl,Required

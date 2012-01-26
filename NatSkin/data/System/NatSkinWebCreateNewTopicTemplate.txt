@@ -4,7 +4,7 @@
 %{</verbatim>}%
 
 %{<verbatim class="tml">}%
-%TMPL:DEF{"title"}%%HTMLTITLE{"%MAKETEXT{"Create New Topic"}%" separator=" %IF{"defined 'HTMLTITLESEP'" then="%HTMLTITLESEP%" else="-"}% "}%%TMPL:END%
+%TMPL:DEF{"title"}%%HTMLTITLE{"%MAKETEXT{"Create a new topic"}%" separator=" %IF{"defined 'HTMLTITLESEP'" then="%HTMLTITLESEP%" else="-"}% "}%%TMPL:END%
 %{</verbatim>}%
 
 %{<verbatim class="tml">}%
@@ -41,7 +41,7 @@
 %{<verbatim class="tml">}%
 %TMPL:DEF{"createform"}%<!-- -->
 %TMPL:P{"formstartstep"}%
-%TMPL:P{"formtitle"}%
+%TMPL:P{"formtitlestep"}%
 %TMPL:P{"topictitlestep"}%
 %TMPL:P{"topictemplatestep"}%
 %IF{"context view"
@@ -56,7 +56,7 @@
 %{<verbatim class="tml">}%
 %TMPL:DEF{"detailedoptionsstep"}%<!-- -->
 %TWISTY{
-  showlink="%MAKETEXT{" Show advanced options"}%" 
+  showlink="%MAKETEXT{"Show advanced options"}%" 
   hidelink="%MAKETEXT{"Hide advanced options"}%"
   showimgleft="%TMPL:P{"iconpath:toggle"}%"
   hideimgleft="%TMPL:P{"iconpath:toggleopen"}%"
@@ -77,9 +77,10 @@
 %{</verbatim>}%
 
 %{<verbatim class="tml">}%
-%TMPL:DEF{"formtitle"}%<!-- -->
-<h2 class="foswikiDialogTitle jqSimpleModalDraggable">%MAKETEXT{"Create a new topic in the [_1] web" args="%WEBLINK{"%BASEWEB%" format="<nop>$title"}%"}%</h2>
+%TMPL:DEF{"formtitlestep"}%<!-- -->
+<h2 class="foswikiDialogTitle jqSimpleModalDraggable">%TMPL:P{"formtitle"}%</h2>
 <!-- -->%TMPL:END%
+%TMPL:DEF{"formtitle"}%%MAKETEXT{"Create a new topic in the [_1] web" args="%WEBLINK{"%BASEWEB%" format="<nop>$title"}%"}%%TMPL:END%
 %{</verbatim>}%
 
 
@@ -98,7 +99,7 @@
 %{<verbatim class="tml">}%
 %TMPL:DEF{"topictitlestep"}%<!-- -->
 <div class='foswikiFormStep'>
-<h3 >%MAKETEXT{"Title:"}%</h3>
+<h3 >%MAKETEXT{"Title"}%:</h3>
 %TMPL:P{"topictitleinput"}%
 </div>
 <!-- -->%TMPL:END%
@@ -107,7 +108,7 @@
 %{<verbatim class="tml">}%
 %TMPL:DEF{"topicnamestep"}%<!-- -->
 <div class='foswikiFormStep'>
-<h3 >%MAKETEXT{"Name:"}%</h3>
+<h3 >%MAKETEXT{"Name"}%:</h3>
 %TMPL:P{"topicname"}%%TMPL:P{"nonwikiword"}%
 </div>
 <!-- -->%TMPL:END%
@@ -116,7 +117,7 @@
 %{<verbatim class="tml">}%
 %TMPL:DEF{"topicparentstep"}%<!-- -->
 <div class="foswikiFormStep">
-<h3 >%MAKETEXT{"Parent:"}%</h3>
+<h3 >%MAKETEXT{"Parent"}%:</h3>
 %TMPL:P{"topicparent"}%
 </div>
 <!-- -->%TMPL:END%
@@ -137,7 +138,7 @@
 %{<verbatim class="tml">}%
 %TMPL:DEF{"topictemplatestep"}%<!-- -->
 <div class='foswikiFormStep'>
-<h3 >%MAKETEXT{"Template:"}%</h3>
+<h3 >%MAKETEXT{"Template"}%:</h3>
 %TMPL:P{"topictemplate"}%
 </div>
 <!-- -->%TMPL:END%

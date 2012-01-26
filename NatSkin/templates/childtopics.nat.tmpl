@@ -2,12 +2,13 @@
 
 %{ ################################################################################ }%
 %TMPL:DEF{"title"}%%TOPIC% (%MAKETEXT{"Child topics"}%) - %WIKITOOLNAME%%TMPL:END%
-%TMPL:DEF{"breadcrumbstail"}%%TMPL:P{"sep"}%<a href="%SCRIPTURLPATH{"view"}%/%BASEWEB%/%BASETOPIC%?template=childtopics;%QUERYSTRING%">%MAKETEXT{"Child topics"}%</a>%TMPL:END%
+%TMPL:DEF{"breadcrumbs::tail"}%%TMPL:P{"sep"}%<a href="%SCRIPTURLPATH{"view"}%/%BASEWEB%/%BASETOPIC%?template=childtopics;%QUERYSTRING%">%MAKETEXT{"Child topics"}%</a>%TMPL:END%
 %TMPL:DEF{"topicactions"}%%TMPL:END%
 %TMPL:DEF{"bottombar"}%%TMPL:END%
 %TMPL:DEF{"sidebar"}%%TMPL:END%
 %TMPL:DEF{"revinfo"}%%TMPL:END%
-%TMPL:DEF{"heading"}%%MAKETEXT{"Child topics of [_1]" args="[[%BASEWEB%.%BASETOPIC%][%BASETOPIC%]]"}%%TMPL:END%
+%TMPL:DEF{"heading"}%%MAKETEXT{"Child topics of [_1]" args="%GETTOPICTITLE{"%BASEWEB%.%BASETOPIC%"}%"}%%TMPL:END%
+%TMPL:DEF{"childtopics::limit"}%500%TMPL:END%
 
 %{ ################################################################################ }%
 %TMPL:DEF{"content"}%<!-- -->
@@ -24,19 +25,17 @@
 
 
 %{ ################################################################################ }%
-%TMPL:DEF{"dialog"}%<div class="foswikiDialog foswikiFormSteps">
-<h2 class="foswikiDialogTitle jqSimpleModalDraggable">%TMPL:P{"heading"}%</h2>
-<div class="foswikiFormStep natChildTopicsContainer"></div>
-<hr />
-<div class="foswikiFormStep">
-  %BUTTON{"%MAKETEXT{"Close"}%" class="jqSimpleModalCancel" icon="cross"}%
-  %CLEAR%
+%TMPL:DEF{"dialog"}%<noautolink>
+<div class="jqUIDialog foswikiFormSteps {modal:true, height:600, width:800, draggable:true, resizable:true}" title="%TMPL:P{"heading"}%">
+  <div class="foswikiFormStep natChildTopicsContainer"></div>
+  %TMPL:P{"childtopicsjavascript"}%<!-- -->
+  <a class="jqUIDialogButton {icon:'ui-icon-cancel', click: function() { $(this).dialog('close'); }}">%MAKETEXT{"Close"}%</a>
 </div>
-%TMPL:P{"childtopicsjavascript"}%<!-- -->
-%TMPL:END%
+</noautolink>%TMPL:END%
 
 %{ ################################################################################ }%
-%TMPL:DEF{"childtopicsearch"}%%TMPL:P{context="DBCachePluginEnabled" then="childtopicsearch::dbcache" else="childtopicsearch::default"}%%TMPL:END%
+%TMPL:DEF{"childtopicsearch"}%%TMPL:P{context="SolrPluginEnabled" then="childtopicsearch::solr" else="childtopicsearch::else"}%%TMPL:END%
+%TMPL:DEF{"childtopicsearch::else"}%%TMPL:P{context="DBCachePluginEnabled" then="childtopicsearch::dbcache" else="childtopicsearch::default"}%%TMPL:END%
 
 %{ ################################################################################ }%
 %TMPL:DEF{"childtopicsearch::default"}%<!-- -->
@@ -50,7 +49,7 @@
   pattern="\((.*)\);(.*)"
   split="\n"
   cols="3"
-  header="%MAKETEXT{"[_1] topics found" args="<span class='foswikiAlert'>$count</span>"}%$n$n $percntCALC{\"$SET(found,1)\"}$percnt"
+  header="%MAKETEXT{"[_1] topic(s) found" args="<span class='foswikiAlert'>$count</span>"}%$n$n $percntCALC{\"$SET(found,1)\"}$percnt"
   format="[[$2][$1]]"
   sort="nocase"
 }%
@@ -69,11 +68,38 @@
   pattern="\((.*)\);(.*)"
   split="\n"
   cols="3"
-  header="%MAKETEXT{"[_1] topics found" args="<span class='foswikiAlert'>$count</span>"}%$n$n $percntCALC{\"$SET(found,1)\"}$percnt"
+  header="%MAKETEXT{"[_1] topic(s) found" args="<span class='foswikiAlert'>$count</span>"}%$n$n $percntCALC{\"$SET(found,1)\"}$percnt"
   format="[[$2][$1]]"
   sort="nocase"
+  limit="%TMPL:P{"childtopics::limit"}%"
 }%
 %IF{"'%CALC{"$GET(found)"}%'=''"
+  then="<span class='foswikiAlert'>%MAKETEXT{"No child topics"}%</span>"
+}%<!-- -->%TMPL:END%
+
+%{ ################################################################################ }%
+%TMPL:DEF{"childtopicsearch::solr"}%<noautolink>
+%MAKEINDEX{
+  "%SOLRSEARCH{
+    "parent:%BASEWEB%.%BASETOPIC%"
+    header="$percntCALC{\"$SET(total,$count)\"}$percnt"
+    format="($title);$web.$topic"
+    sort="title"
+    separator="$n"
+    rows="%TMPL:P{"childtopics::limit"}%"
+  }%"
+  pattern="\((.*)\);(.*)"
+  split="\n"
+  cols="3"
+  header="%MAKETEXT{"[_1] topic(s) found" args="<span class='foswikiAlert'>%CALC{"$GET(total)"}%</span>"}%
+    $percntIF{\"%CALC{"$GET(total)"}%>%TMPL:P{"childtopics::limit"}%\"
+      then=\"(%MAKETEXT{"showing only [_1]" args="%TMPL:P{"childtopics::limit"}%"}%)\"
+    }$percnt<!-- -->$n
+  "
+  format="[[$2][$1]]"
+  sort="nocase"
+}%</noautolink>
+%IF{"'%CALC{"$GET(total)"}%'=''"
   then="<span class='foswikiAlert'>%MAKETEXT{"No child topics"}%</span>"
 }%<!-- -->%TMPL:END%
 

@@ -1,0 +1,57 @@
+%META:TOPICINFO{author="ProjectContributor" comment="reprev" date="1307448069" format="1.1" reprev="8" version="9"}%
+%META:TOPICPARENT{name="TopicView"}%
+%{<verbatim class="tml">}%
+%TMPL:INCLUDE{"Applications.ClassificationApp.ClassifiedTopicEdit"}%
+%{</verbatim>}%
+
+%{<verbatim class="tml">}%
+%TMPL:DEF{"topictype"}%%MAKETEXT{"blog entry"}%%TMPL:END%
+%{</verbatim>}%
+
+%{<verbatim class="tml">}%
+%TMPL:DEF{"formdefinition"}%Applications.BlogApp.BlogEntry%TMPL:END%
+%{</verbatim>}%
+
+%{<verbatim class="tml">}%
+%TMPL:DEF{"editfields"}%TopicTitle, Summary, Author, State, Sticky%TMPL:END%
+%{</verbatim>}%
+
+%{<verbatim class="tml">}%
+%TMPL:DEF{"formfields"}%<!-- --> 
+<input type="hidden" name="action" value="text" /> 
+%TMPL:P{"categoriestab"}% 
+%TMPL:P{"tagstab"}% 
+%TMPL:P{"seotab"}% 
+<!-- -->%TMPL:END%
+%{</verbatim>}%
+
+%{<verbatim class="tml">}%
+%TMPL:DEF{"seotab"}%<!-- -->
+%TAB{"%MAKETEXT{"SEO"}%"}%
+---++ Search engine optimization
+%RENDERFOREDIT{"%BASEWEB%.%BASETOPIC%"
+  form="%TMPL:P{"formdefinition"}%"
+  fields="MetaTitle, MetaKeywords, MetaDescription"
+  MetaTitle_title="%MAKETEXT{"Meta title"}%"
+  MetaKeywords_title="%MAKETEXT{"Meta keywords"}%"
+  MetaDescription_title="%MAKETEXT{"Meta desciption"}%"
+  MetaTitle_default="%GETTOPICTITLE{"%BASEWEB%.%BASETOPIC%"}%"
+  MetaKeywords_default="%TAGINFO{topic="%BASEWEB%.%BASETOPIC%" format="$name"}%"
+  MetaDescription_default="%FORMFIELD{"Summary" topic="%BASEWEB%.%BASETOPIC%"}%"
+}%
+%ADDTOZONE{"script" id="BLOGPLUGIN::JS" 
+  text="<script src='%PUBURLPATH%/%SYSTEMWEB%/BlogPlugin/blogplugin.js'></script>"
+  requires="JQUERYPLUGIN"
+}%%ENDTAB%
+<!-- -->%TMPL:END%
+</verbatim>
+
+%{<verbatim class="tml">}%
+%TMPL:DEF{"validationrules"}% {'MetaTitle': {maxlength: 60}, 'MetaDescription': {maxlength:160}} %TMPL:END%
+</verbatim>
+
+%META:FORM{name="Applications.ApplicationTopic"}%
+%META:FIELD{name="TopicType" title="TopicType" value="TopicView"}%
+%META:FIELD{name="TopicTitle" attributes="" title="<nop>TopicTitle" value=""}%
+%META:FIELD{name="Summary" attributes="c" title="Summary" value="Editor for BlogEntries"}%
+%META:FIELD{name="WikiApplication" attributes="" title="WikiApplication" value="BlogApp"}%

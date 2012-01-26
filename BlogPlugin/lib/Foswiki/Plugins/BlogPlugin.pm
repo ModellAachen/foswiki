@@ -1,6 +1,6 @@
 # Plugin for Foswiki - The Free and Open Source Wiki, http://foswiki.org/
 #
-# Copyright (C) 2005-2006 MichaelDaum@WikiRing.com
+# Copyright (C) 2005-2011 http://michaeldaumconsulting.com
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -17,112 +17,46 @@
 package Foswiki::Plugins::BlogPlugin;
 
 use strict;
-use vars qw(
-  $VERSION $RELEASE $NO_PREFS_IN_TOPIC $SHORTDESCRIPTION
-  $doneHeader $blogCore $blogFactory
-);
+use warnings;
+use Error qw(:try);
 
-use Foswiki::Plugins::BlogPlugin::WebDB; # must be compiled in advance
-
-$VERSION = '$Rev$';
-$RELEASE = '0.99';
-$NO_PREFS_IN_TOPIC = 1;
-$SHORTDESCRIPTION = 'Basic blogging features used to implement the BlogUp <nop>WikiApplication';
+our $core;
+our $VERSION = '$Rev$';
+our $RELEASE = '2.00';
+our $NO_PREFS_IN_TOPIC = 1;
+our $SHORTDESCRIPTION = 'Basic blogging features used to implement the BlogApp <nop>WikiApplication';
+our $baseTopic;
+our $baseWeb;
 
 ###############################################################################
 sub initPlugin {
+  ($baseTopic, $baseWeb) = @_;
 
-  $doneHeader = 0;
-  $blogCore = undef;
-  $blogFactory = undef;
+  $core = undef;
 
-  Foswiki::Func::registerTagHandler('CITEBLOG', \&handleCiteBlog);
-  Foswiki::Func::registerTagHandler('COUNTCOMMENTS', \&handleCountComments);
-  Foswiki::Func::registerTagHandler('NEXTDOC', \&handleNextDoc);
-  Foswiki::Func::registerTagHandler('PREVDOC', \&handlePrevDoc);
-  Foswiki::Func::registerTagHandler('RECENTCOMMENTS', \&handleRecentComments);
-  Foswiki::Func::registerTagHandler('RELATEDTOPICS', \&handleRelatedTopics);
-  Foswiki::Func::registerRESTHandler('createblog', \&handleCreateBlog);
+  Foswiki::Func::registerRESTHandler('blogconvert', \&handleBlogConvert);
 
   return 1;
 }
 
 ###############################################################################
-sub handleCiteBlog { 
-  newCore()->handleCiteBlog(@_);
+sub handleBlogConvert { 
+
+  require Foswiki::Plugins::BlogPlugin::Converter;
+  my $converter = new Foswiki::Plugins::BlogPlugin::Converter;
+
+  my @params = @_;
+
+  try {
+    $converter->convert(@params);
+  } catch Error::Simple with {
+    my $error = shift;
+
+    print STDERR "ERROR: ".$error->{-text}."\n";
+  };
+
+  return "";
 }
-sub handleCountComments { 
-  newCore()->handleCountComments(@_);
-}
-sub handleNextDoc { 
-  newCore()->handleNextDoc(@_);
-}
-sub handlePrevDoc { 
-  newCore()->handlePrevDoc(@_);
-}
-sub handleRecentComments { 
-  newCore()->handleRecentComments(@_);
-}
-sub handleRelatedTopics { 
-  newCore()->handleRelatedTopics(@_);
-}
-sub handleCreateBlog { 
-  newFactory()->handleCreateBlog(@_);
-}
-
-###############################################################################
-sub newFactory {
-  return $blogFactory if $blogFactory;
-
-  eval 'use Foswiki::Plugins::BlogPlugin::Factory;';
-  die $@ if $@;
-
-  $blogFactory = new Foswiki::Plugins::BlogPlugin::Factory;
-
-  return $blogFactory;
-}
-
-
-###############################################################################
-sub newCore {
-  return $blogCore if $blogCore;
-
-  eval 'use Foswiki::Plugins::BlogPlugin::Core;';
-  die $@ if $@;
-
-  $blogCore = new Foswiki::Plugins::BlogPlugin::Core;
-
-  return $blogCore;
-}
-
-###############################################################################
-sub commonTagsHandler {
-
-  if (!$doneHeader) {
-    my $link = 
-      '<link rel="stylesheet" '.
-      'href="%PUBURL%/%SYSTEMWEB%/BlogPlugin/style.css" '.
-      'type="text/css" media="all" />' . "\n" .
-      '<script type="text/javascript" ' .
-      'src="%PUBURL%/%SYSTEMWEB%/BlogPlugin/blogplugin.js">' .
-      '</script>';
-    if ($_[0] =~ s/<head>(.*?[\r\n]+)/<head>$1$link\n/o) {
-      $doneHeader = 1;
-    }
-  }
-}
-
-###############################################################################
-sub postRenderingHandler { 
-  # remove leftover tags of optional plugins if they are not installed
-
-  $_[0] =~ s/%STARTALIASAREA%//go;
-  $_[0] =~ s/%STOPALIASAREA%//go;
-  $_[0] =~ s/%ALIAS{.*?}%//go;
-}
-  
-
-###############################################################################
 
 1;
 

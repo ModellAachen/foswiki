@@ -31,7 +31,7 @@ our $VERSION = '$Rev$'; # version of *this file*.
 # date    - a date in 1 Jun 2009 format. Three letter English month names only.
 # Note: it's important that this string is exactly the same in the extension
 # topic - if you use %$RELEASE% with BuildContrib this is done automatically.
-our $RELEASE = '0.0.5';
+our $RELEASE = '0.1.1';
 
 our $SHORTDESCRIPTION = 'JQuery Superfish Menu Skin';
 

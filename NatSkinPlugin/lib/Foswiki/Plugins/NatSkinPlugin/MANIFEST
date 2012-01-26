@@ -1,3 +1,4 @@
+bin/natsearch 0755
 data/System/NatSkinPlugin.txt 0644
 lib/Foswiki/Plugins/NatSkinPlugin/Config.spec 0644
 lib/Foswiki/Plugins/NatSkinPlugin/ContentType.pm 0644

@@ -96,6 +96,7 @@
 %TMPL:DEF{"dataform::tab"}%<!-- -->
 %RENDERFORDISPLAY{
   topic="%BASEWEB%.%BASETOPIC%"
+  excludeattr="[hH]"
   header="$percntTAB{\"%MAKETEXT{"Data form"}%\" id=\"dataform\"}$percnt
           <div class=\"foswikiFormSteps foswikiDataForm jqTooltip\">
           $percntBUTTON{\"%MAKETEXT{"Help"}%\"
@@ -258,7 +259,7 @@
       <div class='foswikiAttachmentContainer'>
         <div class='foswikiThumbnail foswikiLeft'>
         $percntIF{
-          \"lc('$name')=~'.*\.(gif|jpe?g|png)$'\"
+          \"lc('$name')=~'.*\.(gif|jpe?g|png)$' and context ImagePluginEnabled\"
 	  then=\"$dollarpercntTMPL:P{\\"attachments::thumbnail\\" filename=\\"$name\\" url=\\"$url\\"}$dollarpercnt\"
           else=\"<a href='$url'>$percntMIMEICON{\"$name\" size=\"48\"}$percnt</a>\"
         }$percnt
@@ -284,13 +285,13 @@
               else=\"<!-- -->\"
             }$percnt
           </div>
-          <div class='foswikiAttachmentComment'>$comment</div>
           %MAKETEXT{"Version [_1] uploaded by [_2] on [_3]" args="$version,$percntSPACEOUT{$user}$percnt,$date"}%
           $percntIF{\"$version>1\"
             then=\"...&nbsp;<a href='#' class='foswikiShowVersions' title='%MAKETEXT{"show previous revisions"}%'>%MAKETEXT{"more"}%</a><a href='#' class='foswikiHideVersions' title='%MAKETEXT{"hide other revisions"}%' style='display:none'>%MAKETEXT{"less"}%</a>
                    <div class='foswikiVersionsContainer' style='display:none'>$dollarpercntICON{processing}$dollarpercnt</div>\"
             else=\"<!-- -->\"
           }$percnt
+          <div class='foswikiAttachmentComment'>$comment</div>
         </div>
         %CLEAR%
       </div>
@@ -348,7 +349,7 @@
   format="$percntFORMATLIST{\"$oldversions\"
       split=\"$n\"
       pattern=\"(.*);(.*);(.*);(.*)\"
-      format=\"%MAKETEXT{"<a href='%SCRIPTURL{"viewfile"}%/%WEB%/%TOPIC%?filename=$encode($name);rev=[_1]'>Version [_1]</a> uploaded by [_2] on [_3]" args="$3,$dollarpercntSPACEOUT{$2}$dollarpercnt,$1"}%\"
+      format=\"%MAKETEXT{"<a href='[_1]'>Version [_2]</a> uploaded by [_3] on [_4]" args="%SCRIPTURL{"viewfile"}%/%WEB%/%TOPIC%?filename=$encode($name);rev=$3,$3,$dollarpercntSPACEOUT{$2}$dollarpercnt,$1"}%\"
       separator=\"%BR%$n\"
     }$percnt"
 }%
@@ -434,7 +435,7 @@
   <input type="text" class="foswikiInputField jqUIAutocomplete" name="newweb" size="50" value="%WEB%" autocomplete="%SCRIPTURL{"view"}%/%SYSTEMWEB%/JQueryAjaxHelper?section=web&skin=text" />
 </div>
 <div class="foswikiFormStep">
-  <h3>%MAKETEXT{"To topic:"}%</h3>
+  <h3>%MAKETEXT{"To topic"}%:</h3>
   <input type="text" class="foswikiInputField jqUIAutocomplete {extraParams:{baseweb:function() {return jQuery('#foswikiAttachmentMove input[name=newweb]').val()}}}" name="newtopic" size="50" value="%TOPIC%" autocomplete="%SCRIPTURL{"view"}%/%SYSTEMWEB%/JQueryAjaxHelper?section=topic&skin=text" />
   <div class="foswikiFormDescription">
     %MAKETEXT{"The new topic chosen must already exist."}%
@@ -449,14 +450,6 @@
 </form>
 </div>
 <!-- -->%TMPL:END%
-
-%TMPL:DEF{"attachments::moveattachment::toattachment"}%<div class="foswikiFormStep">
-  <h3>%MAKETEXT{"To attachment:"}%</h3>
-  <input name="filename" class="foswikiInputField" value="" size="50" />
-  <div class="foswikiFormDescription">
-    %MAKETEXT{"The attachment may be renamed (by appending a number to the name) if an attachment of that name already exists in the target topic."}%
-  </div>
-</div>%TMPL:END%
 
 %{ ################################################################################ }%
 %TMPL:DEF{"attachments::confirmdelete"}%<!-- -->
@@ -604,7 +597,7 @@
 %TMPL:DEF{"uploadform::buttonsstep::autostartcheckbox"}%<!-- -->
 <label class="foswikiLeft" style="line-height:23px">
   <input type="checkbox" class="foswikiCheckbox jqUploaderAutoStart" name="autostart" /> 
-  %MAKETEXT{"Start upload immediately."}%
+  %MAKETEXT{"Start upload immediately"}%
 </label>
 <!-- -->%TMPL:END%
 

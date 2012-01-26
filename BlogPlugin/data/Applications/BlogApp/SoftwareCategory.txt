@@ -1,0 +1,12 @@
+%META:TOPICINFO{author="ProjectContributor" comment="reprev" date="1278345308" format="1.1" reprev="1" version="1"}%
+%DBCALL{"Applications.ClassificationApp.RenderCategory"}%
+
+%META:FORM{name="Applications.ClassificationApp.Category"}%
+%META:FIELD{name="TopicType" title="TopicType" value="Category, CategorizedTopic, WikiTopic"}%
+%META:FIELD{name="TopicTitle" attributes="" title="<nop>TopicTitle" value="Software"}%
+%META:FIELD{name="Summary" attributes="" title="Summary" value=""}%
+%META:FIELD{name="Category" attributes="" title="Category" value=""}%
+%META:FIELD{name="Icon" attributes="" title="Icon" value="plugin.png"}%
+%META:FIELD{name="ImportedCategory" attributes="" title="<nop>ImportedCategory" value=""}%
+%META:FIELD{name="Order" attributes="" title="Order" value=""}%
+%META:TOPICMOVED{by="micha" date="1278345296" from="Applications/BlogApp.ExtensionsCategory" to="Applications/BlogApp.SoftwareCategory"}%

@@ -1,6 +1,6 @@
 # Plugin for Foswiki - The Free and Open Source Wiki, http://foswiki.org/
 #
-# Copyright (C) 2005-2011 Michael Daum http://michaeldaumconsulting.com
+# Copyright (C) 2005-2012 Michael Daum http://michaeldaumconsulting.com
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -93,7 +93,7 @@ sub handleFilter {
 
   # get the source text
   my $text = '';
-  if ($theText) { # direct text
+  if (defined $theText) { # direct text
     $text = $theText;
   } else { # topic text
     return '' if $filteredTopic{"$theWeb.$theTopic"};
@@ -529,6 +529,7 @@ sub handleFormatList {
   my $theMap = $params->{map};
   my $theNullFormat = $params->{null} || '';
   my $theTokenize = $params->{tokenize};
+  my $theHideEmpty = Foswiki::Func::isTrue($params->{hideempty}, 1);
 
   $theFormat = '$1' unless defined $theFormat;
 
@@ -637,7 +638,7 @@ sub handleFormatList {
       next if $seen{$line};
       $seen{$line} = 1;
     }
-    next if $line eq '';
+
     $line =~ s/\$index/$count+1/ge;
     if ($theSelection && $item =~ /$theSelection/) {
       $line =~ s/\$marker/$theMarker/g 
@@ -645,7 +646,7 @@ sub handleFormatList {
       $line =~ s/\$marker//go;
     }
     if ($skip-- <= 0) {
-      push @result, $line;
+      push @result, $line unless ($theHideEmpty && $line eq '');
       $count++;
       last if $theLimit - $count == 0;
     }

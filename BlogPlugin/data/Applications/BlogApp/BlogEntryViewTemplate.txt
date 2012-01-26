@@ -1,0 +1,61 @@
+%META:TOPICINFO{author="ProjectContributor" comment="reprev" date="1319556077" format="1.1" reprev="10" version="13"}%
+%META:TOPICPARENT{name="TopicView"}%
+%{<verbatim class="tml">}%
+%TMPL:INCLUDE{"Applications.ClassificationApp.ClassifiedTopicView"}%
+%{</verbatim>}%
+
+%{<verbatim class="tml">}%
+%TMPL:DEF{"beforetext"}%<!-- -->
+<div class="blogEntry hyphenate">
+%DBCALL{"Applications.BlogApp.RenderBlogEntryPagination" CLASS="blogTopPagination"}%
+<div class="foswikiTopicInfo">
+%DBCALL{"Applications.BlogApp.RenderBlogEntryTitle" TITLE_EXTRA="%TMPL:P{"titleextra"}%"}%
+%ADDTOZONE{"head"
+  id="BLOGPLUGIN::CSS"
+  text="<link rel='stylesheet' href='%PUBURLPATH%/%SYSTEMWEB%/BlogPlugin/blogplugin.css'  media='all' />"
+}%<!-- -->
+<!-- %JQREQUIRE{"hyphenator" warn="off"}% -->
+</div>
+%SETVAR{field="State" matches="unpublished" var="ALLOWTOPICVIEW" type="Set" value="BlogAuthorGroup"}%<!-- -->
+%SETVAR{field="State" matches="unpublished" var="PERMSET_VIEW" value="details" type="Local"}%<!-- -->
+%SETVAR{field="State" matches="unpublished" var="PERMSET_VIEW_DETAILS" value="BlogAuthorGroup" type="Local"}%<!-- -->
+%UNSETVAR{field="State" matches="published" var="ALLOWTOPICVIEW"}%<!-- -->
+%UNSETVAR{field="State" matches="published" var="PERMSET_VIEW"}%<!-- -->
+%UNSETVAR{field="State" matches="published" var="PERMSET_VIEW_DETAILS"}%<!-- -->
+<!-- -->%TMPL:END%
+%{</verbatim>}%
+
+%{<verbatim class="tml">}%
+%TMPL:DEF{"aftertext"}%<!-- -->
+%DBCALL{"Applications.BlogApp.RenderBlogEntryPagination" CLASS="blogBottomPagination"}%
+</div>
+<!-- -->%TMPL:END%
+%{</verbatim>}%
+
+%{<verbatim class="tml">}%
+%TMPL:DEF{"revinfo"}%%TMPL:END%
+%{</verbatim>}%
+
+%{<verbatim class="tml">}%
+%TMPL:DEF{"titleextra"}%%IF{"State = 'unpublished'" then="<span class='foswikiAlert foswikiSmall'>(%MAKETEXT{"unpublished"}%)</span>"}%%TMPL:END%
+%{</verbatim>}%
+
+%{<verbatim class="tml">}%
+%TMPL:DEF{"breadcrumbs"}%%CATINFO{
+  topic="%BASEWEB%.%BASETOPIC%"
+  header="$percntBREADCRUMBS{recurse=\"topicoff\" separator=\"%TMPL:P{"sep"}%\"}$percnt%TMPL:P{"sep"}%" 
+  format="$breadcrumb" 
+  separator="%TMPL:P{"sep"}%"
+  null="$percntBREADCRUMBS{separator=\"$percntTMPL:P{\"sep\"}$percnt\"}$percnt"
+}%%TMPL:END%
+%{</verbatim>}%
+
+%{<verbatim class="tml">}%
+%TMPL:DEF{"sidebar"}%%DBCALL{"Applications.BlogApp.RenderSideBar" SIDEBAR="BlogEntry"}%%TMPL:END%
+%{</verbatim>}%
+
+%META:FORM{name="Applications.ApplicationTopic"}%
+%META:FIELD{name="TopicType" title="TopicType" value="TopicView"}%
+%META:FIELD{name="TopicTitle" attributes="" title="<nop>TopicTitle" value=""}%
+%META:FIELD{name="Summary" attributes="c" title="Summary" value="TopicView for BlogEntries"}%
+%META:FIELD{name="WikiApplication" attributes="" title="WikiApplication" value="BlogApp"}%

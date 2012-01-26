@@ -1,3 +1,5 @@
+locale/SolrPlugin/de.po 0644
+locale/SolrPlugin/Foswiki.pot 0644
 bin/solrsearch 0755
 data/System/NatSkinWebChangesViewTemplate.txt 0644
 data/System/PatternSkinSolrSearchViewTemplate.txt 0644
@@ -110,4 +112,4 @@ tools/solrstart 0755
 tools/virtualhosts-solrdelete 0755
 tools/virtualhosts-solrindex 0755
 tools/virtualhosts-solrsearch 0755
-WebService::Solr-0.14.patch 0644
+WebService-Solr-0.14.patch 0644

@@ -1,9 +1,6 @@
 # Release manifest for JQueryMenuSkin
-pub/System/JQueryMenuSkin/screenshot.png 0644 
-pub/System/JQueryMenuSkin/colors.css 0644
-pub/System/JQueryMenuSkin/menu.css 0644
-pub/System/JQueryMenuSkin/style.css 0644
-pub/System/JQueryMenuSkin/theme.css 0644
+pub/System/JQueryMenuSkin/screenshot.png 0444 
+pub/System/JQueryMenuSkinBarDefault/menu.css 0644
 data/System/JQueryMenuSkin.txt 0644
 data/System/JQueryMenuSkinBarDefault.txt 0644
 lib/Foswiki/Contrib/JQueryMenuSkin.pm 0644

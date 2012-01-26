@@ -1,14 +1,14 @@
-use strict;
-
 # tests for the correct expansion of preferences (*not* FoswikiFns, which
 # should have their own individual testcase)
 
 package VariableTests;
+use strict;
+use warnings;
 
-use FoswikiFnTestCase;
+use FoswikiFnTestCase();
 our @ISA = qw( FoswikiFnTestCase );
 
-use Foswiki;
+use Foswiki();
 use Error qw( :try );
 
 sub set_up {
@@ -16,18 +16,20 @@ sub set_up {
 
     $this->SUPER::set_up();
 
-    my $query = new Unit::Request("");
+    my $query = Unit::Request->new("");
     $query->path_info("/$this->{test_web}/$this->{test_topic}");
-    $this->{session}->finish();
-    $this->{session} = new Foswiki( 'scum', $query );
-    $this->{test_topicObject} =
-      Foswiki::Meta->new( $this->{session}, $this->{test_web},
-        $this->{test_topic} );
+    $this->createNewFoswikiSession( 'scum', $query );
+    $this->{test_topicObject}->finish() if $this->{test_topicObject};
+    ( $this->{test_topicObject} ) =
+      Foswiki::Func::readTopic( $this->{test_web}, $this->{test_topic} );
+
+    return;
 }
 
 sub new {
-    my $self = shift()->SUPER::new( 'Variables', @_ );
-    return $self;
+    my ( $class, @args ) = @_;
+
+    return $class->SUPER::new( 'Variables', @args );
 }
 
 sub test_embeddedExpansions {
@@ -65,6 +67,7 @@ sub test_embeddedExpansions {
     $result = $this->{test_topicObject}->expandMacros("%%%PA%%%%SB{}%%%");
     $this->assert_equals( 'Egg sample', $result );
 
+    return;
 }
 
 sub test_topicCreationExpansions {
@@ -85,11 +88,11 @@ Kill me
 %ENDSECTION{name="fred" type="section"}%
 END
     $this->{test_topicObject}->text($text);
-    $this->{test_topicObject}->put('PREFERENCE',
-                                   {name=>"BLAH", value=>"%WIKINAME%"});
+    $this->{test_topicObject}
+      ->put( 'PREFERENCE', { name => "BLAH", value => "%WIKINAME%" } );
     $this->{test_topicObject}->expandNewTopic();
 
-    my $xpect  = <<END;
+    my $xpect = <<"END";
 scum
 
 ScumBag
@@ -102,7 +105,10 @@ scumbag\@example.com,scum,ScumBag,$this->{users_web}.ScumBag
 %ENDSECTION{name="fred" type="section"}%
 END
     $this->assert_str_equals( $xpect, $this->{test_topicObject}->text() );
-    $this->assert_str_equals( "ScumBag", $this->{test_topicObject}->get('PREFERENCE', 'BLAH')->{value} );
+    $this->assert_str_equals( "ScumBag",
+        $this->{test_topicObject}->get( 'PREFERENCE', 'BLAH' )->{value} );
+
+    return;
 }
 
 sub test_userExpansions {
@@ -118,7 +124,7 @@ sub test_userExpansions {
 %USERINFO{"WikiGuest" format="$cUID,$emails,$username,$wikiname,$wikiusername"}%
 END
     my $result = $this->{test_topicObject}->expandMacros($text);
-    my $xpect  = <<END;
+    my $xpect  = <<"END";
 scum
 ScumBag
 $this->{users_web}.ScumBag
@@ -129,20 +135,24 @@ END
     $this->annotate( "Foswiki::cfg{Register}{AllowLoginName} == "
           . $Foswiki::cfg{Register}{AllowLoginName} );
     $this->assert_str_equals( $xpect, $result );
+
+    return;
 }
 
 sub test_macroParams {
     my $this = shift;
+
     # Check default on undefined macros
     # Check default given, given but null, not given
     # Check quotes and other standard expansions
     # Check override of standard macros
     $this->{session}->{prefs}->setSessionPreferences(
-	ARFLE => '%BARFLE{default="gloop"}%',
-	TING => '%DEFAULT% %DEFAULT{default="tong"}%',
-	ALING =>  '\'%DEFAULT%\' \'%DEFAULT{default="tong"}%\'',
-	TOOT => '\'%NOP%\'',
-	WOOF =>  '%MIAOW{default="$quot$percent$quot"}%');
+        ARFLE => '%BARFLE{default="gloop"}%',
+        TING  => '%DEFAULT% %DEFAULT{default="tong"}%',
+        ALING => '\'%DEFAULT%\' \'%DEFAULT{default="tong"}%\'',
+        TOOT  => '\'%NOP%\'',
+        WOOF  => '%MIAOW{default="$quot$percent$quot"}%'
+    );
     my $input = <<'INPUT';
 | gloop | %BARFLE{default="gloop"}% |
 | mong | %ARFLE{BARFLE="mong"}% |
@@ -153,10 +163,10 @@ sub test_macroParams {
 | "%" | %WOOF% |
 | p"r"r | %WOOF{MIAOW="p$quot()r$quot()r"}% |
 INPUT
-    my $topicObject =
-      Foswiki::Meta->new( $this->{session}, $this->{test_web},
-        $this->{test_topic}, $input );
-    my $result = $topicObject->expandMacros($input);
+    my ($topicObject) =
+      Foswiki::Func::readTopic( $this->{test_web}, $this->{test_topic} );
+    $topicObject->text($input);
+    my $result   = $topicObject->expandMacros($input);
     my $expected = <<'EXPECTED';
 | gloop | gloop |
 | mong | mong |
@@ -168,7 +178,9 @@ INPUT
 | p"r"r | p"r"r |
 EXPECTED
     $this->assert_str_equals( $expected, $result );
+    $topicObject->finish();
 
+    return;
 }
 
 1;

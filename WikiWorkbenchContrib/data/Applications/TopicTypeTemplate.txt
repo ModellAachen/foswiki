@@ -29,7 +29,7 @@ See also: %TOPIC%Template
 
 ---++ <nop>%TOPIC% form
 | *Name:*| *Type:* | *Size:* | *Values:* | *Description:* | *Attributes:* |
-| TopicType | label | 1 | WikiTopic, <!-- ALIAS:... -->&hellip;<!-- //ALIAS --> | Document type  | |
+| TopicType | label | 1 | WikiTopic, ... | Document type  | |
 | <nop>TopicTitle | text | 75 | | title of this topic | |
 | Summary | text | 75 | | Short description of the role of this topic | |
 

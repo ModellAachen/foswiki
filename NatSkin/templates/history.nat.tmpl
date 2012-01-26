@@ -1,15 +1,17 @@
 %TMPL:INCLUDE{"oops"}%<!-- template: history.nat.tmpl -->
 
 %{ ################################################################################ }%
-%TMPL:DEF{"dialog"}%<div class="foswikiDialog foswikiFormSteps">
+%TMPL:DEF{"dialog"}%<noautolink>
+<div class="jqUIDialog foswikiFormSteps {modal:true, draggable:true, width:600}" title="%TMPL:P{"heading"}%">
 %TMPL:P{"formstart"}%<!-- -->
-<h2 class="foswikiDialogTitle jqSimpleModalDraggable">%TMPL:P{"heading"}%</h2>
 %TMPL:P{"revtable"}%<!-- -->
 %TMPL:P{"formend"}%<!-- -->
 %TMPL:P{"historyscript"}%<!-- -->
-</div>%TMPL:END%
+</div>
+</noautolink>%TMPL:END%
 
-%TMPL:DEF{"heading"}%%MAKETEXT{"Revision history of [_1]" args="[[%BASEWEB%.%BASETOPIC%][%BASETOPIC%]]"}%%TMPL:END%
+%{ ################################################################################ }%
+%TMPL:DEF{"heading"}%%MAKETEXT{"Revision history of [_1]" args="%GETTOPICTITLE{"%BASEWEB%.%BASETOPIC%"}%"}%%TMPL:END%
 
 %{ ################################################################################ }%
 %TMPL:DEF{"formstart"}%%TMPL:P{context="CompareRevisionsAddonPluginEnabled" then="formstart_compare" else="formstart_rdiff"}%%TMPL:END%
@@ -21,19 +23,15 @@
 <!-- -->%TMPL:END%
 
 %{ ################################################################################ }%
-%TMPL:DEF{"formstart_rdiff"}%<!-- formstart_rdiff -->
+%TMPL:DEF{"formstart_rdiff"}%<!-- -->
 <form name="main" action="%SCRIPTURLPATH{"rdiff"}%/%BASEWEB%/%BASETOPIC%">
 <input type="hidden" name="render" value="sequential" />
-<!-- //formstart_rdiff -->%TMPL:END%
+<!-- -->%TMPL:END%
 
 %{ ################################################################################ }%
 %TMPL:DEF{"formend"}%<!-- -->
-  <hr />
-  <div class='foswikiFormStep foswikiFormLast'>
-    %BUTTON{"%MAKETEXT{"Compare"}%" icon="time" type="submit"}%
-    %BUTTON{"%MAKETEXT{"Close"}%" icon="cross" class="jqSimpleModalCancel" href="%SCRIPTURLPATH{"view"}%/%BASEWEB%/%BASETOPIC%"}%
-    %CLEAR%
-  </div>
+  <a class="jqUIDialogButton {icon:'ui-icon-clock', click: function() { $(this).find('form:first').submit(); }}">%MAKETEXT{"Compare"}%</a>
+  <a class="jqUIDialogButton {icon:'ui-icon-cancel', click: function() { $(this).dialog('close'); }}">%MAKETEXT{"Close"}%</a>
 </form>%TMPL:END%
 
 %{ ################################################################################ }%
@@ -77,7 +75,7 @@
       <a href='%SCRIPTURLPATH{"view"}%/%BASEWEB%/%BASETOPIC%?rev=$rev' title='%MAKETEXT{"View revision [_1]" args="$rev"}%' class='natHistoryAction'>
         %JQICON{"eye"}% %MAKETEXT{"View"}%
       </a>
-      <a href='%SCRIPTURLPATH{"view"}%/%BASEWEB%/%BASETOPIC%?rev=$rev' title='%MAKETEXT{"Restore revision [_1]" args="$rev"}%' class='natHistoryAction'>
+      <a href='%SCRIPTURLPATH{"edit"}%/%BASEWEB%/%BASETOPIC%?t=%GMTIME{"$epoch"}%&rev=$rev' title='%MAKETEXT{"Restore revision [_1]" args="$rev"}%' class='natHistoryAction'>
         %JQICON{"arrow_refresh"}% %MAKETEXT{"Restore"}%
       </a>
      </td>

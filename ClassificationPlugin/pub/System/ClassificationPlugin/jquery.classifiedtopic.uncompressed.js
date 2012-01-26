@@ -7,7 +7,7 @@ jQuery(function($) {
         pubUrlPath = foswiki.getPreference("PUBURLPATH"),
         scriptUrl = foswiki.getPreference("SCRIPTURL"),
         systemWeb = foswiki.getPreference("SYSTEMWEB"),
-        loadUrl = scriptUrl+'/view/Applications/ClassificationApp/RenderClassifiedTopicView?section=more;skin=text;source='+web+'.'+topic;
+        loadUrl = scriptUrl+'/rest/RenderPlugin/tag?name=TAGINFO;skip=30;header=%2C%20;topic='+web+'.'+topic;
 
     $this.blur().addClass("clsTopicInfoMoreClicked").html('<img src="'+pubUrlPath+'/'+systemWeb+'/JQueryPlugin/images/spinner.gif" />');
     $container.load(loadUrl, function() { 

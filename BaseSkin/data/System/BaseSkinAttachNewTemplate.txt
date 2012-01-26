@@ -12,11 +12,13 @@
 ---------------------------------------------------
 	Page title
 ---------------------------------------------------
-}%%TMPL:DEF{"attach:title"}%<h1> %TOPIC% / %MAKETEXT{"New attachment"}% </h1>%TMPL:END%%{
+}%%TMPL:DEF{"attach:title"}%<h1>%MAKETEXT{"New attachment"}% </h1>%TMPL:END%%{
 ---------------------------------------------------
 	
 ---------------------------------------------------
-}%%TMPL:DEF{"content"}%<div class="foswikiTopic">%TMPL:P{"attach:title"}%%TABPANE{
+}%%TMPL:DEF{"content"}%<div class="foswikiTopic foswikiClearfix">
+%TMPL:P{"attach:title"}%
+%TABPANE{
 	class="simplevertical"
 }%
 %TAB{
@@ -27,8 +29,7 @@
 	"<img src='%PUBURLPATH%/%SYSTEMWEB%/DocumentGraphics/help.png' class='foswikiIcon' height='16' alt='' /> %MAKETEXT{"Help"}%"
 	id="help"
 }%%TMPL:P{"attach:help"}%%ENDTAB%
-%ENDTABPANE%<div class='foswikiClear'></div>
-</div>%TMPL:END%%{
+%ENDTABPANE%</div>%TMPL:END%%{
 ---------------------------------------------------
 	
 ---------------------------------------------------

@@ -4,15 +4,10 @@
 	
 	The webtopbar template defines the page top bar. It INCLUDEs the BaseSkinWebTopBar topic of the current web, or if it doesn't exist, the BaseSkinWebTopBarExample topic.
 ===================================================
-}%%TMPL:DEF{"topbar"}%<nav class="foswikiHeader">%IF{
+}%%TMPL:DEF{"topbar"}%<header>%IF{
 	"istopic '%SYSTEMWEB%.WebTopBar'"
 	then="$percntINCLUDE{$quot%SYSTEMWEB%.BaseSkinWebTopBar$quot}$percnt" 	
 	else="$percntINCLUDE{$quot%SYSTEMWEB%.BaseSkinWebTopBarExample$quot}$percnt"
-}%</nav>%TMPL:END%%{
----------------------------------------------------
-	Top bar (mini)
----------------------------------------------------
-}%%TMPL:DEF{"topbar:mini"}%<nav class="foswikiHeader"><div class="foswikiBar foswikiTopBar foswikiColorBlack"></div>
-</nav>%TMPL:END%%{
+}%</header>%TMPL:END%%{
 ===================================================
 </verbatim>}%

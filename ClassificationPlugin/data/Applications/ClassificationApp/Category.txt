@@ -3,7 +3,6 @@
 %TOC%
 %DBCALL{"Applications.RenderTopicInstaller" 
   TYPE="TopicType"
-  TEMPLATE="Applications.EmptyTopicStubTemplate"
 }%
 ---++ Documentation
 %STARTSECTION{name="documentation" type="section"}%

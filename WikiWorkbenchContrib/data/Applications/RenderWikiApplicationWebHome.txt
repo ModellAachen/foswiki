@@ -3,13 +3,13 @@
 %TOC{depth="2"}%
 
 ---++ Documentation
-%STARTSECTION{name="documentation" type="section"}%
+%STARTSECTION{"documentation"}%
 Renders the WebHome of a WikiApplication subweb
 
 ---+++++ Parameters
 None
 
-%ENDSECTION{name="documentation" type="section"}%
+%ENDSECTION{"documentation"}%
 
 ---++ Implementation
 <verbatim class="tml">

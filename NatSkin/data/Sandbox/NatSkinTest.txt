@@ -1,4 +1,4 @@
-%META:TOPICINFO{author="micha" comment="reprev" date="1313776572" format="1.1" reprev="29" version="31"}%
+%META:TOPICINFO{author="ProjectContributor" comment="reprev" date="1313776572" format="1.1" reprev="29" version="31"}%
 ---+!! %TOPIC%
 %BUTTON{"Toggle grid" icon="table" class="foswikiRight" onclick="jQuery('.natMain').toggleClass('showgrid-40x18')"}%
 

@@ -5,6 +5,7 @@
 %TMPL:DEF{"contentheader_container"}%<div class="natMainHeaderContents">%TMPL:P{"contentheader"}%</div>%TMPL:END%
 %TMPL:DEF{"content_container"}%<div class="natMainContents" id="natMainContents">%TMPL:P{"content"}%<a name="ContentBottom"></a></div>%TMPL:END%
 %TMPL:DEF{"contentfooter_container"}%%CLEAR%<div class="natMainFooterContents">%TMPL:P{"contentfooter"}%</div>%TMPL:END%
+%TMPL:DEF{"breadcrumbs_container"}%<div class='natBreadCrumbs'> %TMPL:P{"breadcrumbs::title"}% %TMPL:P{"breadcrumbs"}%</div>
 %TMPL:DEF{"sidebar_container"}%<div class="natSideBarContents">
 %TMPL:P{"sidebar"}%
 </div>%TMPL:END%
@@ -12,12 +13,7 @@
 %TMPL:P{"rightsidebar"}%
 </div>%TMPL:END%
 
-%TMPL:DEF{"contentheader"}%<!-- -->
-<div class='natBreadCrumbs'>
-  <span class='natBreadCrumbsYouAreHere'>%MAKETEXT{"You are here:"}%</span> 
-  %TMPL:P{"breadcrumbs"}% 
-</div>
-<!-- -->%TMPL:END%
+%TMPL:DEF{"contentheader"}%%TMPL:P{"breadcrumbs_container"}%%TMPL:END%
 
 %TMPL:DEF{"webmenu"}%<div class="natWebMenu clearfix" id="natWebMenu">
   <div class="natWebMenuContents natWebMenuHidden"> 
@@ -95,7 +91,7 @@
 %IF{"{Cache}{Enabled} and context view and $CACHEABLE != 'off'" 
   then="<div class='natPageCacheBanner foswikiGrayText'>
           %MAKETEXT{"This page has been cached at [_1]." args="%SERVERTIME%"}%
-          %MAKETEXT{"Get a fresh version <a href='%SCRIPTURLPATH{view}%/%BASEWEB%/%BASETOPIC%?refresh=cache'>here</a>."}%
+          %MAKETEXT{"Get a fresh version <a href='[_1]'>here</a>." args="%SCRIPTURLPATH{view}%/%BASEWEB%/%BASETOPIC%?refresh=cache"}%
         </div>"
   else="<!-- -->"
 }%
@@ -121,6 +117,7 @@
   </div>
   <a name="PageBottom"></a>
 </div>
+%WEBCOMPONENT{"HtmlBottom"}%<!-- -->
 <!-- -->%TMPL:END%
 
 %TMPL:DEF{"body"}%<body class="%TMPL:P{"defaultbodyclass"}% %IF{"defined 'NATSKIN_FLUIDFONT'" then="jqFluidFont {%NATSKIN_FLUIDFONT%} "}%%IF{"context authenticated" then="natBodyAuthenticated " else="natBodyNotAuthenticated "}%%IF{"context 'natskin_sidebar_left'" then="natBodyLeft "}%%IF{"context 'natskin_sidebar_right'" then="natBodyRight "}%%IF{"context 'natskin_sidebar_both'" then="natBodyBoth "}%%IF{"context 'natskin_sidebar_off'" then="natBodyOff "}%%IF{"context 'natskin_layout_fluid'" then="natBodyFluid "}%%IF{"context 'natskin_layout_fixed'" then="natBodyFixed "}%%IF{"context 'natskin_layout_bordered'" then="natBodyBordered "}%%TMPL:P{"bodyclass"}%">%TMPL:P{"defaultbody"}%</body>%TMPL:END%

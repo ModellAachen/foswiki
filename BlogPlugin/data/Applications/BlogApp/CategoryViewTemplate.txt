@@ -1,0 +1,96 @@
+%META:TOPICINFO{author="ProjectContributor" comment="reprev" date="1319612791" format="1.1" reprev="14" version="14"}%
+%META:TOPICPARENT{name="TopicView"}%
+%{<verbatim class="tml">}%
+%TMPL:INCLUDE{"Applications.ClassificationApp.CategoryView"}%
+%{</verbatim>}%
+
+%{<verbatim class="tml">}%
+%TMPL:DEF{"revinfo"}%%TMPL:END%
+%{</verbatim>}%
+
+%{<verbatim class="tml">}%
+%TMPL:DEF{"content"}%<!-- -->
+%DBCALL{
+  "Applications.BlogApp.RenderBlogEntries"
+   CAT="%URLPARAM{"catname" default="%BASETOPIC%"}%"
+   LIMIT="1"
+   STICKY="%IF{"$'URLPARAM{skip}'" then="disabled" else="category"}%"
+   NOSTICKY=""
+}%<!-- -->
+%DBCALL{
+  "Applications.BlogApp.RenderBlogEntries"
+  CAT="%URLPARAM{"catname" default="%BASETOPIC%"}%"
+  LIMIT="%URLPARAM{"limit" default="5"}%"
+  SKIP="%URLPARAM{"skip" default="0"}%"
+  NOSTICKY="category"
+  STICKY=""
+}%<!-- -->
+%ADDTOZONE{"head" 
+  id="BLOGPLUGIN::CSS" 
+  text="<link rel='stylesheet' href='%PUBURLPATH%/%SYSTEMWEB%/BlogPlugin/blogplugin.css'  media='all' />" 
+}%<!-- -->
+%TMPL:P{context="InfiniteScrollEnabled" then="infinitescroll"}%<!-- -->
+<!-- %JQREQUIRE{"hyphenator" warn="off"}% -->
+<!-- -->%TMPL:END%
+%{</verbatim>}%
+
+%{<verbatim class="tml">}%
+%TMPL:DEF{"sidebar"}%%DBCALL{"Applications.BlogApp.RenderSideBar" SIDEBAR="Category"}%%TMPL:END%
+%{</verbatim>}%
+
+%{<verbatim class="tml">}%
+%TMPL:DEF{"subcategories"}%<!-- -->
+%MAKEINDEX{ 
+  "%HIERARCHY{ 
+     web="%BASEWEB%" 
+     top="%IF{"defined CAT" then="%CAT%" else="%URLPARAM{"catname" default="%BASETOPIC%"}%"}%" 
+     exclude="%IF{"defined CAT" then="%CAT%" else="%URLPARAM{"catname" default="%BASETOPIC%"}%"}%" 
+     depth="2" 
+     hidenull="on"
+     format="$trunctitle;$topic;$origweb$n" 
+   }%" 
+  cols="%IF{"defined CLASSIFICATIONPLUGIN_NRCOLS" then="%CLASSIFICATIONPLUGIN_NRCOLS%" else="3"}%" 
+  split="\n" 
+  group=""
+  pattern="(.*);(.*);(.*)" 
+  sort="nocase" 
+  header="<noautolink><div class='blogSubCategories'>"
+  format="$percntDBCALL{\"$3.$2->RenderIndexItem\" TITLE=\"$1\"}$percnt" 
+  footer="</div></noautolink>"
+}%<!-- -->%TMPL:END%%{</verbatim>}%
+
+%{<verbatim class="tml">}%
+%TMPL:DEF{"infinitescroll"}%<!-- -->
+%ADDTOZONE{"script"
+  id="BLOGPLUGIN::INFINITESCROLL::JS"
+  text="<literal><script>
+jQuery(function($) {
+  $('.blogEntries:not(.blogEntriesSticky)').infinitescroll({
+    navSelector: '.blogBottomPagination',
+    nextSelector: '.blogBottomPagination .blogNext a:visible',
+    itemSelector: '.blogEntry',
+    pathParse: function(path, page) {
+      //console.log('called pathParse');
+      var next = path.match(/^(.*skip=)\d+(.*)$/).slice(1).join(page*5);
+      //console.log('path='+path+' page='+page+' next='+next);
+      return next;
+    },
+    loadingImg: '%PUBURLPATH%/%SYSTEMWEB%/InfiniteScrollContrib/loading.gif',
+    donetext: '',
+    loadingText:'',
+    loadingMsgRevealSpeed: 0,
+    bufferPx: 100,
+    zeroBased: true
+  });
+});
+</script></literal>"
+  requires="JQUERYPLUGIN::INFINITESCROLL"
+}%%JQREQUIRE{"infinitescroll"}%<!-- -->
+<!-- -->%TMPL:END%
+%{</verbatim>}%
+
+%META:FORM{name="Applications.ApplicationTopic"}%
+%META:FIELD{name="TopicType" title="TopicType" value="TopicView"}%
+%META:FIELD{name="TopicTitle" attributes="" title="<nop>TopicTitle" value=""}%
+%META:FIELD{name="Summary" attributes="c" title="Summary" value="special category view for blogs"}%
+%META:FIELD{name="WikiApplication" attributes="" title="WikiApplication" value="BlogApp"}%

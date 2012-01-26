@@ -5,7 +5,7 @@
 <form name="searchform" action="%SCRIPTURLPATH{"kinosearch"}%/%BASEWEB%/%BASETOPIC%">
 <input type="text" class="foswikiInputField" name="search" size="30" value="%URLPARAM{"search" encode="entity"}%" accesskey="f" /> 
 <input type="submit" value="%MAKETEXT{"Search"}%" class="natOkButton" title="submit the query" />
-<input type="button" value="%MAKETEXT{"Cancel"}%" class="natCancelButton" onclick="window.location.href='%SCRIPTURLPATH{"view"}%/%BASEWEB%/%BASETOPIC%';" accesskey="c" title='%MAKETEXT{"go back to <nop>[_1]" args="%WEB%.%TOPIC%"}%'>
+<input type="button" value="%MAKETEXT{"Cancel"}%" class="natCancelButton" onclick="window.location.href='%SCRIPTURLPATH{"view"}%/%BASEWEB%/%BASETOPIC%';" accesskey="c" title='%MAKETEXT{"go back to [_1]" args="<nop>%WEB%.%TOPIC%"}%'>
 &nbsp;%TMPL:P{"seealso"}%
 <table class="natSearchFormOptions" cellspacing="0" cellpadding="0"><tr>
 <td>

@@ -1,21 +1,21 @@
-From: %WIKIWEBMASTER%
+%TMPL:DEF{smtpHeaders}%From: %WIKIWEBMASTER%
 To: %EMAILTO%
 Subject: %WIKITOOLNAME%.%WEB%.%TOPICNAME% - Immediate notification of topic change
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="------------2D594AE113AD25493C2C7246"
-
-This is a multi-part message in MIME format.
---------------2D594AE113AD25493C2C7246
 Content-Type: text/plain; charset=%CHARSET%
 Content-Transfer-Encoding: 8bit
 
+%TMPL:END%
+%TMPL:DEF{smtpMessage}%
 This is an automatically generated email.
 
-%USER% has created or changed the topic
-%SCRIPTURL{"view"}%/%WEB%/%TOPICNAME% - Revision %REV%
+%WIKINAME% has %IF{"context NewTopic" then="created" else="changed"}% the topic
+%SCRIPTURL{"view"}%/%WEB%/%TOPIC% - Revision %REVINFO{format="r1.$rev"}%
 
 --
 This is an automated email from %SYSTEMWEB%.ImmediateNotifyPlugin.
 To unsubscribe, remove yourself from either or both:
    * The IMMEDIATENOTIFY list in the modified topic
    * The %SCRIPTURL{"view"}%/%WEB%/WebImmediateNotify topic
+%TMPL:END%
+%TMPL:P{smtpHeaders}%%TMPL:P{smtpMessage}%

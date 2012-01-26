@@ -2,27 +2,40 @@
 TYPE
 */
 
-body {
-	font-size: 0px + @basefont;
-	.fw_em_line_height(@fw_size_p);
+/*
+Defaults for font family
+Can be changed in webfonts.css
+*/
+body,
+select,
+input,
+label,
+textarea,
+blockquote {
+	font-family: @fw_font_family_main;
+	font-weight: normal;
 }
 
-article {
-	margin-bottom: 0px + @fw_strand1_ratio_up_3;
+body {
+	font-size: 0px + @fw_basefont;
+	.fw_em_line_height(@fw_size_p);
 }
 
 img {
 	border: 0;
 	vertical-align: middle;
 }
-.foswikiImage img {
-	padding: 3px;
-	border-width: 1px;
-	border-style: solid;
+.foswikiImage {
+	overflow: auto;
+		
+	img {
+		padding: 3px;
+		border-width: 1px;
+		border-style: solid;		
+	}
 }
 
 h1, h2, h3, h4, h5, h6 {
-	font-weight: normal;
 	line-height: 1;
 	text-rendering: optimizeLegibility; 
 	-webkit-margin-before:0;
@@ -60,7 +73,6 @@ h6 {
 .foswikiManagePage h1 {
 	.fw_heading_3();
 }
-.foswikiTitle,
 .foswikiLarge,
 .foswikiManagePage h2 {
 	.fw_heading_4();
@@ -70,31 +82,54 @@ h6 {
 }
 .foswikiViewPage h5,
 .foswikiViewPage h6 {
-	font-variant: small-caps;
+	text-transform: none;
+	font-variant: none;
 }
 .foswikiManagePage h4 {
+	.fw_heading_6();
+}
+.foswikiFormSteps h2 {
+	.fw_heading_3();
+}
+.foswikiFormSteps h3,
+.foswikiInputForm legend {
+	.fw_heading_4();
+}
+.foswikiFormSteps h4 {
+	.fw_heading_5();
+}
+.foswikiFormSteps h5 {
 	.fw_heading_6();
 }
 p,
 pre,
 blockquote,
 iframe,
+input[type='text'],
+input[type='password'],
+input[type='file'],
 label,
 address,
 td,
 th,
 ul,
+li,
 ol,
 dl,
+dt,
 hr,
+.foswikiInputField,
 .foswikiTable,
 .foswikiBroadcastMessage,
 .foswikiImage,
+.foswikiHelp,
+.foswikiHint,
 .foswikiMessage,
 .foswikiNotification,
 .foswikiAttachments,
-.foswikiForm {
-	.fw_inline_p();
+.foswikiForm,
+.foswikiFormDescription {
+	.fw_type_p();
 }
 
 /* vertical margin for block level elements */
@@ -110,24 +145,22 @@ hr,
 .foswikiTable,
 .foswikiBroadcastMessage,
 .foswikiImage,
-.foswikiMessage,
+.foswikiHelp,
 .foswikiNotification,
-.foswikiAttachments,
 .foswikiForm,
-.foswikiFormSteps {
+.foswikiFormDescription {
 	.fw_block_p();
 }
 
 dt,
+dd,
 li {
 	.fw_em_font_size(@fw_size_p);
 }
 abbr, code, kbd, samp, small, var {}
 
 /* smaller text */
-.foswikiSmallish,
-.help-inline,
-.help-block {
+.foswikiSmallish {
 	.fw_em_line_height(@fw_size_smallish);
 	.fw_em_font_size(@fw_size_smallish);
 }
@@ -137,32 +170,39 @@ small,
 	.fw_em_font_size(@fw_size_small);
 }
 
-/* consistent block size */
-
-blockquote,
-pre,
-.foswikiHelp,
-.foswikiBroadcastMessage,
-.foswikiNotification {
-	.fw_block_padding_all();
-	li {
-		list-style-type: circle;
-	}
+input[type='text'],
+input[type='password'],
+input[type='file'],
+label {
+	margin-bottom: @fw_tool_padding_em;
 }
-.foswikiFormStep {
-	.fw_block_padding_all();
-		
-	p {
+
+input[type='text'],
+input[type='password'],
+input[type='file'],
+textarea,
+select,
+label,
+.uneditable-input {
+	margin-bottom: @fw_tool_padding_em;
+	padding: 4px;
+}
+.foswikiToolbar {
+	input[type='text'],
+	input[type='password'],
+	input[type='file'],
+	textarea,
+	select,
+	label,
+	.uneditable-input {
 		margin-bottom: 0;
 	}
 }
 
-/* if we don't use a background or border for blockquotes, we don't need the top and bottom padding */
-blockquote {
-	padding-top: 0;
-	padding-bottom: 0;
-	font-family: @fw_font_family_main;
-	font-style: italic;
+label {
+	padding-left: 0;
+	padding-right: 0;
+	line-heigth: 1
 }
 
 /* code texts */
@@ -197,61 +237,6 @@ ul ul, ul ol, ol ol, ol ul {
 	margin-bottom: 0;
 }
 
-
-
-/* prevent double padding with bullet list in block */
-blockquote,
-pre,
-.foswikiHelp,
-.foswikiBroadcastMessage,
-.foswikiNotification {
-	ol:first-child,
-	ul:first-child {
-		margin-top: 0;
-		margin-bottom: 0;
-	}
-}
-blockquote,
-pre,
-.foswikiHelp,
-.foswikiBroadcastMessage,
-.foswikiNotification,
-.foswikiFormStep {
-	h1:first-child,
-	h2:first-child,
-	h3:first-child,
-	h4:first-child,
-	h5:first-child,
-	h6:first-child {
-		margin-top: 0;
-	}
-}
-.foswikiTopicText {
-	:first-child {
-		margin-top: 0;
-	}
-}
-
-.foswikiLeft {
-	float: left;
-	position: relative;
-}
-.foswikiRight {
-	position: relative;
-	float: right;
-}
-.foswikiClear {
-	/* to clean up floats */
-	margin:0;
-	padding:0;
-	height:0;
-	line-height:0px;
-	clear:both;
-	display:block;
-}
-.foswikiHidden {
-	display: none;
-}
 .foswikiAccessKey {
 	text-decoration: none;
 	border-width: 0 0 1px 0;
@@ -264,4 +249,41 @@ a:hover .foswikiAccessKey {
 .foswikiTopicActions .foswikiAccessKey {
 	text-decoration:none;
 	border:none;
+}
+.foswikiMessage {
+	padding: 3px 3px;
+	.border-radius(0);
+}
+
+.foswikiBreadcrumb {
+	.foswikiTopicInfo {
+		.fw_em_line_height(@fw_size_smallish);
+		.fw_em_font_size(@fw_size_smallish);
+	}
+}
+
+/* Form input elements */
+
+input[type='text'],
+input[type='password'],
+input[type='file'] {
+	@tmp_baseline: 13px;
+	height: @tmp_baseline * 1.5; // In IE7, the height of the select element cannot be changed by height, only font-size
+	line-height: @tmp_baseline * 1.5;
+	.border-radius(@fw_corner_radius_button);
+}
+input[type='image'] {
+	width: auto;
+	border: none;
+	.border-radius(0);
+	padding: 0;
+	@select_baseline: 18px;
+	line-height: @select_baseline * 1.5;
+	vertical-align:text-bottom;
+}
+input[type='checkbox'].foswikiCheckbox,
+input[type='radio'].foswikiRadioButton {
+	margin: 0 .5em 0 .1em;
+	padding: 0 0 0 .5em;
+	border: 0;
 }

@@ -1,6 +1,8 @@
-%META:TOPICINFO{author="ProjectContributor" date="1252052464" format="1.1" version="1.7"}%
+%META:TOPICINFO{author="ProjectContributor" date="1324300084" format="1.1" version="8"}%
 %META:TOPICPARENT{name="ApplicationTopic"}%
 See also: RenderWebTagCloud
+
+%RED%Deprecated: Please use Foswiki:Extensions/SolrPlugin for a decent tag cloud based search interface.%ENDCOLOR%
 
 %DBCALL{"Applications.RenderTopicInstaller"}%
 
@@ -48,6 +50,6 @@ See also: RenderWebTagCloud
 
 %META:FORM{name="Applications.ApplicationTopic"}%
 %META:FIELD{name="TopicType" title="TopicType" value="ApplicationTopic, WebTool"}%
-%META:FIELD{name="TopicTitle" attributes="" title="<nop>TopicTitle" value="WebTagCloud"}%
-%META:FIELD{name="Summary" attributes="" title="Summary" value="Faceted navigation, main facet tags"}%
+%META:FIELD{name="TopicTitle" attributes="" title="<nop>TopicTitle" value=""}%
+%META:FIELD{name="Summary" attributes="c" title="Summary" value="Faceted navigation, main facet tags"}%
 %META:FIELD{name="WikiApplication" attributes="" title="WikiApplication" value="ClassificationApp"}%

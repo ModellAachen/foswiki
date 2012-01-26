@@ -13,7 +13,7 @@
   color:#444;
   font-family: Arial, 'Liberation Sans', FreeSans, sans-serif;
   font-size:13px;
-  line-height:18px;
+  line-height:1.39;
 }
 .natLoginBody {
   background:#fff;
@@ -77,9 +77,10 @@ h1,
 }
 .blogEntriesSticky {
   background-color:#f5f5f5;
-  border-top:1px solid #ddd;
-  border-bottom:1px solid #ddd;
-  margin-bottom:2.7692em;
+  border:1px solid #e7e7e7;
+          border-radius: 5px;
+     -moz-border-radius: 5px; 
+  -webkit-border-radius: 5px; 
 }
 ul, ol {
   margin:1.3846em 0em 1.3846em 3.0769em; 
@@ -92,6 +93,10 @@ ul ul {
   margin-top:0em;
   margin-bottom:0em;
 }
+.foswikiIndent {
+  margin-left:3.0769em;
+  padding:0;
+}
 /*
 li {
   margin:0em 0em 0em 2.623em;
@@ -102,9 +107,18 @@ li li {
 }
 */
 
-dl dd {
+dd {
   margin:0em 0em 1.3846em 3.0769em;
+  /*margin-left:16em;*/
 }
+/*
+dt {
+  border-bottom:1px solid #ddd;
+  float:left;
+  width:15em;
+  margin-right:1em;
+}
+*/
 
 /* layout */
 .natTopBar {
@@ -145,9 +159,6 @@ dl dd {
 .natBodyBordered .natBodyContents {
   margin:1em 2em;
 }
-.natEditBody.natBodyBordered .natBodyContents {
-  margin:0px;
-}
 
 .natBodyBordered.natBodyLeft .natSideBarHeader,
 .natBodyBordered.natBodyRight .natWebMenu {
@@ -167,12 +178,6 @@ dl dd {
 .natBodyBordered .natMiddle,
 .natBodyBordered .natSideBar {
   border-bottom:1px #aaaaaa solid;
-}
-.natBodyBordered .natEditBody .natTopBar,
-.natBodyBordered .natEditBody .natWebMenu,
-.natBodyBordered .natEditBody .natMiddle,
-.natBodyBordered .natEditBody .natBottomBar {
-  border:0px
 }
 
 /* fixed layout*/
@@ -196,12 +201,6 @@ dl dd {
 .natBodyFixed .natMain,
 .natBodyFixed .natSideBar {
   border-bottom:1px #aaaaaa solid;
-}
-.natBodyFixed.natEditBody .natMiddle {
-  border-top:1px #aaaaaa solid;
-}
-.natBodyFixed.natEditBody .natBodyContents {
-  padding-top:0;
 }
 
 /* web menu */
@@ -344,7 +343,7 @@ dl dd {
   background-color:#fff;
 }
 
-#simplemodal-container h2.foswikiDialogTitle {
+#simplemodal-container h2 {
   background:#eee;
   color:#9C3063;
   margin:-1.0625em -1.125em 1.125em -1.125em; /* 17px 18px */
@@ -413,7 +412,7 @@ dl dd {
 .natBody .atpChanges, 
 .mceContentBody table,
 .foswikiTable {
-  border:1px #dedede solid;
+  border:1px #ddd solid;
   font-size:0.923em;
   line-height:1.5em;
 }
@@ -436,7 +435,7 @@ dl dd {
 .foswikiTable tr.foswikiTableEven td,
 .mceContentBody table tr.foswikiTableOdd td,
 .mceContentBody table tr.foswikiTableEven td {
-  background:#f9f9f9;
+  background:#fcfcfc;
 }
 .natBody .atpDef th, 
 .natBody .atpSearch th, 
@@ -449,7 +448,7 @@ dl dd {
 .foswikiTable th,
 .foswikiTable td {
   padding:0.6666em 0.75em 0.75em 0.666em;
-  border:1px #dedede solid;
+  border:1px #ddd solid;
 }
 
 .natBody .atpDef th, 
@@ -457,41 +456,44 @@ dl dd {
 .natBody .atpChanges th, 
 .mceContentBody th,
 .foswikiTable th,
-.foswikiTable th font,
 .foswikiTable th h2,
 .foswikiTable th h3,
 .foswikiTable th h4 {
   color:#444;
   font-weight:bold;
   text-decoration:none;
-  background:#9CBAEF;
-  color:#fff;
+  background-color: #f0f0f0;
+  background:-webkit-gradient(linear, left top, left bottom, from(#fff), to(#f0f0f0));
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#fff), to(#f0f0f0));
+  background-image: -webkit-linear-gradient(top, #fff, #f0f0f0);
+  background-image:    -moz-linear-gradient(top, #fff, #f0f0f0);
+  background-image:     -ms-linear-gradient(top, #fff, #f0f0f0);
+  background-image:      -o-linear-gradient(top, #fff, #f0f0f0);
+  background-image:         linear-gradient(top, #fff, #f0f0f0);
+  -webkit-box-shadow: 0 1px 0 rgba(255,255,255,.8) inset; 
+  -moz-box-shadow:0 1px 0 rgba(255,255,255,.8) inset;  
+  box-shadow: 0 1px 0 rgba(255,255,255,.8) inset;        
+  text-shadow: 0 1px 0 rgba(255,255,255,.5); 
 }
 .natBody .atpDef th a, 
 .natBody .atpSearch th a, 
 .natBody .atpChanges th a, 
 .foswikiTable th a,
 .foswikiTable th a:hover,
-.foswikiTable th span,
-.foswikiTable th a font {
+.foswikiTable th span {
   text-decoration:none;
   font-weight:bold;
-  color:inherit;
-  background-color:inherit;
+  color:#444;
 }
-.foswikiTable th a:hover,
-.foswikiTable th a:hover font {
+.foswikiTable th a:hover {
   text-decoration:underline;
+  color:#444;
+  background-color:transparent;
 }
 .foswikiTable th h4 {
   margin:0px;
 }
 
-.foswikiTable th.foswikiSortedCol,
-.foswikiTable th.foswikiSortedDescendingCol,
-.foswikiTable th.foswikiSortedAscendingCol{ 
-  background:#8DA8D8;
-}
 .foswikiTable tr.foswikiTableEven td.foswikiSortedCol,
 .foswikiTable tr.foswikiTableOdd td.foswikiSortedCol,
 .foswikiTable td.foswikiSortedCol,
@@ -549,11 +551,6 @@ dl dd {
 
 .foswikiDiffDeletedText {
  background:#FFD7D7;
-}
-
-/* history */
-.natHistoryTable .selected {
-  background-color:#DDD;
 }
 
 /* forms */
@@ -814,12 +811,6 @@ td .foswikiFormDescription {
   float:left;
   margin:0px;
 }
-.natBodyFluid .natWebTitle a {
-  margin-top:-5px;
-}
-.natBodyFluid.natBodyLeft .natWebTitle {
-  padding-left:1em;
-}
 .natWebTitle a,
 .natWebTitle a:hover {
   text-decoration:none;
@@ -834,11 +825,8 @@ td .foswikiFormDescription {
   margin:0px;
 }
 .natEditTitle {
-  margin-top:1em; 
   font-size: 1.3846em; /* 18px */ 
   line-height: 1em; /* 18px */ 
-  margin-bottom:1em; 
-  border-bottom:0px;
 }
 .natWebSlogan {
   font-style:italic;
@@ -856,37 +844,14 @@ td .foswikiFormDescription {
   text-decoration:none;
 }
 
-.natBodyFluid .natWebTitle {
-  background-position:-24px 0px;
-}
-
-.natBodyFluid .natGreeter {
-  position:absolute;
-  top:103px;
-  right:0px;
-  text-align:left;
-  width:15.7692em; /* 205px */
-  padding-left:0px;
-  padding-right:0px;
-}
-.natBodyFluid .natGreeter a {
-  color:#00458F;
-  font-weight:bold;
-}
-.natBodyFluid .natGreeter a:hover {
-  color:#fff;
-}
-
 .natUserAction {
   font-size:0.923em; /* 12px */
-  padding:3px;
-  margin:0px -2px;
+}
+.natGreeter .natUserAction {
+  padding:3px 5px;
 }
 .natUserAction img {
   width:1.3333em; /* 16px */
-}
-.natUserAction span {
-  padding-left:0.1619em; /* 2px */
 }
 .natDisabledUserAction span,
 .natDisabledTopicAction span {
@@ -1213,31 +1178,6 @@ h2 .foswikiTopicSummary {
 }
 
 /* TOC */
-.foswikiToc {
-  margin:1.3846em 0em;
-  padding:0em;
-}
-.foswikiTocTitle {
-  font-size: 1.2308em; /* 16px */ 
-  line-height: 1.125em; /* 18px */ 
-  margin-top: 1.125em; 
-  margin-bottom: 0em;
-  display:block;
-  color:#222;
-}
-.foswikiToc ul {
-  list-style:none;
-  margin:0.6923em 0em 1.3846em;
-  padding:0.6153em 0em;
-  border-top:1px solid #ddd;
-  border-left:4px solid #ddd;
-}
-.foswikiToc ul ul {
-  padding:0em 0em 0em .5em;
-  margin-top:0px;
-  margin-bottom:0px;
-  border:0px;
-}
 .foswikiToc li {
   margin-left:1em;
   padding-left:1em;

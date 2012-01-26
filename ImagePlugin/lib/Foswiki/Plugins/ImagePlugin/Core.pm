@@ -1,7 +1,7 @@
 # Plugin for Foswiki - The Free and Open Source Wiki, http://foswiki.org/
 #
 # Copyright (C) 2006 Craig Meyer, meyercr@gmail.com
-# Copyright (C) 2006-2011 Michael Daum http://michaeldaumconsulting.com
+# Copyright (C) 2006-2012 Michael Daum http://michaeldaumconsulting.com
 #
 # Early version Based on ImgPlugin
 # Copyright (C) 2006 Meredith Lesly, msnomer@spamcop.net
@@ -31,11 +31,10 @@ use Digest::MD5 ();
 use URI ();
 
 BEGIN {
-  # coppied over from TW*k*.pm to cure Item3087
   # Image::Magick seems to override locale usage
   my $useLocale = $Foswiki::cfg{UseLocale};
-  my $siteLocale = $Foswiki::cfg{Site}{Locale};
   if ( $useLocale ) {
+    my $siteLocale = $Foswiki::cfg{Site}{Locale};
     $ENV{LC_CTYPE} = $siteLocale;
     require POSIX;
     import POSIX qw( locale_h LC_CTYPE );
@@ -133,7 +132,7 @@ sub handleREST {
 sub handleIMAGE {
   my ($this, $params, $theTopic, $theWeb) = @_;
 
-  #writeDebug("called handleIMAGE(params, $theTopic, $theWeb)");
+  writeDebug("called handleIMAGE(params, $theTopic, $theWeb)");
 
   if($params->{_DEFAULT} && $params->{_DEFAULT} =~ m/^(?:clr|clear)$/io ) { 
     return $this->getTemplate('clear');
@@ -208,6 +207,15 @@ sub handleIMAGE {
   my $doRefresh = $query->param('refresh') || 0;
   $doRefresh = ($doRefresh =~ /^(on|1|yes|img)$/g)?1:0;
 
+  # strip off prefix pointing to self
+  
+  # http://foswiki...
+  $origFile =~ s/^$Foswiki::cfg{DefaultUrlHost}$Foswiki::cfg{PubUrlPath}//;    
+  
+  # the %PUBURLPATH% part, but could also be a custom http://foswiki-static...
+  $origFile =~ s/^$Foswiki::cfg{PubUrlPath}//;
+  $origFile =~ s/^\///;
+
   # search image
   if ($origFile =~ /^https?:\/\/.*/) {
     my $url = $origFile;
@@ -236,11 +244,12 @@ sub handleIMAGE {
     unless($this->mirrorImage($imgWeb, $imgTopic, $url, $imgPath, $doRefresh)) {
       return $this->inlineError($params);
     }
-  } elsif ($origFile =~ /(?:\/?pub\/)?(.*)\/(.*?)$/) {
-    # part of the filename
-    $origFile = $2;
-    ($imgWeb, $imgTopic) = Foswiki::Func::normalizeWebTopicName($imgWeb, $1);
-    $imgPath = $pubDir.'/'.$imgWeb.'/'.$imgTopic.'/'.$origFile;
+  } elsif ($origFile =~ /(?:pub\/)?(.+?)\/([^\/]+)\/([^\/]+?)$/) {
+    $imgWeb = $1;
+    $imgTopic = $2;
+    $origFile = $3;
+    ($imgWeb, $imgTopic) = Foswiki::Func::normalizeWebTopicName($imgWeb, $imgTopic);
+     $imgPath = $pubDir.'/'.$imgWeb.'/'.$imgTopic.'/'.$origFile;
 
     #writeDebug("looking for an image file at $imgPath");
 
@@ -324,9 +333,6 @@ sub handleIMAGE {
     return $this->inlineError($params);
   }
 
-  # For compatibility with i18n-characters in file names, encode urls (as Foswiki.pm/viewfile does for attachment names in general)
-  my $thumbFileUrl = $pubUrl.'/'.$imgWeb.'/'.$imgTopic.'/'.$imgInfo->{file};
-  $thumbFileUrl = urlEncode($thumbFileUrl);
 
   # format result
   my $result = $params->{format} || '';
@@ -373,10 +379,6 @@ sub handleIMAGE {
   } else {
     $result =~ s/\$mouseout//go;
   }
-  my $title = plainify($params->{title});
-  my $desc = plainify($params->{desc});
-  my $alt = plainify($params->{alt});
-  my $href = $params->{href};
 
   my $context = Foswiki::Func::getContext();
   if ($context->{JQueryPluginEnabled} && $params->{tooltip} eq 'on') {
@@ -393,25 +395,28 @@ sub handleIMAGE {
       "}";
   }
 
-  #my $thumbFileUrl = $pubUrl.'/'.$imgWeb.'/'.$imgTopic.'/'.$imgInfo->{file};
+  # For compatibility with i18n-characters in file names, encode urls (as Foswiki.pm/viewfile does for attachment names in general)
+  my $thumbFileUrl = $pubUrl.'/'.$imgWeb.'/'.$imgTopic.'/'.$imgInfo->{file};
+  $thumbFileUrl = urlEncode($thumbFileUrl);
 
-  $result =~ s/\$href/$href/g;
+  $result =~ s/\$href/$params->{href}/g;
   $result =~ s/\$src/$thumbFileUrl/g;
-  $result =~ s/\$height/$imgInfo->{height}/g;
-  $result =~ s/\$width/$imgInfo->{width}/g;
+  $result =~ s/\$thumbfile/$imgInfo->{file}/g;
+  $result =~ s/\$width/(pingImage($this, $imgInfo))[0]/ge;
+  $result =~ s/\$height/(pingImage($this, $imgInfo))[1]/ge;
+  $result =~ s/\$framewidth/(pingImage($this, $imgInfo))[0]+2/ge;
   $result =~ s/\$origsrc/$origFileUrl/g;
-  $result =~ s/\$origheight/$imgInfo->{origHeight}/g;
-  $result =~ s/\$origwidth/$imgInfo->{origWidth}/g;
-  $result =~ s/\$framewidth/($imgInfo->{width}+2)/ge;
+  $result =~ s/\$origwidth/(pingOrigImage($this, $imgInfo))[0]/ge;
+  $result =~ s/\$origheight/(pingOrigImage($this, $imgInfo))[1]/ge;
   $result =~ s/\$text/$origFile/g;
   $result =~ s/\$class/$params->{class}/g;
   $result =~ s/\$data/$params->{data}/g;
   $result =~ s/\$id/$params->{id}/g;
   $result =~ s/\$style/$params->{style}/g;
   $result =~ s/\$align/$params->{align}/g;
-  $result =~ s/\$alt/<noautolink>$alt<\/noautolink>/g;
-  $result =~ s/\$title/<noautolink>$title<\/noautolink>/g;
-  $result =~ s/\$desc/<noautolink>$desc<\/noautolink>/g;
+  $result =~ s/\$alt/'<noautolink>'.plainify($params->{alt}).'<\/noautolink>'/ge;
+  $result =~ s/\$title/'<noautolink>'.plainify($params->{title}).'<\/noautolink>'/ge;
+  $result =~ s/\$desc/'<noautolink>'.plainify($params->{desc}).'<\/noautolink>'/ge;
 
   $result =~ s/\$perce?nt/\%/go;
   $result =~ s/\$nop//go;
@@ -443,15 +448,35 @@ sub plainify {
 }
 
 ###############################################################################
-# get info about the image and its thumbnail cousin, resize source image if
-# a $size was specified, returns a pointer to a hash with the following entries:
-#    * file: the name of the source file or its thumbnail 
-#    * width: width of the imgInfo{file}
-#    * heith: heith of the imgInfo{file}
-#    * origFile: the name of the source image
-#    * origWidth: width of the source image
-#    * origHeight: height of the source image
-# returns undef on error
+sub pingImage {
+  my ($this, $imgInfo) = @_;
+
+  unless (defined $imgInfo->{width}) {
+    writeDebug("pinging $imgInfo->{imgPath}\n");
+    ($imgInfo->{width}, $imgInfo->{height}, $imgInfo->{filesize}, $imgInfo->{format}) = $this->{mage}->Ping($imgInfo->{imgPath});
+    $imgInfo->{width} ||= 0;
+    $imgInfo->{height} ||= 0;
+  }
+
+  return ($imgInfo->{width}, $imgInfo->{height}, $imgInfo->{filesize}, $imgInfo->{format})
+}
+
+
+###############################################################################
+sub pingOrigImage {
+  my ($this, $imgInfo) = @_;
+
+  unless (defined $imgInfo->{origWidth}) {
+    writeDebug("pinging $imgInfo->{origImgPath}\n");
+    ($imgInfo->{origWidth}, $imgInfo->{origHeight}, $imgInfo->{origFilesize}, $imgInfo->{origFormat}) = $this->{mage}->Ping($imgInfo->{origImgPath});
+    $imgInfo->{origWidth} ||= 0;
+    $imgInfo->{origHeight} ||= 0;
+  }
+
+  return ($imgInfo->{origWidth}, $imgInfo->{origHeight}, $imgInfo->{origFilesize}, $imgInfo->{origFormat})
+}
+
+###############################################################################
 sub processImage {
   my ($this, $imgWeb, $imgTopic, $imgFile, $params, $doRefresh) = @_;
 
@@ -465,17 +490,14 @@ sub processImage {
 
   $this->{errorMsg} = '';
 
-  my %imgInfo;
-  $imgInfo{file} = $imgFile;
-  $imgInfo{origFile} = $imgFile;
-
-  my $imgPath = $Foswiki::cfg{PubDir}.'/'.$imgWeb.'/'.$imgTopic;
-  my $origImgPath = $imgPath.'/'.$imgFile;
-
-  writeDebug("pinging $imgPath/$imgFile");
-  ($imgInfo{origWidth}, $imgInfo{origHeight}, $imgInfo{origFilesize}, $imgInfo{origFormat}) = $this->{mage}->Ping($origImgPath);
-  $imgInfo{origWidth} ||= 0;
-  $imgInfo{origHeight} ||= 0;
+  my %imgInfo = (
+    imgWeb => $imgWeb,
+    imgTopic => $imgTopic,
+    origFile => $imgFile,
+    origImgPath => $Foswiki::cfg{PubDir}.'/'.$imgWeb.'/'.$imgTopic.'/'.$imgFile,
+    file => undef,
+    imgPath => undef,
+  );
 
   if ($size || $width || $height || $doRefresh) {
     if (!$size) {
@@ -493,24 +515,23 @@ sub processImage {
     }
     writeDebug("size=$size");
 
-    my $newImgFile = $this->getImageFile($size, $zoom, $crop, $imgFile);
-    my $newImgPath = $imgPath.'/'.$newImgFile;
-    #writeDebug("checking for $newImgFile");
+    $imgInfo{file} = $this->getImageFile($size, $zoom, $crop, $imgFile);
+    $imgInfo{imgPath} = $Foswiki::cfg{PubDir}.'/'.$imgWeb.'/'.$imgTopic.'/'.$imgInfo{file};
+
+    #writeDebug("checking for $imgInfo{imgFile}");
 
     # compare file modification times
-    $doRefresh = 1 if -f $newImgPath && 
-      getModificationTime($origImgPath) > getModificationTime($newImgPath);
+    $doRefresh = 1 if -f $imgInfo{imgPath} && 
+      getModificationTime($imgInfo{origImgPath}) > getModificationTime($imgInfo{imgPath});
 
-    if (-f $newImgPath && !$doRefresh) { # cached
-      ($imgInfo{width}, $imgInfo{height}, $imgInfo{filesize}, $imgInfo{format}) = $this->{mage}->Ping($newImgPath);
-      $imgInfo{width} ||= 0;
-      $imgInfo{height} ||= 0;
-      writeDebug("found $newImgFile at $imgWeb.$imgTopic");
+
+    if (-f $imgInfo{imgPath} && !$doRefresh) { # cached
+      writeDebug("found $imgInfo{file} at $imgWeb.$imgTopic");
     } else { 
-      writeDebug("creating $newImgFile");
+      writeDebug("creating $imgInfo{file}");
       
       # read
-      my $error = $this->{mage}->Read($origImgPath);
+      my $error = $this->{mage}->Read($imgInfo{origImgPath});
       if ($error =~ /(\d+)/) {
 	$this->{errorMsg} = $error;
 	return undef if $1 >= 400;
@@ -531,14 +552,14 @@ sub processImage {
         return undef if $1 >= 400;
       }
 
-      # crop
+      # gravity
       if ($crop =~ /^(on|northwest|north|northeast|west|center|east|southwest|south|southeast)$/i) {
-        my $gravity = $crop;
-        $gravity = "center" if $crop eq 'on';
-        writeDebug("Set(Gravity=>$gravity)");
-        $error = $this->{mage}->Set(Gravity=>$gravity);
+        $crop = "center" if $crop eq 'on';
+        writeDebug("Set(Gravity=>$crop)");
+        $error = $this->{mage}->Set(Gravity=>"$crop");
         if ($error =~ /(\d+)/) {
           $this->{errorMsg} = $error;
+          writeDebug("Error: $error");
           return undef if $1 >= 400;
         }
 
@@ -553,42 +574,51 @@ sub processImage {
           $geometry = $width.'x'.$height.'+0+0';
         }
  
-        writeDebug("crop($geometry)");
-        $error = $this->{mage}->Crop($geometry);
-        if ($error =~ /(\d+)/) {
-          $this->{errorMsg} = $error;
-          return undef if $1 >= 400;
-        }
+        if (0) {
+          # old method ... deprecated:
+          # this branch will be removed asap as soon as we know the newer whay to thumbnail
+          # works out fine
+          writeDebug("crop(geometry=>$geometry)");
+          $error = $this->{mage}->Crop($geometry);
+          if ($error =~ /(\d+)/) {
+            $this->{errorMsg} = $error;
+            writeDebug("Error: $error");
+            return undef if $1 >= 400;
+          }
 
-        $error = $this->{mage}->Set(page=>'0x0+0+0');
-        if ($error =~ /(\d+)/) {
-          $this->{errorMsg} = $error;
-          return undef if $1 >= 400;
+          $error = $this->{mage}->Set(page=>'0x0+0+0');
+          if ($error =~ /(\d+)/) {
+            $this->{errorMsg} = $error;
+            writeDebug("Error: $error");
+            return undef if $1 >= 400;
+          }
+        } else {
+          # new method
+          writeDebug("extent(geometry=>$geometry)");
+          $error = $this->{mage}->Extent($geometry);
+          if ($error =~ /(\d+)/) {
+            $this->{errorMsg} = $error;
+            writeDebug("Error: $error");
+            return undef if $1 >= 400;
+          }
         }
       }
-
 
       # write
-      $error = $this->{mage}->Write($newImgPath);
+      $error = $this->{mage}->Write($imgInfo{imgPath});
       if ($error =~ /(\d+)/) {
 	$this->{errorMsg} .= " $error";
+        writeDebug("Error: $error");
 	return undef if $1 >= 400;
       }
+
       ($imgInfo{width}, $imgInfo{height}, $imgInfo{filesize}, $imgInfo{format}) = $this->{mage}->Get('width', 'height', 'filesize', 'format');
       $imgInfo{width} ||= 0;
       $imgInfo{height} ||= 0;
-
-      #writeDebug("old geometry=$imgInfo{origWidth}x$imgInfo{origHeight}, new geometry=$imgInfo{width}x$imgInfo{height}");
-
-#      $this->updateAttachment($imgWeb, $imgTopic, $newImgFile, {path => $imgFile, filesize=>$imgInfo{filesize}})
-#        if $this->{autoAttachThumbnails};
     }
-    $imgInfo{file} = $newImgFile;
   } else {
-    $imgInfo{width} = $imgInfo{origWidth};
-    $imgInfo{height} = $imgInfo{origHeight};
-    $imgInfo{filesize} = $imgInfo{origFilesize};
-    $imgInfo{format} = $imgInfo{origFormat};
+    $imgInfo{file} = $imgInfo{origFile};
+    $imgInfo{imgPath} = $imgInfo{origImgPath};
   }
 
   # forget images
@@ -661,7 +691,7 @@ sub urlEncode {
 sub mirrorImage {
   my ($this, $web, $topic, $url, $fileName, $force) = @_;
 
-  writeDebug("called mirrorImage($url, $fileName)");
+  writeDebug("called mirrorImage($url, $fileName, $force)");
   return 1 if !$force && -e $fileName;
 
   require File::Temp;
@@ -727,7 +757,13 @@ sub mirrorImage {
 sub getImageFile {
   my ($this, $size, $zoom, $crop, $imgFile) = @_;
 
-  return 'igp_'.Digest::MD5::md5_hex($size, $zoom, $crop).'_'.$imgFile;
+  my $digest = Digest::MD5::md5_hex($size, $zoom, $crop);
+
+  if ($imgFile =~ /^(.*)\/(.+?)$/) {
+    return $1."/igp_".$digest."_".$2;
+  } else {
+    return "igp_".$digest."_".$imgFile;
+  }
 }
 
 ###############################################################################

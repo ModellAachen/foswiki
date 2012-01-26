@@ -1,11 +1,11 @@
 %TMPL:INCLUDE{"messages"}%
 %TMPL:DEF{"remove_user_done"}%<!-- removes contact note -->
----+++ %MAKETEXT{"User Account [_1] Deleted" args="<nop>%PARAM1%"}%
+---+++ %MAKETEXT{"User account [_1] deleted" args="<nop>%PARAM1%"}%
 %MAKETEXT{"Your user name has been removed from the Authentication System."}%
 
 %MAKETEXT{"Your [[[_1]][homepage]] has _not_ been removed yet." args="%USERSWEB%.%PARAM1%"}%
 
-%MAKETEXT{"Please email [_1] to request this."
+%MAKETEXT{"Please e-mail [_1] to request this."
  args="<a href='mailto:%WIKIWEBMASTER%?subject=%ENCODE{"%WIKITOOLNAME% Delete User"}%&amp;body=%ENCODE{"%PARAM1%"}%'>%WIKIWEBMASTER%</a>"
 }%
 <style>.natContact {display:none}</style>
@@ -19,14 +19,14 @@
 %TMPL:P{"goback"}%
 %TMPL:END%
 %TMPL:DEF{"topic_exists"}%<!-- uses goback def -->
----+++ %MAKETEXT{"The [_1] topic already exists" args="\"%TOPIC%\""}%
+---+++ %MAKETEXT{"The [_1] topic already exists" args="%TOPIC%"}%
 %MAKETEXT{"Cannot create [_1] because it already exists." args="%TOPIC%"}%
 
 %TMPL:P{"goback" target="%BASEWEB%.%BASETOPIC%"}%
 %TMPL:END%
 %TMPL:DEF{"rename_topic_exists"}%<!-- uses goback def -->
 ---+++ %MAKETEXT{"Rename failed"}%
-%MAKETEXT{"Cannot rename [_1] to [_2] because it already exists." args="%TOPIC%,<nop>%PARAM1%.<nop>%PARAM2%"}%
+%MAKETEXT{"Cannot rename [_1] to [_2] because it already exists." args="%TOPIC%,%PARAM1%.%PARAM2%"}%
 
 %TMPL:P{"goback" target="%BASEWEB%.%BASETOPIC%"}%
 %TMPL:END%
@@ -37,8 +37,8 @@
 %TMPL:P{"goback" target="%BASEWEB%.%BASETOPIC%"}%
 %TMPL:END%
 %TMPL:DEF{"rename_not_wikiword"}%<!-- uses goback def -->
----+++ %MAKETEXT{"New topic name [_1] is not a [_2]" args="<nop>\"%PARAM1%\",%SYSTEMWEB%.WikiWord"}%
-%MAKETEXT{"Chose a topic name that is a [_1] or check the allow non-Wiki Word box." args="%SYSTEMWEB%.WikiWord"}%
+---+++ %MAKETEXT{"New topic name [_1] is not a [_2]" args="<nop>%PARAM1%,%SYSTEMWEB%.WikiWord"}%
+%MAKETEXT{"Chose a topic name that is a [_1] or check the allow non-<nop>WikiWord box." args="%SYSTEMWEB%.WikiWord"}%
 
 %TMPL:P{"goback" target="%BASEWEB%.%BASETOPIC%"}%
 %TMPL:END%
@@ -67,7 +67,7 @@
 %TMPL:P{"goback"}%
 %TMPL:END%
 %TMPL:DEF{"invalid_web_name"}%<!-- uses goback def -->
----+++ %MAKETEXT{"\"[_1]\" is an invalid name for a new web." args="%PARAM1%"}%
+---+++ %MAKETEXT{"[_1] is an invalid name for a new web." args="%PARAM1%"}%
 %MAKETEXT{"You are recommended to choose short names, preferably less than 10 characters,
 starting with an upper-case alphabetic character and using only alphanumeric
 characters. If you want to create a template web (a web just used as a base
@@ -77,7 +77,7 @@ alphanumeric characters."}%
 %TMPL:P{"goback"}%
 %TMPL:END%
 %TMPL:DEF{"web_exists"}%<!-- uses goback def -->
----+++ %MAKETEXT{"Cannot create web [_1] because it already exists" args="\"%PARAM1%\""}%
+---+++ %MAKETEXT{"Cannot create web [_1] because it already exists" args="%PARAM1%"}%
 
 %TMPL:P{"goback" target="%BASEWEB%.%BASETOPIC%"}%
 %TMPL:END%
@@ -93,7 +93,7 @@ numbers, e.g. =#FFFF00=."}%
 
 %MAKETEXT{"Pick one of the [_1]." args="%SYSTEMWEB%.StandardColors"}%
 
-%MAKETEXT{"You can also use the names of the standard HTML colors"}% (black, silver, gray,
+%MAKETEXT{"You can also use the names of the standard HTML colors."}% (black, silver, gray,
 white, maroon, red, purple, fuchsia, green, lime, olive, yellow, navy, blue, teal, or aqua)
 
 %TMPL:P{"goback" target="%BASEWEB%.%BASETOPIC%"}%
@@ -105,7 +105,7 @@ white, maroon, red, purple, fuchsia, green, lime, olive, yellow, navy, blue, tea
 %TMPL:END%
 %TMPL:DEF{"confirm"}%<!-- confirm -->
 ---+++ %MAKETEXT{"Thank you for registering"}%
-%MAKETEXT{"Your activation code has been sent to [_1].  Either click on the link in your email or enter the code in the box below to activate your membership.  (This code is of the form \"YourName.xxxxxxxxxx\")" args="%PARAM1%"}%
+%MAKETEXT{"Your activation code has been sent to [_1].  Either click on the link in your e-mail or enter the code in the box below to activate your membership.  (This code is of the form \"YourName.xxxxxxxxxx\")" args="%PARAM1%"}%
 
 <form action="%SCRIPTURLPATH{"register"}%" method="post">
 <input type="hidden" name="action" value="verify" size="20" />
@@ -115,7 +115,7 @@ white, maroon, red, purple, fuchsia, green, lime, olive, yellow, navy, blue, tea
 
 %TMPL:END%
 %TMPL:DEF{"missing_fields"}%<!-- better dialog, uses goback def -->
----+++ %MAKETEXT{"Missing Fields =<span class=\"foswikiAlert\">**</span>="}%
+---+++ %MAKETEXT{"Missing fields =<span class='foswikiAlert'>**</span>="}%
 <noautolink>
 %MAKETEXT{"The required field [_1] was not filled in." args="*%PARAM1%*"}%
 </noautolink>
@@ -131,11 +131,11 @@ white, maroon, red, purple, fuchsia, green, lime, olive, yellow, navy, blue, tea
 %TMPL:DEF{"problem_adding"}%<!-- removes contact -->
 ---+++ %MAKETEXT{"Error registering user [_1]" args="<nop>%PARAM1%"}%
 %MAKETEXT{"There has been a problem adding your user id to the Password system."}%
-%MAKETEXT{"Please notify your [_1] webmaster [_2]." args="<nop>%WIKITOOLNAME%,%WIKIWEBMASTER%"}%
+%MAKETEXT{"Please notify your [_1] administrator [_2]." args="<nop>%WIKITOOLNAME%,%WIKIWEBMASTER%"}%
 <style>.natContact {display:none}</style>
 %TMPL:END%
 %TMPL:DEF{"send_mail_error"}%<!-- better dialog, removes contact -->
----+++ %MAKETEXT{"Mail Error"}%
+---+++ %MAKETEXT{"Mail error"}%
 %MAKETEXT{"An e-mail could not be delivered."}% 
 
 *%MAKETEXT{"Mail to"}%*:
@@ -148,8 +148,8 @@ white, maroon, red, purple, fuchsia, green, lime, olive, yellow, navy, blue, tea
 %PARAM2%
 </pre>
 
-%MAKETEXT{"Please notify your [_1] administrator [_2]"
- args="<nop>%WIKITOOLNAME%,<a href=\"mailto:%WIKIWEBMASTER%?subject=%ENCODE{"%WIKITOOLNAME% Send Mail Error"}%\">%WIKIWEBMASTER%</a>"}%
+%MAKETEXT{"Please notify your [_1] administrator [_2]."
+ args="<nop>%WIKITOOLNAME%,<a href='mailto:%WIKIWEBMASTER%?subject=%ENCODE{"%WIKITOOLNAME% Send Mail Error"}%'>%WIKIWEBMASTER%</a>"}%
 <style>.natContact {display:none}</style>
 %TMPL:END%
 %TMPL:DEF{"already_exists"}%<!-- only one contact message -->
@@ -158,11 +158,11 @@ white, maroon, red, purple, fuchsia, green, lime, olive, yellow, navy, blue, tea
 
 %MAKETEXT{"Did you want to ~[~[[_1]~]~[reset [_2]'s password~]~]?" args="%SCRIPTURLPATH{"view"}%/%SYSTEMWEB%/ResetPassword?username=%PARAM1%,%PARAM1%"}%
 
-%MAKETEXT{"Alternatively go <a href=\"javascript:history.back()\">back</a> in your browser and choose a different username."}%
+%MAKETEXT{"Alternatively go back in your browser and choose a different username."}%
 %TMPL:END%
 %TMPL:DEF{"bad_loginname"}%
 ---+++ %MAKETEXT{"Incorrect [_1]" args="%SYSTEMWEB%.LoginName"}%
-%MAKETEXT{"'[_1]' is not a valid [_2] " args="%PARAM1%,%SYSTEMWEB%.LoginName"}%
+%MAKETEXT{"[_1] is not a valid [_2]" args="%PARAM1%,%SYSTEMWEB%.LoginName"}%
 
 %TMPL:P{"goback" target="%BASEWEB%.%BASETOPIC%"}%
 %TMPL:END%
@@ -171,7 +171,7 @@ white, maroon, red, purple, fuchsia, green, lime, olive, yellow, navy, blue, tea
 %MAKETEXT{"The [_1] field must be your first and lastname in [_2], e.g. your capitalized first and lastname with spaces removed."
  args="%SYSTEMWEB%.WikiName,%SYSTEMWEB%.WikiNotation"}%
 
-| *%MAKETEXT{"Good examples:"}%* | *%MAKETEXT{"Incorrect [_1]" args="%SYSTEMWEB%.WikiNames"}%:* |
+| *%MAKETEXT{"Good examples"}%:* | *%MAKETEXT{"Incorrect [_1]" args="%SYSTEMWEB%.WikiNames"}%:* |
 | =JohnSmith= | =John M. Smith= |
 | =RjMiller= | =RJ Miller= |
 | =RickO= | =Rick O= (%MAKETEXT{"single character last name"}%) |
@@ -201,20 +201,20 @@ white, maroon, red, purple, fuchsia, green, lime, olive, yellow, navy, blue, tea
 </form>
 %TMPL:END%
 %TMPL:DEF{"no_email_for"}%<!-- nach %2 umbenennenbetter dialog -->
----+++ %MAKETEXT{"Can't get an email address for [_1]" args="%PARAM1%"}%
-%MAKETEXT{"An email address is required before a password can be reset."}%
+---+++ %MAKETEXT{"Can't get an e-mail address for [_1]" args="%PARAM1%"}%
+%MAKETEXT{"An e-mail address is required before a password can be reset."}%
 %TMPL:END%
 %TMPL:DEF{"mandatory_field"}%<!-- uses goback def, duplicate missing_fields -->
 <div class='natErrorMessage'>
----+++ %MAKETEXT{"Topic Save Error"}%
+---+++ %MAKETEXT{"Topic save error"}%
 %MAKETEXT{"Could not save [_1]." args="<nop>%WEB%.%TOPIC%"}%
 
-%MAKETEXT{"The required field =<span class=\"foswikiAlert\">**</span>= *[_1]* was not filled in." args="%PARAM1%"}%
+%MAKETEXT{"The required field =<span class='foswikiAlert'>**</span>= *[_1]* was not filled in." args="%PARAM1%"}%
 </div>
 %TMPL:P{"goback"}%
 %TMPL:END%
 %TMPL:DEF{"zero_size_upload"}%<!-- uses goback def -->
----+++ %MAKETEXT{"Uploaded file \"<nop>[_1]\" does not exist or is empty." args="%PARAM1%"}%
+---+++ %MAKETEXT{"Uploaded file [_1] does not exist or is empty." args="<nop>%PARAM1%"}%
 
 %TMPL:P{"goback" target="%BASEWEB%.%BASETOPIC%"}%
 %TMPL:END%
@@ -230,7 +230,7 @@ white, maroon, red, purple, fuchsia, green, lime, olive, yellow, navy, blue, tea
 </div>
 %MAKETEXT{"Please notify your [_1] administrator [_2]." args="<nop>%WIKITOOLNAME%,%WIKIWEBMASTER%"}%
 
-%MAKETEXT{"Go <a href=\"javascript:history.back()\">back</a> in your browser and save your changes locally."}%
+%MAKETEXT{"Go back in your browser and save your changes locally."}%
 <style>.natContact {display:none}</style>
 %TMPL:END%
 %TMPL:DEF{"delete_err"}%<!-- better dialog, removes contact -->
@@ -250,8 +250,8 @@ white, maroon, red, purple, fuchsia, green, lime, olive, yellow, navy, blue, tea
 %MAKETEXT{"The file has been uploaded and attached properly to the [_1] topic." args="<nop>%TOPIC%"}%
 %MAKETEXT{"However, the filename has been changed from [_1] to [_2]. Please make a note of it." args="<b><code>%PARAM1%</code></b>,<b><code>%PARAM2%</code></b>"}%
 
-%MAKETEXT{"Note:"}%
-%MAKETEXT{"In some cases, Foswiki changes the name of the uploaded file to make it safe and accessible across all platforms:"}%
+%MAKETEXT{"Note"}%:
+%MAKETEXT{"In some cases, Foswiki changes the name of the uploaded file to make it safe and accessible across all platforms"}%:
    * %MAKETEXT{"Spaces are replaced by underscores"}%
    * %MAKETEXT{"A =.txt= extension is appended to some filenames for security reasons"}%
    * %MAKETEXT{"Some characters such as =&#126;=, =$=, =@=, =%= are removed"}%
@@ -261,7 +261,7 @@ white, maroon, red, purple, fuchsia, green, lime, olive, yellow, navy, blue, tea
 %BUTTON{"%MAKETEXT{"OK"}%" target="%WEB%.%TOPIC%" icon="tick"}%%CLEAR%
 %TMPL:END%
 %TMPL:DEF{"rename_web_prerequisites"}%<!-- better buttons -->
----+++ %MAKETEXT{"There are problems with renaming this web:"}%
+---+++ %MAKETEXT{"There are problems with renaming this web"}%:
    %MAKETEXT{"1. You are denied access to the following topics in the web: %BR%
    [_1]" args="%PARAM1%"}%
    %MAKETEXT{"2. The following topics are locked for edit, and cannot be moved: %BR%
@@ -292,14 +292,14 @@ template that doesn't exist." args="%PARAM2%"}%
 
 %MAKETEXT{"[_1] is currently set to [_2]" args="=%PARAM2%=,<code><nop>%PARAM1%</code>"}% 
 
-%MAKETEXT{"(don't forget to check your Topic Settings)"}%
+(%MAKETEXT{"Don't forget to check your topic settings."}%)
 %TMPL:END%
 %TMPL:DEF{"topic_access"}% <!-- -->
-%MAKETEXT{"[_1] has no permission to [_2] [_3]." args="<nop>%SPACEOUT{"%WIKINAME%"}%,%PARAM1%,%TOPIC%"}%
+%MAKETEXT{"[_1] has no permission to [_2] [_3]." args="[[%WIKIUSERNAME%]], <b>%PARAM1%</b> ,[[%TOPIC%]]"}%
 
 %TMPL:P{"login"}%
 
-%MAKETEXT{"See also:"}% %USERSWEB%.WikiGroups, %SYSTEMWEB%.AccessControl,
+%MAKETEXT{"See also"}%: %USERSWEB%.WikiGroups, %SYSTEMWEB%.AccessControl,
 %SYSTEMWEB%.UserRegistration
 %TMPL:END%
 %TMPL:DEF{"only_group"}% <!-- -->
@@ -307,11 +307,11 @@ template that doesn't exist." args="%PARAM2%"}%
 
 %TMPL:P{"login"}%
 
-%MAKETEXT{"See also:"}% %USERSWEB%.WikiGroups, %SYSTEMWEB%.AccessControl,
+%MAKETEXT{"See also"}%: %USERSWEB%.WikiGroups, %SYSTEMWEB%.AccessControl,
 %SYSTEMWEB%.UserRegistration
 %TMPL:END%
 %TMPL:DEF{"no_such_web"}% <!-- -->
----++ %MAKETEXT{"The [_1] web does not exist" args="\"%WEB%\""}%
+---++ %MAKETEXT{"The [_1] web does not exist" args="%WEB%"}%
 
 %MAKETEXT{"You are trying to [_1] in a web that does not exist." args="'%PARAM1%'"}%
 
@@ -323,19 +323,19 @@ template that doesn't exist." args="%PARAM2%"}%
 
 %TMPL:END%
 %TMPL:DEF{"no_such_topic"}% <!-- -->
----++ %MAKETEXT{"\"[_1]\" topic does not exist" args="%WEB%.%TOPIC%"}%
+---++ %MAKETEXT{"[_1] topic does not exist" args="%WEB%.%TOPIC%"}%
 %MAKETEXT{"You are trying to [_1] a topic that does not exist." args="%PARAM1%"}%
 
-%MAKETEXT{"If you want to create the topic then [[[_1]][click here]]." args="%SCRIPTURLPATH{\"edit\"}%/%WEB%/%TOPIC%?t=%SERVERTIME{\"$year$mo$day$min$sec\"}%"}%
+%MAKETEXT{"If you want to create the topic then [[[_1]][click here]]." args="%SCRIPTURLPATH{"edit"}%/%WEB%/%TOPIC%?t=%SERVERTIME{"$year$mo$day$min$sec"}%"}%
 %TMPL:END%
 %TMPL:DEF{"no_such_topic_template"}%
----++ %MAKETEXT{"Template [_1] does not exist" args="\"%WEB%.%TOPIC%\""}%
+---++ %MAKETEXT{"Template [_1] does not exist" args="%WEB%.%TOPIC%"}%
 %MAKETEXT{"You are trying to create a topic from a template that does not exist." args="%PARAM1%"}%
 
 %TMPL:P{"goback"}%
 %TMPL:END%
 %TMPL:DEF{"no_such_topic_rename"}%
----++ %MAKETEXT{"[_1] topic does not exist" args="\"%WEB%.%TOPIC%\""}%
+---++ %MAKETEXT{"[_1] topic does not exist" args="%WEB%.%TOPIC%"}%
 %MAKETEXT{"You are trying to rename a topic that does not exist." args="%PARAM1%"}%
 
 %TMPL:P{"goback"}%
@@ -347,7 +347,7 @@ template that doesn't exist." args="%PARAM2%"}%
 %TMPL:END%
 %TMPL:DEF{"oversized_upload"}%
 ---+++ %MAKETEXT{"Uploaded file is too big"}%
-%MAKETEXT{"Uploaded file [_1] exceeds limit of [_2] KB" args="<code>%PARAM1%</code>,%PARAM2%"}%
+%MAKETEXT{"Uploaded file [_1] exceeds limit of [_2] KB." args="<code>%PARAM1%</code>,%PARAM2%"}%
 
 %TMPL:P{"goback"}%
 %TMPL:END%

@@ -39,7 +39,7 @@ sub render {
 
   if ($addClass) {
     #writeDebug("called renderExternalLink($thePrefix, $theUrl)");
-    $text = "class='natExternalLink' target='_blank' $thePrefix$theUrl";
+    $text = "class='natExternalLink' $thePrefix$theUrl";
     #writeDebug("text=$text");
   }
 

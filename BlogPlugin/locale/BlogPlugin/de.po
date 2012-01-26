@@ -1,0 +1,212 @@
+# BlogPlugin translation base file
+msgid ""
+msgstr ""
+"Project-Id-Version: 1.0\n"
+"POT-Creation-Date: 2011-12-18 14:25+000\n"
+"PO-Revision-Date: 2011-12-18 20:24+0000\n"
+"Last-Translator: Michael Daum <daum@michaeldaumconsulting.com>\n"
+"Language-Team: Foswiki Translation Team <none>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: \n"
+
+#: data/Applications/BlogApp/RenderArchives.txt:28
+msgid "%1 Archive"
+msgstr "%1 Archiv"
+
+#: data/_BlogTemplate/WebLeftBar.txt:3
+msgid "%1 Web"
+msgstr "%1 Web"
+
+#: data/Applications/BlogApp/RenderCategories.txt:26
+msgid "%1 categories"
+msgstr "%1 Kategorien"
+
+#: data/Applications/BlogApp/RenderSideBar.txt:29
+#: data/Applications/BlogApp/RenderSideBar.txt:43
+#: data/Applications/BlogApp/RenderSideBar.txt:54
+#: data/Applications/BlogApp/RenderSideBar.txt:67
+msgid "About"
+msgstr "Über"
+
+#: data/Applications/BlogApp/RenderArchives.txt:29
+msgid "Archive"
+msgstr "Archiv"
+
+#: data/Applications/BlogApp/BlogSearchViewTemplate.txt:19
+msgid "Author"
+msgstr "Author"
+
+#: data/Applications/BlogApp/RenderAuthorTools.txt:24
+msgid "BlogEntries"
+msgstr "Blog-Einträge"
+
+#: data/Applications/BlogApp/RenderAuthorTools.txt:25
+#: data/Applications/BlogApp/RenderCategories.txt:27
+msgid "Categories"
+msgstr "Kategorien"
+
+#: data/Applications/BlogApp/BlogSearchViewTemplate.txt:16
+msgid "Category"
+msgstr "Kategorien"
+
+#: data/Applications/BlogApp/RenderAuthorTools.txt:27
+#: data/_BlogTemplate/WebLeftBar.txt:7
+msgid "Changes"
+msgstr "Änderungen"
+
+#: data/Applications/BlogApp/RenderRecentComments.txt:32
+msgid "Comments"
+msgstr "Kommentare"
+
+#: data/Applications/BlogApp/RenderRecentComments.txt:31
+msgid "Comments in %1"
+msgstr "Kommentare zu %1"
+
+#: data/_BlogTemplate/WebLeftBar.txt:4
+msgid "Create New Topic"
+msgstr "Neues Topic anlegen"
+
+#: data/Applications/BlogApp/BlogSearchViewTemplate.txt:32
+msgid "Create date"
+msgstr "Erstellungsdatum"
+
+#: data/Applications/BlogApp/BlogSearchViewTemplate.txt:18
+msgid "Date"
+msgstr "Datum"
+
+#: data/Applications/BlogApp/BlogEntry.txt:37
+msgid "Get description from content."
+msgstr "Beschreibung vom Text extrahieren."
+
+#: data/Applications/BlogApp/BlogEntry.txt:38
+msgid "Get from classification."
+msgstr "Extrahiere von Klassifikation"
+
+#: data/Applications/BlogApp/BlogEntry.txt:36
+msgid "Get from topic title."
+msgstr "Vom Topic-Titel extrahieren"
+
+#: data/Applications/BlogApp/RenderAuthorTools.txt:26
+#: data/_BlogTemplate/WebLeftBar.txt:5
+msgid "Index"
+msgstr "Index"
+
+#: data/Applications/BlogApp/BlogSearchViewTemplate.txt:31
+msgid "Last changed"
+msgstr "Zuletzt geändert"
+
+#: data/Applications/BlogApp/RenderRecentBlogEntries.txt:29
+msgid "Latest"
+msgstr "Neuestes"
+
+#: data/Applications/BlogApp/BlogEntryEditTemplate.txt:37
+msgid "Meta desciption"
+msgstr "Meta Beschreibung"
+
+#: data/Applications/BlogApp/BlogEntryEditTemplate.txt:36
+msgid "Meta keywords"
+msgstr "Meta Schlüsselworte"
+
+#: data/Applications/BlogApp/BlogEntryEditTemplate.txt:35
+msgid "Meta title"
+msgstr "Meta Titel"
+
+#: data/Applications/BlogApp/BlogSearchViewTemplate.txt:33
+msgid "Name"
+msgstr "Name"
+
+#: data/_BlogTemplate/WebLeftBar.txt:8
+msgid "Notifications"
+msgstr "Benachrichtigungen"
+
+#: data/Applications/BlogApp/RenderAuthorTools.txt:30
+#: data/_BlogTemplate/WebLeftBar.txt:11
+msgid "Preferences"
+msgstr "Einstellungen"
+
+#: data/_BlogTemplate/WebLeftBar.txt:9
+msgid "RSS Feed"
+msgstr "RSS Feed"
+
+#: data/Applications/BlogApp/BlogSearchViewTemplate.txt:30
+msgid "Relevance"
+msgstr "Relevanz"
+
+#: data/Applications/BlogApp/BlogEntryEditTemplate.txt:30
+msgid "SEO"
+msgstr "SEO"
+
+#: data/_BlogTemplate/WebLeftBar.txt:6
+msgid "Search"
+msgstr "Suchen"
+
+#: data/Applications/BlogApp/RenderSimilarBlogEntries.txt:23
+msgid "Similar"
+msgstr "Ähnliches"
+
+#: data/Applications/BlogApp/BlogSearchViewTemplate.txt:27
+msgid "Sort by"
+msgstr "Sortieren nach"
+
+#: data/Applications/BlogApp/RenderAuthorTools.txt:29
+#: data/_BlogTemplate/WebLeftBar.txt:10
+msgid "Statistics"
+msgstr "Statistiken"
+
+#: data/Applications/BlogApp/RenderAuthorTools.txt:28
+msgid "Subscriptions"
+msgstr "Abonnements"
+
+#: data/Applications/BlogApp/BlogSearchViewTemplate.txt:17
+msgid "Tags"
+msgstr "Schlüsselworte"
+
+#: data/Applications/BlogApp/WebAtom.txt:3
+#: data/Applications/BlogApp/WebRss.txt:5 data/_BlogTemplate/WebAtom.txt:3
+#: data/_BlogTemplate/WebRss.txt:5
+msgid "The %1 web of Foswiki, the Free and Open Source Wiki."
+msgstr "Das %1 Web von Foswiki, dem Freien Open Source Wiki."
+
+#: data/_BlogTemplate/WebNotify.txt:3
+msgid ""
+"This is a subscription service to be automatically notified by e-mail when "
+"topics change in this %1 web. This is a convenient service, so you do not "
+"have to come back and check all the time if something has changed. To "
+"subscribe, please add a bullet with your %2 in alphabetical order to this "
+"list:"
+msgstr ""
+"Dies ist ein Abonnement-Service, um automatisch per E-Mail benachrichtigt zu "
+"werden, wenn ein Topic im %1 Web sich geändert hat. Um sich für diesen "
+"Service anzumelden fügen Sie einfach ihren %2 in alphabetischer Reihenfolge "
+"zu dieser Liste hinzu."
+
+#: data/Applications/BlogApp/RenderAuthorTools.txt:23
+msgid "Tools"
+msgstr "Werkzeuge"
+
+#: lib/Foswiki/Plugins/BlogPlugin/Factory.pm:86
+msgid "access not allowed on web"
+msgstr "Zugriff zu diesem Web nicht gestattet"
+
+#: data/Applications/BlogApp/BlogEntryEditTemplate.txt:8
+msgid "blog entry"
+msgstr "Blog-Eintag"
+
+#: data/Applications/BlogApp/RenderBlogEntries.txt:125
+msgid "next page"
+msgstr "nächste Seite"
+
+#: data/Applications/BlogApp/RenderBlogEntries.txt:122
+msgid "previous page"
+msgstr "vorherige Seite"
+
+#: data/Applications/BlogApp/RenderBlogEntries.txt:91
+msgid "reply"
+msgstr "antworten"
+
+#: data/Applications/BlogApp/BlogEntryViewTemplate.txt:40
+#: data/Applications/BlogApp/RenderBlogEntries.txt:67
+msgid "unpublished"
+msgstr "unveröffentlicht"

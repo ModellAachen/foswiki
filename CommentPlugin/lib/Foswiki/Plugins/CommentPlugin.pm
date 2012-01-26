@@ -13,7 +13,7 @@ use Foswiki::Func    ();
 use Foswiki::Plugins ();
 
 our $VERSION = '$Rev$';
-our $RELEASE = '26 Oct 2011';
+our $RELEASE = '2.0.3';
 our $SHORTDESCRIPTION =
   'Quickly post comments to a page without an edit/save cycle';
 our $NO_PREFS_IN_TOPIC = 1;
@@ -93,8 +93,71 @@ sub _restSave {
     my $session  = shift;
     my $response = $session->{response};
     my $query    = Foswiki::Func::getCgiQuery();
+
     my ( $web, $topic ) =
       Foswiki::Func::normalizeWebTopicName( undef, $query->param('topic') );
+
+    if ( $query->param('comment_target') ) {
+        ( $web, $topic ) =
+          Foswiki::Func::normalizeWebTopicName( $web,
+            $query->param('comment_target') );
+    }
+
+    $web =
+      Foswiki::Sandbox::untaint( $web, \&Foswiki::Sandbox::validateWebName );
+
+    unless ( Foswiki::Func::webExists($web) ) {
+        if ( $query->param('comment_ajax') ) {
+            $response->header( -status => 500 );
+            $response->body(shift);
+        }
+        else {
+            throw Foswiki::OopsException(
+                'oopsattention',
+                status => 403,
+                def    => 'web_not_found',
+                params => [ $web, "$web.$topic" ]
+            );
+        }
+    }
+
+    # Note: missing topic is okay,  will be created if allowed.
+    # but it needs to be a valid name.
+
+    my $origTopic = $topic;    # (Stash topic name in case it's bad)
+    $topic = Foswiki::Sandbox::untaint( $topic,
+        \&Foswiki::Sandbox::validateTopicName );
+
+    unless ($topic) {
+
+        # validation failed - illegal name, don't have a topic name
+        if ( $query->param('comment_ajax') ) {
+            $response->header( -status => 500 );
+            $response->body(shift);
+        }
+        else {
+            throw Foswiki::OopsException(
+                'oopsattention',
+                status => 403,
+                def    => 'invalid_topic_parameter',
+                params => [ "$origTopic", 'comment_target' ]
+            );
+        }
+    }
+
+   # SMELL: Foswiki.pm ensures that the web cannot access a topic beginning with
+   # lower case letter,  so force it here as well.
+    $topic = ucfirst($topic);
+
+    if ( $query->param('redirectto') ) {
+        Foswiki::Func::writeWarning(
+"CommentPlugin: obsolete redirectto parameter overriding endPoint in $web.$topic"
+        );
+        $query->param(
+            -name  => 'endPoint',
+            -value => $query->param('redirectto')
+        );
+    }
 
     try {
         require Foswiki::Plugins::CommentPlugin::Comment;
@@ -105,11 +168,15 @@ sub _restSave {
         $text =
           Foswiki::Plugins::CommentPlugin::Comment::save( $text, $web, $topic );
 
-        Foswiki::Func::saveTopic( $web, $topic, $meta, $text,
-            { ignorepermissions => 1 } );
+        if ( defined $text ) {
 
-        $response->header( -status => 200 );
-        $response->body("$web.$topic");
+            # Don't save anything if nothing to save
+            Foswiki::Func::saveTopic( $web, $topic, $meta, $text,
+                { ignorepermissions => 1 } );
+
+            $response->header( -status => 200 );
+            $response->body("$web.$topic");
+        }
     }
     catch Foswiki::AccessControlException with {
         if ( $query->param('comment_ajax') ) {
@@ -117,7 +184,18 @@ sub _restSave {
             $response->body(shift);
         }
         else {
-            shift->throw;
+            shift->throw();
+        }
+    }
+    catch Error::Simple with {
+        my $e = shift;
+
+        # Redirect already requested to clear the endpoint
+        if ( $e =~ 'restauth-redirect' ) {
+            $query->param( endPoint => '' );
+        }
+        else {
+            $e->throw();
         }
     }
     otherwise {
@@ -126,7 +204,7 @@ sub _restSave {
             $response->body(shift);
         }
         else {
-            shift->throw;
+            shift->throw();
         }
     };
     return undef;
@@ -136,7 +214,7 @@ sub _restSave {
 __END__
 Foswiki - The Free and Open Source Wiki, http://foswiki.org/
 
-Copyright (C) 2008-2010 Foswiki Contributors. Foswiki Contributors
+Copyright (C) 2008-2012 Foswiki Contributors. Foswiki Contributors
 are listed in the AUTHORS file in the root of this distribution.
 NOTE: Please extend that file, not this notice.
 

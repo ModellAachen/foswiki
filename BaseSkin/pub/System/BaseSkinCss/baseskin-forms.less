@@ -3,37 +3,81 @@ FORM ELEMENTS
 Button styles execpt for colors; these are set in baseskin-colors.less
 */
 
-input[type='text'] {
-	@tmp_baseline: 13px;
-	height: @tmp_baseline * 1.5; // In IE7, the height of the select element cannot be changed by height, only font-size
-	line-height: @tmp_baseline * 1.5;
-	.border-radius(@fw_block_corner);
-}
-input[type='image'] {
-	width: auto;
-	border: none;
-	.border-radius(0);
+/* Form structure */
+
+.foswikiFormSteps {
+	.well();
 	padding: 0;
-	@select_baseline: 18px;
-	line-height: @select_baseline * 1.5;
-	vertical-align:text-bottom;
+	border-style: solid;
+	border-width: 1px;
 }
-input[type='checkbox'].foswikiCheckbox,
-input[type='radio'].foswikiRadioButton {
-	margin:0 .5em 0 .1em;
-	padding:0 0 0 .5em;
-	border:0;
+.foswikiFormStep {
+	.fw_component_padding();
+	border-style: none none solid none;
+	border-width: 1px;
+	clear: both;
+	
+	p,
+	.foswikiFormDescription {
+		margin-bottom: 0;
+		padding-bottom: 0;
+	}
+	
+	&:last-child {
+		border: none;
+	}
 }
+
+.foswikiInputForm {
+	legend {
+		.fw_offset(2);
+		text-align: left;
+	}
+	label {
+		.columns(2);
+		float: left;
+		text-align: right;
+	}
+	ul {
+		list-style: none;
+		clear: both;
+		margin-left: 0;
+		
+		li {
+			display: block;
+			
+			label {
+				float: none;
+				margin-left: 0;
+				text-align: left;
+			}
+		}
+	}
+}
+.foswikiInputs {
+	.fw_offset(2);
+	
+	label.foswikiLabel {
+		float: none;
+		text-align: left;
+		width: auto;
+	}
+}
+
 .foswikiButton,
+.jqButton,
+.jqButton:hover,
 .foswikiSubmit,
-.jqButton,
-.jqButton:hover {
-	padding: @fw_button_padding;
-}
-.foswikiButton,
-.jqButton,
-.jqButton:hover {
-	.btn();
+.foswikiButtonCancel,
+// jqButton with ButtonCancel should not be red
+.jqButton.foswikiButtonCancel,
+.foswikiButtonSmall,
+.foswikiButtonLarge,
+.foswikiButtonDisabled,
+.foswikiSubmitDisabled,
+.foswikiSubmit.foswikiButtonDisabled,
+.foswikiButtonCancel.foswikiButtonDisabled {
+	.fw_button();
 }
 .jqButton {
 	height: auto;
@@ -53,37 +97,13 @@ input[type='radio'].foswikiRadioButton {
 .foswikiButton .foswikiButtonIcon,
 .foswikiButton:active .foswikiButtonIcon {
 	background-position: 0 50%;
+	display: block;
+	height: 16px;
 }
-.foswikiSubmit {
-	.btn();
-}
-.btn {
-	&.small {
-		padding: 5px 9px;
-		.fw_em_font_size(@fw_size_small);
-	}
-}
-.foswikiButtonCancel {
-	.btn();
-}
-// jqButton with ButtonCancel should not be red
-.jqButton.foswikiButtonCancel {
-	.btn();
-}
-
 .foswikiButtonSmall {
-	.btn();
-	.btn.small();
+	.fw_button.small();
 }
 .foswikiButtonLarge {
-	.btn();
-	.btn.large();
-	.border-radius(@fw_block_corner);
-}
-
-.foswikiButtonDisabled,
-.foswikiSubmitDisabled,
-.foswikiSubmit.foswikiButtonDisabled,
-.foswikiButtonCancel.foswikiButtonDisabled {
-	.btn();
+	.fw_button.large();
+	.border-radius(@fw_corner_radius_button);
 }

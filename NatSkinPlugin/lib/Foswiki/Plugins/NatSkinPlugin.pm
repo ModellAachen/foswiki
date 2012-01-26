@@ -120,7 +120,6 @@ sub postRenderingHandler {
   require Foswiki::Plugins::NatSkinPlugin::ExternalLink;
 
   $_[0] =~ s/<a\s+([^>]*?href=(?:\"|\'|&quot;)?)([^\"\'\s>]+(?:\"|\'|\s|&quot;>)?)/'<a '.Foswiki::Plugins::NatSkinPlugin::ExternalLink::render($1,$2)/geoi;
-  $_[0] =~ s/(<a\s+[^>]+ target="_blank" [^>]+) target="_top"/$1/go; # core adds target="_top" ... we kick it out again
 }
 
 ###############################################################################

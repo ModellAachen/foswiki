@@ -1,0 +1,53 @@
+%META:TOPICINFO{author="ProjectContributor" comment="reprev" date="1320868829" format="1.1" reprev="5" version="5"}%
+%META:TOPICPARENT{name="TopicFunction"}%
+%TOC{depth="2"}%
+
+---++ Documentation
+%STARTSECTION{name="documentation" type="section"}%
+%RED%TODO%ENDCOLOR%
+
+---+++++ Parameters
+   * CAT: top category whose subcategories are displayed, defaults to TopCategory
+
+%ENDSECTION{name="documentation" type="section"}%
+
+---++ Implementation
+<verbatim class="tml">
+%STARTINCLUDE%<!-- -->
+%HIERARCHY{
+  web="%BASEWEB%"
+  top="%IF{"defined CAT and '%CAT%'!=''" then="%CAT%" else="TopCategory"}%"
+  exclude="%IF{"defined CAT and '%CAT%'!=''" then="%CAT%" else="TopCategory"}%"
+  hidenull="on"
+  depth="2"
+  filter="TopicType=~'\bBlogEntry\b' AND State != 'unpublished'"
+  header="<div class='blogSideBarSection'>
+    <h2 >%IF{"defined CAT and '%CAT%' !=''"
+           then="%MAKETEXT{"[_1] categories" args="%CATINFO{cat="%CAT%" format="$title"}%"}%"
+           else="%MAKETEXT{"Categories"}%"
+        }%</h2>
+    <div class='jqSerialPager'><ul>"
+  footer="</ul></div></div>"
+  subheader=""
+  subfooter=""
+  format="<li><a href='$url'><span class='foswikiRight'>$count</span><img src='$icon' />&nbsp;$title</a></li>"
+}%<!-- -->%STOPINCLUDE%
+</verbatim>
+
+---++ Test
+%DBCALL{"%TOPIC%"}%
+
+%DBCALL{"Applications.RenderFunctionCallers"}%
+
+---++ Copyright
+&copy; 2005-2011 http://michaeldaumconsulting.com
+
+%DBCALL{"Applications.GnuGeneralPublicLicense" section="notice"}%
+
+
+%META:FORM{name="Applications.ApplicationTopic"}%
+%META:FIELD{name="TopicType" title="TopicType" value="DocuTopic, TopicFunction"}%
+%META:FIELD{name="TopicTitle" attributes="" title="<nop>TopicTitle" value=""}%
+%META:FIELD{name="Summary" attributes="c" title="Summary" value="display a list of categories in the sidebar"}%
+%META:FIELD{name="WikiApplication" attributes="" title="WikiApplication" value="BlogApp"}%
+%META:PREFERENCE{name="EDIT_TEMPLATE" title="EDIT_TEMPLATE" type="Set" value="Applications.WikiTopicEdit"}%

@@ -1,2 +1,11 @@
 %TMPL:INCLUDE{"view"}%
-%TMPL:INCLUDE{"body.plain.nat"}%
+%TMPL:DEF{"defaultbodyclass"}%natBody natSlideShowBody%TMPL:END%
+
+%TMPL:DEF{"defaultbody"}%<!-- -->
+<div class="natBodyContents">
+<a name="PageTop"></a>
+%TMPL:P{"content_container"}%<!-- content_container// -->
+<a name="PageBottom"></a>
+</div>
+<!-- -->%TMPL:END%
+

@@ -1,53 +1,22 @@
 %TMPL:INCLUDE{"edit"}%<!-- template: edit.chapter.tmpl -->
 %TMPL:INCLUDE{"editjavascript"}%<!-- editjavascript// -->
 
-%TMPL:DEF{"textarea"}%<!-- textarea -->
-<textarea name="beforetext" style="display:none" >%EXTRACTCHAPTER{before="%URLPARAM{"from" default="0"}%" encode="on"}%</textarea>
-<textarea name="chapter" class="foswikiTextarea natEditTextArea natedit {autoMaxExpand:true, minHeight:215}" rows="%EDITBOXHEIGHT%" cols="%EDITBOXWIDTH%" style='%EDITBOXSTYLE%' wrap="virtual">%EXTRACTCHAPTER{from="%URLPARAM{"from" default="0"}%" to="%URLPARAM{"to"}%" encode="on"}%</textarea>
-<textarea name="aftertext" style="display:none">%EXTRACTCHAPTER{after="%URLPARAM{"to"}%" encode="on"}%</textarea>
-<textarea name="text" style="display:none" >%EXTRACTCHAPTER%</textarea>
-<input type="hidden" name="from" value="%URLPARAM{"from" default="0"}%" />
-<input type="hidden" name="to" value="%URLPARAM{"to"}%" />
-%TMPL:P{"javascript"}%<!-- //javascript -->
-<!-- //textarea -->%TMPL:END%
-
-%TMPL:DEF{"form"}%%TMPL:END%
-%TMPL:DEF{"titleaction"}%(%MAKETEXT{"edit chapter"}%)%TMPL:END%
-%TMPL:DEF{"action_buttons"}%%TMPL:P{"button_save"}%&nbsp;%TMPL:P{"button_quietsave"}% %MAKETEXT{"or"}% %TMPL:P{"button_cancel"}%%TMPL:END%
-%TMPL:DEF{"title"}%%TOPICTITLE% (%MAKETEXT{"edit chapter"}%) - %WIKITOOLNAME%%TMPL:END%
-%TMPL:DEF{"pagetitle"}%[[%WEB%.%TOPIC%]] (%MAKETEXT{"edit chapter"}%)%TMPL:END%
-%TMPL:DEF{"settingstab"}%%TMPL:END%
-%TMPL:DEF{"formfields"}%%TMPL:END%
-
-%TMPL:DEF{"dialog"}%<div id="ecpDialog" class="foswikiDialog ecpDialog foswikiFormSteps jqSimpleModalResizable {alsoResize:'textarea[name=chapter]'}">
-  <form name="EditForm" action="%SCRIPTURLPATH{"save"}%/%WEB%/%TOPIC%" method="post" class="ecpForm">
-  <input type="hidden" name="t=" value="%GMTIME{"$epoch"}%" />
-  <input type="hidden" name="redirectto" value="%SCRIPTURL{"view"}%/%BASEWEB%/%BASETOPIC%#%URLPARAM{"id"}%" />
-  <h2 class="foswikiDialogTitle jqSimpleModalDraggable">%MAKETEXT{"Edit chapter '[_1]'" args="%URLPARAM{"title" default="%URLPARAM{"from"}%"}%"}%</h2>
-  <div class="foswikiFormStep">
-    <textarea name="beforetext" style="display:none" >%EXTRACTCHAPTER{before="%URLPARAM{"from" default="0"}%" encode="on"}%</textarea>
-    <textarea name="chapter" class="jqFocus foswikiTextarea natEditTextArea natedit" rows="%EDITBOXHEIGHT%" cols="%EDITBOXWIDTH%" wrap="virtual">%EXTRACTCHAPTER{from="%URLPARAM{"from" default="0"}%" to="%URLPARAM{"to"}%" encode="on"}%</textarea>
-    <textarea name="aftertext" style="display:none">%EXTRACTCHAPTER{after="%URLPARAM{"to"}%" encode="on"}%</textarea>
-    <textarea name="text" style="display:none" >%EXTRACTCHAPTER%</textarea>
-    <input type="hidden" name="from" value="%URLPARAM{"from" default="0"}%" />
-    <input type="hidden" name="to" value="%URLPARAM{"to"}%" />
-  </div>
-  <div class="foswikiFormStep foswikiFormLast">
-    %BUTTON{"%MAKETEXT{"Save"}%" icon="disk" type="submit"}%
-    %BUTTON{"%MAKETEXT{"Cancel"}%" icon="cross" class="jqSimpleModalCancel"}%
-    %BUTTON{"%MAKETEXT{"Edit all"}%" icon="pencil" href="%SCRIPTURLPATH{"edit"}%/%WEB%/%TOPIC%?t=%GMTIME{"$epoch"}%" class="simple"}%
-    %TMPL:P{"fullscreen"}%<!-- -->
-    %CLEAR%
-  </div>
+%TMPL:DEF{"dialog"}%<div class="jqUIDialog {alsoResize:'textarea[name=chapter]', modal:true, resizable:true, autoCenter:true, width:800}" title="%MAKETEXT{"Edit chapter '[_1]'" args="%URLPARAM{"title" default="%URLPARAM{"from"}%"}%"}%">
+  <form name="EditForm" action="%SCRIPTURLPATH{"save"}%" method="post" class="ecpForm">
+  <input type="hidden" name="topic" value="%WEB%.%TOPIC%" />
+  <input type="hidden" name="t" value="%GMTIME{"$epoch"}%" />
+  <input type="hidden" name="redirectto" value="%SCRIPTURL{"view"}%/%WEB%/%TOPIC%#%URLPARAM{"id"}%" />
+  <textarea name="beforetext" style="display:none" >%EXTRACTCHAPTER{before="%URLPARAM{"from" default="0"}%" encode="on"}%</textarea>
+  <textarea name="chapter" class="jqFocus foswikiTextarea natEditTextArea natedit" rows="%EDITBOXHEIGHT%" cols="%EDITBOXWIDTH%" wrap="virtual">%EXTRACTCHAPTER{from="%URLPARAM{"from" default="0"}%" to="%URLPARAM{"to"}%" encode="on"}%</textarea>
+  <textarea name="aftertext" style="display:none">%EXTRACTCHAPTER{after="%URLPARAM{"to"}%" encode="on"}%</textarea>
+  <textarea name="text" style="display:none" >%EXTRACTCHAPTER%</textarea>
+  <input type="hidden" name="from" value="%URLPARAM{"from" default="0"}%" />
+  <input type="hidden" name="to" value="%URLPARAM{"to"}%" />
   </form>
   <link rel="stylesheet" href="%PUBURLPATH%/%SYSTEMWEB%/NatEditPlugin/styles.css" media="all" />
   <link rel="stylesheet" href="%PUBURLPATH%/%SYSTEMWEB%/NatEditPlugin/default/styles.css" media="all" />
   <script src="%PUBURLPATH%/%SYSTEMWEB%/NatEditPlugin/jquery.natedit.js"></script>
+  <a class="jqUIDialogButton jqUIDialogSubmit {icon:'ui-icon-disk'}">%MAKETEXT{"OK"}%</a>
+  <a class="jqUIDialogButton {icon:'ui-icon-cancel', click: function() {$(this).trigger('cancel');}}">%MAKETEXT{"Cancel"}%</a>
+  <a class="jqUIDialogButton {icon:'ui-icon-pencil'}" href="%SCRIPTURL{"edit"}%/%WEB%/%TOPIC%?t=%GMTIME{"$epoch"}%">%MAKETEXT{"Edit all"}%</a>
 </div>%TMPL:END%
-
-%TMPL:DEF{"DISfullscreen"}%<!-- -->
-  <label class="foswikiLeft" style="line-height:23px">
-    <input type="checkbox" class="ecpFullScreen foswikiCheckbox" name="ecpFullScreen">
-    %MAKETEXT{"Fullscreen"}%
-  </label>
-<!-- -->%TMPL:END%

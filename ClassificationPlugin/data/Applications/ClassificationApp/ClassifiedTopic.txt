@@ -1,4 +1,4 @@
-%META:TOPICINFO{author="ProjectContributor" comment="save topic" date="1277732388" format="1.1" reprev="15" version="17"}%
+%META:TOPICINFO{author="ProjectContributor" comment="save topic" date="1323093757" format="1.1" reprev="15" version="19"}%
 %META:TOPICPARENT{name="TopicType"}%
 %TOC{depth="2"}%
 %DBCALL{"Applications.RenderTopicInstaller" TEXT="Install '%TOPIC%' TopicType" TYPE="TopicType" PARENT="TopicType"}%
@@ -60,7 +60,7 @@ See also: ClassifiedTopicTemplate, ClassifiedTopicViewTemplate
 %ADDTOZONE{"script" section="javascript" requires="JQUERYPLUGIN::WIKIWORD"}%
 
 %DBCALL{"Applications.RenderTopicsOfType" 
-  FIELDS="Topic, Summary, Tag, Category, Changed"
+  FIELDS="TopicTitle, Summary, Tag, Category, Changed"
   ROWS="20"
 }%
 <!-- //classified topic -->%STOPINCLUDE%
@@ -89,7 +89,7 @@ $(function() {
 
 %META:FORM{name="Applications.TopicType"}%
 %META:FIELD{name="TopicType" title="TopicType" value="TopicType, DataForm, DocuTopic, ApplicationTopic"}%
-%META:FIELD{name="TopicTitle" attributes="" title="<nop>TopicTitle" value="ClassifiedTopic"}%
+%META:FIELD{name="TopicTitle" attributes="" title="<nop>TopicTitle" value=""}%
 %META:FIELD{name="Inheritance" attributes="" title="Inheritance" value="CategorizedTopic, TaggedTopic"}%
-%META:FIELD{name="Summary" attributes="" title="Summary" value="Categorized and tagged topics"}%
+%META:FIELD{name="Summary" attributes="c" title="Summary" value="Categorized and tagged topics"}%
 %META:FIELD{name="WikiApplication" attributes="" title="WikiApplication" value="ClassificationApp"}%

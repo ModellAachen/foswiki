@@ -1,9 +1,9 @@
-%META:TOPICINFO{author="micha" comment="reprev" date="1314170121" format="1.1" reprev="8" version="8"}%
+%META:TOPICINFO{author="ProjectContributor" comment="reprev" date="1321307368" format="1.1" reprev="12" version="12"}%
 %META:TOPICPARENT{name="TopicFunction"}%
 %TOC{depth="2"}%
 
 ---++ Documentation
-%STARTSECTION{name="documentation" type="section"}%
+%STARTSECTION{"documentation"}%
 This function gets the first image attachment from a topic and creates
 a 48x48 thumbnail using <nop>ImagePlugin. The attachment taken must end
 with =jpeg, jpg, gif or png=. If there are multiple image attachments
@@ -18,7 +18,7 @@ is returned if no image attachment is found.
    * CROP
    * SORT: specifies which image to chose from the attachments, defaults to =comment:name= which will take the one that sorts first wrt the comment, falling back to the name
 
-%ENDSECTION{name="documentation" type="section"}%
+%ENDSECTION{"documentation"}%
 
 ---++ Implementation
 <verbatim class="tml">

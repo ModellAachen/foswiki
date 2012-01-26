@@ -1,0 +1,65 @@
+%META:TOPICINFO{author="ProjectContributor" comment="save topic" date="1305113620" format="1.1" reprev="2" version="2"}%
+%META:TOPICPARENT{name="TopicFunction"}%
+%TOC{depth="2"}%
+
+---++ Documentation
+%STARTSECTION{name="documentation" type="section"}%
+This needs Foswiki:Extensions/SolrPlugin
+
+---+++++ Parameters
+   * NONE
+
+%ENDSECTION{name="documentation" type="section"}%
+
+---++ Implementation
+<verbatim class="tml">
+%STARTINCLUDE%<!-- -->
+<noautolink> 
+%SOLRSIMILAR{"id:%BASEWEB%.%BASETOPIC%" 
+   filter="web:%BASEWEB% type:topic field_TopicType_lst:BlogEntry" 
+   fields="web,topic,title,score" 
+   like="category,tag"
+   header="<div class='blogSideBarSection blogSideBarSimilar'>
+     <h2 >%MAKETEXT{"Similar"}%</h2><ul>"  
+   footer="</ul></div>" 
+   format="<li> 
+       <a href='%SCRIPTURLPATH{"view"}%/$web/$topic' title='score: $score'> 
+         $percntDBCALL{\"Applications.RenderTopicThumbnail\" 
+           OBJECT=\"$web.$topic\" 
+           TYPE=\"plain\" 
+         }$percnt<!-- --> 
+         <!-- -->$title 
+         $percntDBQUERY{ 
+           header=\"<br /><span class='foswikiTopicInfo foswikiSmallish'>\" 
+           topic=\"$web.$topic\"  
+           format=\"$formfield(Summary)\" 
+           footer=\"</span>\" 
+         }$percnt 
+         %CLEAR% 
+       </a> 
+     </li>" 
+   separator="$n" 
+   rows="5" 
+}%<!-- solrsimilar --> 
+</noautolink> 
+<!-- -->%STOPINCLUDE%
+</verbatim>
+
+---++ Test
+%DBCALL{"%TOPIC%"}%
+
+%DBCALL{"Applications.RenderFunctionCallers"}%
+
+---++ Copyright
+&copy; 2005-2011 http://michaeldaumconsulting.com
+
+%DBCALL{"Applications.GnuGeneralPublicLicense" section="notice"}%
+
+
+%META:FORM{name="Applications.ApplicationTopic"}%
+%META:FIELD{name="TopicType" title="TopicType" value="DocuTopic, TopicFunction"}%
+%META:FIELD{name="TopicTitle" attributes="" title="<nop>TopicTitle" value=""}%
+%META:FIELD{name="Summary" attributes="c" title="Summary" value="display a list of related BlogEntries"}%
+%META:FIELD{name="WikiApplication" attributes="" title="WikiApplication" value="BlogApp"}%
+%META:TOPICMOVED{by="micha" date="1305113619" from="Applications/BlogApp.RenderRelatedBlogEntries" to="Applications/BlogApp.RenderSimilarBlogEntries"}%
+%META:PREFERENCE{name="EDIT_TEMPLATE" title="EDIT_TEMPLATE" type="Set" value="Applications.WikiTopicEdit"}%

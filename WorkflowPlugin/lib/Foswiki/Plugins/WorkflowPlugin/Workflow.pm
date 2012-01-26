@@ -23,20 +23,20 @@ package Foswiki::Plugins::WorkflowPlugin::Workflow;
 
 use strict;
 
-use Foswiki::Func ();
+use Foswiki::Func    ();
 use Foswiki::Plugins ();
 
 sub new {
     my ( $class, $web, $topic ) = @_;
 
-    if (defined &Foswiki::Sandbox::untaint) {
-        $web = Foswiki::Sandbox::untaint(
-            $web, \&Foswiki::Sandbox::validateWebName );
-        $topic = Foswiki::Sandbox::untaint(
-            $topic, \&Foswiki::Sandbox::validateTopicName );
+    if ( defined &Foswiki::Sandbox::untaint ) {
+        $web = Foswiki::Sandbox::untaint( $web,
+            \&Foswiki::Sandbox::validateWebName );
+        $topic = Foswiki::Sandbox::untaint( $topic,
+            \&Foswiki::Sandbox::validateTopicName );
     }
 
-    return undef unless ($web && $topic);
+    return undef unless ( $web && $topic );
 
     my ( $meta, $text ) = Foswiki::Func::readTopic( $web, $topic );
     unless (
@@ -60,28 +60,35 @@ sub new {
     my $inTable;
     my @fields;
 
-
     # Yet another table parser
     # State table:
     # | *State*       | *Allow Edit* | *Message* |
     # Transition table:
     # | *State* | *Action* | *Next state* | *Allowed* |
     foreach my $line ( split( /\n/, $text ) ) {
-        if ($line =~ s/^\s*\|([\s*]*State[\s*]*\|
-                           [\s*]*Action[\s*]*\|.*)\|$/$1/ix) {
+        if (
+            $line =~ s/^\s*\|([\s*]*State[\s*]*\|
+                           [\s*]*Action[\s*]*\|.*)\|$/$1/ix
+          )
+        {
+
             # Transition table header
-            @fields = map { _cleanField( $_ ) } split(/\s*\|\s*/, lc( $line ));
+            @fields = map { _cleanField($_) } split( /\s*\|\s*/, lc($line) );
 
             $inTable = 'TRANSITION';
         }
-        elsif ($line =~ s/^\s*\|([\s*]*State[\s*]*\|
-                              [\s*]*Allow\s*Edit[\s*]*\|.*)\|$/$1/ix) {
+        elsif (
+            $line =~ s/^\s*\|([\s*]*State[\s*]*\|
+                              [\s*]*Allow\s*Edit[\s*]*\|.*)\|$/$1/ix
+          )
+        {
+
             # State table header
-            @fields = map { _cleanField( $_ ) } split(/\s*\|\s*/, lc( $line ));
+            @fields = map { _cleanField($_) } split( /\s*\|\s*/, lc($line) );
 
             $inTable = 'STATE';
         }
-        elsif ($line =~ /^(?:\t|   )+\*\sSet\s(\w+)\s=\s*(.*)$/) {
+        elsif ( $line =~ /^(?:\t|   )+\*\sSet\s(\w+)\s=\s*(.*)$/ ) {
 
             # store preferences
             $this->{preferences}->{$1} = $2;
@@ -90,13 +97,15 @@ sub new {
 
             my %data;
             my $i = 0;
-            foreach my $col (split(/\s*\|\s*/, $line)) {
-                $data{$fields[$i++]} = $col;
+            foreach my $col ( split( /\s*\|\s*/, $line ) ) {
+                $data{ $fields[ $i++ ] } = $col;
             }
 
-            if ($inTable eq 'TRANSITION') {
+            if ( $inTable eq 'TRANSITION' ) {
                 push( @{ $this->{transitions} }, \%data );
-            } elsif ($inTable eq 'STATE') {
+            }
+            elsif ( $inTable eq 'STATE' ) {
+
                 # read row in STATE table
                 $this->{defaultState} ||= $data{state};
                 $this->{states}->{ $data{state} } = \%data;
@@ -116,10 +125,11 @@ sub getActions {
     my @actions      = ();
     my $currentState = $topic->getState();
     foreach my $t ( @{ $this->{transitions} } ) {
-        my $allowed = $topic->expandMacros( $t->{allowed} );
+        my $allowed   = $topic->expandMacros( $t->{allowed} );
         my $nextState = $topic->expandMacros( $t->{nextstate} );
-        if ( $t->{state} eq $currentState
-            && _isAllowed($allowed) && $nextState )
+        if (   $t->{state} eq $currentState
+            && _isAllowed($allowed)
+            && $nextState )
         {
             push( @actions, $t->{action} );
         }
@@ -134,11 +144,12 @@ sub getNextState {
     my ( $this, $topic, $action ) = @_;
     my $currentState = $topic->getState();
     foreach my $t ( @{ $this->{transitions} } ) {
-        my $allowed = $topic->expandMacros( $t->{allowed} );
+        my $allowed   = $topic->expandMacros( $t->{allowed} );
         my $nextState = $topic->expandMacros( $t->{nextstate} );
         if (   $t->{state} eq $currentState
             && $t->{action} eq $action
-            && _isAllowed($allowed) && $nextState )
+            && _isAllowed($allowed)
+            && $nextState )
         {
             return $nextState;
         }
@@ -174,7 +185,7 @@ sub getNotifyList {
         my $allowed = $topic->expandMacros( $t->{allowed} );
         if (   $t->{state} eq $currentState
             && $t->{action} eq $action
-            && _isAllowed( $allowed ) )
+            && _isAllowed($allowed) )
         {
             return $t->{notify};
         }

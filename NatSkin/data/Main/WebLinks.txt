@@ -5,8 +5,8 @@ Sidebar navigation in the %WEB% web. See also the %SYSTEMWEB%.SiteLinks
 
 %STARTINCLUDE%<!-- main.weblinks -->
    * [[%SYSTEMWEB%.WelcomeGuest][%MAKETEXT{"Welcome"}%]]
-   * [[%SYSTEMWEB%.UserRegistration][%MAKETEXT{"Registration"}%]] %IFDEFINEDTHEN{"%IFEXISTS{"%USERSWEB%.%WIKIUSERSTOPIC%"}%" as="1" glue="off"}%
-   * [[%USERSWEB%.%WIKIUSERSTOPIC%][%MAKETEXT{"Users"}%]] %FIDEFINED%
+   * [[%SYSTEMWEB%.UserRegistration][%MAKETEXT{"Registration"}%]] %IF{"istopic '%USERSWEB%.%WIKIUSERSTOPIC%'" then="
+   * [[%USERSWEB%.%WIKIUSERSTOPIC%][%MAKETEXT{"Users"}%]]"}%
    * [[%USERSWEB%.WikiGroups][%MAKETEXT{"Groups"}%]]
    * [[%SYSTEMWEB%.ChangePassword][%MAKETEXT{"Password"}%]]
 <!-- //main.weblinks -->%STOPINCLUDE%

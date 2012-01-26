@@ -4,7 +4,6 @@ Foswiki::Plugins::BreadCrumbsPlugin,>=4318,perl,Required
 Foswiki::Plugins::DBCachePlugin,>=1,perl,Optional
 Foswiki::Plugins::FilterPlugin,>=3491,perl,Required
 Foswiki::Plugins::FlexWebListPlugin,>=3493,perl,Required
-Foswiki::Plugins::IfDefinedPlugin,>=3637,perl,Required
 Foswiki::Plugins::ImagePlugin,>=6307,perl,Optional
 Foswiki::Plugins::JQueryPlugin,>=3740,perl,Required
 Foswiki::Plugins::NatEditPlugin,>=1993,perl,Required

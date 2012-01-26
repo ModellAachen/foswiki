@@ -2,7 +2,7 @@
 ---+!! %TOPIC%
 Default sidebar implementation
 
-%STARTINCLUDE%<!-- sitesidebar -->
+%STARTINCLUDE%<!-- -->
 <h2 ><noautolink>%WEBLINK{"%BASEWEB%"}%</noautolink></h2>
 %WEBCOMPONENT{"Links"}%<!-- weblinks// -->
 %IF{
@@ -12,6 +12,6 @@ Default sidebar implementation
 <h2 >%MAKETEXT{"Tools"}%</h2>
    * [[WebTopicList][%MAKETEXT{"Index"}%]]
    * [[WebChanges][%MAKETEXT{"Changes"}%]]
-   * [[WebNotify][%MAKETEXT{"Notifications"}%]]
-   * [[WebStatistics][%MAKETEXT{"Statistics"}%]]
-<!-- //sitesidebar -->%STOPINCLUDE%
+   * [[WebNotify][%MAKETEXT{"Notifications"}%]]%IF{"istopic '%BASEWEB%.WebStatistics'" then="
+   * [[WebStatistics][%MAKETEXT{"Statistics"}%]]"}%
+<!-- -->%STOPINCLUDE%

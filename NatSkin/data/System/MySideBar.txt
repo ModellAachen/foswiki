@@ -103,7 +103,7 @@
   class="jqButtonSimple"
   type="submit" 
   style="width:99%" 
-  title="%MAKETEXT{"Add the topic <nop>%BASETOPIC% to my sidebar navigation"}%"
+  title="%MAKETEXT{"Add topic [_1] to my sidebar navigation" args="<nop>%BASETOPIC%"}%"
 }%
 %CLEAR%
 <!-- //mysidebarbookmark:prompt -->%TMPL:END%

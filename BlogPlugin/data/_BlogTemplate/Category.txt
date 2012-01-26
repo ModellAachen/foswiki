@@ -1,0 +1,11 @@
+%META:TOPICINFO{author="ProjectContributor" comment="save topic" date="1275569671" format="1.1" reprev="2" version="2"}%
+%META:TOPICPARENT{name="TopicType"}%
+
+%META:FORM{name="Applications.TopicStub"}%
+%META:FIELD{name="TopicType" title="TopicType" value="WebTool, TopicStub, TopicType"}%
+%META:FIELD{name="TopicTitle" attributes="" title="<nop>TopicTitle" value="Category"}%
+%META:FIELD{name="Summary" attributes="" title="Summary" value=""}%
+%META:FIELD{name="WikiApplication" attributes="" title="WikiApplication" value="ClassificationApp"}%
+%META:FIELD{name="Target" attributes="" title="Target" value="Applications/ClassificationApp.Category"}%
+%META:FIELD{name="Section" attributes="" title="Section" value=""}%
+%META:PREFERENCE{name="SIDEBAR" title="SIDEBAR" type="Set" value="Admin"}%

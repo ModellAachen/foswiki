@@ -2,11 +2,11 @@
 %META:TOPICPARENT{name="TopicType"}%
 %DBCALL{"RenderTopicInstaller" TYPE="TopicType" PARENT="TopicType"}%
 ---++ Documentation
-%STARTSECTION{name="documentation" type="section"}%
+%STARTSECTION{"documentation"}%
 Note, that there is no creator to build a topic of this kind as it is a pure "marker type", that is topics
 are created with another creator tool and then in addition marked to be an WebTool. Topics of this type
 are ApplicationTopics too and take associated DataForm.
-%ENDSECTION{name="documentation" type="section"}%
+%ENDSECTION{"documentation"}%
 
 ---++ Topics of type '%TOPIC%'
 %STARTINCLUDE%<!-- -->

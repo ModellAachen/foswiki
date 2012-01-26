@@ -1,6 +1,6 @@
-use strict;
-
 package InitFormTests;
+use strict;
+use warnings;
 
 # TODO: Should we check untitled labels? There is some special processing there.
 
@@ -30,15 +30,12 @@ The testcases below assume that the correct interpretation is the one used in Ed
 
 =cut
 
-use FoswikiTestCase;
+use FoswikiTestCase();
 our @ISA = qw( FoswikiTestCase );
 use Error qw( :try );
 
-use Foswiki;
-use Foswiki::UI::Edit;
-use Foswiki::Form;
-use Unit::Request;
-use Unit::Response;
+use Foswiki::UI::Edit();
+use Unit::Request();
 use Error qw( :try );
 
 my $testweb    = "TemporaryTestWeb";
@@ -48,7 +45,6 @@ my $testtopic3 = "InitTestTopic3";
 my $testform   = "InitTestForm";
 my $testtmpl   = "InitTestTemplate";
 
-my $user;
 my $testuser1 = "TestUser1";
 my $testuser2 = "TestUser2";
 
@@ -125,25 +121,15 @@ my $edittmpl1 = <<'HERE';
 %FORMFIELDS%
 HERE
 
-sub new {
-    my $self = shift()->SUPER::new(@_);
-    return $self;
-}
-
 # Set up the test fixture
 sub set_up {
     my $this = shift;
     $this->SUPER::set_up();
 
-    $Foswiki::Plugins::SESSION->finish();
-    $this->{request} = Unit::Request->new();
-    $Foswiki::Plugins::SESSION =
-      Foswiki->new( $Foswiki::cfg{AdminUserLogin}, $this->{request} );
-    $this->{response} = Unit::Response->new();
+    $this->createNewFoswikiSession( $Foswiki::cfg{AdminUserLogin},
+        $this->{request} );
     Foswiki::Func::createWeb($testweb);
-    $Foswiki::Plugins::SESSION->finish();
-    $this->{session} = Foswiki->new( undef, $this->{request} );
-    $Foswiki::Plugins::SESSION = $this->{session};
+    $this->createNewFoswikiSession( undef, $this->{request} );
     $aurl = $this->{session}->getPubUrl( 1, $testweb, $testform );
     $surl = $this->{session}->getScriptUrl(1);
     Foswiki::Func::saveTopicText( $testweb, $testtopic1, $testtext1, 1, 1 );
@@ -154,13 +140,17 @@ sub set_up {
     Foswiki::Func::saveTopicText( $testweb, "MyeditTemplate", $edittmpl1, 1,
         1 );
     $this->{session}->enterContext('edit');
+
+    return;
 }
 
 sub tear_down {
     my $this = shift;
+
     $this->removeWebFixture( $this->{session}, $testweb );
-    $this->{session}->finish();
     $this->SUPER::tear_down();
+
+    return;
 }
 
 # The right form values are created
@@ -175,17 +165,21 @@ sub get_formfield {
 
 sub setup_formtests {
     my ( $this, $web, $topic, $params ) = @_;
+    my $q = Unit::Request->new();
 
-    $this->{session}->{webName}   = $web;
-    $this->{session}->{topicName} = $topic;
-    my $render = $this->{session}->renderer;
+    $q->path_info("/$web/$topic");
 
-    use Foswiki::Attrs;
-    my $attr = new Foswiki::Attrs($params);
-    foreach my $k ( keys %$attr ) {
+    #$this->{session}->{webName}   = $web;
+    #$this->{session}->{topicName} = $topic;
+
+    require Foswiki::Attrs;
+    my $attr = Foswiki::Attrs->new($params);
+    foreach my $k ( keys %{$attr} ) {
         next if $k eq '_RAW';
-        $this->{request}->param( -name => $k, -value => $attr->{$k} );
+        $q->param( -name => $k, -value => $attr->{$k} );
     }
+    $this->createNewFoswikiSession( undef, $q );
+    $this->{session}->enterContext('edit');
 
     # Now generate the form. We pass a template which throws everything away
     # but the form to allow for simpler analysis.
@@ -193,7 +187,6 @@ sub setup_formtests {
       Foswiki::UI::Edit::init_edit( $this->{session}, 'myedit' );
 
     return $tmpl;
-
 }
 
 sub test_form {
@@ -230,6 +223,8 @@ Simple description of problem</textarea>', get_formfield( 2, $text )
 '<input type="text" name="History4" value="%ATTACHURL%" size="20" class="foswikiInputField" />',
         get_formfield( 7, $text )
     );
+
+    return;
 }
 
 sub test_tmpl_form {
@@ -270,6 +265,7 @@ Simple description of problem</textarea>', get_formfield( 2, $text )
         get_formfield( 7, $text )
     );
 
+    return;
 }
 
 sub test_tmpl_form_new {
@@ -308,6 +304,7 @@ sub test_tmpl_form_new {
         get_formfield( 7, $text )
     );
 
+    return;
 }
 
 sub test_tmpl_form_existingform {
@@ -346,6 +343,7 @@ sub test_tmpl_form_existingform {
         get_formfield( 7, $text )
     );
 
+    return;
 }
 
 sub test_tmpl_form_params {
@@ -384,6 +382,7 @@ sub test_tmpl_form_params {
         get_formfield( 7, $text )
     );
 
+    return;
 }
 
 sub test_tmpl_form_existingform_params {
@@ -422,6 +421,7 @@ Simple description of problem</textarea>', get_formfield( 2, $text )
         get_formfield( 7, $text )
     );
 
+    return;
 }
 
 sub test_tmpl_form_new_params {
@@ -460,6 +460,7 @@ Simple description of problem</textarea>', get_formfield( 2, $text )
         get_formfield( 7, $text )
     );
 
+    return;
 }
 
 sub test_tmpl_form_notext_params {
@@ -498,6 +499,7 @@ Simple description of problem</textarea>', get_formfield( 2, $text )
         get_formfield( 7, $text )
     );
 
+    return;
 }
 
 # Purpose:  Just edit the form topic, do not provide any init values
@@ -529,6 +531,8 @@ Simple description of problem</textarea>', get_formfield( 2, $text )
     $this->assert_html_matches(
         '<input type="hidden" name="History3" value="$percntSCRIPTURL%"  />',
         get_formfield( 6, $text ) );
+
+    return;
 }
 
 # Item10874, originally Item10446
@@ -544,7 +548,8 @@ sub test_unsavedtopic_rendersform {
     );
     $query->path_info("/$testweb/MissingTopic");
     $query->method('POST');
-    my $fatwilly = Foswiki->new( $this->{test_user_login}, $query );
+    my $fatwilly =
+      $this->createNewFoswikiSession( $this->{test_user_login}, $query );
     my ($text) = $this->capture(
         sub {
             no strict 'refs';
@@ -554,8 +559,6 @@ sub test_unsavedtopic_rendersform {
                 $fatwilly->{request} );
         }
     );
-    $fatwilly->finish();
-    $query->finish() if $query->can('finish');
     $this->assert_html_matches(
 '<input type="text" name="IssueName" value="My first defect" size="73" class="foswikiInputField foswikiMandatory" />',
         get_formfield( 6, $text )

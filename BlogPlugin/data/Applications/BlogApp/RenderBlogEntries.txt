@@ -1,0 +1,158 @@
+%META:TOPICINFO{author="ProjectContributor" comment="reprev" date="1319610036" format="1.1" reprev="15" version="15"}%
+%META:TOPICPARENT{name="TopicFunction"}%
+%TOC{depth="2"}%
+
+---++ Documentation
+%STARTSECTION{name="documentation" type="section"}%
+This TopicFunction displays a collection of BlogEntries within the given CATegory and/or TAG.
+
+---+++++ Parameters
+   * SKIP: offset into the archive
+   * LIMIT: number of postings to show at max
+   * CAT: categories to extract (optional)
+   * TAG: tagged entries to be extracted (optional)
+   * STICKY: a pattern the Sticky field must match to list the posting see the "Sticky" definition in BlogEntry (optional)
+   * NOSTICKY: same as STICKY but with inverse logic
+%ENDSECTION{name="documentation" type="section"}%
+
+---++ Implementation
+<verbatim class="tml">
+%STARTINCLUDE%<!-- -->
+<noautolink>
+%DBQUERY{
+  "TopicType=~'\bBlogEntry\b'
+   AND State != 'unpublished'
+   AND topic != 'WebTopicEditTemplate'
+   %IF{"defined CAT and '%CAT%' != ''" then="AND topic ISA '%CAT%'"}%
+   %IF{"defined TAG and '%TAG%' != ''" then="AND Tag=~'\b%TAG%\b'"}%
+   %IF{"defined STICKY and '%STICKY%' != ''" then="AND Sticky=~'\b%STICKY%\b'"}%
+   %IF{"defined NOSTICKY and '%NOSTICKY%' != ''" then="AND ! Sticky=~'\b%NOSTICKY%\b'"}%
+  "
+  limit="%IF{"defined LIMIT" then="%LIMIT%" else="5"}%" 
+  skip="%IF{"defined SKIP" then="%SKIP%" else="0"}%" 
+  order="created" 
+  reverse="on" 
+  hidenull="on"
+  web="%BASEWEB%" 
+  header="%IF{"'%SKIP%'!='0'"
+    then="$dollarpercntDBCALL{
+        \\"%WEB%.%TOPIC%\\" 
+        section=\\"pagination%IF{"defined STICKY and '%STICKY%'!=''" then="DISABLED"}%\\" 
+        warn=\\"off\\"
+        LIMIT=\\"%IF{"defined LIMIT" then="%LIMIT%" else="5"}%\\" 
+        SKIP=\\"%IF{"defined SKIP" then="%SKIP%" else="0"}%\\" 
+        COUNT=\\"$count\\"
+        CLASS=\\"blogTopPagination\\"
+        PARAMS=\\"%IF{
+           "defined STICKY and '%STICKY%'!=''" then=";sticky=%STICKY%"
+         }%%IF{
+           "defined CAT and '%CAT%'!=''" then=";catname=%CAT%"
+         }%\\"
+      }$dollarpercnt<!-- -->"
+    }%<!-- -->
+    <div class='blogEntries%IF{"defined STICKY and '%STICKY%' != ''" then=" blogEntriesSticky"}%'>"
+  format="<div class='blogEntry'>
+    <div class='foswikiTopicInfo'>
+      <h2>
+        $percntMETACOMMENTS{
+          topic=\"$web.$topic\"
+          approval=\"on\"
+          format=\"<div class='blogCommentCount foswikiRight'>$dollarcount</div>\" 
+          limit=\"1\"
+          singular=\"1\" 
+          plural=\"$dollarcount\"
+        }$percnt<!-- -->
+        [[$web.$topic]] 
+        $percntIF{\"'$expand(State)' = 'unpublished'\"
+          then=\"<span class='foswikiAlert foswikiSmall'>(%MAKETEXT{"unpublished"}%)</span>\"
+        }$percnt<!-- -->
+        $percntREDDOT{\"$web.$topic\"}$percnt<!-- -->
+        <div class='foswikiTopicSummary'>$expand(Summary')</div>
+      </h2>
+      <$nopdirtyarea>
+        $percntTIMESINCE{ 
+        \"$expand(createdate)\" 
+        format=\"<nop>$time ago\"  
+        null=\"about now\" 
+      }$percnt </$nopdirtyarea> 
+      &#124; [[%USERSWEB%.$expand(createauthor)][$expand(createauthor)]]
+      $percntCATINFO{
+        topic=\"$web.$topic\"
+        header=\"&#124; \"
+      }$percnt<!-- -->
+      $percntTAGINFO{
+        topic=\"$web.$topic\"
+        header=\"&#124; \"
+      }$percnt<!-- -->
+    </div>
+    <div class='blogText hyphenate'>
+$expand(text)
+~~~
+      <span class='blogMore'>&#8230;&nbsp;[[$web.$topic][%MAKETEXT{"reply"}%]]</span>
+      %CLEAR%
+    </div>
+    </div>"
+   footer="</div>
+     $percntDBCALL{\"%WEB%.%TOPIC%\" 
+       section=\"pagination%IF{"defined STICKY and '%STICKY%'!=''" then="DISABLED"}%\" 
+       warn=\"off\"
+       LIMIT=\"%IF{"defined LIMIT" then="%LIMIT%" else="5"}%\"  
+       SKIP=\"%IF{"defined SKIP" then="%SKIP%" else="0"}%\"  
+       COUNT=\"$count\" 
+       CLASS=\"blogBottomPagination\"
+       PARAMS=\"%IF{
+           "defined STICKY and '%STICKY%'!=''" then=";sticky=%STICKY%"
+         }%%IF{
+           "defined CAT and '%CAT%'!=''" then=";catname=%CAT%"
+         }%\"
+     }$percnt<!-- -->"
+}%<!-- -->
+</noautolink>
+<!-- -->%STOPINCLUDE%
+</verbatim>
+
+---++ Pagination
+<verbatim class="tml">
+%STARTSECTION{"pagination"}%<!-- -->
+<div class='blogPagination %CLASS% foswikiSmallish'> 
+%CALC{"$SET(theNextSkip,$EVAL(%SKIP%+%LIMIT%))$SET(thePrevSkip,$EVAL(%SKIP%-%LIMIT%))$IF($GET(thePrevSkip) < 0,$SET(thePrevSkip,0))"}%<!-- -->
+<table class='foswikiNullTable' width='100%'>
+<tr> 
+<td class='blogPrev'> 
+<a %IF{"%SKIP% = 0" then="style='display:none'"}%' href='%SCRIPTURL{"view"}%/%BASEWEB%/%BASETOPIC%?skip=%CALC{"$GET(thePrevSkip)"}%;limit=%LIMIT%%IF{"defined PARAMS" then="%PARAMS%"}%'>&#171;&nbsp;%MAKETEXT{"previous page"}%</a> 
+</td> 
+<td class='blogNext' align='right'> 
+<a %IF{"%CALC{"$GET(theNextSkip)"}% >= %COUNT%" then="style='display:none'"}% href='%SCRIPTURL{"view"}%/%BASEWEB%/%BASETOPIC%?skip=%CALC{"$GET(theNextSkip)"}%;limit=%LIMIT%%IF{"defined PARAMS" then="%PARAMS%"}%'>%MAKETEXT{"next page"}%&nbsp;&#187;</a> 
+</td> 
+</tr>
+</table> 
+</div><!-- -->%ENDSECTION{"pagination"}%
+</verbatim>
+
+---++ Test
+
+---+++ no stickiness
+%TWISTY%
+%DBCALL{"%TOPIC%"}%
+%ENDTWISTY%
+
+---+++ stickiness
+%TWISTY%
+%DBCALL{"%TOPIC%" STICKY="frontpage"}%
+%ENDTWISTY%
+
+%DBCALL{"Applications.RenderFunctionCallers"}%
+
+---++ Copyright
+&copy; 2005-2011 http://michaeldaumconsulting.com
+
+%DBCALL{"Applications.GnuGeneralPublicLicense" section="notice"}%
+
+</verbatim>
+
+%META:FORM{name="Applications.ApplicationTopic"}%
+%META:FIELD{name="TopicType" title="TopicType" value="DocuTopic, TopicFunction"}%
+%META:FIELD{name="TopicTitle" attributes="" title="<nop>TopicTitle" value=""}%
+%META:FIELD{name="Summary" attributes="c" title="Summary" value="Render a set of postings to leaf through"}%
+%META:FIELD{name="WikiApplication" attributes="" title="WikiApplication" value="BlogApp"}%
+%META:PREFERENCE{name="EDIT_TEMPLATE" title="EDIT_TEMPLATE" type="Set" value="Applications.WikiTopicEdit"}%

@@ -42,39 +42,17 @@ use Foswiki::Contrib::DBCacheContrib::Search ();
 # To operate as a tie, subclasses must implement the methods of
 # Tie::Array, except TIEARRAY, and must implement new(). Additional new()
 # parameters are passed by name.
-# Parameters required to be supported by new() in subclasses are as follows:
-#    * =archivist= - reference to an object that implements
-#      Foswiki::Contrib::DBCacheContrib::Archivist
-#    * =existing= - if defined, reference to an existing object that implements
-#      the class being tied to.
-# If =existing= is defined, then =archivist= will be ignored.
-# For example,
-# =my $obj = Foswiki::Contrib::DBCacheContrib::MemArray()=
-# will create a new MemArray  that is not tied to a backing archive.
-# =tie(@array, ref($obj), existing=>$obj)= will tie @array to $obj so you can
-# write =$array[0] = 1= etc.
 
 sub new {
     my $class = shift;
     my %args  = @_;
     my $this  = bless( {}, $class );
-    if ( $args{existing} ) {
-        ASSERT( UNIVERSAL::isa( $args{existing}, __PACKAGE__ ) ) if DEBUG;
-        $this->setArchivist( $args{existing}->getArchivist() );
-    }
-    elsif ( $args{archivist} ) {
-        $this->setArchivist( $args{archivist} );
-    }
     return $this;
 }
 
 sub TIEARRAY {
     my $class = shift;
     my %args  = @_;
-    if ( $args{existing} ) {
-        ASSERT( UNIVERSAL::isa( $args{existing}, __PACKAGE__ ) ) if DEBUG;
-        return $args{existing};
-    }
     return $class->new(@_);
 }
 

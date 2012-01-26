@@ -13,19 +13,21 @@
 # http://www.gnu.org/copyleft/gpl.html
 
 package Foswiki::Plugins::TopicDataHelperPlugin;
-
 use strict;
-use Foswiki::Func;
+use warnings;
+
+use Assert;
+use Foswiki::Func();
 
 our $VERSION = '$Rev$';
-our $RELEASE = '1.1.2';
+our $RELEASE = '1.1.4';
 our $SHORTDESCRIPTION =
   'helper plugin for collecting, filtering and sorting data objects';
 our $NO_PREFS_IN_TOPIC = 1;
-
-our $pluginName = 'TopicDataHelperPlugin';
 our $debug;
 our %sortDirections = ( 'ASCENDING', 1, 'NONE', 0, 'DESCENDING', -1 );
+
+my $pluginName = 'TopicDataHelperPlugin';
 my $topic;
 my $web;
 my $user;
@@ -637,6 +639,14 @@ sub sortObjectData {
 
     my $sortOrder = $inSortOrder || $sortDirections{'NONE'};
 
+    if (DEBUG) {
+        ASSERT(defined $inSortOrder);
+        ASSERT(grep { $_ == $inSortOrder} values(%Foswiki::Plugins::TopicDataHelperPlugin::sortDirections));
+        ASSERT($inSortKey);
+        ASSERT(defined $inCompareMode);
+        ASSERT(($inCompareMode =~ /^(numeric|integer|string|alphabetical)$/), "inCompareMode: '$inCompareMode' invalid");
+    }
+
     my $tmpSortedObjects =
       _sortObjectsByProperty( \@objectData, $sortOrder, $inSortKey,
         $inCompareMode, $inNameKey );
@@ -672,21 +682,23 @@ sub _sortObjectsByProperty {
     my @objectData    = @$inObjectData;
     my @sortedObjects = ();
 
-    if ( defined $inCompareMode && $inCompareMode eq 'integer' ) {
+    if ( defined $inCompareMode && ($inCompareMode eq 'integer' || $inCompareMode eq 'numeric') ) {
+
+        # Item11416: This had lc() around each $z->{$inSortKey}, PH removed them
         if ( $inSortOrder == $sortDirections{'ASCENDING'} ) {
             @sortedObjects =
               sort {
-                lc( $a->{$inSortKey} ) <=> lc( $b->{$inSortKey} )
+                ( $a->{$inSortKey} || 0 ) <=> ( $b->{$inSortKey} || 0 )
                   ||    # secondary key hardcoded
-                  lc( $a->{$inSecondaryKey} ) cmp lc( $b->{$inSecondaryKey} )
+                  ( $a->{$inSecondaryKey} || '' ) cmp ( $b->{$inSecondaryKey} || '' )
               } @objectData;
         }
         else {
             @sortedObjects =
               sort {
-                lc( $b->{$inSortKey} ) <=> lc( $a->{$inSortKey} )
+                ( $b->{$inSortKey} || 0 ) <=> ( $a->{$inSortKey} || 0)
                   ||    # secondary key hardcoded
-                  lc( $b->{$inSecondaryKey} ) cmp lc( $a->{$inSecondaryKey} )
+                  ( $b->{$inSecondaryKey} || '' ) cmp ( $a->{$inSecondaryKey} || '' )
               } @objectData;
         }
     }
@@ -696,17 +708,17 @@ sub _sortObjectsByProperty {
         if ( $inSortOrder == $sortDirections{'ASCENDING'} ) {
             @sortedObjects =
               sort {
-                lc( $a->{$inSortKey} ) cmp lc( $b->{$inSortKey} )
+                lc( $a->{$inSortKey} || '' ) cmp lc( $b->{$inSortKey} || '' )
                   ||    # secondary key hardcoded
-                  lc( $a->{$inSecondaryKey} ) cmp lc( $b->{$inSecondaryKey} )
+                  lc( $a->{$inSecondaryKey} || '' ) cmp lc( $b->{$inSecondaryKey} || '' )
               } @objectData;
         }
         else {
             @sortedObjects =
               sort {
-                lc( $b->{$inSortKey} ) cmp lc( $a->{$inSortKey} )
+                lc( $b->{$inSortKey} || '' ) cmp lc( $a->{$inSortKey} || '' )
                   ||    # secondary key hardcoded
-                  lc( $b->{$inSecondaryKey} ) cmp lc( $a->{$inSecondaryKey} )
+                  lc( $b->{$inSecondaryKey} || '' ) cmp lc( $a->{$inSecondaryKey} || '' )
               } @objectData;
         }
     }

@@ -1,41 +1,38 @@
 %TMPL:INCLUDE{"foswiki"}%<!-- template: managetags.nat.tmpl -->
-%TMPL:DEF{"dialog"}%<div class="foswikiDialog foswikiFormSteps">
+
+%{ ################################################################################ }%
+%TMPL:DEF{"dialog"}%<div class="jqUIDialog foswikiFormSteps {modal:true, width:450, draggable:true}" title="%TMPL:P{"heading"}%" id="renameTagDialog">
 %TMPL:P{"content"}%<!-- -->
 %TMPL:P{"managetags::javascript"}%<!-- -->
 </div>%TMPL:END%
 
+%{ ################################################################################ }%
+%TMPL:DEF{"heading"}%%MAKETEXT{"Rename, merge or delete tags"}%%TMPL:END%
+
+%{ ################################################################################ }%
 %TMPL:DEF{"content"}%<!-- -->
 <form class="jqRenameTag" name="renametagform" action="%SCRIPTURLPATH{"rest"}%/ClassificationPlugin/renametag">
   <input type="hidden" name="web" value="%BASEWEB%" />
-  <h2 class="foswikiDialogTitle jqSimpleModalDraggable">%MAKETEXT{"Rename, merge or delete tags"}%</h2>
   <div class="foswikiFormStep">
-    <h3>%MAKETEXT{"From:"}%</h3>
-    <input type="text" class="foswikiInputField jqTextboxList required {autocomplete:'%SCRIPTURL{"rest"}%/RenderPlugin/template/rest?name=classificationplugin&expand=querytags&topic=%BASEWEB%.%BASETOPIC%', clearControl:'#renameClear'}" size="30" name="from" />
+    <h3>%MAKETEXT{"From"}%:</h3>
+    <input type="text" class="foswikiInputField jqTextboxList jqFocus required {autocomplete:'%SCRIPTURL{"rest"}%/RenderPlugin/template/rest?name=classificationplugin&expand=querytags&topic=%BASEWEB%.%BASETOPIC%', clearControl:'#renameClear'}" size="30" name="from" />
     <span class="foswikiHidden" id="renameClear">clear</span>
     <div class="foswikiFormDescription">
       %MAKETEXT{"Select one or more existing tags to be renamed."}%
     </div>
   </div>
   <div class="foswikiFormStep">
-    <h3>%MAKETEXT{"To:"}%</h3>
+    <h3>%MAKETEXT{"To"}%:</h3>
     <input type="text" class="foswikiInputField jqUIAutocomplete" required autocomplete='%SCRIPTURL{"rest"}%/RenderPlugin/template/rest?name=classificationplugin&expand=querytags&topic=%BASEWEB%.%BASETOPIC%' size="30" name="to" />
     <div class="foswikiFormDescription">
       %MAKETEXT{"Select the tag to rename the above tags to. Leaving this empty will delete them."}%
     </div>
   </div>
-  <hr />
-  <div class="foswikiFormStep foswikiFormLast foswikiFormButtons">
-    %BUTTON{"%MAKETEXT{"Rename"}%" icon="tag_blue" type="submit"}%
-    %BUTTON{"%MAKETEXT{"Cancel"}%" 
-      class="jqSimpleModalCancel" 
-      icon="cross" 
-      %IF{"context view"
-        then="target=\"%URLPARAM{"origurl" default="%BASEWEB%.%BASETOPIC%"}%\""
-      }%
-    }%
-    %CLEAR%
-  </div>
+  <a class="jqUIDialogButton {icon:'ui-icon-circle-check', click: function() { $(this).find('form:first').submit(); }}">%MAKETEXT{"Submit"}%</a>
+  <a class="jqUIDialogButton {icon:'ui-icon-cancel', click: function() { $(this).dialog('close'); }}">%MAKETEXT{"Cancel"}%</a>
 </form>
 <!-- -->%TMPL:END%
 
+%{ ################################################################################ }%
 %TMPL:DEF{"managetags::javascript"}%<script src='%PUBURLPATH%/%SYSTEMWEB%/ClassificationPlugin/renametag.js?t=%GMTINE{"$epoch"}%'></script>%TMPL:END%
+

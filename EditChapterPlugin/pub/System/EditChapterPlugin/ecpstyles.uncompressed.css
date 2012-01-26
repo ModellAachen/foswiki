@@ -1,9 +1,6 @@
-.ecpDialog {
-  display:none;
-}
 .ecpHeading {
   position:relative;
-  padding-right:1.1111em;
+  padding-right:20px;
 }
 .ecpEditHover {
   background:transparent !important;
@@ -33,10 +30,4 @@
 .ecpDisabled .ecpEdit,
 .ecpDisabled img {
   display:none;
-}
-#simplemodal-container {
-  width:600px;
-}
-.jqSimpleModalDraggable {
-  cursor: move;
 }

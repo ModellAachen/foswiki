@@ -731,7 +731,8 @@
       <str name="echoParams">explicit</str>
       <float name="tie">0.01</float>
       <str name="qf"> 
-        webtopic_search^8.0 
+        web_search^8.0 
+        topic_search^5.0 
         title_search^3.0 
         category_search^2.0 
         tag_search^2.0 
@@ -748,7 +749,8 @@
       <!-- boost topics in favor of attachments -->
       <str name="bq">type:topic^16</str>
       <str name="pf">
-        webtopic_search^8.0 
+        web_search^8.0 
+        topic_search^5.0 
         title_search^3.0 
         category_search^2.0 
         substrings^0.5
@@ -780,9 +782,8 @@
       <str name="echoParams">explicit</str>
       <float name="tie">0.01</float>
       <str name="qf"> 
-        webtopic_search^8.0 
-        web_search^4.0 
-        topic_search^4.0 
+        web_search^8.0 
+        topic_search^5.0 
         title_search^3.0 
         category_search^2.0 
         tag_search^2.0 
@@ -797,9 +798,8 @@
       <!-- boost topics in favor of attachments -->
       <str name="bq">type:topic^200</str>
       <str name="pf">
-        webtopic_search^8.0 
-        web_search^4.0 
-        topic_search^4.0 
+        web_search^8.0 
+        topic_search^5.0 
         title_search^3.0 
         category_search^2.0 
         tag_search^2.0
@@ -850,14 +850,15 @@
   <requestHandler name="/update" 
                   class="solr.XmlUpdateRequestHandler">
     <!-- See below for information on defining 
-         updateRequestProcessorChains that can be used by name 
+         updateRequestProcessorChain-s that can be used by name 
          on each Update Request
       -->
-    <!--
-       <lst name="defaults">
-         <str name="update.chain">dedupe</str>
-       </lst>
-       -->
+    <lst name="defaults">
+      <!-- BUG: not using "unique": it removes any duplicate not leaving behind even a single one -->
+      <!-- <str name="update.chain">unique</str> -->
+      <!-- uncomment this to enable uima: see below for more information -->
+      <!-- <str name="update.chain">uima</str> -->
+    </lst>
     </requestHandler>
   <!-- Binary Update Request Handler
        http://wiki.apache.org/solr/javabin
@@ -1161,6 +1162,37 @@
     </arr>
   </requestHandler>
 
+  <!-- suggester based on spellcheck component -->
+  <searchComponent class="solr.SpellCheckComponent" name="suggest">
+    <lst name="spellchecker">
+      <str name="name">suggest</str>
+      <str name="classname">org.apache.solr.spelling.suggest.Suggester</str>
+      <str name="lookupImpl">org.apache.solr.spelling.suggest.jaspell.JaspellLookup</str>
+      <!-- Alternatives to lookupImpl: 
+           org.apache.solr.spelling.suggest.fst.FSTLookup   [finite state automaton]
+           org.apache.solr.spelling.suggest.jaspell.JaspellLookup [default, jaspell-based]
+           org.apache.solr.spelling.suggest.tst.TSTLookup   [ternary trees]
+      -->
+      <str name="field">spell</str>  <!-- the indexed field to derive completions from -->
+      <float name="threshold">0.001</float>
+      <str name="buildOnOptimize">true</str>
+      <!-- <str name="sourceLocation">american-english</str> -->
+    </lst>
+  </searchComponent>
+  <requestHandler name="/suggest" class="org.apache.solr.handler.component.SearchHandler" >
+    <lst name="defaults">
+      <str name="spellcheck">true</str>
+      <str name="spellcheck.dictionary">suggest</str>
+      <str name="spellcheck.onlyMorePopular">false</str>
+      <str name="spellcheck.extendedResults">false</str>
+      <str name="spellcheck.count">10</str>
+      <str name="spellcheck.collate">true</str>
+    </lst>
+    <arr name="components">
+      <str>suggest</str>
+    </arr>
+  </requestHandler>
+
   <!-- Term Vector Component
 
        http://wiki.apache.org/solr/TermVectorComponent
@@ -1448,6 +1480,83 @@
        <processor class="solr.RunUpdateProcessorFactory" />
      </updateRequestProcessorChain>
     -->
+
+  <!-- A non-duplicate processor. Removes duplicates in the specified fields.
+       listing some copyField destinations here that get content from quite some other fields
+  -->
+  <updateRequestProcessorChain name="unique">
+    <processor class="solr.processor.UniqFieldsUpdateProcessorFactory">
+      <lst name="fields">
+        <str>catchall</str>
+        <str>spell</str>
+        <str>phonetic</str>
+        <str>substrings</str>
+      </lst>      
+    </processor>
+    <processor class="solr.LogUpdateProcessorFactory" />
+    <processor class="solr.RunUpdateProcessorFactory" />
+  </updateRequestProcessorChain>
+
+  <!-- UIMA Metadata Extraction 
+
+   VALID_ALCHEMYAPI_KEY is your AlchemyAPI Access Key. You need to register AlchemyAPI Access
+   key to exploit the AlchemyAPI services: http://www.alchemyapi.com/api/register.html
+
+   VALID_OPENCALAIS_KEY is your Calais Service Key. You need to register Calais Service
+   key to exploit the Calais services: http://www.opencalais.com/apikey
+  
+   the analysisEngine must contain an AE descriptor inside the specified path in the classpath
+
+  -->
+  <!-- 
+  <updateRequestProcessorChain name="uima">
+    <processor class="org.apache.solr.uima.processor.UIMAUpdateRequestProcessorFactory">
+      <lst name="uimaConfig">
+        <lst name="runtimeParameters">
+          <str name="keyword_apikey">VALID_ALCHEMYAPI_KEY</str>
+          <str name="concept_apikey">VALID_ALCHEMYAPI_KEY</str>
+          <str name="lang_apikey">VALID_ALCHEMYAPI_KEY</str>
+          <str name="cat_apikey">VALID_ALCHEMYAPI_KEY</str>
+          <str name="entities_apikey">VALID_ALCHEMYAPI_KEY</str>
+          <str name="oc_licenseID">VALID_OPENCALAIS_KEY</str>
+        </lst>
+        <str name="analysisEngine">/org/apache/uima/desc/OverridingParamsExtServicesAE.xml</str>
+        <bool name="ignoreErrors">true</bool>
+        <lst name="analyzeFields">
+          <bool name="merge">false</bool>
+          <arr name="fields">
+            <str>text</str>
+          </arr>
+        </lst>
+        <lst name="fieldMappings">
+          <lst name="type">
+            <str name="name">org.apache.uima.alchemy.ts.concept.ConceptFS</str>
+            <lst name="mapping">
+              <str name="feature">text</str>
+              <str name="field">concept</str>
+            </lst>
+          </lst>
+          <lst name="type">
+            <str name="name">org.apache.uima.alchemy.ts.language.LanguageFS</str>
+            <lst name="mapping">
+              <str name="feature">language</str>
+              <str name="field">language</str>
+            </lst>
+          </lst>
+          <lst name="type">
+            <str name="name">org.apache.uima.SentenceAnnotation</str>
+            <lst name="mapping">
+              <str name="feature">coveredText</str>
+              <str name="field">sentence</str>
+            </lst>
+          </lst>
+        </lst>
+      </lst>
+    </processor>
+    <processor class="solr.LogUpdateProcessorFactory" />
+    <processor class="solr.RunUpdateProcessorFactory" />
+  </updateRequestProcessorChain>
+  -->
 
   <!-- Response Writers
 

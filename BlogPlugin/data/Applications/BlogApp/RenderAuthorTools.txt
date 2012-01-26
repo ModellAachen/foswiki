@@ -1,0 +1,48 @@
+%META:TOPICINFO{author="ProjectContributor" comment="reprev" date="1320870379" format="1.1" reprev="4" version="4"}%
+%META:TOPICPARENT{name="TopicFunction"}%
+%TOC{depth="2"}%
+
+---++ Documentation
+%STARTSECTION{name="documentation" type="section"}%
+%RED%TODO%ENDCOLOR%
+
+---+++++ Parameters
+   * NONE
+
+%ENDSECTION{name="documentation" type="section"}%
+
+---++ Implementation
+<verbatim class="tml">
+%STARTINCLUDE%%IF{"'%BASEWEB%.WebPreferences' allows 'change'" 
+  then="$percntDBCALL{\"%WEB%.%TOPIC%\" section=\"tools\"}$percnt"
+}%%STOPINCLUDE%
+</verbatim>
+
+<verbatim class="tml">
+%STARTSECTION{"tools"}%<!-- -->
+<h2 >%MAKETEXT{"Tools"}%</h2>
+   * [[BlogEntry][%MAKETEXT{"BlogEntries"}%]]
+   * [[Category][%MAKETEXT{"Categories"}%]]
+   * [[WebTopicList][%MAKETEXT{"Index"}%]]
+   * [[WebChanges][%MAKETEXT{"Changes"}%]]
+   * [[WebNotify][%MAKETEXT{"Subscriptions"}%]]
+   * [[WebStatistics][%MAKETEXT{"Statistics"}%]]
+   * [[WebPreferences][%MAKETEXT{"Preferences"}%]]
+<!-- -->%ENDSECTION{"tools"}%
+</verbatim>
+
+%DBCALL{"Applications.RenderFunctionCallers"}%
+
+---++ Copyright
+&copy; 2005-2011 http://michaeldaumconsulting.com
+
+%DBCALL{"Applications.GnuGeneralPublicLicense" section="notice"}%
+
+
+%META:FORM{name="Applications.ApplicationTopic"}%
+%META:FIELD{name="TopicType" title="TopicType" value="DocuTopic, TopicFunction"}%
+%META:FIELD{name="TopicTitle" attributes="" title="<nop>TopicTitle" value=""}%
+%META:FIELD{name="Summary" attributes="c" title="Summary" value="tools visible to blog authors"}%
+%META:FIELD{name="WikiApplication" attributes="" title="WikiApplication" value="BlogApp"}%
+%META:TOPICMOVED{by="micha" date="1294073388" from="Applications/BlogApp.RenderBlogAuthorTools" to="Applications/BlogApp.RenderAuthorTools"}%
+%META:PREFERENCE{name="EDIT_TEMPLATE" title="EDIT_TEMPLATE" type="Set" value="Applications.WikiTopicEdit"}%

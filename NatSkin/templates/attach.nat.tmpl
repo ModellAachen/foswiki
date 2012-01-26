@@ -5,12 +5,12 @@
 %TMPL:INCLUDE{"metadata"}%<!-- attachsidebar// -->
 
 %{ ################################################################################ }%
-%TMPL:DEF{"title"}%%TOPIC% (attach) - %WIKITOOLNAME%%TMPL:END%
+%TMPL:DEF{"titleaction"}%%MAKETEXT{"attach"}%%TMPL:END%
 %TMPL:DEF{"bodyclass"}%natAttachBody%TMPL:END%
 %TMPL:DEF{"meta"}%<meta name="robots" content="noindex, nofollow" />%TMPL:END%
 %TMPL:DEF{"attachments::hidden"}%%URLPARAM{"attachments_hidden" default="on"}%%TMPL:END%
 %TMPL:DEF{"attachments::showuploader"}%%URLPARAM{"attachments_showuploader" default="on"}%%TMPL:END%
-%TMPL:DEF{"breadcrumbstail"}%%TMPL:P{"sep"}%<a href="%SCRIPTURLPATH{"attach"}%/%BASEWEB%/%BASETOPIC%">%MAKETEXT{"Attachments"}%</a>%TMPL:END%
+%TMPL:DEF{"breadcrumbs::tail"}%%TMPL:P{"sep"}%<a href="%SCRIPTURLPATH{"attach"}%/%BASEWEB%/%BASETOPIC%">%MAKETEXT{"Attachments"}%</a>%TMPL:END%
 
 %{ ################################################################################ }%
 %TMPL:DEF{"content"}%<!-- content -->

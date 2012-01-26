@@ -2,7 +2,7 @@
 %META:TOPICPARENT{name="WikiGroups"}%
 ---+!! <nop>BlogAuthorGroup
 
-   * Set GROUP =
+   * Set GROUP = micha, test_group
    * Set ALLOWTOPICCHANGE = BlogAdminGroup
 
 __Related topics:__ %WIKIUSERSTOPIC%, WikiGroups, %SYSTEMWEB%.AccessControl, BlogAdminGroup

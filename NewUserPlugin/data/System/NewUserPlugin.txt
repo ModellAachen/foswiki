@@ -37,7 +37,7 @@ During topic creation the following variables in the <nop>NEWUSERTEMPLATE are ex
    * =%<nop>EXPAND{...}%=
    * =%<nop>STARTEXPAND%= ... =%<nop>STOPEXPAND%=
 
-To expand additional VARIABLES, you can use the =%EXPAND{}%= or =%<nop>STARTEXPAND%= ... %<nop>STOPEXPAND%=
+To expand additional VARIABLES, you can use the =%<nop>EXPAND{}%= or =%<nop>STARTEXPAND%= ... %<nop>STOPEXPAND%=
 syntax.  All percent signs have to be escaped by =$percnt=, deeper recursion levels may
 use =$dollar=, too. 
 
@@ -58,11 +58,14 @@ This work is partly funded by
     * Set SHORTDESCRIPTION = Create a user topic if it does not exist yet
 -->
 |  Plugin Author: | Michael Daum |
-|  Copyright &copy;: | 2006-2009, Michael Daum http://michaeldaumconsulting.com |
+|  Copyright &copy;: | 2006-2012, Michael Daum http://michaeldaumconsulting.com |
 |  License: | GPL ([[http://www.gnu.org/copyleft/gpl.html][GNU General Public License]]) |
 |  Release: | %$RELEASE% |
 |  Version: | %$VERSION% |
 |  Change History: | <!-- versions below in reverse order -->&nbsp; |
+|  20 Jan 2012 | fixed creating user profiles by not using deprecate Func apis; \
+                 added better view template for ldap users; \
+                 added way to configure new user templates via =configure= | 
 |  11 Dec 2010 | fixed dependencies of plugin and simplified example !RenderLdapUser |
 |  13 Sep 2009 | creating user homepages as !RegistrationAgent |
 |  05 May 2009 | also expand %25WIKINAME%25 and friends |

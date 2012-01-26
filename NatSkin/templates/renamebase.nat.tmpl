@@ -6,11 +6,11 @@
 %{ ################################################################################ }%
 %TMPL:DEF{"bodyclass"}%natRenameBody%TMPL:END%
 %TMPL:DEF{"meta"}% <meta name="robots" content="noindex, nofollow" /> %TMPL:END%
-%TMPL:DEF{"title"}%%TOPIC% (%MAKETEXT{"rename"}%) - %WIKITOOLNAME%%TMPL:END%
+%TMPL:DEF{"titleaction"}%%MAKETEXT{"rename"}%%TMPL:END%
 %TMPL:DEF{"contenttitle"}%<h1>%MAKETEXT{"Rename or move [_1]"  args="<nop>%TOPIC%"}%</h1>%TMPL:END%
 %TMPL:DEF{"trashcheckbox"}%
     <input type="checkbox" class="foswikiCheckbox" name="totrash" id="totrash" onclick="document.rename.newweb.value = (this.checked)?'%TRASHWEB%':'%WEB%';this.blur()">
-    <label for="totrash">%MAKETEXT{"Move to %TRASHWEB%"}%</label>
+    <label for="totrash">%MAKETEXT{"Move to [_1]" args="%TRASHWEB%"}%</label>
 %TMPL:END%
 
 %{ ################################################################################ }%
@@ -43,7 +43,7 @@
     %TMPL:P{"newtopic"}%
 
     <input type="checkbox" class="foswikiCheckbox" name="nonwikiword" id="nonwikiword" %IF{"$ 'URLPARAM{nonwikiword}'='on'" then="checked='checked'"}% />
-    <label for="nonwikiword">%MAKETEXT{"Allow non <nop>WikiWord for the new topic name"}%</label>
+    <label for="nonwikiword">%MAKETEXT{"Allow non-<nop>WikiWord for the new topic name"}%</label>
   </div>
 ---
   <div class="natSearchBacklinks" %IF{"'%SEARCH_COUNT%'='0'" then="style='display:none'"}%>

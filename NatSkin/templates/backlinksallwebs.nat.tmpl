@@ -1,9 +1,9 @@
 %TMPL:INCLUDE{"backlinksweb"}%<!-- template: backlinksallwebs.nat.tmpl -->
 
 %{ ################################################################################ }%
-%TMPL:DEF{"title"}%%TOPIC% %MAKETEXT{"(backlinks)"}% - %WIKITOOLNAME%%TMPL:END%
+%TMPL:DEF{"titleaction"}%%MAKETEXT{"backlinks"}%%TMPL:END%
 %TMPL:DEF{"contenttitle"}%<h1>%MAKETEXT{"Backlinks to [_1] in all Webs" args="<nop>%TOPIC%"}%</h1>%TMPL:END%
-%TMPL:DEF{"breadcrumbstail"}%%TMPL:P{"sep"}%<a href="%SCRIPTURLPATH{"view"}%/%WEB%/%TOPIC%?template=backlinksallwebs">%MAKETEXT{"Backlinks"}%</a>%TMPL:END%
+%TMPL:DEF{"breadcrumbs::tail"}%%TMPL:P{"sep"}%<a href="%SCRIPTURLPATH{"view"}%/%WEB%/%TOPIC%?template=backlinksallwebs">%MAKETEXT{"Backlinks"}%</a>%TMPL:END%
 
 %{ ################################################################################ }%
 %TMPL:DEF{"content"}%<!-- content -->
@@ -19,7 +19,7 @@
   %CLEAR%
 </div>
 %TMPL:P{"contenttitle"}%<!-- // -->
-%BUTTON{"%MAKETEXT{"Search [_1] Web only" args="<nop>%WEB%"}%" 
+%BUTTON{"%MAKETEXT{"Search [_1] web only" args="<nop>%WEB%"}%" 
   icon="find" 
   href="%SCRIPTURLPATH{"view"}%/%WEB%/%TOPIC%?template=backlinksallwebs" 
   title="%MAKETEXT{"Search [_1] web only for topics that link to here" args="<nop>%WEB%"}%"

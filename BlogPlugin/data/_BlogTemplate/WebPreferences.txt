@@ -1,0 +1,70 @@
+%META:TOPICINFO{author="ProjectContributor" date="1275569295" format="1.1" reprev="2" version="3"}%
+%META:TOPICPARENT{name="WebHome"}%
+---+!! <nop>%WEB% Web Preferences
+
+%TOC%
+
+---++ General settings
+   * Set SITEMAPLIST = on
+   * Set WEBSUMMARY = 
+   * Set NOSEARCHALL = 
+   * Set WEBBGCOLOR = 
+   * Set NOAUTOLINK = on
+
+---++ Image settings
+   * Set BLOGIMAGES = %PUBURLPATH%/%WEB%/BlogImages
+   * Set IMAGEALBUM = %WEB%/BlogImages
+
+---++ !WebComponents
+   * [[WebTopicEditTemplate]]: template for new topics
+   * [[WebMenu]]: horizontal navitation, overrides [[%USERSWEB%.SiteMenu]], or [[%SYSTEMWEB%.SiteMenu]]
+   * [[WebLinks]]: sidebar links, overrides [[%USERSWEB%.SiteLinks]], or [[%SYSTEMWEB%.SiteLinks]]
+   * [[WebSideBar]]: sidebar navigation, overrides [[%USERSWEB%.SiteSideBar]], or [[%SYSTEMWEB%.SiteSideBar]]
+   * [[WebBottomBar]]: bottom part, overrides [[%USERSWEB%.SiteBottomBar]], or [[%SYSTEMWEB%.SiteBottomBar]]
+
+---++ Skin settings
+   * Set NATSKIN_LAYOUT = fixed
+      * possible values: fixed, bordered, fluid
+   * #Set NATSKIN_VARIATION = 
+   * Set NATSKIN_SIDEBAR = right
+      * possible values: left, right, both, off
+   * #Set NATSKIN_SIDEBARWIDTH = 19.23em
+
+---++ Comment settings
+   * Set COMMNENTFORMAT = threaded
+      * can be threaded, linear, reverse, insidetab
+   * Set COMMENTMODERATION = on
+
+---++ !DataForm settings
+   * Set WEBFORMS = Applications.BlogApp.BlogEntry, Applications.ClassificationApp.ClassifiedTopic, Applications.ClassificationApp.CategorizedTopic, Applications.ClassificationApp.TaggedTopic
+
+---++ !ClassificationPlugin settings
+   * Set CLASSIFICATIONPLUGIN_AUTOREPARENT = on
+
+---++ !AutoTemplatePlugin settings
+
+   * Set VIEW_TEMPLATE_RULES = 
+     .+\..+Category => Applications.BlogApp.CategoryView,
+     WebSearch.* => Applications.BlogApp.BlogSearchView
+
+---++ Cache settings
+   * Set WEBDEPENDENCIES = WebHome, WebTopicList, WebIndex, WebChanges, Category, WebRss, WebAtom, WebSearch
+
+---++ Access rights
+*Web*:
+   * #Set DENYWEBVIEW = 
+   * Set ALLOWWEBVIEW = %USERSWEB%.AdminGroup
+   * #Set DENYWEBCHANGE = 
+   * Set ALLOWWEBCHANGE = %USERSWEB%.AdminGroup
+   * #Set DENYWEBRENAME = 
+   * Set ALLOWWEBRENAME = %USERSWEB%.AdminGroup
+   * Set ALLOWWEBCOMMENT = 
+   * Set ALLOWWEBMODERATE = %USERSWEB%.BlogAuthorGroup
+
+*Moderation*:
+   * #Set ALLOWWEBMODERATE = %USERSWEB%.BlogAuthorGroup
+
+*Topic*:
+   * Set ALLOWTOPICCHANGE = %USERSWEB%.AdminGroup
+   * Set ALLOWTOPICRENAME = %USERSWEB%.AdminGroup
+

@@ -65,7 +65,7 @@ var solr; /* last solr manager constructed; this is a singleton in most use case
 	// adding DATA:: prefix to prevent clashes with prototype properties of Arrays, like 'filter' 
 
     if (typeof(self.mapping[_key]) === 'undefined') {
-      self.log("mapping key="+key+", val="+val);
+      //self.log("mapping key="+key+", val="+val);
       self.mapping[_key] = val; 
     }
 
@@ -380,46 +380,49 @@ var solr; /* last solr manager constructed; this is a singleton in most use case
     });
 
     /* init autocompletion */
-    var $searchField = $(".solrSearchField"), 
-	searchFieldOpts = $.extend({}, $searchField.metadata()),
-	filter = searchFieldOpts.filter?searchFieldOpts.filter:[];
+    var $searchField = $(".solrSearchField");
 
-    for (var i = 0; i < self.selection.length; i++) {
-      var fv = self.selection[i];
-      if (fv.facet !== 'keyword') {
-        filter.push(fv.facet+":"+fv.value);
+    if ($searchField.length) {
+      var searchFieldOpts = $.extend({}, $searchField.metadata()),
+          filter = searchFieldOpts.filter?searchFieldOpts.filter:[];
+
+      for (var i = 0; i < self.selection.length; i++) {
+        var fv = self.selection[i];
+        if (fv.facet !== 'keyword') {
+          filter.push(fv.facet+":"+fv.value);
+        }
+      }
+      if (filter.length) {
+        filter = ";filter="+filter.join(",");
+      }
+
+      /* init autocompletion */
+      // TODO: test for newer autocomplete library
+      if (1) {
+        $searchField.autocomplete({
+          source:foswiki.getPreference("SCRIPTURL")+'/rest/SolrPlugin/autocomplete?'+filter
+        }).data("autocomplete")._renderItem = function(ul, item) {
+          return $("<li></li>")
+            .data("item.autocomplete", item)
+            .append("<a><table width='100%'><tr><td align='left'>"+item.label+"</td><td align='right'>"+item.frequency+"</td></tr></table></a>")
+            .appendTo(ul);
+        };
+      } else {
+        $searchField.autocomplete(
+          foswiki.getPreference("SCRIPTURL")+'/rest/SolrPlugin/autocomplete?'+filter, {
+            selectFirst: false,
+            autoFill:false,
+            matchCase:false,
+            matchSubset:false,
+            matchContains:false,
+            scrollHeight:'20em',
+            formatItem: function(row, index, max, search) {
+              return "<table width='100%'><tr><td align='left'>"+row[0]+"</td><td align='right'>"+row[2]+"</td></tr></table>";
+            }
+        });
       }
     }
-    if (filter.length) {
-      filter = ";filter="+filter.join(",");
-    }
 
-    // TODO: test for newer autocomplete library
-    if (1) {
-      $searchField.autocomplete({
-	source:foswiki.getPreference("SCRIPTURL")+'/rest/SolrPlugin/autocomplete?'+filter
-      }).data("autocomplete")._renderItem = function(ul, item) {
-	return $("<li></li>")
-	  .data("item.autocomplete", item)
-	  .append("<a><table width='100%'><tr><td align='left'>"+item.label+"</td><td align='right'>"+item.frequency+"</td></tr></table></a>")
-	  .appendTo(ul);
-      };
-    } else {
-      $searchField.autocomplete(
-	foswiki.getPreference("SCRIPTURL")+'/rest/SolrPlugin/autocomplete?'+filter, {
-	  selectFirst: false,
-	  autoFill:false,
-	  matchCase:false,
-	  matchSubset:false,
-	  matchContains:false,
-	  scrollHeight:'20em',
-	  formatItem: function(row, index, max, search) {
-	    return "<table width='100%'><tr><td align='left'>"+row[0]+"</td><td align='right'>"+row[2]+"</td></tr></table>";
-	  }
-      });
-    }
-
-    /* init autocompletion */
     var filter = [];
 
     /* init facet pager */
@@ -572,10 +575,12 @@ var solr; /* last solr manager constructed; this is a singleton in most use case
     /* behavior for autosubmit */
     function updateAutoSubmit() {
       var $toggleAutoSubmit = $(".solrToggleAutoSubmit");
-      if ($toggleAutoSubmit.is(":checked") || $toggleAutoSubmit.is("[type=hidden][value=on]") ) {
-	$.SolrManager.SUPPRESSSUBMIT = 0;
-      } else {
-	$.SolrManager.SUPPRESSSUBMIT = 1;
+      if ($toggleAutoSubmit.length) {
+        if ($toggleAutoSubmit.is(":checked") || $toggleAutoSubmit.is("[type=hidden][value=on]") ) {
+          self.suppressSubmit = false;
+        } else {
+          self.suppressSubmit = true;
+        }
       }
     }
     $(".solrToggleAutoSubmit").change(updateAutoSubmit);

@@ -16,3 +16,11 @@ $Foswiki::cfg{DBCachePlugin}{MemoryCache} = 1;
 # enable the UseUploadHandler flag to use the afterUploadHandler in favor to the depreated
 # counterpart. Leave this to false on newer engines or when you are unsure what this is all about.
 $Foswiki::cfg{DBCachePlugin}{UseUploadHandler} = 0;
+
+# ---+ Security and Authentication
+# ---++ Access Control
+# **BOOLEAN EXPERT**
+# When enabling this option, reading TopicTitles is protected by view rights on that topic.
+# Note, however, that this might cause a performance degradation as every wiki link will
+# require a permission check.
+$Foswiki::cfg{SecureTopicTitles} = 0;

@@ -3,7 +3,7 @@
 %TOC{depth="2"}%
 
 ---++ Documentation
-%STARTSECTION{name="documentation" type="section"}%
+%STARTSECTION{"documentation"}%
 This is a "getter" TopicFunction that returns a list of known TopicTypes
 in a given web. Use it to create a selection in DataForms for the !TopicType formfield.
 It adds the "none" type so that you can have (temporarily) un-typed topics. The 
@@ -16,7 +16,7 @@ scratch on as you will be able to create an initial !TopicType !TopicType this w
    * EXCLUDE: expression to exclude types (optional)
    * ADDITION: types that are listed additionally (optional)
 
-%ENDSECTION{name="documentation" type="section"}%
+%ENDSECTION{"documentation"}%
 
 ---++ Implementation
 <verbatim class="tml">

@@ -18,7 +18,7 @@
 %REPEAT%<div class="natSearchHit">
 %TMPL:P{"searchhit"}%
 </div>%REPEAT%%SPLIT%<div class="natSearchTotal">
-  %MAKETEXT{"<span>[_1]</span> topics found" args="%NTOPICS%"}% 
+  %MAKETEXT{"[_1] topic(s) found" args="%NTOPICS%"}% 
 </div>%SPLIT%
 <!-- //content -->%TMPL:END%
 %TMPL:DEF{"searchform"}%<!-- searchform -->
@@ -28,7 +28,7 @@
 <div class="foswikiFormStep">
 <input type="text" class="foswikiInputField jqFocus" id="search" name="search" size="30" value="%URLPARAM{"search" encode="entity"}%" style="float:left;margin-right:8px;"/>
 %BUTTON{"%MAKETEXT{"Search"}%" type="submit" title="submit the query" icon="find"}%
-%BUTTON{"%MAKETEXT{"Cancel"}%" target="%BASEWEB%.%BASETOPIC%" title="%MAKETEXT{"go back to <nop>[_1]" args="%WEB%.%TOPIC%"}%" icon="cross"}%
+%BUTTON{"%MAKETEXT{"Cancel"}%" target="%BASEWEB%.%BASETOPIC%" title="%MAKETEXT{"go back to [_1]" args="<nop>%WEB%.%TOPIC%"}%" icon="cross"}%
 %TMPL:P{"seealso"}%
 %CLEAR%
 </div>

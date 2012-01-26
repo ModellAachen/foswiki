@@ -1,4 +1,4 @@
-%META:TOPICINFO{author="ProjectContributor" date="1266012866" format="1.1" version="1.2"}%
+%META:TOPICINFO{author="ProjectContributor" date="1308213511" format="1.1" version="3"}%
 <!--
 
    PLEASE DO NOT EDIT THIS TOPIC
@@ -98,14 +98,14 @@ The image name is mandatory.  Further arguments are optional.
 | =title= | title text | *alt* value |
 | =tooltipheight= | height of tooltip image | 300 |
 | =tooltip= | on/off | off |
-| =tooltipcrop= | on/northwest/north/northeast/west/center/east/southwest/south/southeast/off: same as =crop= but used for the tooltip |
+| =tooltipcrop= | on/northwest/north/northeast/west/center/east/southwest/south/southeast/off: same as =crop= but used for the tooltip | |
 | =tooltipwidth= | width of tooltip image | 300 |
 | =topic= | valid topic name | topic part of IMGALBUM value or current topic |
 | =type=  | simple, plain, link, thumb[nail], frame, float | plain  |
 | =warn= | on/off, surpress error warnings | on |
 | =web= | valid web name | web part of IMGALBUM value or current topic |
 | =width= | integer value | image width |
-| =zoom=  | on/off to scale images, if set to "on" scaling up images is allowed, otherwise it downscales only | off 
+| =zoom=  | on/off to scale images, if set to "on" scaling up images is allowed, otherwise it downscales only | off |
 
 ---+++ Tooltip preview
 The =tooltip= argument allows rendering image previews in a tooltip. This option
@@ -151,6 +151,7 @@ pseudo variables:
 | =$origwidth= | image width of the original image |
 | =$percnt= | replaced with percent sign (%) |
 | =$src= | image source url |
+| =$thumbfile= | thumbnail image file name |
 | =$style= | value of =style= argumet |
 | =$text= | link text to be displayed in the "link" layout type |
 | =$title= | value of =title= argument |
@@ -243,11 +244,17 @@ $Foswiki::cfg{ImagePlugin}{Mode} = 'Image::Magick';
    * Set SHORTDESCRIPTION = Control the display and alignment of images using an easy syntax
 -->
 |  Plugin Author: | Craig Meyer, Foswiki:Main.MichaelDaum |
-|  Copyright: | &copy; 2006, Craig Meyer, %BR% &copy; 2006-2010 Michael Daum http://michaeldaumconsulting.com |
+|  Copyright: | &copy; 2006, Craig Meyer, %BR% &copy; 2006-2012 Michael Daum http://michaeldaumconsulting.com |
 |  License: | GPL ([[http://www.gnu.org/copyleft/gpl.html][GNU General Public License]]) |
 |  Release: | %$RELEASE% |
 |  Version: | %$VERSION% |
 |  Change History: | <!-- versions below in reverse order -->&nbsp; |
+|  09 Jan 2012: | added new option 'thumbfile' to format string (Foswiki:Main/JoenioCosta);\
+                  speed improvement by not "ping-ing" each image on display; \
+                  rendering thumbnails using newer method available in image::magick 6.5.x, the old method faild resizing and cropping on some platforms;\
+                  removing =longdesc= from default image templates; \
+                  now also caching urls to external images that include url params |
+|  29 Jun 2011: | fixed detection of image links to the own wiki not to try an external download+mirror |
 |  10 Jan 2011: | fixed parsing of mediawiki like params; \
                   fixed jquery interface to foswiki preferences; \
                   fixed dependency on !ZonePlugin to only be required for old foswiki versions; \

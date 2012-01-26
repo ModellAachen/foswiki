@@ -1,0 +1,22 @@
+%META:TOPICINFO{author="ProjectContributor" date="1268484865" format="1.1" version="1.1"}%
+%STARTSECTION{name="message"}%
+---+ <span class="foswikiAlert">Warning: this page does not exist.</span>
+
+*Do you want to create '<nop>%BASETOPIC%'?*
+
+<form name="newtopic" id="newtopic" action="%SCRIPTURLPATH{edit}%/%BASEWEB%/%BASETOPIC%">
+<input type="hidden" name="onlywikiname" />
+<input type="hidden" name="onlynewtopic" value="on" />
+<table>
+<tr>
+<td><input type="submit" class="natOkButton" value="Yes" /></td>
+<td><input type="button" class="natCancelButton" value="No" onclick="window.location.href='%SCRIPTURL{"view"}%/%WEB%/%HOMETOPIC%';" /></td>
+</tr>
+</table>
+</form>
+
+Contact <a href="mailto:%WIKIWEBMASTER%?subject=%ENCODE{"%WIKITOOLNAME%: Request for support"}%&&body=%ENCODE{"Hello, i've got a question ..."}%">%WIKIWEBMASTER%</a> 
+if you have any questions.
+
+
+%ENDSECTION{name="message"}%

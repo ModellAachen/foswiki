@@ -1,0 +1,9 @@
+%META:TOPICINFO{author="ProjectContributor" date="1268484864" format="1.1" version="1.1"}%
+%META:TOPICPARENT{name="TopicType"}%
+
+%META:FORM{name="Applications.TopicStub"}%
+%META:FIELD{name="TopicType" attributes="" title="TopicType" value="TopicStub, TopicType"}%
+%META:FIELD{name="Summary" attributes="" title="Summary" value="Tool to create documentation topis"}%
+%META:FIELD{name="WikiApplication" attributes="" title="WikiApplication" value="WikiWorkbench"}%
+%META:FIELD{name="Target" attributes="" title="Target" value="Applications.DocuTopic"}%
+%META:FIELD{name="Section" attributes="" title="Section" value=""}%

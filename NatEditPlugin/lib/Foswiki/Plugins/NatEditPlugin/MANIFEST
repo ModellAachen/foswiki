@@ -2,6 +2,8 @@ data/System/NatEditHelpText.txt 0644
 data/System/NatEditPluginJSUnitTests.txt 0644
 data/System/NatEditPlugin.txt 0644
 data/System/NatEditWordHelpText.txt 0644
+locale/NatEditPlugin/de.po 0644
+locale/NatEditPlugin/Foswiki.pot 0644
 lib/Foswiki/Plugins/NatEditPlugin/NATEDIT.pm 0644
 lib/Foswiki/Plugins/NatEditPlugin.pm 0644
 pub/System/NatEditPlugin/default/btn_left.gif 0644
@@ -47,3 +49,4 @@ templates/preview.natedit.tmpl 0644
 templates/previewtoolbar.natedit.tmpl 0644
 templates/settings.natedit.tmpl 0644
 templates/settingstoolbar.natedit.tmpl 0644
+templates/workflowedit.natedit.tmpl 0644

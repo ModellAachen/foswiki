@@ -1,6 +1,6 @@
 # Plugin for Foswiki - The Free and Open Source Wiki, http://foswiki.org/
 #
-# Copyright (C) 2005-2011 Michael Daum http://michaeldaumconsulting.com
+# Copyright (C) 2005-2012 Michael Daum http://michaeldaumconsulting.com
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -88,21 +88,21 @@ sub init {
 sub renderWikiWordHandler {
   my ($theLinkText, $hasExplicitLinkLabel, $theWeb, $theTopic) = @_;
 
+  return if $hasExplicitLinkLabel;
+
   #writeDebug("called renderWikiWordHandler($theLinkText, ".($hasExplicitLinkLabel?'1':'0').", $theWeb, $theTopic)");
 
-  return undef if !defined($theWeb) and !defined($theTopic);
+  return if !defined($theWeb) and !defined($theTopic);
 
-  # does not work out for TMwikis < 4.2
-
-  return if $hasExplicitLinkLabel && $theLinkText ne $theTopic;
-  return if $theLinkText eq "$theWeb.$theTopic";
+  # normalize web name
+  $theWeb =~ s/\//./g;
 
   $theWeb = Foswiki::Sandbox::untaintUnchecked($theWeb);    # woops why is theWeb tainted
   my $topicTitle = getTopicTitle($theWeb, $theTopic);
 
   #writeDebug("topicTitle=$topicTitle");
 
-  $theLinkText = $topicTitle if $topicTitle && $topicTitle ne $theTopic;
+  $theLinkText = $topicTitle if $topicTitle;
 
   return $theLinkText;
 }
@@ -160,6 +160,53 @@ sub loadTopic {
 }
 
 ###############################################################################
+sub handleNeighbours {
+  my ($mode, $session, $params, $topic, $web) = @_;
+
+  #writeDebug("called handleNeighbours($web, $topic)");
+
+  my ($theWeb, $theTopic) = Foswiki::Func::normalizeWebTopicName($params->{web} || $baseWeb, $params->{topic} || $baseTopic);
+
+  my $theSearch = $params->{_DEFAULT};
+  $theSearch = $params->{search} unless defined $theSearch;
+
+  my $theFormat = $params->{format} || '$web.$topic';
+  my $theOrder = $params->{order} || 'created';
+  my $theReverse = $params->{reverse} || 'off';
+
+  return inlineError("ERROR: no \"search\" parameter in DBPREV/DBNEXT") unless $theSearch;
+
+  #writeDebug('theFormat='.$theFormat);
+  #writeDebug('theSearch='. $theSearch) if $theSearch;
+
+  
+  my $db = Foswiki::Plugins::DBCachePlugin::getDB($theWeb);
+  return inlineError("ERROR: DBPREV/DBNEXT unknown web $theWeb") unless $db;
+
+  my ($prevTopic, $nextTopic) = $db->getNeighbourTopics($theTopic, $theSearch, $theOrder, $theReverse);
+
+  my $result = $theFormat;
+
+  if ($mode) {
+    # DBPREV
+    return '' unless $prevTopic;
+    $result =~ s/\$topic/$prevTopic/g;
+  } else {
+    # DBNEXT
+    return '' unless $nextTopic;
+    $result =~ s/\$topic/$nextTopic/g;
+  }
+
+  $result =~ s/\$web/$theWeb/g;
+  $result =~ s/\$perce?nt/\%/go;
+  $result =~ s/\$nop//g;
+  $result =~ s/\$n/\n/go;
+  $result =~ s/\$dollar/\$/go;
+
+  return $result;
+}
+
+###############################################################################
 sub handleTOPICTITLE {
   my ($session, $params, $theTopic, $theWeb) = @_;
 
@@ -193,14 +240,19 @@ sub handleTOPICTITLE {
 sub getTopicTitle {
   my ($theWeb, $theTopic) = @_;
 
-  ($theWeb, $theTopic) =
-    Foswiki::Func::normalizeWebTopicName($theWeb, $theTopic);
+  ($theWeb, $theTopic) = Foswiki::Func::normalizeWebTopicName($theWeb, $theTopic);
 
   my $db = getDB($theWeb);
   return $theTopic unless $db;
 
   my $topicObj = $db->fastget($theTopic);
   return $theTopic unless $topicObj;
+
+  if ($Foswiki::cfg{SecureTopicTitles}) {
+    my $wikiName = Foswiki::Func::getWikiName();
+    return $theTopic
+      unless Foswiki::Func::checkAccessPermission('VIEW', $wikiName, undef, $theTopic, $theWeb);
+  }
 
   my $topicTitle = $topicObj->fastget('topictitle');
   return $topicTitle if $topicTitle;
@@ -262,6 +314,7 @@ sub handleDBQUERY {
   $theSkip = 0 if $theSkip < 0;
 
   my $theDB = getDB($thisWeb);
+  return '' unless $theDB;
 
   # flag the current web we evaluate this query in, used by web-specific operators
   $dbQueryCurrentWeb = $thisWeb;
@@ -351,6 +404,10 @@ sub findTopicMethod {
 
   # get form object
   my $baseDB = getDB($thisWeb);
+  unless ($baseDB) {
+    print STDERR "can't get dbcache for '$thisWeb'\n";
+    return undef;
+  }
 
   #writeDebug("1");
 
@@ -452,7 +509,7 @@ sub handleDBCALL {
       # last resort: lookup the method in the Applications web
       #writeDebug("last resort check for Applications.$thisTopic");
       my $appDB = getDB('Applications');
-      if ($appDB->fastget($thisTopic)) {
+      if ($appDB && $appDB->fastget($thisTopic)) {
         $params->{OBJECT} = $theObject;
         $thisWeb = 'Applications';
       }
@@ -474,6 +531,8 @@ sub handleDBCALL {
 
   # get web and topic
   my $thisDB = getDB($thisWeb);
+  return inlineError("ERROR: DBALL can't find web $thisWeb") unless $thisDB;
+
   my $topicObj = $thisDB->fastget($thisTopic);
   unless ($topicObj) {
     if ($warn) {
@@ -1044,8 +1103,8 @@ sub formatRecursive {
 
 ###############################################################################
 sub getDB {
-  my $theWeb = shift;
-  
+  my ($theWeb, $refresh) = @_;
+
   writeDebug("called getDB($theWeb)");
 
   unless(Foswiki::Sandbox::validateWebName($theWeb, 1)) {
@@ -1088,12 +1147,12 @@ sub getDB {
     $isModified = $webDBIsModified{$webKey};
   }
 
-  if ($isModified) {
+  if ($isModified || $refresh) {
     my $impl = Foswiki::Func::getPreferencesValue('WEBDB', $theWeb)
       || 'Foswiki::Plugins::DBCachePlugin::WebDB';
     $impl =~ s/^\s+//go;
     $impl =~ s/\s+$//go;
-    writeDebug("loading new webdb for '$theWeb($isModified)'");
+    writeDebug("loading new webdb for '$theWeb'");
     #writeDebug("impl='$impl'");
     $webDB{$webKey} = new $impl($theWeb);
     $webDB{$webKey}->load($doRefresh, $baseWeb, $baseTopic);
@@ -1171,7 +1230,7 @@ sub fixIncludeLink {
 sub expandVariables {
   my ($theFormat, $web, $topic, %params) = @_;
 
-  return '' unless $theFormat;
+  return '' unless defined $theFormat;
   
   foreach my $key (keys %params) {
     my $val = $params{$key};
@@ -1183,7 +1242,7 @@ sub expandVariables {
   $theFormat =~ s/\$perce?nt/\%/go;
   $theFormat =~ s/\$nop//g;
   $theFormat =~ s/\$n/\n/go;
-  $theFormat =~ s/\$flatten\((.*?)\)/flatten($1)/ges;
+  $theFormat =~ s/\$flatten\((.*?)\)/flatten($1, $web, $topic)/ges;
   $theFormat =~ s/\$rss\((.*?)\)/rss($1, $web, $topic)/ges;
   $theFormat =~ s/\$encode\((.*?)\)/entityEncode($1)/ges;
   $theFormat =~ s/\$trunc\((.*?),\s*(\d+)\)/substr($1,0,$2)/ges;
@@ -1267,6 +1326,18 @@ sub urlDecode {
 
 ###############################################################################
 sub flatten {
+  my ($text, $web, $topic) = @_;
+
+  my $session = $Foswiki::Plugins::SESSION;
+  my $topicObject = Foswiki::Meta->new($session, $web, $topic);
+  $text = $session->renderer->TML2PlainText($text, $topicObject);
+
+  $text =~ s/(https?)/<nop>$1/go;
+  $text =~ s/[\r\n\|]+/ /gm;
+  return $text;
+}
+
+sub OLDflatten {
   my $text = shift;
 
   $text =~ s/&lt;/</g;

@@ -1,5 +1,6 @@
+data/System/LdapUserViewTemplate.txt 0644
 data/System/NewLdapUserTemplate.txt 0644
 data/System/NewUserPlugin.txt 0644
-data/System/RenderLdapUser.txt 0644
+lib/Foswiki/Plugins/NewUserPlugin/Config.spec 0644
 lib/Foswiki/Plugins/NewUserPlugin.pm 0644
 pub/System/NewUserPlugin/wikiringlogo40x40.png 0644

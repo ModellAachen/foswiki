@@ -1,0 +1,57 @@
+%META:TOPICINFO{author="ProjectContributor" comment="reprev" date="1294150177" format="1.1" reprev="1" version="2"}%
+%META:TOPICPARENT{name="TopicFunction"}%
+%TOC{depth="2"}%
+
+---++ Documentation
+%STARTSECTION{name="documentation" type="section"}%
+This function renders a help text for the sidebar depending on the SIDEBAR variable.
+It helps to identify the area of the blog the user is currently exploring.
+
+---+++++ Parameters
+   * SIDEBAR
+
+%ENDSECTION{name="documentation" type="section"}%
+
+---++ Default Section
+%STARTSECTION{"Default"}%%WEBSUMMARY%%ENDSECTION{"Default"}%
+
+---+++ Entry section 
+<verbatim>
+%STARTSECTION{"Entry"}%%WEBSUMMARY%%ENDSECTION{"Entry"}%
+</verbatim>
+
+---++ Page section 
+%STARTSECTION{"Page"}%<!-- -->
+You are in the page section consisting of all the 
+topics that 
+exist outside the chronological sortion of [[%BASEWEB%.BlogEntry][BlogEntries]] but are special
+[[%BASEWEB%.WikiTopic][WikiTopics]] with respect to this application.
+<!-- -->%ENDSECTION{"Page"}%
+
+---++ Admin section
+%STARTSECTION{"Admin"}%<!-- --> 
+You are in the administrative section 
+of the [[Applications.BlogApp.WebHome][BlogApp]] which the 
+[[%BASEWEB%.%BASETOPIC%][%BASETOPIC%]] topic is part of. 
+<!-- -->%ENDSECTION{"Admin"}%
+
+---++ Category section
+%STARTSECTION{"Category"}%<!-- -->
+You are visiting this blog by category, that is all postings here are filed
+into the [[%BASEWEB%.%BASETOPIC%][%BASETOPIC%]] category.
+<!-- -->%ENDSECTION{"Category"}%
+
+%DBCALL{"Applications.RenderFunctionCallers"}%
+
+---++ Copyright
+&copy; 2005-2010 http://michaeldaumconsulting.com
+
+%DBCALL{"Applications.GnuGeneralPublicLicense" section="notice"}%
+
+
+%META:FORM{name="Applications.ApplicationTopic"}%
+%META:FIELD{name="TopicType" title="TopicType" value="DocuTopic, TopicFunction"}%
+%META:FIELD{name="TopicTitle" attributes="" title="<nop>TopicTitle" value=""}%
+%META:FIELD{name="Summary" attributes="c" title="Summary" value="Renders a help text at the top if the sidebar"}%
+%META:FIELD{name="WikiApplication" attributes="" title="WikiApplication" value="BlogApp"}%
+%META:PREFERENCE{name="EDIT_TEMPLATE" title="EDIT_TEMPLATE" type="Set" value="Applications.WikiTopicEdit"}%

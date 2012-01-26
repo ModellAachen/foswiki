@@ -40,7 +40,7 @@
 <!-- //similar -->%TMPL:END%
 
 %TMPL:DEF{"formstartstep"}%<!-- formstartstep -->
-%TWISTYBUTTON{id="createnewtopic" link="%BUTTON{"%MAKETEXT{"Create new topic"}%" icon="add"}%"}%
+%TWISTYBUTTON{id="createnewtopic" link="%BUTTON{"%MAKETEXT{"Create a new topic"}%" icon="add"}%"}%
 %BUTTON{"%MAKETEXT{"Search in all webs"}%" icon="find" target="%SCRIPTURLPATH{"view"}%/%BASEWEB%/WebSearch?scope=topic;web=all;search=%BASETOPIC%" }%
 %BUTTON{"%MAKETEXT{"Cancel"}%" icon="cross" target="%BASEWEB%.%HOMETOPIC%" title="%MAKETEXT{"Get me out of here"}%"}%
 %CLEAR%

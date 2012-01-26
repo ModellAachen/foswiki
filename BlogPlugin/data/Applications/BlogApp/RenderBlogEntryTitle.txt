@@ -1,0 +1,55 @@
+%META:TOPICINFO{author="ProjectContributor" comment="reprev" date="1304953256" format="1.1" reprev="2" version="2"}%
+%META:TOPICPARENT{name="TopicFunction"}%
+%TOC{depth="2"}%
+
+---++ Documentation
+%STARTSECTION{name="documentation" type="section"}%
+%RED%TODO%ENDCOLOR%
+
+---+++++ Parameters
+   * TITLE_EXTRA
+
+%ENDSECTION{name="documentation" type="section"}%
+
+---++ Implementation
+<verbatim class="tml">
+%STARTINCLUDE%<!-- -->
+%DBCALL{"Applications.RenderWikiTopicView" TITLE_EXTRA="%TITLE_EXTRA%"}% 
+<div class="blogInfo">
+  %DBQUERY{
+     topic="%BASEWEB%.%BASETOPIC%"
+     format="$formatTime(createdate, '$day $mon $year - $hour:$minute')"
+  }%
+  %DBQUERY{
+    topic="%BASEWEB%.%BASETOPIC%" 
+    format="&#124; [[%USERSWEB%.$expand(createauthor)][$expand(createauthor)]]"
+  }%
+  %CATINFO{
+    "%BASEWEB%.%BASETOPIC%" 
+    header="&#124; "
+  }% <!-- -->
+  %TAGINFO{
+    "%BASEWEB%.%BASETOPIC%"
+    header="&#124; "
+  }% <!-- -->
+</div>
+<!-- -->%STOPINCLUDE%
+</verbatim>
+
+---++ Test
+%DBCALL{"%TOPIC%"}%
+
+%DBCALL{"Applications.RenderFunctionCallers"}%
+
+---++ Copyright
+&copy; 2005-2011 http://michaeldaumconsulting.com
+
+%DBCALL{"Applications.GnuGeneralPublicLicense" section="notice"}%
+
+
+%META:FORM{name="Applications.ApplicationTopic"}%
+%META:FIELD{name="TopicType" title="TopicType" value="DocuTopic, TopicFunction"}%
+%META:FIELD{name="TopicTitle" attributes="" title="<nop>TopicTitle" value=""}%
+%META:FIELD{name="Summary" attributes="c" title="Summary" value="renders the heading section of a BlogEntry"}%
+%META:FIELD{name="WikiApplication" attributes="" title="WikiApplication" value="BlogApp"}%
+%META:PREFERENCE{name="EDIT_TEMPLATE" title="EDIT_TEMPLATE" type="Set" value="Applications.WikiTopicEdit"}%

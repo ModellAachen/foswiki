@@ -1,7 +1,7 @@
 # Plugin for Foswiki - The Free and Open Source Wiki, http://foswiki.org/
 #
 # Copyright (C) 2006 Craig Meyer, meyercr@gmail.com
-# Copyright (C) 2006-2010 Michael Daum http://michaeldaumconsulting.com
+# Copyright (C) 2006-2012 Michael Daum http://michaeldaumconsulting.com
 #
 # Based on ImgPlugin
 # Copyright (C) 2006 Meredith Lesly, msnomer@spamcop.net
@@ -32,7 +32,7 @@ use vars qw(
 );
 
 $VERSION = '$Rev$';
-$RELEASE = '2.40';
+$RELEASE = '2.41';
 $NO_PREFS_IN_TOPIC = 1;
 
 use Foswiki::Plugins ();
@@ -57,10 +57,15 @@ HERE
   $doneRegisterJQueryPlugin = 0;
 
   # register the tag handlers
-  Foswiki::Func::registerTagHandler( 'IMAGE', \&handleIMAGE);
+  Foswiki::Func::registerTagHandler( 'IMAGE', sub {
+    getCore($baseWeb, $baseTopic, shift)->handleIMAGE(@_); 
+  });
 
   # register rest handler
-  Foswiki::Func::registerRESTHandler('resize', \&handleREST);
+  Foswiki::Func::registerRESTHandler('resize', sub {
+    getCore($baseWeb, $baseTopic, shift)->handleREST(@_); 
+  });
+
 
   # SMELL: monkey-patching Foswiki::Render::_externalLink()
   if ($Foswiki::cfg{ImagePlugin}{RenderExternalImageLinks}) {
@@ -97,20 +102,6 @@ HERE
 }
 
 ###############################################################################
-# schedule tag handlers
-sub handleIMAGE { 
-  my $session = shift;
-  getCore($baseWeb, $baseTopic, $session)->handleIMAGE(@_); 
-}
-
-###############################################################################
-sub handleREST {
-  my $session = shift;
-
-  getCore($baseWeb, $baseTopic, $session)->handleREST(@_); 
-}
-
-###############################################################################
 sub renderExternalLink {
   my ($this, $url, $text) = @_;
 
@@ -128,7 +119,7 @@ sub renderExternalLink {
     $text = '';
   }
 
-  if ($url =~ /^(https?:).*\.(gif|jpg|jpeg|png)$/i && !$text) {
+  if ($url =~ /^(https?:).*\.(gif|jpg|jpeg|png)/i && !$text) {
     my $pubUrl = $this->{session}->getPubUrl(1);
     # skip "external links" to self and to any other excluded url
     my $excludePattern = $Foswiki::cfg{ImagePlugin}{Exclude};
@@ -137,6 +128,7 @@ sub renderExternalLink {
 
       # untaint url, check above
       $url = Foswiki::Sandbox::untaintUnchecked($url);
+      $url =~ s/\?.*$//;
 
       my $params = {
 	_DEFAULT => "$url",

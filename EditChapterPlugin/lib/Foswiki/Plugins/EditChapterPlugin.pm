@@ -1,6 +1,6 @@
 # Plugin for Foswiki - The Free and Open Source Wiki, http://foswiki.org/
 #
-# Copyright (C) 2008-2011 Michael Daum http://michaeldaumconsulting.com
+# Copyright (C) 2008-2012 Michael Daum http://michaeldaumconsulting.com
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -19,11 +19,10 @@ use strict;
 
 use Foswiki::Func();
 use Foswiki::Plugins();
-use Foswiki::Plugins::EditChapterPlugin::Core();
 use Foswiki::Contrib::JsonRpcContrib ();
 
 our $VERSION = '$Rev$';
-our $RELEASE = '4.10';
+our $RELEASE = '4.20';
 our $NO_PREFS_IN_TOPIC = 1;
 our $SHORTDESCRIPTION = 'An easy sectional edit facility';
 our $core;
@@ -50,9 +49,10 @@ sub initPlugin {
 
 ###############################################################################
 sub getCore {
+  my $session = shift || $Foswiki::Plugins::SESSION;
 
   unless ($core) {
-    my $session = shift || $Foswiki::Plugins::SESSION;
+    require Foswiki::Plugins::EditChapterPlugin::Core;
     $core = new Foswiki::Plugins::EditChapterPlugin::Core($session);
   }
 
@@ -82,8 +82,8 @@ sub postRenderingHandler {
   return unless $core;
   my $translationToken = $core->{translationToken};
   $_[0] =~ s/$translationToken//g;
-#  $_[0] =~ s/(<a name=["'])A_01_/$1/g; # cleanup anchors
-#  $_[0] =~ s/(<a href=["']#)A_01_/$1/g; 
+  $_[0] =~ s/(<a name=["'])A_01_/$1/g; # cleanup anchors
+  $_[0] =~ s/(<a href=["']#)A_01_/$1/g; 
 }
 
 1;

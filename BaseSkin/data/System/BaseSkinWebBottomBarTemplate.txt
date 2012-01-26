@@ -4,10 +4,10 @@
 	
 	The webbottombar template defines the page bottom bar. It INCLUDEs the BaseSkinWebBottomBar topic of the current web, or if it doesn't exist, the BaseSkinWebBottomBarExample topic.
 ===================================================
-}%%TMPL:DEF{"bottombar"}%<nav class="foswikiFooter">%IF{
+}%%TMPL:DEF{"bottombar"}%<footer>%IF{
 	"istopic '%SYSTEMWEB%.WebBottomBar'"
 	then="$percntINCLUDE{$quot%SYSTEMWEB%.BaseSkinWebBottomBar$quot}$percnt" 	
 	else="$percntINCLUDE{$quot%SYSTEMWEB%.BaseSkinWebBottomBarExample$quot}$percnt"
-}%</nav>%TMPL:END%%{
+}%</footer>%TMPL:END%%{
 ===================================================
 </verbatim>}%

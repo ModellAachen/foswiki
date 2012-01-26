@@ -1,0 +1,106 @@
+/*
+Font files can be built with
+http://www.fontsquirrel.com/fontface/generator
+*/
+
+/* regular */
+@font-face{ 
+font-family: 'opensans-regular';
+src: url('webfonts/opensans/opensans-regular.eot');
+src: url('webfonts/opensans/opensans-regular.eot?#iefix') format('embedded-opentype'),
+	 url('webfonts/opensans/opensans-regular.woff') format('woff'),
+	 url('webfonts/opensans/opensans-regular.ttf') format('truetype'),
+	 url('webfonts/opensans/opensans-regular.svg#webfont') format('svg');
+}
+
+/* semibold */
+@font-face{ 
+font-family: 'opensans-semibold';
+src: url('webfonts/opensans/opensans-semibold.eot');
+src: url('webfonts/opensans/opensans-semibold.eot?#iefix') format('embedded-opentype'),
+	 url('webfonts/opensans/opensans-semibold.woff') format('woff'),
+	 url('webfonts/opensans/opensans-semibold.ttf') format('truetype'),
+	 url('webfonts/opensans/opensans-semibold.svg#webfont') format('svg');
+}
+
+/* bold */
+@font-face{ 
+font-family: 'opensans-bold';
+src: url('webfonts/opensans/opensans-bold.eot');
+src: url('webfonts/opensans/opensans-bold.eot?#iefix') format('embedded-opentype'),
+	 url('webfonts/opensans/opensans-bold.woff') format('woff'),
+	 url('webfonts/opensans/opensans-bold.ttf') format('truetype'),
+	 url('webfonts/opensans/opensans-bold.svg#webfont') format('svg');
+}
+
+/* italic */
+@font-face{ 
+font-family: 'opensans-italic';
+src: url('webfonts/opensans/opensans-italic.eot');
+src: url('webfonts/opensans/opensans-italic.eot?#iefix') format('embedded-opentype'),
+	 url('webfonts/opensans/opensans-italic.woff') format('woff'),
+	 url('webfonts/opensans/opensans-italic.ttf') format('truetype'),
+	 url('webfonts/opensans/opensans-italic.svg#webfont') format('svg');
+}
+
+/* bolditalic */
+@font-face{ 
+font-family: 'opensans-bolditalic';
+src: url('webfonts/opensans/opensans-bolditalic.eot');
+src: url('webfonts/opensans/opensans-bolditalic.eot?#iefix') format('embedded-opentype'),
+	 url('webfonts/opensans/opensans-bolditalic.woff') format('woff'),
+	 url('webfonts/opensans/opensans-bolditalic.ttf') format('truetype'),
+	 url('webfonts/opensans/opensans-bolditalic.svg#webfont') format('svg');
+}
+
+/* regular */
+body,
+select,
+input,
+label,
+textarea,
+blockquote {
+	font-family: 'opensans-regular';
+	font-weight: normal;
+}
+
+/* semi-bold */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.foswikiInputForm legend,
+ul.menu-dropdown li p,
+ul.dropdown-menu li p,
+.foswikiTable th {
+	font-family: 'opensans-semibold';
+	font-weight: normal;
+}
+
+/* bold */
+b,
+strong,
+.foswikiSummary em,
+.foswikiTocTitle,
+.foswikiSearchResultTitle {
+	font-family: 'opensans-bold';
+	font-weight: bold;
+}
+
+/* italic */
+em,
+i {
+	font-family: 'opensans-italic';
+	font-weight: normal;
+}
+
+/* bolditalic */
+b em,
+b i,
+strong em,
+strong i {
+	font-family: 'opensans-bolditalic';
+	font-weight: bold;
+}

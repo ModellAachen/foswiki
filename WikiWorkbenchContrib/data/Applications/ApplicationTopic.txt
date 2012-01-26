@@ -2,11 +2,11 @@
 %META:TOPICPARENT{name="TopicType"}%
 %DBCALL{"RenderTopicInstaller" TYPE="TopicType" PARENT="TopicType"}%
 ---++ Documentation
-%STARTSECTION{name="documentation" type="section"}%
+%STARTSECTION{"documentation"}%
 An ApplicationTopic is a topic that belongs to a WikiApplication. TopicTypes, TopicFunctions, TopicViews etc are all ApplicationTopics as they belong to some WikiApplication. Based on this information
 all parts of an application are gathered to create documentation and use it for packaging purposes.
 
-%ENDSECTION{name="documentation" type="section"}%
+%ENDSECTION{"documentation"}%
 
 ---++ Topics of type '%TOPIC%'
 %STARTINCLUDE%<!-- -->

@@ -1,21 +1,26 @@
 %TMPL:INCLUDE{"view"}%
+%TMPL:DEF{"breadcrumb:wikitoolname"}%[[%USERSWEB%.%HOMETOPIC%][%WIKITOOLNAME% Home]]%TMPL:END%
+
 %TMPL:DEF{"contentheader"}%
-<div style="clear: left;">%JQREQUIRE{"supersubs"}%%JQREQUIRE{"bgiframe"}%%ADDTOZONE{ 
-    "head" text="<link rel='stylesheet' href='%PUBURLPATH%/%SYSTEMWEB%/JQueryMenuSkin/menu.css' type='text/css'/>
-          <link rel='stylesheet' href='%PUBURLPATH%/%SYSTEMWEB%/JQueryPlugin/plugins/superfish/jquery.superfish-navbar.css' type='text/css'/>
-          <link rel='stylesheet' href='%PUBURLPATH%/%SYSTEMWEB%/JQueryPlugin/plugins/superfish/jquery.superfish-vertical.css' type='text/css'/>"
-}%%ADDTOZONE{ "script" text="<script type='text/javascript'>
-$(document).ready(function(){
-    $('sf-menu').superfish({
-        autoArrows:    true,
-        delay:  1000
+%JQREQUIRE{"supersubs"}%%JQREQUIRE{"bgiframe"}%%ADDTOZONE{
+    "head" text="<link rel='stylesheet' href='%IF{"defined JQUERYMENUSKINCSS and $ JQUERYMENUSKINCSS" then="%JQUERYMENUSKINCSS%" else="%PUBURLPATH%/%SYSTEMWEB%/JQueryMenuSkinBarDefault/menu.css"}%' type='text/css'/>"}%
+%ADDTOZONE{ "script" text="<script type='text/javascript'>
+jQuery(document).ready(function(){
+    jQuery('#jqmenu').supersubs({
+        minWidth: 12, /* minimum width of sub-menus in em units */
+        maxWidth: 30, /* maximum width of sub-menus in em units */
+        extraWidth: 1 /* extra width can ensure lines don't sometimes turn over
+                         due to slight rounding differences and font-family */
     });
-    $('sf-menu').bgIframe({opacity:false});
+    jQuery('#jqmenu').superfish({
+        delay:  500
+    });
+    jQuery('#jqmenu').bgIframe({opacity:false});
 });
+
 </script>"
 requires="JQUERYPLUGIN::SUPERSUBS,JQUERYPLUGIN::BGIFRAME"
-}%%INCLUDE{"%IF{"defined JQUERYMENUSKINBAR and $ JQUERYMENUSKINBAR" then="%JQUERYMENUSKINBAR%" else="%SYSTEMWEB%.JQueryMenuSkinBarDefault"}%" raw="on" warn="<div class='menu_missing'>The <nop>JQueryMenuSkin menu configuration topic could not be found</div>"}%</div>
-<div style="clear: left;" />%TMPL:END%
-%TMPL:DEF{"top"}%<span class="foswikiLeft breadcrumb">%TMPL:P{"breadcrumb"}%</span>%TMPL:END%
+}%<div id="menu_container">%INCLUDE{"%IF{"defined JQUERYMENUSKINBAR and $ JQUERYMENUSKINBAR" then="%JQUERYMENUSKINBAR%" else="%SYSTEMWEB%.JQueryMenuSkinBarDefault"}%" raw="on" warn="<div class='menu_missing'>The <nop>JQueryMenuSkin menu configuration topic could not be found</div>"}%</div></div>
+<div style="clear: left;" />%TMPL:END%%TMPL:DEF{"top"}%<span class="foswikiLeft breadcrumb">%TMPL:P{"breadcrumb"}%</span>%TMPL:END%
 %TMPL:DEF{"top:toolbarbuttons"}%%TMPL:END%
 %TMPL:DEF{"patternTopBarContents"}%%TMPL:END%

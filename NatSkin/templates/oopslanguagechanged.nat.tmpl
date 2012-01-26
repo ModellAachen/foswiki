@@ -1,6 +1,6 @@
 %TMPL:INCLUDE{"oops"}%<!-- template: oopslanguagechanged.nat.tmpl -->
-%TMPL:DEF{"title"}%%MAKETEXT{"Change language"}% - %WIKITOOLNAME%%TMPL:END%
-%TMPL:DEF{"heading"}%%MAKETEXT{"Change language"}%%TMPL:END%
+%TMPL:DEF{"title"}%%MAKETEXT{"Change interface language"}% - %WIKITOOLNAME%%TMPL:END%
+%TMPL:DEF{"heading"}%%MAKETEXT{"Change interface language"}%%TMPL:END%
 %TMPL:DEF{"headingstyle"}%natNoteHeading%TMPL:END%
 %TMPL:DEF{"message"}%
 %IF{"$'URLPARAM{language}'='default'" 
@@ -13,7 +13,17 @@
 
 %ADDTOZONE{
   "script" 
-  text="<script>window.setTimeout(\"window.location.href = '%SCRIPTURLPATH{"view"}%/%WEB%/%TOPIC%'\",2000);</script>"
-  tag="reload"
+  text="<literal>
+<script>
+jQuery(function($) {
+  window.setTimeout(
+    function() {
+      window.location.href = '%SCRIPTURL{"view"}%/%WEB%/%TOPIC%';
+    }, 
+    2000
+  );
+});
+</script>"
+  </literal>"
 }%
 %TMPL:END%

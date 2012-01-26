@@ -1,0 +1,28 @@
+%META:TOPICINFO{author="ProjectContributor" comment="reprev" date="1294073222" format="1.1" reprev="1" version="2"}%
+%META:TOPICPARENT{name="WikiApplication"}%
+%TOC{depth="4"}%
+---++ Description
+...
+
+---++ Documentation
+%DBCALL{"Applications.RenderApplicationDocumentation" TYPE="TopicType" THEWEB="%WEB%"}%
+%DBCALL{"Applications.RenderApplicationDocumentation" TYPE="DataForm" NOTTYPE="TopicType" THEWEB="%WEB%"}%
+%DBCALL{"Applications.RenderApplicationDocumentation" TYPE="TopicTemplate" THEWEB="%WEB%"}%
+%DBCALL{"Applications.RenderApplicationDocumentation" TYPE="TopicView" THEWEB="%WEB%"}%
+%DBCALL{"Applications.RenderApplicationDocumentation" TYPE="TopicFunction" THEWEB="%WEB%"}%
+
+---++ Installation
+...
+
+---++ Manifest
+%DBCALL{"Applications.RenderApplicationManifest" THEWEB="%WEB%"}%
+
+%META:FORM{name="Applications.WikiApplication"}%
+%META:FIELD{name="TopicType" title="TopicType" value="WikiApplication"}%
+%META:FIELD{name="TopicTitle" attributes="" title="<nop>TopicTitle" value=""}%
+%META:FIELD{name="Summary" attributes="c" title="Summary" value="Complete documentation for the BlogApp"}%
+%META:FIELD{name="Version" attributes="" title="Version" value="2.0"}%
+%META:FIELD{name="Author" attributes="" title="Author" value="Michael Daum"}%
+%META:FIELD{name="Copyright" attributes="" title="Copyright" value="&copy; 2005-2011 http://michaeldaumconsulting.com"}%
+%META:FIELD{name="License" attributes="" title="License" value="Applications.GnuGeneralPublicLicense"}%
+%META:FIELD{name="Dependencies" attributes="" title="Dependencies" value="Applications.ClassificationApp.ClassificationApp"}%

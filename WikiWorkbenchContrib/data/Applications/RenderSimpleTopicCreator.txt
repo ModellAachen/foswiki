@@ -1,4 +1,4 @@
-%META:TOPICINFO{author="ProjectContributor" comment="reprev" date="1305896211" format="1.1" reprev="15" version="15"}%
+%META:TOPICINFO{author="ProjectContributor" comment="reprev" date="1320320012" format="1.1" reprev="15" version="17"}%
 %META:TOPICPARENT{name="TopicFunction"}%
 %TOC{depth="2"}%
 
@@ -17,7 +17,7 @@ This function renders a topic creator form that holds a set of initial input ele
    * TYPE: initial TopicType value, defaults to values predefined in the form definition
    * PARENT: parent topic for the new topic, defaults to the BASETOPIC
    * WHITEBOARD: switch on/off the whiteboard textarea
-   * EXTRA: additional =&lt;input <!-- ALIAS:... -->&hellip;<!-- //ALIAS --> />= (deprecated: use =c= attribute in form definition to include it in the creator)
+   * EXTRA: additional =&lt;input &hellip; />= (deprecated: use =c= attribute in form definition to include it in the creator)
    * ACTION: script to be used to create the topic, eg =save= or =edit=, defaults to =edit=
    * EDITOR: TopicView to be used as an edit_template 
 
@@ -34,7 +34,7 @@ This function renders a topic creator form that holds a set of initial input ele
 }%
 
 <noautolink>
-<form class='createTopicForm' action="%SCRIPTURLPATH{"%IF{"defined ACTION" then="%ACTION%" else="edit"}%"}%/%BASEWEB%/" method="get">
+<form class='createTopicForm' action="%SCRIPTURLPATH{"%IF{"defined ACTION" then="%ACTION%" else="edit"}%"}%/%BASEWEB%/" method="%IF{"'%ACTION%'='save'" then="post" else"get"}%">
 <div class='foswikiFormSteps'>
 <input type="hidden" name="web" value="%BASEWEB%" />
 <input type="hidden" name="onlynewtopic" value="on" />

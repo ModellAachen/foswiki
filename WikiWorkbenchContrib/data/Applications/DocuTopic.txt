@@ -1,7 +1,7 @@
 %META:TOPICINFO{author="ProjectContributor" comment="reprev" date="1273490841" format="1.1" reprev="3" version="5"}%
 %META:TOPICPARENT{name="TopicType"}%
 ---++ Documentation
-%STARTSECTION{name="documentation" type="section"}%
+%STARTSECTION{"documentation"}%
 This is a pure "marker" type that is attached to topics that contain documentation.
 !DocuTopics have a ="documentation"= section marked using
 <verbatim>
@@ -25,7 +25,7 @@ links to.
 
 !DocuTopics, as all TopicTypes belong to a certain !WikiApplication and can thus be grouped
 and distinguished.
-%ENDSECTION{name="documentation" type="section"}%
+%ENDSECTION{"documentation"}%
 
 ---++ Topics of type '%TOPIC%'
 %STARTINCLUDE%<!-- -->

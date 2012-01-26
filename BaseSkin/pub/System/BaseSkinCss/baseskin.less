@@ -1,69 +1,69 @@
-
-.foswikiBroadcastMessage,
-.foswikiNotification,
-.foswikiHelp {
-	.alert-message();
-	.alert-message.block-message();
-	.border-radius(0);
-}
-.foswikiBroadcastMessage,
-.foswikiNotification {
-	// warning by default
-}
-.foswikiHelp {
-	.alert-message.block-message.info();
-}
-.foswikiMessage {
-	padding: 1px 3px; // same as code
-	.border-radius(@fw_block_corner);
-	background-color: @fw_color_background_message;
-}
+/*
+ * STRUCTURAL PAGE ELEMENTS
+ * -------------------------------------------------------------------------- */
 
 .foswikiContainer {
 	.container();
 	width: auto;
 	max-width: 1180px;
 	margin: 0 auto;
-	padding: 0 20px;
+	.fw_section_padding();
+	padding-left: 20px;
+	padding-right: 20px;
+}
+.foswikiBar .foswikiContainer {
+	padding-top: 0;
+	padding-bottom: 0;
 }
 
-.foswikiEditPage {
-	.foswikiTopic {
-		padding-top: 0;
-		margin-top: -1px; /* hides top border */
-	}
+.foswikiSection {
+	position: relative;
+	border-style: solid none none none;
+	border-width: 1px;
 }
+
+.foswikiMain {}
 
 .foswikiBar {
-	.topbar;
-	.topbar-inner;
 	z-index: 0;
 	height: auto;
 	float: none;
 	position: relative;
 	margin: 0;
-	.fw_menu_padding_vertical_only();
 	.box-shadow(none);
+	background: none;
+	
+	.foswikiSection {
+		.fw_tool_padding_vertical_only();
+	}	
 	
 	form {
-		margin: 0 10px 0 0;
-		bottom: -6px;
+		float: none;
+		margin: 0;
 	}
 
+	input {
+		width: auto;
+	}
+	input[type='text'],
+	input[type='password'] {
+		margin: 5px @fw_button_spacing 0 0;
+		.span3();
+	}
+	
 	p {
 	    margin: 0;
 	}
 	
-	a {
-		text-shadow: none;
-		display: inline;
+	ul {
+		list-style: none;
 		padding: 0;
-		&:hover {
-			color: inherit;
-			text-decoration: underline;
-		}
+		margin: 0;
 	}
 	
+	ul.menu-dropdown {
+		font-size: 90%;
+	}
 	ul.menu-dropdown li p,
 	ul.menu-dropdown li a,
 	ul.dropdown-menu li a,
@@ -73,46 +73,256 @@
 	}
 	ul.menu-dropdown li p,
 	ul.dropdown-menu li p {
-		font-weight: bold;
 		text-transform: uppercase;
-		font-size: 90%;
 	}
 	
 	div > ul {
-		.nav();
+		display: block;
+		float: left;
+		margin: 0 @fw_button_spacing 0 0;
+		position: relative;
+		left: 0;
 		
+		> li {
+			display: block;
+			float: left;
+		}
+		  
 		a {
 			padding: @fw_button_padding;
+		}
+	}
+	
+	form {
+		display: inline;
+		
+		input[type='text'],
+		input[type='password'] {
+			float: left;
+			line-height: 0px + @fw_body_line_height;
+			.border-radius(@fw_corner_radius_block);
+		}
+	}
+	.foswikiNavigation,
+	.foswikiNavigationSecondary {
+		.nav();
+		margin: 0;
+		clear: none;
+		
+		> li {
+			margin-right: @fw_button_spacing;
+			
+			&:last-child {
+				margin-right: 0;
+			}
+		}
+		
+		> li {
+			> a,
+			> span a,
+			> a.dropdown-toggle,
+			> span a.dropdown-toggle {
+				.fw_button();
+				.fw_type_p();
+				
+				&.nolabel {
+					padding-left: 1px;
+					padding-right: 6px;
+				}
+				img {
+					vertical-align: text-top;
+				}
+			}
+		}
+		
+		&.foswikiButtonGroup {
+			> li,
+			& {
+				margin: 0;
+			}
+		}
+	}
+	
+	/* Secondary (floated right) */
+	.foswikiNavigationSecondary {
+		float: right;
+		margin: 0;
+		
+		> li {
+			margin-right: 0;
+			margin-left: @fw_button_spacing;
+		}
+		
+		// backwards compatibility
+		.menu-dropdown,
+		.dropdown-menu {
+			right: 0;
+			border: 0;
+		}
+	}
+	
+	ul.menu-dropdown,
+	ul.dropdown-menu {
+		min-width: 180px;
+		max-width: 260px;
+		top: @fw_body_line_height + @fw_button_padding_top + @fw_button_padding_bottom - 2;
+		padding-bottom: 0px + @fw_body_line_height / 4;
+		padding-top: 0px + @fw_body_line_height / 4;
+		
+		a {
+			border: none;
+			.box-shadow(none);
 		}
 	}
 }
 
 .foswikiTopBar {
-	position: relative; // make fixed when having js; see bottom of file
+	position: relative;
 	height: auto;
-	min-height: 4px;
-	z-index: 2;
-	
-	.foswikiLogo a {
-		padding: 0;
+	min-height: 40px;
+	z-index: 2; /* for foldout menus */
+	border: none;
+
+	.foswikiContainer {
+		.fw_tool_padding_vertical_only();
+		> nav,
+		> div {
+			margin-left: -@fw_universal_side_padding;
+		}
 	}
 	
-	div > ul a {
+	.foswikiLogo {
+		position: absolute;
+		left: 46%;
+		right: 46%;
+		padding: 0;
+		display: block;
+		width: 45px;
+		height: 45px;
+		text-indent: -999px;
+		overflow: hidden;
+		margin: 0px auto;
+	}
+	
+	.foswikiNavigation > li > a,
+	.foswikiNavigationSecondary > li > a {
 		margin: 0;
 		padding: @fw_topbar_button_padding;
 	}
-	div > ul.foswikiTitle .foswikiSeparator {
-		padding: @fw_topbar_separator_padding;
-	}
-	div > ul.foswikiTitle a {
-		padding-left: 0;
-		padding-right: 0;
-	}
 	
+	ul.menu-dropdown,
+	ul.dropdown-menu {
+		top: 40px - 4;
+	}
 }
 
-.foswikiBottomBar {
-	.fw_block_padding_vertical_only();
+.foswikiTopicActions {
+	z-index: 1;
+	.border-radius(0);
+
+	.foswikiContainer {
+		.fw_tool_padding_vertical_only();
+	}
+	
+	.foswikiTopicActionButtons {
+		float: right;
+		
+		.foswikiNavigationSecondary {
+			float: left;
+		}
+		
+		.foswikiButton,
+		.jqButton,
+		.foswikiSubmit {
+			margin: 0 0 0 @fw_button_spacing;
+		}
+	}
+}
+
+.foswikiMeta {}
+.foswikiBottomBar {}
+
+/*
+ * STRUCTURAL TOPIC COMPONENTS
+ * -------------------------------------------------------------------------- */
+
+.foswikiBroadcastMessage,
+.foswikiNotification,
+.foswikiHelp {
+	/*
+	you might want to differentiate in border style
+	by default, foswikiBroadcastMessage and foswikiNotification look the same
+	*/
+	border-style: solid;
+	border-width: 1px;
+	.border-radius(0);
+}
+
+.foswikiLogin {
+	margin: @fw_tool_padding_em 0;
+	.span9();
+}
+
+/*
+ * NON-STRUCTURAL TOPIC ELEMENTS
+ * -------------------------------------------------------------------------- */
+
+/* consistent block size */
+
+blockquote,
+pre,
+.foswikiHelp,
+.foswikiBroadcastMessage,
+.foswikiNotification {
+	.fw_component_padding();
+	li {
+		list-style-type: circle;
+	}
+}
+
+/* if we don't use a background or border for blockquotes, we don't need the top and bottom padding */
+blockquote {
+	padding-top: 0;
+	padding-bottom: 0;
+	font-style: normal;
+}
+
+.foswikiLeft {
+	float: left;
+	position: relative;
+}
+.foswikiRight {
+	position: relative;
+	float: right;
+}
+.foswikiClear {
+	/* to clean up floats */
+	margin: 0;
+	padding: 0;
+	height: 0;
+	line-height: 0;
+	clear: both;
+	display: block;
+}
+.foswikiHidden {
+	display: none;
+}
+
+.foswikiNoBorder {
+	border: none;
+}
+
+.foswikiNewLink {}
+
+// Clearfix for clearing floats like a boss h5bp.com/q
+.foswikiClearfix {
+	.clearfix();
+}
+form .foswikiClearfix {
+	margin-bottom: @fw_component_padding_em;
+}
+form .foswikiFormStep.foswikiClearfix {
+	margin-bottom: 0;
 }
 
 .foswikiButtonGroup {
@@ -136,102 +346,19 @@
 	
 	> li:first-child > a,
 	> li:first-child > span a {
-		.border-radius-left(@fw_block_corner);
+		.fw_border-radius-left(@fw_corner_radius_button);
 	}
 	> li:last-child > a,
 	> li:last-child > span a {
-		.border-radius-right(@fw_block_corner);
-	}
-}
-
-.foswikiTopicActions {
-	position: relative;
-	width: 100%;
-	z-index: 1;
-	top: 0;
-	.box-shadow(none);
-
-	.nav > li {
-		> a,
-		> span a,
-		> a.dropdown-toggle,
-		> span a.dropdown-toggle {
-
-			background-color: transparent;
-			
-			color: #666;
-			border: 1px solid #ddd;
-			.box-shadow(0 1px 1px #fff);
-			.transition(.1s linear all);
-			.border-radius(@fw_block_corner);
-			
-			&.nolabel {
-				padding-left: 1px;
-				padding-right: 6px;
-				color: #ccc;
-			}
-			&:hover {
-				border-color: #999;
-			}
-			img {
-				vertical-align: text-top;
-			}
-		}
-	}
-	/*
-	No rounded corners in topic actions button group
-	*/
-	.foswikiButtonGroup {
-		> li:first-child a {
-			.border-radius-right(0);
-		}
-		> li:last-child a {
-			.border-radius-left(0);
-		}
+		.fw_border-radius-right(@fw_corner_radius_button);
 	}
 	
-	.foswikiTopicActionButtons {
-		float: right;
-		
-		ul.secondary-nav {
-			float: left;
-		}
-		
-		.foswikiButton,
-		.jqButton,
-		.foswikiSubmit {
-			margin: 0 0 0 6px;
-		}
+	> li:first-child a {
+		.fw_border-radius-right(0);
 	}
-	
-	ul.menu-dropdown,
-	ul.dropdown-menu {
-		min-width: 180px;
-		max-width: 260px;
-		top: 26px;
-		
-		a {
-			border: none;
-			.box-shadow(none);
-		}
+	> li:last-child a {
+		.fw_border-radius-left(0);
 	}
-	
-	.foswikiBreadcrumb {
-		padding: @fw_button_padding;
-		padding-left: 0;
-		float: left;
-		color: #999; // TODO: move to color schemes
-	
-		.foswikiSeparator {
-			padding: 0 .5em;
-		}
-	}
-}
-
-
-
-.foswikiContextual {
-	.box-shadow(inset 0 1px 1px rgba(0,0,0,.05));
 }
 
 /* tables */
@@ -242,39 +369,69 @@
 	padding: 0;
 	border-collapse: separate; // Done so we can round those corners!
 	*border-collapse: collapse; /* IE7, collapse table to remove spacing */
-	border: 1px solid @fw_color_border_light;
+	border-style: solid;
+	border-width: 1px;
 	th, td {
-		.fw_menu_padding_all();
+		.fw_tool_padding_all();
 		line-height: @baseline;
 		text-align: left;
+		border-style: none;
+		border-width: 1px;
 	}
 	th {
-		font-weight: bold;
 		vertical-align: middle;
-		border-bottom: 1px solid @fw_color_border_light;
+		letter-spacing: 1px;
 	}
 	td {
 		vertical-align: top;
 	}
-	th + th,
 	td + td {
-		border-left: 1px solid @fw_color_border_light;
+		border-left-style: solid;
 	}
 	tr + tr td {
-		border-top: 1px solid @fw_color_border_light;
+		border-top-style: solid;
 	}
 }
+
 
 /* miscellaneous */
 
-hr {
-	color: #ccc;
-	background-color: #ccc;
-}
-
 .foswikiSeparator {}
-.foswikiBreadcrumb {}
+.foswikiTopicInfo {}
 
+.foswikiBreadcrumb {
+	> ul {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	
+		& > li {
+			display: inline;
+			padding: @fw_button_padding;
+			padding-bottom: @fw_button_padding_bottom - 2;
+			padding-left: 0;
+			padding-right: 0;
+			
+			a {
+				margin: 0;
+				padding: 0;
+				display: inline;
+				
+				&:hover {
+					text-decoration: underline;
+				}
+			}
+		}
+		
+		.foswikiSeparator {
+			padding: 0 5px;
+		}
+	}
+	
+	.foswikiTopicInfo {
+		padding: 0 .5em;
+	}
+}
 
 .foswikiPreviewArea {
 	border-width: 1px;
@@ -283,111 +440,72 @@ hr {
 	padding: 1em;
 }
 .foswikiSummary em {
-	font-weight: bold;
 	font-style: normal;
 }
 
 .foswikiLogo {}
-.foswikiImage {
-	overflow: auto;
-}
 
-.foswikiAlert,
-.foswikiAlert code {
-	color: @fw_color_alert;
-}
-.foswikiEmulatedLink {
-	color: @fw_link_color;
+.foswikiHorizontalList {
+	ul,
+	ol {
+		margin: 0;
+		padding: 0;
+		list-style: none;
+		clear: both;
+		
+		li {
+			float: left;
+			display: block;
+			padding: 0;
+			border-style: none solid none none;
+			border-width: 1px;
+			padding: 0 .5em;
+			
+			&:last-child {
+				border: none;
+				padding: none;
+			}
+		}
+	}
 }
 
 /* structural elements */
 
+.foswikiTopicText,
+.foswikiContentHeader,
+.foswikiContentFooter {}
+
 .foswikiTopic {
-	margin: 0;
-	padding: 0;
-}
-
-.foswikiTopicText {
-	position: relative;
-	padding-top: 0em + @fw_strand2_ratio_up_2 / @basefont;
-}
-
-.foswikiContentFooter {
-	.fw_block_padding_vertical_only();
-}
-
-.foswikiToolHeader {
-	.fw_em_margin_top(@fw_size_p);
-	.fw_menu_padding_all();
-	background-color: @fw_color_tool_background_gradient_dark;
-	.gradientBar(@fw_color_tool_background_gradient_light, @fw_color_tool_background_gradient_dark);
-	.border-radius(@fw_block_corner);
-	vertical-align: middle;
+	min-height: 0em + @fw_strand1_ratio_up_8 / @fw_basefont;
 }
 
 .foswikiToolbar {
-
-	.well();
-	.border-radius(0);
-  	.box-shadow(0 0px 0px rgba(0,0,0,0));
-	.fw_menu_padding_all();
-	margin-bottom: @fw_size_padding_menu_em;
-
-	.foswikiToolButtonRow {
-		position: relative;
-		margin: 0;
-		padding: 0;
-		float: right;
-		list-style: none;
-		
-		li {
-			float: left;
-			margin-left: 5px;
-		}
-	}
-
-	a:link,
-	a:visited {
-		color: @fw_color_text;
-	}
-
-	.foswikiToolbarHeader {
-		float: left;
-		line-height: 1;
-		.fw_em_font_size(@fw_size_h6);
-		.fw_menu_padding_vertical_only();
-	}
+	.fw_tool_padding_all();
+	.border-radius(@fw_corner_radius_block);
 }
-
-
 
 /* table of contents */
 .foswikiToc {
-	.foswikiTocTitle {
-		font-weight: bold;
-	}
+	.foswikiTocTitle {}
 	ul {
 		margin-top: 0;
 	}
 }
 
-
-
 /* search results */
-.foswikiSearchResults {}
+.foswikiSearchResults {
 
 	.foswikiSearchResult {
-		.fw_menu_padding_vertical_only();
+		.fw_tool_padding_vertical_only();
 		position: relative;
-		border-bottom: 1px solid @fw_color_border_light;
+		border-style: none none solid none;
+		border-width: 1px;
 		
 		.foswikiSearchResultImage img {
 			max-width: 70px;
 			float:left;
 		}
-		.foswikiSearchResultTitle {
-			font-weight: bold;
-		}
+		.foswikiSearchResultTitle {}
 		.foswikiSearchResultContents {
 			margin: 0 0 0 90px;
 		}
@@ -398,10 +516,7 @@ hr {
 		margin:1em 0;
 		padding:.25em 0;
 	}
-	.foswikiSearchResultMeta {
-		color: @fw_color_text_light;
-	}
-
+}
 
 /* attachments */
 
@@ -420,17 +535,17 @@ hr {
 		.foswikiSearchResultTitle {
 			a {
 				.fw_heading_6();
-				color: @fw_color_text;
+//				color: @fw_color_text;
 			}
 		}	
 		
 		.foswikiSearchResultMeta {
-			color: @fw_color_hint;
+//			color: @fw_color_hint;
 			.foswikiSmall();
 			
 			a:link,
 			a:visited {
-				color: @fw_link_color_gray;
+//				color: @fw_link_color_gray;
 			}
 		}
 	}
@@ -449,245 +564,250 @@ hr {
 	}
 }
 
-/* JQueryPlugin styles */
+/* Tabs */
 
-.jqTabGroup {
-	.tabs();
-	border: none;
-}
-.jqTabGroup > li {
-	top: 0;
-}
-.jqTabGroup > li a {
-	.border-radius(0);
-}	
-.foswikiTabs ul {
-	margin:0;
-	padding:0;
-	list-style:none;
-	position:relative;
-	bottom:0;
-}
-.foswikiTabs ul li {
-	display:inline;
-}
-.foswikiTabs ul li a,
-.foswikiTabs ul li a:link,
-.foswikiTabs ul li a:hover,
-.foswikiTabs ul li a:visited {
-	text-decoration:none;
-}
-.foswikiTabs ul li a,
-.foswikiTabs ul li span {
-	display:block;
-	float:left;
-	border-style:solid;
-	border-width:1px;
-}
-.foswikiTabs ul li a,
-.foswikiTabs ul li span {
-	border-style:solid;
-	border-width:1px;
-}
-.foswikiTabContent {
-	margin:-1px 0 1em 0;
-	padding:0;
-	border-style:solid;
-	border-width:1px;
-}
-.jqTab,
-.foswikiTab,
-.foswikiTabContent,
-.jqTabContents {
-	background:none;
-	border:none;
-}
-.foswikiTabContent,
-.jqTabContents {
-	border-top:1px solid #ccc;
-}
-.foswikiTabs ul li a,
-.foswikiTabs ul li a:hover,
-.foswikiTabs ul li span,
-.jqTabPaneSimple > .jqTabGroup a,
-.jqTabPaneSimple > .jqTabGroup a:hover {
-	border: none;
-	background: none;
-	color: @fw_color_text_toned_down;
-}
-.foswikiTabs ul li.foswikiActiveTab a,
-.foswikiTabs ul li.foswikiActiveTab a:hover,
-.jqTabPaneSimple > .jqTabGroup li.current a,
-.jqTabPaneSimple > .jqTabGroup li.current a:hover {
-	border-style: solid;
-	border-width: 1px;
-	border-color: #ccc #ccc #fff #ccc;
-	margin:-1px -1px 0 -1px;
-	font-weight: bold;
-	color: @fw_color_text;
-	
-	span {
-		font-weight: normal;
-	}
-}
-.jqTabPaneSimple > .jqTabGroup a:hover {
-	background: #eee;
-	border: none;
-}
-
-.jqTab {
-	border: none;
-}
-.jqTabPane {
-	.fw_inline_p();
-	.fw_block_p();
-}
-.jqTabContents {
-	.fw_menu_padding_all();
-	padding-top: 0;
-	
-	h4 {
-		margin-top: 0;
-		padding-top: 0;
-	}
-	.foswikiToolbar {
-		margin-left: -@fw_size_padding_menu_px;
-		margin-right: -@fw_size_padding_menu_px;
-	}
-
-}
-.jqTabPaneSimple .jqTabGroup a,
-.jqTabPaneSimple .jqTabGroup a:hover {
-	.fw_menu_padding_all();
-}
-
-/* vertical theme */
-.jqTabPane.jqTabPaneSimplevertical {
-
-	@tmp_menucolspan: 4;
-	@tmp_menu_width: (@gridColumnWidth * @tmp_menucolspan) + (@gridGutterWidth * (@tmp_menucolspan - 1));
-	@tmp_color_background_normal: #eaeef3;
-	@tmp_color_background_selected: #fff;
-
+.fw_tabs_ul {
+	margin: 0;
+	padding: 0;
+	list-style: none;
 	position: relative;
-	border-top: 1px solid @fw_color_border_medium;
+	bottom: 0;
 	
-	ul.jqTabGroup {
-		width: 0px + @fw_strand2_ratio_up_7 - 2 * @fw_contentSidePadding;
-		float: none;
-		
-		li {
-			position: relative;
-		}
-		
-		li img {
-			vertical-align: text-bottom;
-		}
-		
-		li a {
-			.fw_menu_padding_all();
+	li {
+	
+		&,
+		&.foswikiActiveTab,
+		&.current {
 			display: block;
-			margin: -1px 0 0 0;
-			background-color: @tmp_color_background_normal;
-			color: @fw_color_text;
-			width: @tmp_menu_width - 2*@fw_size_padding_menu_px;
-			border-style: solid none;
-			border-color:@fw_color_border_medium;
-			border-width: 1px;
-			&:hover {
-				background-color: @tmp_color_background_selected;
-				color: @fw_color_text;
+			float: left;
+			border: none;
+			background: none;
+			margin: 0 @fw_button_spacing 0 0;
+			padding: 0;
+			height: auto;
+		}
+		
+		& {
+			a,
+			a:hover {
+				display: block;
+				float: left;
+				height: auto;
+				line-height: auto;
+				margin: 0;
+				padding: @fw_button_padding;
+				border-style: solid;
+				border-width: 1px;
+				text-decoration: none;
+				.border-radius(@fw_corner_radius_button);
 			}
 		}
-		li.current a,
-		li.current a:hover {
-			background-color: @tmp_color_background_selected;
+		
+		img {
+			vertical-align: text-top;
 		}
+	}
+}
 
-		li.current a:after,
-		li a:hover:after {
-			content:"";
-			display: block;
-			position: absolute;
-			top: 50%;
-			right: 0;
-			width: 0;
-			height: 0;
-			line-height: 0;
-			font-size: 0;
-			border-width:4px;
-			margin: -5px 5px 0 0;
-			border-style: solid;
-			border-color: transparent transparent transparent @fw_color_heading_secondary;
+.foswikiTabs ul,
+.jqTabPaneDefault > ul.jqTabGroup,
+.jqTabPaneSimple > ul.jqTabGroup {
+	.fw_tabs_ul();
+}
+
+.jqTabPaneDefault > ul.jqTabGroup {
+	
+	li {
+		
+		& {
+			a,
+			a:hover {
+				.fw_button();
+				padding-top: 3px;
+				padding-bottom: 3px;
+				
+				&:before {
+					font-size: 70%;
+					padding-right: 5px;
+					content:"\25B6";
+				}
+			}
 		}
+		
+		&.foswikiActiveTab a,
+		&.current a {
+			&,
+			&:hover {
+				padding: @fw_button_padding;
+				padding-bottom: 4 + @fw_button_padding_bottom;
+				
+				&:before {
+					font-size: 80%;
+					content:"\25BC";
+				}
+			}
+		}
+	}
+}
 
-			
+.jqTab,
+.foswikiTabContent {
+	margin: -1px 0 1em 0;
+	.fw_component_padding();
+	.border-radius(@fw_corner_radius_block);
+	
+	-webkit-border-top-left-radius: 0;
+	-moz-border-top-left-radius: 0;
+	border-top-left-radius: 0;
+	
+	border-style: solid;
+	border-width: 1px;
+}
+.jqTabContents {
+	border: none;
+	padding: 0;
+}
+
+
+/* prevent double padding with bullet list in block */
+blockquote,
+pre,
+.foswikiHelp,
+.foswikiBroadcastMessage,
+.foswikiNotification {
+	ol:first-child,
+	ul:first-child {
+		margin-top: 0;
 	}
-	span.foswikiClear {
-		clear: none;
+	ol:last-child,
+	ul:last-child {
+		margin-bottom: 0;
 	}
-	.jqTab {
-		position: absolute;
-		top: 0;
-		left: @tmp_menu_width + 1.5 * @gridGutterWidth;
-		width: (@gridColumnWidth * (@gridColumns - @tmp_menucolspan)) + (@gridGutterWidth * ((@gridColumns - @tmp_menucolspan) - 1)) - (0.5 * @gridGutterWidth);
+}
+/* prevent double padding inside block */
+blockquote,
+pre,
+.foswikiHelp,
+.foswikiBroadcastMessage,
+.foswikiNotification,
+.foswikiFormStep,
+.foswikiSection,
+.foswikiTopicText,
+.foswikiTabContent,
+.jqTabContents,
+.foswikiInputs,
+td {
+	h1,
+	h2,
+	h3,
+	h4,
+	h5,
+	h6,
+	p,
+	legend,
+	pre,
+	ul {
+		&:first-child {
+			margin-top: 0;
+		}
+	}
+}
+/*
+Unfortunately this does not work in Foswiki because paragraph blocks are not put in p tags. :last-child will select the 'wrong' element.
+So we will omit the elements that should normally be last elements
+*/
+blockquote,
+pre,
+.foswikiHelp,
+.foswikiBroadcastMessage,
+.foswikiNotification,
+.foswikiFormStep,
+.foswikiSection,
+.foswikiTopicText,
+.foswikiTabContent,
+.jqTabContents,
+.foswikiInputs,
+td {
+	p,
+	legend,
+	pre,
+	ul {
+		&:last-child {
+			margin-bottom: 0;
+		}
+	}
+}
+
+/* Edit page */
+
+.foswikiEditPage {
+	.foswikiTopicText {
+		padding-top: 0;
 	}
 	
-	.jqTabContents {
-		border: none;
+	.foswikiEditControls {		
+		input {
+			margin: 0 @fw_button_spacing 0 0;
+		}
+	}
+
+	#topic_2WYSIWYG {
+		display: none;
 	}
 	
-	label {
-		width: auto;
-		float: none;
+	.foswikiEditTextarea {
+		border-style: none solid solid solid;
+		border-width: 1px;
 	}
+	
+	#foswikiEditControlsContainer {
+		border-style: solid solid none solid;
+		border-width: 1px;
+	}
+	
+	.foswikiHasWysiwyg .foswikiEditTextarea {
+		border-style: none solid;
+		border-width: 1px;
+	}
+}
+
+.foswikiHasWysiwyg .foswikiEditControls {
+	display: none;
 }
 
 /* extensions */
-
-.foswikiEditTextarea {
-	#topic,
-	#topic_tbl {
-		width: 100% !important;
-	}
-}
-body div.mceExternalToolbar {
-    position: fixed;
-    top: -28px;
-}
 
 /* TinyMCEPlugin */
 
 #topic_external {
 	display: block !important; /* always show */
 }
-// create space above
-.foswikiBar {
-	.o2k7Skin td.mceToolbar {
-		background: none;
-	}
-	.o2k7Skin .mceSeparator {
-		background: none;
-	}
+.mceToolbar {
+	background: transparent !important;
 }
-.o2k7SkinBlack table.mceLayout tr.mceLast td {
-	border: 1px solid #ddd !important;
+table.mceToolbar {
+	margin-left: 0 !important;
 }
 
-.o2k7SkinBlack .mceExternalToolbar,
-.o2k7SkinBlack .mceListBox .mceText,
-.o2k7SkinBlack div.mceMenu,
-.o2k7SkinBlack table.mceLayout,
-.o2k7SkinBlack table.mceLayout tr.mceFirst td,
-.o2k7SkinBlack table.mceLayout,
-.o2k7SkinBlack table.mceLayout tr.mceLast td,
-.o2k7SkinBlack .mceIframeContainer {
-	border-color: #ddd !important;
+.foswikiEditTextarea {
+	textarea#topic,
+	#topic_tbl {
+		.fw_box_sizing(border-box);
+		.box-shadow(none);
+		padding: 5px;
+		border: none !important;
+		width: 100% !important;
+	}
 }
-
-.o2k7SkinBlack td.mceStatusbar,
-.o2k7SkinBlack .mceMenuItemTitle span.mceText,
-.o2k7SkinBlack .mceStatusbar div,
-.o2k7SkinBlack .mceStatusbar span {
-	background-color: #ddd !important;
+.foswikiSticky td.mceToolbar {
+	width: 100% !important;
+}
+#topic_toolbargroup {
+	display: none;
+}
+.foswikiHasWysiwyg #topic_toolbargroup {
+	display: block;
+}
+.mceIframeContainer {
+	border: none !important;
 }

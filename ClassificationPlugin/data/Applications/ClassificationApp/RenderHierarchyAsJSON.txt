@@ -1,4 +1,4 @@
-%META:TOPICINFO{author="mdaum" date="1314780575" format="1.1" version="1.6"}%
+%META:TOPICINFO{author="ProjectContributor" date="1314780575" format="1.1" version="1.6"}%
 %META:TOPICPARENT{name="TopicFunction"}%
 %TOC{depth="2"}%
 

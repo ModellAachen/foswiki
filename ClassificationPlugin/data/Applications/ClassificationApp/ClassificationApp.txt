@@ -11,7 +11,7 @@
 %DBCALL{"Applications.RenderApplicationDocumentation" TYPE="TopicFunction"}%
 
 ---++ Installation
-<!-- ALIAS:... -->&hellip;<!-- //ALIAS -->
+...
 
 ---++ Manifest
 %DBCALL{"Applications.RenderApplicationManifest"}%

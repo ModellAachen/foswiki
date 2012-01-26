@@ -67,18 +67,18 @@ $Foswiki::cfg{SolrPlugin}{AutoStartDaemon} = 0;
 # **COMMAND**
 # Command used to start the solr instance. Note that <code>solrstart</code> is a shell script wrapping
 # around the actual startup routine
-$Foswiki::cfg{SolrPlugin}{SolrStartCmd} = $Foswiki::cfg{ToolsDir}.'/solrstart %SOLRHOME|F%';
+$Foswiki::cfg{SolrPlugin}{SolrStartCmd} = '$Foswiki::cfg{ToolsDir}/solrstart %SOLRHOME|F%';
 
 # **PATH**
 # Path to the directory containing the <code>start.jar</code> file. That's where the jetty engine is 
 # located and where solr puts its data further down the directory structure
-$Foswiki::cfg{SolrPlugin}{SolrHome} = '/home/www-data/foswiki/solr';
+$Foswiki::cfg{SolrPlugin}{SolrHome} = '';
 
 # **STRING**
 # Default collection where to put foswiki content to (including topic text as well as all attachments)
 $Foswiki::cfg{SolrPlugin}{DefaultCollection} = 'wiki';
 
-# **STRING**
+# **PERL**
 # List of supported languages. These are the locale IDs as supported for by the schema.xml configuration
 # file for solr. For each language ID there's a text field named text_&lt;ID&gt; that will be filled
 # with content in the appropriate language. A wiki page can be flagged to be in a specific language by

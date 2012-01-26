@@ -2,7 +2,7 @@
 
 Foswiki - The Free and Open Source Wiki, http://foswiki.org/
 
-(c)opyright 2010-2011 Michael Daum http://michaeldaumconsulting.com
+(c)opyright 2010-2012 Michael Daum http://michaeldaumconsulting.com
 
 are listed in the AUTHORS file in the root of this distribution.
 NOTE: Please extend that file, not this notice.
@@ -124,12 +124,12 @@ jQuery(function($) {
         opts.cols = 2;
       } else {
         //$.log("METADATA: thisWidth="+thisWidth+" ... removing cols");
-        $this.removeClass("foswikiAttachmentsCols2 foswikiAttachmentsCols3");
+        newClass = "foswikiAttachmentsCols1";
         opts.cols = 1;
       }
 
       if (newClass && !$this.hasClass(newClass)) {
-        $this.removeClass("foswikiAttachmentsCols2 foswikiAttachmentsCols3");
+        $this.removeClass("foswikiAttachmentsCols1 foswikiAttachmentsCols2 foswikiAttachmentsCols3");
         $this.addClass(newClass);
         //$.log("METADATA: thisWidth="+thisWidth+" ... switching class="+newClass);
       } else {

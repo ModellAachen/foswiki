@@ -133,6 +133,7 @@ Clients use the DBCache by defining a subclass of the
 |  Release: | %$RELEASE% |
 |  Version: | %$VERSION% |
 |  Change History: | |
+|  10 Jan 2012 | Foswikitask:Item11406: remove redundant reference to archivist from all stored values |
 |  25 Aug 2011 | Foswikitask:Item11070: working around odd defaults of =normalizeWebTopicName= |
 |  28 Mar 2011 | Foswikitask:Item9375: disabling {AlwaysUpdateCache} by default and making an expert option with appropriate warnings |
 |  17 Nov 2009 | Foswikitask:Item8327: series of robustness fixes (Foswiki:Main.MichaelDaum) |

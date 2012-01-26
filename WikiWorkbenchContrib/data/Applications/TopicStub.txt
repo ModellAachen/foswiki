@@ -2,7 +2,7 @@
 %META:TOPICPARENT{name="TopicType"}%
 %DBCALL{"RenderTopicInstaller" TYPE="TopicType" PARENT="TopicType"}%
 ---++ Documentation
-%STARTSECTION{name="documentation" type="section"}%
+%STARTSECTION{"documentation"}%
 This is a type of topics that has no own net data but includes all data from
 another topic. Thereby content from another web can be integrated into this
 web without reduplication. Every TopicStub has a rather rigid structure and
@@ -14,7 +14,7 @@ redundancy of pure content, whereas TopicFunctions are part of a WikiWorkbench
 library and thus reduce redundancy in WikiApplications.
 
 See also: %TOPIC%Template
-%ENDSECTION{name="documentation" type="section"}%
+%ENDSECTION{"documentation"}%
 
 ---++ Topics of type '%TOPIC%'
 %STARTINCLUDE%<!-- -->

@@ -1,55 +1,49 @@
-<noautolink><div class="foswikiBar foswikiTopBar foswikiColorNavigationPrimary foswikiStickyx" data-dropdown="dropdown">
-	<div class="foswikiContainer">
-		<ul>
-			<li class="foswikiLogo">
-				<a href='#'><img src='%PUBURL%/%SYSTEMWEB%/BaseSkin/foswiki-logo-top.png' /></a>
+<noautolink>%TMPL:P{"startsection" class="foswikiBar foswikiTopBar foswikiColorNavigationPrimary"}%
+	<nav>
+		<a class='foswikiLogo' href='%SCRIPTURL{view}%/%BASEWEB%/%HOMETOPIC%'></a>
+		<ul class='foswikiNavigation' data-dropdown='dropdown'>
+			<li>
+				<a href='%SCRIPTURL{view}%/%BASEWEB%/%HOMETOPIC%'>%MAKETEXT{"Home"}%</a>
 			</li>
 			<li>
-				<a href="%SCRIPTURL{view}%/%BASEWEB%/%HOMETOPIC%" class="menu">%MAKETEXT{"[_1] Web" args="%BASEWEB%"}%</a>
-				<ul class="menu-dropdown">
+				<a href='%SCRIPTURL{view}%/%BASEWEB%/%HOMETOPIC%' class='menu'>%MAKETEXT{"[_1] Web" args="%BASEWEB%"}%</a>
+				<ul class='menu-dropdown'>
 					<li>[[WebHome][%MAKETEXT{"Home"}%]]</li>
 					<li>[[WebTopicList][%MAKETEXT{"Index"}%]]</li>
 					<li>[[%BASEWEB%.WebSearch][%MAKETEXT{"Search"}%]]</li>
 					<li>[[WebChanges][%MAKETEXT{"Changes"}%]]</li>
 					<li>[[WebNotify][%MAKETEXT{"Notifications"}%]]</li>
 					<li>[[WebRss][%MAKETEXT{"RSS Feed"}%]]</li>
-					<li>[[WebStatistics][%MAKETEXT{"Statistics"}%]]</li>
+					<li>[[%STATISTICSTOPIC%][%MAKETEXT{"Statistics"}%]]</li>
 					<li>[[WebPreferences][%MAKETEXT{"Preferences"}%]]</li>
+					<li class='divider'></li>
+					<li><p>Test</p></li>
 				</ul>
 			</li>
 			<li>
-				<a href="#" class="menu">Other webs</a>
-				<ul class="menu-dropdown">
-					<li><a href="#">Web 2</a></li>
-					<li><a href="#">Web 3</a></li>
-					<li class="divider"></li>
-					<li><a href="#">Customize web list...</a></li>
+				<a href='#' class='menu'>Other webs</a>
+				<ul class='menu-dropdown'>
+					<li><a href='#'>Web 2</a></li>
+					<li><a href='#'>Web 3</a></li>
+					<li class='divider'></li>
+					<li><a href='#'>Customize web list...</a></li>
 				</ul>
 			</li>
 		</ul>
-		<ul class="nav secondary-nav">
-			<form action="">
-				<input type="text" placeholder="Search or create topic">
+		<div class='foswikiRight'>
+			<form class='foswikiLeft' action='#'>
+				<input type='text' placeholder='%MAKETEXT{"Search or create topic..."}%'>
 			</form>
-			<!--
-			<li>
-				<a href="#" class="menu">My groups</a>
-				<ul class="menu-dropdown">
-					<li><a href="#">Secondary link</a></li>
-					<li><a href="#">Something else here</a></li>
-					<li class="divider"></li>
-					<li><a href="#">Another link</a></li>
-				</ul>
-			</li>
-			-->
-			<li>
-				<a href="%SCRIPTURL{login}%/%BASEWEB%/%BASETOPIC%" class="menu">%MAKETEXT{"Log in"}%</a>
-				<ul class="menu-dropdown">
-					<li><a href="#">Create account</a></li>
-					<li class="divider"></li>
-					<li><a href="#">About this site</a></li>
-				</ul>
-			</li>
-		</ul>
-	</div>
-</div></noautolink>
+			<ul class='foswikiNavigationSecondary' data-dropdown='dropdown'>
+				<li>
+					<a href='%SCRIPTURL{login}%/%BASEWEB%/%BASETOPIC%' class='menu'>%MAKETEXT{"Log in"}%</a>
+					<ul class='menu-dropdown'>
+						<li><a href='#'>Create account</a></li>
+						<li class='divider'></li>
+						<li><a href='#'>About this site</a></li>
+					</ul>
+				</li>
+			</ul>
+		</div>
+	</nav>
+%TMPL:P{"endsection"}%</noautolink>

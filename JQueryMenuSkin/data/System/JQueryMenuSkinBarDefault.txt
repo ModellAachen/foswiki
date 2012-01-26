@@ -1,51 +1,47 @@
 %META:TOPICINFO{author="ProjectContributor" date="1292936279" format="1.1" version="1.1"}%
 %META:TOPICPARENT{name="JQueryMenuSkin"}%
 %STARTINCLUDE%
-<ul class="sf-menu">
-    <li><a href="%SCRIPTURLPATH{"view"}%">Home</a></li>
+<!--
+   * Set ALLOWTOPICCHANGE = AdminGroup
+-->
+<ul id="jqmenu" class="sf-menu">
 	<li><a class="sf-with-ul" href="#a">User<span class="sf-sub-indicator"> &#187;</span></a>
 	<ul>
-%IF{"context authenticated" then='
-		<li><a href="%SCRIPTURLPATH{"view"}%/%USERSWEB%/%WIKINAME%">My Home Page</a></li>
-		<li><a href="%LOGOUTURL%">Logout</a></li>
-    	<li><a href="%SCRIPTURLPATH{"view"}%/%SYSTEMWEB%/ChangePassword">Change Password</a></li>
-' else='
-    	<li><a href="%LOGINURL%">Login</a></li>
-    	<li><a href="%SCRIPTURLPATH{"view"}%/%SYSTEMWEB%/UserRegistration">Register</a></li>
-    	<li><a href="%SCRIPTURLPATH{"view"}%/%SYSTEMWEB%/ResetPassword">Reset Password</a></li>
+%IF{"context authenticated" then='<li><a href="%SCRIPTURLPATH{"view"}%/%USERSWEB%/%WIKINAME%">%ICON{home}% My Home Page</a></li><li><a href="%SCRIPTURLPATH{"view"}%/%SYSTEMWEB%/ChangePassword">%ICON{retweet}% Change Password</a></li><li><a href="%LOGOUTURL%">%ICON{"logout"}% Logout</a></li>' else='<li><a href="%LOGINURL%">%ICON{"key"}% Login</a></li><li><a href="%SCRIPTURLPATH{"view"}%/%SYSTEMWEB%/UserRegistration">%ICON{"reg"}% Register</a></li><li><a href="%SCRIPTURLPATH{"view"}%/%SYSTEMWEB%/ResetPassword">%ICON{"retweet"}% Reset Password</a></li>
 '}%
-	</ul></li>
-    <li><a class="sf-with-ul" href="#a">Webs<span class="sf-sub-indicator"> &#187;</span></a>
-	<ul>
-		<li><a href="%SCRIPTURLPATH{"view"}%/%USERSWEB%/WebHome">%USERSWEB%</a></li>
-		<li><a href="%SCRIPTURLPATH{"view"}%/%SYSTEMWEB%/WebHome">%SYSTEMWEB%</a></li>
-		<li><a href="%SCRIPTURLPATH{"view"}%/Trash/WebHome">Trash</a></li>
+		<li><a href="%SCRIPTURLPATH{"view"}%/%USERSWEB%/WikiUsers">%ICON{"persons"}% Other Users</a></li>
+		<li><a href="%SCRIPTURLPATH{"view"}%/%USERSWEB%/WikiGroups">%ICON{"group"}% Groups</a></li>
 	</ul></li>
     <li><a class="sf-with-ul" href="#a">Actions<span class="sf-sub-indicator"> &#187;</span></a>
 	<ul>
-		<li><a href="%SCRIPTURLPATH{"edit"}%/%BASEWEB%/%BASETOPIC%?t=%GMTIME{"$epoch"}%">Edit this Topic</a></li>
-		<li><a href="%SCRIPTURLPATH{"edit"}%/%BASEWEB%/%BASETOPIC%?nowysiwyg=1;t=%GMTIME{"$epoch"}%">Edit Wiki Text</a></li>
-		<li><a href="%SCRIPTURLPATH{"view"}%/%BASEWEB%/WebCreateNewTopic?topicparent=%BASETOPIC%">Create A New Topic</a></li>
-		<li><a href="%SCRIPTURLPATH{"attach"}%/%BASEWEB%/%BASETOPIC%">Attach an Image/File</a></li>
-		<li><a href="%SCRIPTURLPATH{"view"}%/%BASEWEB%/%BASETOPIC%?template=more">More Actions</a></li>
-		<li><a href="%SCRIPTURLPATH{"rename"}%/%BASEWEB%/%BASETOPIC%?newweb=Trash&nonwikiword=on">Delete this topic</a></li>
-   </ul></li>
+		<li><a href="%SCRIPTURLPATH{"edit"}%/%BASEWEB%/%BASETOPIC%?t=%GMTIME{"$epoch"}%">%ICON{"edittopic"}% Edit this Topic</a></li>
+		<li><a href="%SCRIPTURLPATH{"edit"}%/%BASEWEB%/%BASETOPIC%?nowysiwyg=1;t=%GMTIME{"$epoch"}%">%ICON{"pencil"}% Edit Wiki Text</a></li>
+        <li><form id="editpref" action="/foswiki/bin/manage/%BASEWEB%/%BASETOPIC%" method="post"><input type="hidden" name="action" value="editSettings" /></form><a href="javascript:document.forms['editpref'].submit();">%JQICON{"page_key"}% Edit Topic Preferences</a></li>
+		<li><a href="%SCRIPTURLPATH{"view"}%/%BASEWEB%/WebCreateNewTopic?topicparent=%BASETOPIC%">%ICON{"newtopic"}% Create A New Topic</a></li>
+		<li><a href="%SCRIPTURLPATH{"attach"}%/%BASEWEB%/%BASETOPIC%">%ICON{"attachfile"}% Attach an Image/File</a></li>
+		<li><a href="%SCRIPTURLPATH{"view"}%/%BASEWEB%/%BASETOPIC%?template=more">%ICON{"more"}% More Actions</a></li>
+		<li><a href="%SCRIPTURLPATH{"rename"}%/%BASEWEB%/%BASETOPIC%?newweb=Trash&nonwikiword=on">%ICON{"trash"}% Delete this topic</a></li>
+    </ul></li>
     <li><a class="sf-with-ul" href="#a">View<span class="sf-sub-indicator"> &#187;</span></a>
 	<ul>
-		<li><a href="%SCRIPTURLPATH{"view"}%/%BASEWEB%/%BASETOPIC%?cover=print">View Printable</a></li>
-		<li><a href="%SCRIPTURLPATH{"view"}%/%BASEWEB%/%BASETOPIC%?raw=on">View Wiki Text</a></li>
-		<li><a href="%SCRIPTURLPATH{"view"}%/%USERSWEB%/WikiUsers">View Users</a></li>
-		<li><a href="%SCRIPTURLPATH{"view"}%/%USERSWEB%/WikiGroups">View Groups</a></li>
-		<li><a href="%SCRIPTURLPATH{"view"}%/%BASEWEB%/WebChanges">View '%BASEWEB%' Web Changes</a></li>
-		<li><a href="%SCRIPTURLPATH{"view"}%/%BASEWEB%/WebIndex">View '%BASEWEB%' Web Index</a></li>
-		<li><a href="%SCRIPTURLPATH{"view"}%/%SYSTEMWEB%/InstalledPlugins">View Installed Plugins</a></li>
-   </ul></li>
+		<li><a href="%SCRIPTURLPATH{"view"}%/%BASEWEB%/%BASETOPIC%?cover=print">%ICON{"printtopic"}% Print Version</a></li>
+		<li><a href="%SCRIPTURLPATH{"view"}%/%BASEWEB%/%BASETOPIC%?raw=all">%ICON{"txt"}% Topic Wiki Text</a></li>
+		<li><a href="%SCRIPTURLPATH{"view"}%/%BASEWEB%/WebChanges">%ICON{"changes"}% Web Changes</a></li>
+		<li><a href="%SCRIPTURLPATH{"view"}%/%BASEWEB%/WebIndex">%ICON{"index"}% Web Index</a></li>
+		<li><a href="%SCRIPTURLPATH{"view"}%/%BASEWEB%/WebStatistics">%ICON{"statistics"}% Web Statistics</a></li>
+		<li><a href="%SCRIPTURLPATH{"view"}%/%BASEWEB%/WebRss">%ICON{"rss"}% Web RSS Feed</a></li>
+		<li><a href="%SCRIPTURLPATH{"view"}%/%SYSTEMWEB%/InstalledPlugins">%ICON{"plugin"}% Installed Extensions</a></li>
+    </ul></li>
+    <li><a class="sf-with-ul" href="#a">Webs<span class="sf-sub-indicator"> &#187;</span></a>
+	<ul>
+	    %WEBLIST{"<li><a href=\"%SCRIPTURLPATH{"view"}%/$name/%HOMETOPIC%\"><img src=\"%ICONURL{web-bg}%\" border=\"0\" alt=\"\" width=\"16\" height=\"16\" style=\"background-color:%$markerVAR{\"WEBBGCOLOR\" web=$qname}$marker%\" />&nbsp;<nop>$indentedname</a></li>"}%
+	</ul></li>
     <li><a class="sf-with-ul" href="#a">Help<span class="sf-sub-indicator"> &#187;</span></a>
 	<ul>
-		<li><a href="%SCRIPTURLPATH{"view"}%/System/BeginnersStartHere">Wiki Beginners</a></li>
-		<li><a href="%SCRIPTURLPATH{"view"}%/System/TipsOfTheDay">Tip of the Day</a></li>
-       	<li><a href="http://foswiki.org/Support/WebHome" target="_blank">Foswiki Support</a></li>
-       	<li><a href="http://foswiki.org/About/WebHome" target="_blank">About Foswiki</a></li>
+		<li><a href="%SCRIPTURLPATH{"view"}%/%SYSTEMWEB%/BeginnersStartHere">%ICON{"presentation"}% Wiki Beginners</a></li>
+		<li><a href="%SCRIPTURLPATH{"view"}%/%SYSTEMWEB%/TipsOfTheDay">%ICON{"tip"}% Tip of the Day</a></li>
+       	<li><a href="http://foswiki.org/Extensions/WebHome" target="_blank">%ICON{"gear"}% Browse Foswiki Extensions</a></li>
+       	<li><a href="http://foswiki.org/Support/WebHome" target="_blank">%ICON{"foswiki"}% Foswiki Support</a></li>
+       	<li><a href="http://foswiki.org/About/WebHome" target="_blank">%ICON{"foswiki"}% About Foswiki</a></li>
    </ul></li>
 %STOPINCLUDE%
-%META:PREFERENCE{name="ALLOWTOPICCHANGE" title="ALLOWTOPICCHANGE" type="Set" value="AdminGroup"}%

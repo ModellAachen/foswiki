@@ -51,7 +51,7 @@
   exclude="%FORMATLIST{"%VALUE%" split="\s*,\s*" format="\b($1=\d+)\b" separator="|"}%"
   split="\s*,\s*"
   pattern="(.*)=(.*)"
-  header="$n$n<hr />$n$n<h3>%MAKETEXT{"Related tags:"}%</h3><ol>"
+  header="$n$n<hr />$n$n<h3>%MAKETEXT{"Related tags"}%:</h3><ol>"
   format="<li><a class='clsTagSuggestion' href='#'>$1</a>
     <span class='foswikiGrayText'>... %MAKETEXT{"found in [_1] other topic(s)" args="$2"}%</span>
     </li>"

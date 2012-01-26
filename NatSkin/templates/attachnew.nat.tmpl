@@ -33,12 +33,11 @@
 </tr>
 <!-- //moreoptions -->%TMPL:END%
 %TMPL:DEF{"existingattachments"}%<!-- existingattachments -->
-%IFDEFINEDTHEN{"$percntMETA{\"attachments\" all=\"on\"}$percnt"}%
-%$nopTAB{"%MAKETEXT{"Existing files"}%"}%
+%TAB{"%MAKETEXT{"Existing files"}%"}%
 <h2><noautolink>%MAKETEXT{"Attachments at [_1]" args="%TMPL:P{"topictitle"}%"}%:</noautolink></h2>
 <div id="natTopicAttachments" class="natTopicAttachments">
-$test
+%META{"attachments" all="on"}%
 </div>
-%$nopENDTAB%
+%ENDTAB%
 %FIDEFINED%
 <!-- //existingattachments -->%TMPL:END%

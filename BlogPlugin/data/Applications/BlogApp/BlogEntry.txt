@@ -1,0 +1,45 @@
+%META:TOPICINFO{author="ProjectContributor" comment="reprev" date="1322565484" format="1.1" reprev="15" version="17"}%
+%META:TOPICPARENT{name="TopicType"}%
+%DBCALL{"Applications.RenderTopicInstaller" TEXT="Install '%TOPIC%' TopicType" TYPE="TopicType"}%
+
+---++ Documentation
+%STARTSECTION{name="documentation" type="section"}%
+This is the central TopicType to store blog entries.
+%ENDSECTION{name="documentation" type="section"}%
+
+---++ Topics of type '%TOPIC%'
+%STARTINCLUDE%
+%DBCALL{"Applications.RenderSimpleTopicCreator" 
+  VALUE=""
+  FORM="%WEB%.%TOPIC%"
+  EDITOR="Applications.BlogApp.BlogEntryEdit"
+  EXTRA="<input type='hidden' name='State' value='unpublished' /><input type='hidden' name='DISPLAYCOMMENTS' value='on' />"
+  PARENT="none"
+}%
+
+%DBCALL{"Applications.RenderTopicsOfType" 
+  FIELDS="TopicTitle, Author, State, Tag, Category, Changed"
+  ROWS="20"
+  FILTER="topic!='WebTopicEditTemplate'"
+}%
+%STOPINCLUDE%
+
+---++ <nop>%TOPIC% form
+| *Name:*| *Type:* | *Size:* | *Values:* | *Description:* | *Attributes:* |
+| TopicType | label | 1 | BlogEntry, ClassifiedTopic, CategorizedTopic, TaggedTopic | Document type  | |
+| <nop>TopicTitle | text | 75 | | title of this blog entry | |
+| Summary | text | 75 | | enter a punch line | |
+| Tag | tag | 30 | | keywords | |
+| Category | cat | 1 |  | categories this blog entry is field to |  |
+| State | radio | 2 | published, unpublished | only blog entries in state published are readable by other users; unpublished blog entries are only visible for the authors of this blog entry |  |
+| Sticky | checkbox+values | 4 | on frontpage=frontpage, on category=category | a sticky blog entries is rendered at the top of the frontpage or category independent of the normal timeline |
+| <nop>MetaTitle | text | 75 | | SEO page title. Use a maximum of 60 chars for the title. <a href='#' id='blogFetchTitle'>%MAKETEXT{"Get from topic title."}%</a> | |
+| <nop>MetaDescription | textarea | 80x2 | | SEO description. Use a maximum of 160 chars for the description. <a href='#' id='blogFetchDescription'>%MAKETEXT{"Get description from content."}%</a> | | 
+| <nop>MetaKeywords | text | 75 | | SEO keywords. Specify a comma separate list of keywords. <a href='#' id='blogFetchKeywords'>%MAKETEXT{"Get from classification."}%</a> | |
+
+%META:FORM{name="Applications.TopicType"}%
+%META:FIELD{name="TopicType" title="TopicType" value="TopicType, DataForm, DocuTopic, ApplicationTopic"}%
+%META:FIELD{name="TopicTitle" attributes="" title="<nop>TopicTitle" value=""}%
+%META:FIELD{name="Inheritance" attributes="" title="Inheritance" value=""}%
+%META:FIELD{name="Summary" attributes="c" title="Summary" value=""}%
+%META:FIELD{name="WikiApplication" attributes="" title="WikiApplication" value="BlogApp"}%

@@ -13,7 +13,7 @@ package Foswiki::Plugins::ImmediateNotifyPlugin::XMPP;
 use strict;
 use warnings;
 
-use Net::XMPP qw(Client);
+use Net::XMPP;
 
 my $debug;
 my $warning;
@@ -104,13 +104,13 @@ sub notify {
     my ($skin) = Foswiki::Func::getPreferencesValue("SKIN");
     my ($template) = Foswiki::Func::readTemplate( 'xmpp', 'immediatenotify' );
 
-    # &$debug("- SMTP:  template read $template");
-    my ($from) = Foswiki::Func::getPreferencesValue("WIKIWEBMASTER");
+    &$debug("- XMPP:  template read $template");
 
+    # Expand Legacy variables - not used in latest templates
+    my ($from) = Foswiki::Func::getPreferencesValue("WIKIWEBMASTER");
     $template =~ s/%EMAILFROM%/$from/go;
-    $template =~ s/%WEB%/$info->{web}/go;
-    $template =~ s/%TOPICNAME%/$info->{topic}/go;
     $template =~ s/%USER%/$info->{user}/go;
+    $template =~ s/%TOPICNAME%/$info->{topic}/go;
     $template =~ s/%REV%/$info->{version}/go;
 
     my $body =
@@ -124,7 +124,6 @@ sub notify {
 
         &$debug(" processing $user");
 
-        #&$debug(" userref = ".ref($userHash->{$user}));
         my %uHash = %{ $userHash->{$user} };
 
         # TODO:  Allow serverless ID's - substute in the @server for destination

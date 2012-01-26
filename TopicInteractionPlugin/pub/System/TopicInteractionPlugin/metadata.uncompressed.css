@@ -122,6 +122,10 @@ a.foswikiAttachmentsOptionsToggle {
   position:relative;
   width:auto;
 }
+.foswikiAttachmentComment {
+  max-height:4em;
+  overflow:auto;
+}
 .foswikiAttachmentSelected.foswikiAttachmentEdit,
 .foswikiAttachment {
   border-bottom:1px solid #ddd;
@@ -176,6 +180,7 @@ a.foswikiAttachmentsOptionsToggle {
 .foswikiAttachmentControl a {
   margin-left:0.6923em;
 }
+.foswikiAttachmentSelected .foswikiAttachmentControl,
 .foswikiAttachmentHover .foswikiAttachmentControl {
   display:block;
 }

@@ -1,0 +1,54 @@
+.blogInfo {
+  text-align:left;
+}
+.blogEntry {
+  text-align:justify;
+}
+.blogEntry .foswikiTopicInfo {
+  text-align:left;
+}
+.blogEntriesSticky {
+  margin-bottom:2.7692em; /* 36px 36px */
+  padding:1em;
+}
+.blogEntriesSticky h2 {
+  margin-top:0px;
+}
+.blogEntriesSticky .blogEntry:last-child {
+  margin-bottom:0px;
+}
+.blogEntries .blogEntry {
+  margin-bottom:2.7692em;
+}
+.blogEntryInfo {
+  margin:1em 0em;
+}
+.blogPrev a,
+.blogNext a {
+  text-decoration:none;
+}
+.blogEntryPagination,
+.blogBottomPagination {
+  margin-top:1em;
+}
+.blogTopPagination {
+  margin:0em 0em 1em;
+}
+.blogSideBarSection strong {
+  color:inherit;
+}
+.blogEntry .imagePlain_right {
+  margin-left:1em;
+  margin-bottom:1em;
+}
+.blogEntry .imagePlain_left {
+  margin-right:1em;
+  margin-bottom:1em;
+}
+.blogCategoryTitle {
+  border:0px;
+  float:left;
+}
+.blogCategoryTitle h1 {
+  margin-top:0px;
+}

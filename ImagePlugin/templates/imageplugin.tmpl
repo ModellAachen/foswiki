@@ -2,13 +2,13 @@
 
 %TMPL:DEF{"image:link"}%<a %IF{"'$id'!=''" then="id='$id' "}%class='imageLink' href='$href' title='$title' style='$style'>$text</a>%TMPL:END%
 
-%TMPL:DEF{"image:plain"}%<img class='imagePlain imagePlain_$align $class' border='0' src='$src' alt='$alt' title='$title' width='$width' height='$height' longdesc='$desc' $mousein $mouseout style='$style' align='$align' />%TMPL:END%
+%TMPL:DEF{"image:plain"}%<img class='imagePlain imagePlain_$align $class' border='0' src='$src' alt='$alt' title='$title' width='$width' height='$height' $mousein $mouseout style='$style' align='$align' />%TMPL:END%
 
-%TMPL:DEF{"image:simple"}%<a %IF{"'$id'!=''" then="id='$id' "}%class='imageHref imageSimple imageSimple_$align $class' title='$title' style='$style' href='$href' ><img border='0' src='$src' alt='$alt' width='$width' height='$height' longdesc='$desc' $mousein $mouseout/></a>%TMPL:END%
+%TMPL:DEF{"image:simple"}%<a %IF{"'$id'!=''" then="id='$id' "}%class='imageHref imageSimple imageSimple_$align $class' title='$title' style='$style' href='$href' ><img border='0' src='$src' alt='$alt' width='$width' height='$height' $mousein $mouseout/></a>%TMPL:END%
   
-%TMPL:DEF{"image:frame"}%<div %IF{"'$id'!=''" then="id='$id' "}%class='imageFrame imageFrame_$align $class' style='_width:$framewidthpx;max-width:$framewidthpx;$style'><a class='imageHref' title='$title' href='$href'><img border='0' src='$src' alt='$alt' width='$width' height='$height' longdesc='$desc' $mousein $mouseout/></a>$captionFormat</div>%TMPL:END%
+%TMPL:DEF{"image:frame"}%<div %IF{"'$id'!=''" then="id='$id' "}%class='imageFrame imageFrame_$align $class' style='_width:$framewidthpx;max-width:$framewidthpx;$style'><a class='imageHref' title='$title' href='$href'><img border='0' src='$src' alt='$alt' width='$width' height='$height' $mousein $mouseout/></a>$captionFormat</div>%TMPL:END%
 
-%TMPL:DEF{"image:float"}%<div %IF{"'$id'!=''" then="id='$id' "}%class='imageFloat imageFloat_$align $class' style='$style'><a class='imageHref' title='$title' href='$href'><img border='0' src='$src' alt='$alt' width='$width' height='$height' longdesc='$desc' $mousein $mouseout/></a>$captionFormat</div>%TMPL:END%
+%TMPL:DEF{"image:float"}%<div %IF{"'$id'!=''" then="id='$id' "}%class='imageFloat imageFloat_$align $class' style='$style'><a class='imageHref' title='$title' href='$href'><img border='0' src='$src' alt='$alt' width='$width' height='$height' $mousein $mouseout/></a>$captionFormat</div>%TMPL:END%
 
 %{ helper snippets }%
 

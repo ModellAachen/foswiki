@@ -1,16 +1,16 @@
-%META:TOPICINFO{author="micha" comment="reprev" date="1310632051" format="1.1" reprev="5" version="5"}%
+%META:TOPICINFO{author="ProjectContributor" comment="reprev" date="1310632051" format="1.1" reprev="5" version="5"}%
 %META:TOPICPARENT{name="TopicFunction"}%
 %TOC{depth="2"}%
 
 ---++ Documentation
-%STARTSECTION{name="documentation" type="section"}%
+%STARTSECTION{"documentation"}%
 This function renders a view for a wiki topic,
 showing its title and the summary line.
 
 ---+++ Parameters
    * TITLE_EXTRA: optional addition put behind the topic title
 
-%ENDSECTION{name="documentation" type="section"}%
+%ENDSECTION{"documentation"}%
 
 ---++ Implementation
 <verbatim class="tml">

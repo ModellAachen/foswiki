@@ -1,3 +1,5 @@
+locale/NatSkin/de.po 0644
+locale/NatSkin/Foswiki.pot 0644
 data/Main/WebLinks.txt 0644
 data/Main/WikiGuestSideBar.txt 0644
 data/Sandbox/NatSkinTest.txt 0644
@@ -6,11 +8,12 @@ data/System/EmptySideBarTemplate.txt 0644
 data/System/JazzyNoteTheme.txt 0644
 data/System/MySideBar.txt 0644
 data/System/NatSearch.txt 0644
+data/System/NatSkinChangeEmailAddressViewTemplate.txt 0644
 data/System/NatSkinChangePasswordViewTemplate.txt 0644
-data/System/NatSkinResetPasswordViewTemplate.txt 0644
 data/System/NatSkinConfiguration.txt 0644
 data/System/NatSkinCss.txt 0644
 data/System/NatSkinFAQ.txt 0644
+data/System/NatSkinResetPasswordViewTemplate.txt 0644
 data/System/NatSkinStyleBrowser.txt 0644
 data/System/NatSkinTemplates.txt 0644
 data/System/NatSkinTopicDoesNotExistViewTemplate.txt 0644
@@ -50,13 +53,6 @@ pub/System/JazzyNoteTheme/GrayBlend.png 0644
 pub/System/JazzyNoteTheme/GreenVariation.css 0644
 pub/System/JazzyNoteTheme/GreenVariation.css.gz 0644
 pub/System/JazzyNoteTheme/GreenVariation.uncompressed.css 0644
-pub/System/JazzyNoteTheme/images/ui-bg_flat_0_aaaaaa_40x100.png 0644
-pub/System/JazzyNoteTheme/images/ui-bg-selected.png 0644
-pub/System/JazzyNoteTheme/images/ui-icons_222222_256x240.png 0644
-pub/System/JazzyNoteTheme/images/ui-icons_228ef1_256x240.png 0644
-pub/System/JazzyNoteTheme/images/ui-icons_ef8c08_256x240.png 0644
-pub/System/JazzyNoteTheme/images/ui-icons_ffd27a_256x240.png 0644
-pub/System/JazzyNoteTheme/images/ui-icons_ffffff_256x240.png 0644
 pub/System/JazzyNoteTheme/input-bg.png 0644
 pub/System/JazzyNoteTheme/jazzynotegreen-logo.png 0644
 pub/System/JazzyNoteTheme/jazzynote-logo.png 0644
@@ -84,7 +80,6 @@ pub/System/NatSkin/BlueNoteStyle.jpeg 0644
 pub/System/NatSkin/edit.js 0644
 pub/System/NatSkin/edit.js.gz 0644
 pub/System/NatSkin/edit.uncompressed.js 0644
-pub/System/NatSkin/external.png 0644
 pub/System/NatSkin/favicon.ico 0644
 pub/System/NatSkin/foswiki-logo.png 0644
 pub/System/NatSkin/grid-40x18.png 0644
@@ -142,6 +137,7 @@ pub/System/NatSkin/icons/page_white_stack.png 0644
 pub/System/NatSkin/icons/pencil_go.png 0644
 pub/System/NatSkin/icons/pencil.png 0644
 pub/System/NatSkin/icons/printer.png 0644
+pub/System/NatSkin/icons/quote.png 0644
 pub/System/NatSkin/icons/simple-arrow.png 0644
 pub/System/NatSkin/icons/text_align_left.png 0644
 pub/System/NatSkin/icons/time.png 0644
@@ -182,6 +178,7 @@ pub/System/NatSkin/rename.js 0644
 pub/System/NatSkin/rename.js.gz 0644
 pub/System/NatSkin/rename.uncompressed.js 0644
 pub/System/NatSkin/wikiringlogo40x40.png 0644
+templates/languageselector.nat.tmpl 0644
 templates/actionform.nat.tmpl 0644
 templates/addform.nat.tmpl 0644
 templates/attachagain.nat.tmpl 0644
@@ -205,6 +202,7 @@ templates/edit.nat.tmpl 0644
 templates/edittext.nat.tmpl 0644
 templates/form.nat.tmpl 0644
 templates/formtables.nat.tmpl 0644
+templates/foswiki.jazzynote.nat.tmpl 0644
 templates/foswiki.nat.tmpl 0644
 templates/history.nat.tmpl 0644
 templates/javascript.nat.tmpl 0644
@@ -263,4 +261,5 @@ templates/viewplain.nat.tmpl 0644
 templates/view.print.nat.tmpl 0644
 templates/viewprint.nat.tmpl 0644
 templates/viewraw.nat.tmpl 0644
+templates/viewslideshow.nat.tmpl 0644
 templates/viewtopicactions.nat.tmpl 0644

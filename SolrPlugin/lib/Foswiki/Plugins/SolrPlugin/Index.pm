@@ -81,7 +81,7 @@ sub index  {
   # mode to run in parallel
 
   try {
-    $this->lock();
+#    $this->lock();
 
     my $query = Foswiki::Func::getCgiQuery();
     my $web = $query->param('web') || 'all';
@@ -108,7 +108,7 @@ sub index  {
   }
 
   finally {
-    $this->unlock();
+#    $this->unlock();
   }
 }
 
@@ -281,8 +281,12 @@ sub indexTopic {
 
   # parent data
   my $parent = $meta->getParent();
-  $parent =~ s/\//\./g;
-  $this->_addLink(\%outgoingLinks, $web, $topic, undef, $parent);
+  my $parentWeb;
+  my $parentTopic;
+  if ($parent) {
+    ($parentWeb, $parentTopic) = $this->normalizeWebTopicName($web, $parent);
+    $this->_addLink(\%outgoingLinks, $web, $topic, $parentWeb, $parentTopic);
+  }
 
   # get all outgoing links from topic text
   $this->extractOutgoingLinks($web, $topic, $origText, \%outgoingLinks);
@@ -358,8 +362,9 @@ sub indexTopic {
     createdate => $createDate,
     type => 'topic',
     # topic specific
-    parent => $parent,
   );
+
+  $doc->add_fields(parent => "$parentWeb.$parentTopic") if $parent;
 
   # tag and analyze language
   my $contentLanguage = $this->getContentLanguage($web, $topic);
@@ -396,6 +401,7 @@ sub indexTopic {
           my $attrs = $fieldDef->{attributes}; # TODO: check for Facet
           my $name = $fieldDef->{name};
           my $type = $fieldDef->{type};
+          my $isMultiValued = $fieldDef->isMultiValued;
           my $field = $meta->get('FIELD', $name);
           next unless $field;
 
@@ -428,8 +434,7 @@ sub indexTopic {
           } 
 
           # multi-valued types
-          elsif ($type =~ /^(checkbox|select|radio|textboxlist)/ ||
-                 $name =~ /TopicType/) { # TODO: make this configurable
+          elsif ($isMultiValued || $name =~ /TopicType/) { # TODO: make this configurable
 
 	    $doc->add_fields(
 	      'field_'.$name.'_lst' => [split(/\s*,\s*/, $value)]
@@ -551,6 +556,11 @@ sub indexTopic {
 sub getContentLanguage {
   my ($this, $web, $topic) = @_;
 
+  unless (defined $Foswiki::cfg{SolrPlugin}{SupportedLanguages}) {
+    Foswiki::Func::writeWarning("{SolrPlugin}{SupportedLanguages} not defined. Please run configure.");
+    return;
+  }
+
   my $donePush = 0;
   if ($web ne $this->{session}{webName} || $topic ne $this->{session}{topicName}) {
     Foswiki::Func::pushTopicContext($web, $topic);
@@ -578,7 +588,7 @@ sub extractOutgoingLinks {
   $text = $this->takeOutBlocks($text, 'noautolink', $removed);
 
   # normal wikiwords
-  $text =~ s#$STARTWW(?:($Foswiki::regex{webNameRegex})\.)?($Foswiki::regex{wikiWordRegex}|$Foswiki::regex{abbrevRegex})#$this->_addLink($outgoingLinks, $web, $topic, $1, $2)#gexom;
+  $text =~ s#(?:($Foswiki::regex{webNameRegex})\.)?($Foswiki::regex{wikiWordRegex}|$Foswiki::regex{abbrevRegex})#$this->_addLink($outgoingLinks, $web, $topic, $1, $2)#gexom;
 
   # square brackets
   $text =~ s#\[\[([^\]\[\n]+)\]\]#$this->_addLink($outgoingLinks, $web, $topic, undef, $1)#ge;
@@ -595,6 +605,7 @@ sub _addLink {
 
   my $link = $web.".".$topic;
   return '' if $link =~ /^http|ftp/; # don't index external links
+  return '' unless Foswiki::Func::topicExists($web, $topic);
 
   $link =~ s/\%SCRIPTURL(PATH)?{.*?}\%\///g;
   $link =~ s/%WEB%/$baseWeb/g;

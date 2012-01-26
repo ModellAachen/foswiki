@@ -1,10 +1,10 @@
 %TMPL:INCLUDE{"login"}%<!-- template: login.sudo.nat.tmpl -->
 
-%TMPL:DEF{"LOG_IN_BANNER"}%%MAKETEXT{"Admin Foswiki User Authentication"}%%TMPL:END%
+%TMPL:DEF{"LOG_IN_BANNER"}%%MAKETEXT{"Admin Foswiki user authentication"}%%TMPL:END%
 %TMPL:DEF{"LOGGED_IN_BANNER"}%%MAKETEXT{"[_1] is currently logged in" args="%USERSWEB%.%WIKINAME%"}%%TMPL:END%
 %TMPL:DEF{"UNRECOGNISED_USER"}%%MAKETEXT{"Unrecognised user and/or password"}%%TMPL:END%
 
-%TMPL:DEF{"title"}%%MAKETEXT{"Sudo Login"}% - %WIKITOOLNAME%%TMPL:END%
+%TMPL:DEF{"title"}%%MAKETEXT{"Sudo login"}% - %WIKITOOLNAME%%TMPL:END%
 
 %TMPL:DEF{"usernamefield"}%<input type="text" class="foswikiInputField required" size="20" id="username" name="username" value='%WIKIADMINLOGIN%' />%TMPL:END%
 
@@ -16,4 +16,4 @@
 
 %TMPL:DEF{"loginasadministratorform"}%%TMPL:END%
 
-%TMPL:DEF{"authrealm"}%<span class="foswikiUnvisited">%MAKETEXT{"Enter the %WIKITOOLNAME% Administrator user or login as set in [_1]" args="[[%SCRIPTURL{configure}%][configure]]"}%</span>%TMPL:END%
+%TMPL:DEF{"authrealm"}%<span class="foswikiUnvisited">%MAKETEXT{"Enter the %WIKITOOLNAME% administrator user or login as set in [_1]" args="[[%SCRIPTURL{configure}%][configure]]"}%</span>%TMPL:END%

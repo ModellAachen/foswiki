@@ -1,0 +1,6 @@
+!noci
+data/System/DownloadZipPlugin.txt 0644 Documentation page
+# data/System/VarDOWNLOADZIP.txt 0644 Tag documentation
+# data/System/VarDOWNLOADWEBZIP.txt 0644 Tag documentation
+lib/Foswiki/Plugins/DownloadZipPlugin.pm 0444 Perl module
+lib/Foswiki/Plugins/DownloadZipPlugin/Config.spec 0444 Configuration

@@ -1,0 +1,32 @@
+# EditChapterPlugin translations
+# Copyright (C) 2012 Michael Daum
+# This file is distributed under the same license as the EditChapterPlugin package.
+# Michael Daum <foswiki@michaeldaumconsulting.com>, 2012.
+msgid ""
+msgstr ""
+"Project-Id-Version: 4.20\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-01-10 14:30+0001\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Michael Daum <foswiki@michaeldaumconsulting.com>\n"
+"Language-Team: Foswiki German Translation Team <none>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: templates/edit.chapter.tmpl:20
+msgid "Cancel"
+msgstr ""
+
+#: templates/edit.chapter.tmpl:21
+msgid "Edit all"
+msgstr ""
+
+#: templates/edit.chapter.tmpl:4
+msgid "Edit chapter '%1'"
+msgstr ""
+
+#: templates/edit.chapter.tmpl:19
+msgid "OK"
+msgstr ""

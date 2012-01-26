@@ -1,7 +1,7 @@
 ###############################################################################
 # NatSkinPlugin.pm - Plugin handler for the NatSkin.
 # 
-# Copyright (C) 2003-2010 MichaelDaum http://michaeldaumconsulting.com
+# Copyright (C) 2003-2011 MichaelDaum http://michaeldaumconsulting.com
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -38,6 +38,7 @@ sub render {
   }
 
   my $theFormat = $params->{_DEFAULT};
+  $theFormat = $params->{format} unless defined $theFormat;
 
   unless (defined $theFormat) {
     my $htmlTitle = Foswiki::Func::getPreferencesValue("HTMLTITLE");
@@ -48,11 +49,7 @@ sub render {
   my $webTitle = join($theSep, reverse split(/[\.\/]/, $web));
 
   my $topicTitle = $params->{title};
-
-  unless (defined $topicTitle) {
-    require Foswiki::Plugins::DBCachePlugin;
-    $topicTitle = Foswiki::Plugins::DBCachePlugin::getTopicTitle($web, $topic);
-  }
+  $topicTitle = getTopicTitle($web, $topic) unless defined $topicTitle;
 
   $theFormat = '$title$sep$webtitle$wikitoolname' unless defined $theFormat;
   $theFormat =~ s/\$sep\b/$theSep/g;
@@ -63,6 +60,45 @@ sub render {
 
   return Foswiki::Func::decodeFormatTokens($theFormat);
 }
+
+sub getTopicTitle {
+  my ($web, $topic) = @_;
+
+  if (Foswiki::Func::getContext()->{DBCachePluginEnabled}) {
+    #print STDERR "using DBCachePlugin\n";
+    require Foswiki::Plugins::DBCachePlugin;
+    return Foswiki::Plugins::DBCachePlugin::getTopicTitle($web, $topic);
+  } 
+
+  #print STDERR "using foswiki core means\n";
+
+  my ($meta, undef) = Foswiki::Func::readTopic($web, $topic);
+
+  # read the formfield value
+  my $title = $meta->get('FIELD', 'TopicTitle');
+  $title = $title->{value} if $title;
+
+  # read the topic preference
+  unless ($title) {
+    $title = $meta->get('PREFERENCE', 'TOPICTITLE');
+    $title = $title->{value} if $title;
+  }
+
+  # read the preference
+  unless ($title)  {
+    Foswiki::Func::pushTopicContext($web, $topic);
+    $title = Foswiki::Func::getPreferencesValue('TOPICTITLE');
+    Foswiki::Func::popTopicContext();
+  }
+
+  # default to topic name
+  $title ||= $topic;
+
+  $title =~ s/\s*$//;
+  $title =~ s/^\s*//;
+
+  return $title;
+} 
 
 1;
 

@@ -2,52 +2,86 @@
 ===================================================
 	Base Skin topic template
 
-	The basecss template adds CSS files to the html head:
-		- TODO: external font files
-		- baseskin css or less
+	The basecss template adds CSS files to the html head.
+	
 ===================================================
 }%%TMPL:INCLUDE{"foswiki"}%%{
 ---------------------------------------------------
-	head:css
-		Adds to head:
-		- font (TODO Link to font should be added here)
-		- Default baseskin css or less files
+	"head:css"
+		- base:screen
+		- base:webfont
+		- base:print
+		- base:dynamic
 ---------------------------------------------------
-}%%TMPL:DEF{"head:css"}%%ADDTOZONE{
-	"head-base"
-	id="font"
-	text=""
-}%%{
-----------------------
-	Loads CSS files defined in BASESKIN_USE_CSS_FILE if set
-----------------------
-}%%IF{
-	"defined BASESKIN_USE_LESS='1'"
-	then="$percntTMPL:P{$quot_less_basekin$quot}$percnt"
-	else="$percntTMPL:P{$quot_css_baseskin$quot}$percnt"
+}%%TMPL:DEF{"head:css"}%%TMPL:P{"head:css:screen"}%
+%TMPL:P{"head:css:webfont"}%
+%TMPL:P{"head:css:print"}%
+%TMPL:P{"head:css:inline"}%%TMPL:END%%{
+---------------------------------------------------
+	"head:css:screen"
+		Conditionally loads CSS or LESS
+---------------------------------------------------
+}%%TMPL:DEF{"head:css:screen"}%%IF{
+	"defined SKIN_USE_LESS AND $SKIN_USE_LESS='1'"
+	then="$percntTMPL:P{$quothead:css:screen:_less$quot}$percnt"
+	else="$percntTMPL:P{$quothead:css:screen:_css$quot}$percnt"
 }%%TMPL:END%%{
 ---------------------------------------------------
-	_less_basekin
+	"head:css:webfont"
+---------------------------------------------------
+}%%TMPL:DEF{"head:css:webfont"}%%IF{
+	"defined SKIN_WEBFONTS_URL AND $SKIN_WEBFONTS_URL!=''"
+	then="$percntTMPL:P{
+	$quotWEBFONT_CSSFILE$quot
+	name=$quotbase:webfonts$quot
+	url=$quot%SKIN_WEBFONTS_URL%$quot
+}$percnt"
+}%%TMPL:END%%{
+---------------------------------------------------
+	"head:css:print"
+		TODO
+---------------------------------------------------
+}%%TMPL:DEF{"head:css:print"}%%TMPL:END%%{
+---------------------------------------------------
+	"head:css:inline"
+		TESTING
+---------------------------------------------------
+}%%TMPL:DEF{"head:css:inline"}%%TMPL:P{
+	"INLINE_CSSTEXT"
+	name="base:dynamic"
+	text="
+$percntIF{
+$quot$WIKILOGOIMG$quot
+then=$quot.foswikiTopBar {
+	background-image:url(%WIKILOGOIMG%);
+	background-position: 50% 50%;
+	background-repeat: no-repeat;
+}$quot
+}$percnt
+"
+}%%TMPL:END%%{
+---------------------------------------------------
+	"head:css:screen:_less"
 		Less js engine
 		Baseskin less file
 ---------------------------------------------------
-}%%TMPL:DEF{"_less_basekin"}%%TMPL:P{
+}%%TMPL:DEF{"head:css:screen:_less"}%%TMPL:P{
 	"LIBJS"
 	id="BaseSkinCss/less-1.1.5.min"
-	requires=""
+	name="lessparser"
 }%%TMPL:P{
 	"LIBLESS"
 	id="BaseSkinCss/baseskin-bootstrap"
-	requires=""
+	name="base:screen"
 }%%TMPL:END%%{
 ---------------------------------------------------
-	_css_baseskin
+	"head:css:screen:_css"
 		Baseskin css file
 ---------------------------------------------------
-}%%TMPL:DEF{"_css_baseskin"}%%TMPL:P{
+}%%TMPL:DEF{"head:css:screen:_css"}%%TMPL:P{
 	"LIBCSS"
 	id="BaseSkinCss/baseskin"
-	requires=""
+	name="base:screen"
 }%%TMPL:END%%{
 ===================================================
 </verbatim>}%

@@ -211,6 +211,6 @@
    websearch::hits::footer - this appended to the hit set of a web
 }%
 %TMPL:DEF{"websearch::hits::footer"}%<!-- -->
-<div class="natSearchTotal">%MAKETEXT{"<span>[_1]</span> topic(s) found" args="%count%"}%</div>
+<div class="natSearchTotal">%MAKETEXT{"[_1] topic(s) found" args="%count%"}%</div>
 <!-- -->%TMPL:END%
 %{</verbatim>}%

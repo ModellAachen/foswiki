@@ -23,7 +23,7 @@ package Foswiki::Plugins::WorkflowPlugin::ControlledTopic;
 
 use strict;
 
-use Foswiki       ();    # for regexes
+use Foswiki ();         # for regexes
 use Foswiki::Func ();
 
 # Constructor
@@ -182,46 +182,58 @@ sub isLatestRev {
 
 # Some day we may handle the can... functions indepedently. For now,
 # they all check editability thus....
-sub isModifyable {
-    my $this = shift;
+sub _isModifiable {
+    my ($this) = @_;
+    my $meta = $this->{meta};
 
     return $this->{isEditable} if defined $this->{isEditable};
 
     # See if the workflow allows an edit
-    unless ( defined $this->{isEditable} ) {
-        $this->{isEditable} = (
-            $this->isLatestRev()
+    # is the latest rev (or no rev) loaded?
+    $this->{isEditable} = $this->isLatestRev();
+    #print STDERR "Modify denied by isLatestRev\n" unless $this->{isEditable};
 
-              # Does the workflow permit editing?
-              && $this->{workflow}->allowEdit($this)
-
-              # Does Foswiki permit editing?
-              && Foswiki::Func::checkAccessPermission(
-                'CHANGE',      $Foswiki::Plugins::SESSION->{user},
-                $this->{text}, $this->{topic},
-                $this->{web},  $this->{meta}
-              )
-        ) ? 1 : 0;
+    # Does the workflow permit editing?
+    if ($this->{isEditable}) {
+	$this->{isEditable} = $this->{workflow}->allowEdit($this);
+	#print STDERR "Modify denied by allowEdit\n" unless $this->{isEditable};
     }
+    # Does Foswiki permit editing?
+    if ($this->{isEditable}) {
+	# DO NOT PASS $this->{meta}, because of Item11461
+	$this->{isEditable} = Foswiki::Func::checkAccessPermission(
+	    'CHANGE',      $Foswiki::Plugins::SESSION->{user},
+	    $this->{text}, $this->{topic},
+	    $this->{web} ) if $this->{isEditable};
+	#print STDERR "Modify denied by checkAccessPermission\n" unless $this->{isEditable};
+    }
+    $this->{isEditable} ||= 0; # ensure defined
+
     return $this->{isEditable};
 }
 
 # Return tue if this topic is editable
 sub canEdit {
     my $this = shift;
-    return $this->isModifyable($this);
+    return $this->_isModifiable();
+}
+
+# Return tue if this topic is editable
+sub canSave {
+    my $this = shift;
+    return $this->_isModifiable();
 }
 
 # Return true if this topic is attachable to
 sub canAttach {
     my $this = shift;
-    return $this->isModifyable($this);
+    return $this->_isModifiable();
 }
 
 # Return tue if this topic is forkable
 sub canFork {
     my $this = shift;
-    return $this->isModifyable($this);
+    return $this->_isModifiable();
 }
 
 # Expand miscellaneous preferences defined in the workflow and topic
@@ -276,8 +288,8 @@ sub changeState {
 
     return unless $this->isLatestRev();
 
-    my $state  = $this->{workflow}->getNextState( $this,  $action );
-    my $form   = $this->{workflow}->getNextForm( $this,   $action );
+    my $state = $this->{workflow}->getNextState( $this, $action );
+    my $form = $this->{workflow}->getNextForm( $this, $action );
     my $notify = $this->{workflow}->getNotifyList( $this, $action );
 
     my ( $revdate, $revuser, $version ) = $this->{meta}->getRevisionInfo();

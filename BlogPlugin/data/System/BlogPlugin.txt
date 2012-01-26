@@ -1,79 +1,14 @@
 %META:TOPICINFO{author="ProjectContributor" date="1139389084" format="1.1" version="1.1"}%
-<!--
-
-   PLEASE DO NOT EDIT THIS TOPIC
-
-   It is automatically generated from the subversion repository, and any changes
-   you make will simply be overwritten the next time a release is generated.
-
-   Instead, you could check your fix in, raise a bug in the Bugs web, or mail the author.
--->
 ---+!! <nop>%TOPIC%
 %TOC%
 
-This is the supplemental plugin for the BlogUp <nop>WikiApplication.
+This is the supplemental plugin for the !BlogApp <nop>WikiApplication.
 It bundles some of the features found in common blogging applications 
 that are very hard or even impossible to implement using <nop>TML (Topic Markup Language). 
-Note, that most of the tags are tightly related to the
-data model of BlogUp, i.e. it relies on its <nop>TopicType and <nop>DataForm 
-definitions. 
 
 Shortcut: want to create a blog ... use the BlogFactory.
 
 ---++ Syntax Rules
-
----+++ CITEBLOG
-Format a link to another <nop>BlogEntry displaying its headline and date.
-
-*Syntax:*
-
-| *%<nop>CITEBLOG{"&lt;topic>"}%* ||
-| ="&lt;topic>"= | name of a <nop>BlogEntry topic, e.g. <nop>BlogEntry0 |
-
-*Example:*
-
-=%<nop>CITEBLOG{"_BlogPlugin.BlogEntry0"}%=
-
-%CITEBLOG{"_BlogPlugin.BlogEntry0"}%
-
-
----+++ COUNTCOMMENTS
-Count the <nop>BlogComments that refer to a given topic recursively, that is
-the number of <nop>BlogComment topics that refer to a given <nop>BlogEntry and 
-each <nop>BlogComment referring to the <nop>BlogComment found so far. Reference
-is expressed by the <nop>BlogRef formfield in the <nop>BlogCommentForm.
-
-*Syntax:*
-| *%<nop>COUNTCOMMENTS{"&lt;topic>" ... }%* ||
-| ="&lt;topic>"= \
-| name of a <nop>BlogEntry or <nop>BlogComment topic, e.g. <nop>BlogEntry0 |
-| =web="..."= \
-| web where to search for references; defaults to the \
-  web specified as part of the "topic" parameter or the current one |
-| =format="..."= \
-| format string used to display the count; \
-  the variable $count is replaced by the calculated references; \
-  defaults to "$count" |
-| =single="..."= \
-| format string used to display a single hit; \
-  defaults to the "format" value (see above) |
-| =null="..."= \
-| format string used to display a zero hit; defaults to "0" |
-| =hidenull="on,off"= \
-| if set to "on" nohting is displayed if no references where found; \
-  defaults to "off" |
-| =offset="..."= \
-| add an "offset" to the computed number of hits; so if offset="9" and \
-  11 references where found the $count is set to 20 |
-
-Following variables are expanded in format strings:
-   * $percnt: % sign
-   * $dollar: $ sign
-   * $n: newline
-   * $t: tab
-   * $nop: "empty string"
-   * $count: the calculated number of references (plus an optional offset)
-
 
 ---+++ PREVDOC, NEXTDOC
 Display the previous/next topic in an ordered set.
@@ -93,137 +28,19 @@ using a "where" and an "order" clause which the given topic is supposed to be pa
 | =reverse="on,off"= \
 | if set to on the sorting will be reversed, that is the logic of PREV and NEXT is inverted |
 
-
----+++ RECENTCOMMENTS
-Display an ordered list of most recent <nop>BlogComments, grouped by the
-referred <nop>BlogEntry.
-
-*Syntax:*
-| *%<nop>RECENTCOMMENTS{"&lt;format>" ...}%* ||
-| ="&lt;format>"= | format string used to display the hit results; \
-  each hit is displayed using the given format |
-| =header="..."= | format string to prepended to the list of hits being displayed |
-| =footer="..."= | format string to appended to the list of hits being displayed |
-| =separator="..."= | format string used to separate hits; \
-  defaults top "$n"; the special separator "none" disables separation |
-| =limit="..."= | restrict the number of hits being displayed; \
-  defaults to "-1" which means unlimited |
-| =age="..."= | restrict the age of comments being displayed; \
-  values must be given in epoch seconds, e.g. 5184000 being ca. 2 months; \
-  defaults to "0" which means unlimited |
-| =category="..."= \
-| pattern that limits comments to those whose <nop>BlogEntries match the \
-  <nop>SubjectCategory; defaults to ".*" |
-| =author="..."= \
-| pattern that limits comments to those on <nop>BlogEntries from the given author \
-  defaults to ".*" |
-
-(Each <nop>BlogEntry that is found given the above search parameters and limits
-is called a hit.)
-
-Following variables are expanded in format strings:
-   * $percnt: % sign
-   * $dollar: $ sign
-   * $n: newline
-   * $t: tab
-   * $nop: "empty string"
-   * $count: the number of comments on the given <nop>BlogEntry
-   * $topic: the topic name of the referring <nop>BlogEntry, e.g. <nop>BlogEntry0
-   * $web: the web where the hit was found
-   * $headline: the headline of the referring <nop>BlogEntry 
-   * $commenter: a list of links to the comments in the format \
-      [<nop>[BlogEntry0#BlogComment1][&lt;author>]],... (author: name of
-      commenter)
-   * $date: date of the most recent comment on the current hit.
-
-See also the interface <nop>TopicFunction "RenderRecentComments". 
-
----+++ RELATEDENTRIES
-Display a list of <nop>BlogEntries related to a given one. The Relationship
-is manually encoded in the data model using the "Related" formfield. The
-relation is computed transitively and reflexively ('til a configurable depth).
-That is, two <nop>BlogEntries A and B are related if A points to B or vice versa
-or A and B are connected by a series of related postings C1,...CN, where A is related 
-to C1 and B CN is related to B.
-
-*Syntax:*
-| *%<nop>RELATEDENTRIES{"&lt;topic>" ...}%* ||
-| ="&lt;topic>"= | topic name of a <nop>BlogEntry related once are search for |
-| =web="..."= | web where to search for related topics; \
-  defaults to the web given with the &lt;topic> parameter or the current one |
-| =format="..."= | format string to display a hit;\
-  defaults to "$topic" |
-| =header="..."= | format string to prepended to the list of hits |
-| =footer="..."= | format string to appended to the list of hits |
-| =separator="..."= | format string used to separate hits; \
-  defaults to "$n"; the special separator "none" disables separation |
-| =depth="..."= | depth of recursion (the number of hops from posting A to posting B); \
-  defaults to "2"; |
-
-Note, that large "depth" values will very soon include your complete blog archive.
-The hit set also depends on the amount of direct relationships that you add to your
-<nop>BlogEntries. So either use a low "depth" value and add more direct relations based on
-your own judgment, or just specify one related entry and use a "depth" value of up to
-3 for good results.
-
-Following variables are expanded in format strings:
-   * $percnt: % sign
-   * $dollar: $ sign
-   * $n: newline
-   * $t: tab
-   * $topic: topic name of a hit
-   * $web: web name where the hit was found
-   * $depth: distance to the given &lt;topic> (depth in which this topic was found)
-   * $headline: headline of the related <nop>BlogEntry
-
-The relatedness feature here is a very na&iuml;ve and purely manual one.
-We'd like to semi-automate this task using some automatic classificator
-on document similarities. Making use of weights following links is an option too to
-improve the hit set quality.
-
-Read
-   * Wikipedia:Latent_semantic_analysis 
-   * [[http://mitpress.mit.edu/catalog/item/default.asp?ttype=2&tid=3391][Foundations of Statistical Natural Language Processing]]
-   * [[http://www.perl.com/pub/a/2003/02/19/engine.html][Building a Vector Space Search Engine in Perl]]
-   * [[http://search.cpan.org/~mceglows/Search-VectorSpace-0.02/][Search-VectorSpace]]
-And send me a patch if you've coded that into Foswiki ;).
-
 ---++ Plugin Installation Instructions
+%$INSTALL_INSTRUCTIONS%
 
-   * [[http://foswiki.org/pub/Extensions/%TOPIC%/%TOPIC%.zip][Download]] and install 
-     all additionally required plugins listed in the
-     [[#Plugin_Info][dependencies information]] below
-   * Download the BlogPlugin ZIP file from the Plugin web (see below)
-   * Unzip ==%TOPIC%.zip== in your Foswiki installation directory. Content:
-     | *File:* | *Description:* |
-     | ==data/System/%TOPIC%.txt== | plugin topic |
-     | ==data/_BlogPlugin/*.txt== | blog template web |
-     | ==data/Main/BlogAdminGroup.txt== | blog admin group |
-     | ==data/Main/BlogAuthorGroup.txt== | blog author group |
-     | ==lib/Foswiki/Plugins/%TOPIC%.pm== | plugin perl module |
-     | ==lib/Foswiki/Plugins/%TOPIC%/Core.pm== | plugin core module |
-     | ==lib/Foswiki/Plugins/%TOPIC%/Factory.pm== | rest interface for the <nop>BlogFactory |
-     | ==lib/Foswiki/Plugins/%TOPIC%/WebDB.pm== | <nop>WebDB implementation for the <nop>DBCachePlugin |
-   * Open the Foswiki [[%SCRIPTURL{"configure"}%][configuration]] dialog,
-     enable the plugin and change the <nop>PluginsOrder to 
-     _<nop>GluePlugin, <nop>SpreadSheetPlugin, <nop>IfDefinedPlugin, <nop>AliasPlugin_
-   * Create a new Blog web using the _BlogPlugin template web
-   * Edit the Main.BlogAdminGroup and the Main.BlogAuthorGroup to match your needs.
-   * Optionally, run ==%TOPIC%_installer.pl== to automatically check and
-     install other Foswiki modules that this module depends on. You can also do
-     this step manually.
-   * Alternatively, manually make sure the dependencies listed in the table
-     below are resolved.
-     %$DEPENDENCIES%
 
 ---++ Plugin Info
 <!-- provided for compatibility only
    * Set SHORTDESCRIPTION = Basic blogging features used to implement the BlogUp <nop>WikiApplication
 -->
 |  Plugin Author: | Foswiki:Main.MichaelDaum |
-|  Copyright &copy;: | 2006, MichaelDaum@WikiRing.com |
+|  Copyright &copy;: | 2006-2011, http://michaeldaumconsulting.com |
 |  License: | GPL ([[http://www.gnu.org/copyleft/gpl.html][GNU General Public License]]) |
-|  Version: | v0.99 |
+|  Release: | %$RELEASE% |
+|  Version: | %$VERSION% |
 |  Change History: | <!-- versions below in reverse order -->&nbsp; |
 |  31 Aug 2006: | added NO_PREFS_IN_TOPIC;\
                   added Foswiki:Extensions/ImagePlugin support; \
@@ -391,4 +208,3 @@ And send me a patch if you've coded that into Foswiki ;).
 |  Plugin Home: | Foswiki:Extensions/%TOPIC% |
 |  Support: | Foswiki:Support/%TOPIC% |
 
--- Foswiki:Main.MichaelDaum - 31 Aug 2006

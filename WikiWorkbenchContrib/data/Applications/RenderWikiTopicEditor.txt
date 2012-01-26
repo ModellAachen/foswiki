@@ -3,7 +3,7 @@
 %TOC{depth="2"}%
 
 ---++ Documentation
-%STARTSECTION{name="documentation" type="section"}%
+%STARTSECTION{"documentation"}%
 This function renders an editor for a normal WikiTopic to be
 displayed at the topic of the text tab.
 
@@ -12,7 +12,7 @@ displayed at the topic of the text tab.
    * FORM: name of the form definition, defaults to <nop>Applications.WikiTopic
    * FIELDS: fields to be edited, defaults to <nop>TopicTitle, Summary
 
-%ENDSECTION{name="documentation" type="section"}%
+%ENDSECTION{"documentation"}%
 
 ---++ Implementation
 <verbatim class="tml">

@@ -6,30 +6,43 @@
 ===================================================
 }%%TMPL:INCLUDE{"foswiki"}%%{
 ---------------------------------------------------
+
+---------------------------------------------------
 }%%TMPL:DEF{"head:script"}%%TMPL:PREV%%TMPL:P{
 	"LIBJS"
+	name="JavascriptFiles/foswikilib"
 	id="JavascriptFiles/foswikilib"
-	requires="JQUERYPLUGIN"
+	requires="JQUERYPLUGIN::FOSWIKI"
 }%%TMPL:P{
 	"LIBJS"
+	name="JavascriptFiles/foswikiPref"
 	id="JavascriptFiles/foswikiPref"
-	requires="JavascriptFiles/foswikilib,JQUERYPLUGIN"
+	requires="JavascriptFiles/foswikilib,JQUERYPLUGIN::FOSWIKI"
 }%%TMPL:P{
 	"LIBJS"
+	name="base"
 	id="BaseSkinJs/base"
 	requires="JavascriptFiles/foswikilib,JavascriptFiles/foswikiPref,JQUERYPLUGIN"
 }%%TMPL:P{
 	"LIBJS"
 	id="BaseSkinJs/bootstrap-modal"
-	requires="JQUERYPLUGIN"
+	name="bootstrap-modal"
+	requires="JQUERYPLUGIN::FOSWIKI"
 }%%TMPL:P{
 	"LIBJS"
+	name="bootstrap-dropdown"
 	id="BaseSkinJs/bootstrap-dropdown"
-	requires="JQUERYPLUGIN"
-}%%{
----------------------------------------------------
-	Add smooth inpage scrolling; see System.JQueryLocalScroll
----------------------------------------------------
-}%%JQREQUIRE{"localscroll"}%%TMPL:END%%TMPL:END%%{
+	requires="JQUERYPLUGIN::FOSWIKI"
+}%%TMPL:P{
+	"LIBJS"
+	name="sticky"
+	id="BaseSkinJs/jquery.sticky"
+	requires="JQUERYPLUGIN::FOSWIKI"
+}%%TMPL:P{
+	"LIBJS"
+	name="easing"
+	id="BaseSkinJs/jquery.easing.1.3"
+	requires="JQUERYPLUGIN::FOSWIKI"
+}%%TMPL:END%%{
 ===================================================
 </verbatim>}%

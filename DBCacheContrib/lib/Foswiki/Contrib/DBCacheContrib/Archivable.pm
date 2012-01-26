@@ -20,14 +20,6 @@ sub setArchivist {
         delete $this->{archivist};
     }
     $done->{$this} = 1;
-    foreach my $value (@_) {
-        if (   $value
-            && UNIVERSAL::isa( $value, __PACKAGE__ )
-            && !$done->{$value} )
-        {
-            $value->setArchivist( $archivist, $done );
-        }
-    }
 }
 
 sub getArchivist {

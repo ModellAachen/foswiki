@@ -36,10 +36,25 @@
 	    div.dialog({autoOpen: false, width: 600});
 	}
 	div.load(this.href,
-		 function(done) {
-		     var m = /<!-- ATP_CONFLICT (?:[^\s.]+\.)?(\S+) -->/.exec(done, "s");
+		 function(done, status) {
+		     var m = /<!-- ATP_CONFLICT ~(.*?)~(.*?)~(.*?)~(.*?)~ -->/.exec(done, "s");
 		     if (m) {
-			 alert("Page is already being edited by " + m[1] + "; please try again later");
+			 var ohno = "<p style='color:red'>Could not access " + m[1] +
+			     ", the topic containing this action.</p>" +
+			     m[2];
+			 if (m[4] == "") {
+			     ohno += " may still be editing the topic, but their lease expired " +
+				 m[3] + " ago.";
+			 } else {
+			     ohno += " has been editing the topic for " + m[3] +
+				 " and their lease is still active for another " + m[4];
+			 }
+			 ohno += "<p>To clear the lease, try editing " + m[1] +
+			     " with the standard text editor.</p>";
+			 div.html(ohno);
+			 div.dialog("open");
+		     } else if (status == "error") {
+			 alert("Error when I tried to edit the action");
 		     } else {
 			 div.dialog("open");
 		     }

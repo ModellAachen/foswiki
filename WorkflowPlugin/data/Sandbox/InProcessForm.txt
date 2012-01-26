@@ -1,4 +1,4 @@
 | *Name* | *Type* | *Size* | *Values* | *Tooltip messages* | *Attributes* | 
-| Being revised by: | text | | | | | 
+| Being revised by | text | | | | | 
 
 <!-- Do _not_ attempt to edit this topic; it is auto-generated. -->

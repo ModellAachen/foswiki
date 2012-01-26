@@ -1,8 +1,10 @@
-%META:TOPICINFO{author="ProjectContributor" date="1307692067" format="1.1" version="13"}%
+%META:TOPICINFO{author="ProjectContributor" date="1324299999" format="1.1" version="15"}%
 %META:TOPICPARENT{name="TopicFunction"}%
 %TOC{depth="2"}%
 ---++ Documentation
-%STARTSECTION{name="documentation" type="section"}%
+%STARTSECTION{"documentation"}%
+
+%RED%Deprecated: please use Foswiki:Extensions/SolrPlugin for a decent tag cloud search interface%ENDCOLOR%
 
 ---+++++ Parameters
    * TAG: comma separated list of tags to be searched for in the archive
@@ -40,7 +42,7 @@
 <input type="hidden" name="min" value="%IF{"not isempty 'MIN'" then="%MIN%"}%" />
 <input type="hidden" name="topictype" value="%IF{"not isempty 'TOPICTYPE'" then="%TOPICTYPE%"}%" />
 <input type="submit" style="display:none" />
-%~~ TAGCLOUD{
+%TAGCLOUD{
    "$percntDBQUERY{
      \"TopicType=~'.*\b(Tagged|Classified)Topic\b.*'
        %FORMATLIST{"%IF{"not isempty 'TOPICTYPE'" then=", %TOPICTYPE%"}%" 
@@ -78,15 +80,14 @@
    min="%IF{"not isempty 'MIN'" then="%MIN%" else="0"}%"
    header="<div class='clsTagCloud'>"
    group="<strong>$group</strong>&nbsp;"
-   format="<a rel='nofollow' name='$term'
-~~~   style='font-size:$weight%;
-~~~           color:$fadeRGB(
-~~~                 %IF{"not isempty 'FROMCOLOR'" then="%FROMCOLOR%" else="194,199,204"}%,
-~~~                 %IF{"not isempty 'TOCOLOR'" then="%TOCOLOR%" else="0,102,204"}%);'
-~~~   href='#'
-~~~   $percntIF{\"'$percntENCODE{\"%TAG%\"}$percnt' =~ '\b$percntENCODE{\"$term\"}$percnt\b'\" then=\"class='current'\"}$percnt
-~~~   title='found $count time(s)'
-~~~  >$term</a>"
+   format="<a rel='nofollow' name='$term' \
+     style='font-size:$weight%; \
+       color:$fadeRGB(\
+         %IF{"not isempty 'FROMCOLOR'" then="%FROMCOLOR%" else="194,199,204"}%,\
+         %IF{"not isempty 'TOCOLOR'" then="%TOCOLOR%" else="0,102,204"}%);'\
+     href='#' \
+     $percntIF{\"'$percntENCODE{\"%TAG%\"}$percnt' =~ '\b$percntENCODE{\"$term\"}$percnt\b'\" then=\"class='current'\"}$percnt\
+     title='found $count time(s)'>$term</a>"
    footer="</ul></div>"
 }%<!-- tagcloud -->
 </form>
@@ -138,7 +139,7 @@
 %DBCALL{"Applications.RenderFunctionCallers"}%
 
 ---++ Copyright
-&copy; 2007-2010 Michael Daum http://michaeldaumconsulting.com
+&copy; 2007-2011 Michael Daum http://michaeldaumconsulting.com
 
 %DBCALL{"Applications.GnuGeneralPublicLicense" section="notice"}%
 

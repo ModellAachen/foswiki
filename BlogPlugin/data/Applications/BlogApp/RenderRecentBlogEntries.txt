@@ -1,0 +1,63 @@
+%META:TOPICINFO{author="ProjectContributor" comment="reprev" date="1320867722" format="1.1" reprev="3" version="5"}%
+%META:TOPICPARENT{name="TopicFunction"}%
+%TOC{depth="2"}%
+
+---++ Documentation
+%STARTSECTION{name="documentation" type="section"}%
+%RED%TODO%ENDCOLOR%
+
+---+++++ Parameters
+   * LIMIT: maximal number of BlogEntries to list
+   * CAT: optionally render restrict list to this category 
+
+%ENDSECTION{name="documentation" type="section"}%
+
+---++ Implementation
+<verbatim class="tml">
+%STARTINCLUDE%<!-- -->
+<noautolink>
+%DBQUERY{
+  "TopicType=~'\bBlogEntry\b' AND State != 'unpublished' AND topic != 'WebTopicEditTemplate'
+   %IF{"defined CAT and '%CAT%'!=''" then="AND topic ISA '%CAT%'"}% 
+  " 
+  order="createdate" 
+  reverse="on" 
+  limit="%IF{"defined LIMIT" then="%LIMIT%" else="10"}%"  
+  hidenull="on" 
+  web="%BASEWEB%" 
+  header="<div class='blogSideBarSection blogSideBarRecent'> 
+    <h2 >%MAKETEXT{"Latest"}%</h2> 
+    <ul>" 
+  format="<li>
+    <a href='%SCRIPTURLPATH{"view"}%/$web/$topic'>
+      $percntDBCALL{\"Applications.RenderTopicThumbnail\" 
+        OBJECT=\"$web.$topic\" 
+        TYPE=\"plain\" 
+      }$percnt<!-- --> 
+      $expand(topictitle)
+      <br /><span class='foswikiTopicInfo foswikiSmallish'>$formfield(Summary)</span>
+      %CLEAR%
+    </a></li>"
+  footer="</ul></div>" 
+}% 
+</noautolink>
+<!-- -->%STOPINCLUDE%
+</verbatim>
+
+---++ Test
+%DBCALL{"%TOPIC%"}%
+
+%DBCALL{"Applications.RenderFunctionCallers"}%
+
+---++ Copyright
+&copy; 2005-2011 http://michaeldaumconsulting.com
+
+%DBCALL{"Applications.GnuGeneralPublicLicense" section="notice"}%
+
+
+%META:FORM{name="Applications.ApplicationTopic"}%
+%META:FIELD{name="TopicType" title="TopicType" value="DocuTopic, TopicFunction"}%
+%META:FIELD{name="TopicTitle" attributes="" title="<nop>TopicTitle" value=""}%
+%META:FIELD{name="Summary" attributes="c" title="Summary" value="display a list of recent BlogEntries for the sidebar"}%
+%META:FIELD{name="WikiApplication" attributes="" title="WikiApplication" value="BlogApp"}%
+%META:PREFERENCE{name="EDIT_TEMPLATE" title="EDIT_TEMPLATE" type="Set" value="Applications.WikiTopicEdit"}%

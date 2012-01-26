@@ -1,6 +1,5 @@
-%META:TOPICINFO{author="ProjectContributor" comment="save topic" date="1271675781" format="1.1" reprev="1.3" rev="3" version="1.3"}%
----+!! Welcome to the %WEB% web
-
+%META:TOPICINFO{author="micha" comment="reprev" date="1325758483" format="1.1" reprev="6" version="6"}%
+Welcome to the %WEB% web.
 This web contains a set of WikiApplications that can be used in
 different parts of your <nop>%WIKITOOLNAME% wiki. It is used as a 
 library and repository as well as a development interface to write
@@ -8,20 +7,17 @@ new applications.
 
 %DBCALL{"RenderWikiApplicationFactory"}%
 
----++ Installed WikiApplications
+---++ Installed <nop>WikiApplications
 %FORMATLIST{"%FLEXWEBLIST{include="Applications/.*" format="$web;$name" separator=", "}%" 
   pattern="(.*);(.*)"
   format="   1 [[$1.WebHome][$2]]: $percntVAR{\"WEBSUMMARY\" web=\"$1\"}$percnt"
   separator="$n"
 }%
 
-<!--
-   * Set VIEW_TEMPLATE = Applications.HiddenFormView
--->
-
 
 %META:FORM{name="Applications.ApplicationTopic"}%
 %META:FIELD{name="TopicType" title="TopicType" value="WebTool"}%
 %META:FIELD{name="TopicTitle" attributes="" title="<nop>TopicTitle" value="Applications"}%
-%META:FIELD{name="Summary" attributes="" title="Summary" value="Library of all WikiApplications installed on %25WIKITOOLNAME%25"}%
+%META:FIELD{name="Summary" attributes="c" title="Summary" value="Library of all WikiApplications installed on %25WIKITOOLNAME%25"}%
 %META:FIELD{name="WikiApplication" attributes="" title="WikiApplication" value="WikiWorkbench"}%
+%META:PREFERENCE{name="DISPLAYFORM" title="DISPLAYFORM" type="Local" value="off"}%

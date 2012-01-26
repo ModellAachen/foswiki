@@ -1,6 +1,6 @@
 # Plugin for Foswiki - The Free and Open Source Wiki, http://foswiki.org/
 #
-# Copyright (C) 2009-2011 Michael Daum http://michaeldaumconsulting.com
+# Copyright (C) 2009-2012 Michael Daum http://michaeldaumconsulting.com
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -21,7 +21,6 @@ use Foswiki::Contrib::JsonRpcContrib::Error ();
 use Foswiki::Time ();
 use Foswiki::Func ();
 use Error qw( :try );
-use JSON ();
 
 use constant DEBUG => 1; # toggle me
 use constant DRY => 0; # toggle me
@@ -110,7 +109,7 @@ sub jsonRpcSaveComment {
   );
 
   Foswiki::Func::saveTopic($web, $topic, $meta, $text, {ignorepermissions=>1}) unless DRY;
-  Foswiki::Func::writeEvent("comment", "state=(new, unapproved) title=".($title||'').' text='.substr($cmtText, 0, 200)); # SMELL: does not objey approval state
+  writeEvent("comment", "state=(new, unapproved) title=".($title||'').' text='.substr($cmtText, 0, 200)); # SMELL: does not objey approval state
 
   return;
 }
@@ -150,7 +149,7 @@ sub jsonRpcApproveComment {
   Foswiki::Func::saveTopic($web, $topic, $meta, $text, {ignorepermissions=>1}) 
     unless DRY;
 
-  Foswiki::Func::writeEvent("commentapprove", "state=($comment->{state}) title=".($comment->{title}||'').' text='.substr($comment->{text}, 0, 200)); 
+  writeEvent("commentapprove", "state=($comment->{state}) title=".($comment->{title}||'').' text='.substr($comment->{text}, 0, 200)); 
 
   return;
 }
@@ -211,7 +210,7 @@ sub jsonRpcUpdateComment {
   );
 
   Foswiki::Func::saveTopic($web, $topic, $meta, $text, {ignorepermissions=>1}) unless DRY;
-  Foswiki::Func::writeEvent("commentupdate", "state=($state) title=".($title||'')." text=".substr($cmtText, 0, 200)); 
+  writeEvent("commentupdate", "state=($state) title=".($title||'')." text=".substr($cmtText, 0, 200)); 
 
   return;
 }
@@ -256,7 +255,7 @@ sub jsonRpcDeleteComment {
   $meta->remove('COMMENT', $id);
 
   Foswiki::Func::saveTopic($web, $topic, $meta, $text, {ignorepermissions=>1}) unless DRY;
-  Foswiki::Func::writeEvent("commentdelete", "state=($comment->{state}) title=".($comment->{title}||'')." text=".substr($comment->{text}, 0, 200)); 
+  writeEvent("commentdelete", "state=($comment->{state}) title=".($comment->{title}||'')." text=".substr($comment->{text}, 0, 200)); 
 
   return;
 }
@@ -570,6 +569,12 @@ sub expandVariables {
 }
 
 ##############################################################################
+sub writeEvent {
+  return unless defined &Foswiki::Func::writeEvent;
+  return Foswiki::Func::writeEvent(@_);
+}
+
+##############################################################################
 sub indexTopicHandler {
   my ($this, $indexer, $doc, $web, $topic, $meta, $text) = @_;
 
@@ -583,8 +588,8 @@ sub indexTopicHandler {
   foreach my $comment (@comments) {
 
     # set doc fields
-    my $date = Foswiki::Func::formatTime($comment->{modified}, 'iso', 'gmtime' );
     my $createDate = Foswiki::Func::formatTime($comment->{date}, 'iso', 'gmtime' );
+    my $date = defined($comment->{modified})?Foswiki::Func::formatTime($comment->{modified}, 'iso', 'gmtime' ):$createDate;
     my $webtopic = "$web.$topic";
     $webtopic =~ s/\//./g;
     my $id = $webtopic.'#'.$comment->{name};
@@ -592,10 +597,16 @@ sub indexTopicHandler {
     my $title = $comment->{title};
     $title = substr $comment->{text}, 0, 20 unless $title;
 
+    my $collection = $Foswiki::cfg{SolrPlugin}{DefaultCollection} || "wiki";
+    my $language = Foswiki::Func::getPreferencesValue('CONTENT_LANGUAGE') || "en"; # SMELL: standardize
+
     # reindex this comment
     my $commentDoc = $indexer->newDocument();
     $commentDoc->add_fields(
       'id' => $id,
+      'collection' => $collection,
+      'language' => $language,
+      'name' => $comment->{name},
       'type' => 'comment',
       'web' => $web,
       'topic' => $topic,
@@ -607,7 +618,7 @@ sub indexTopicHandler {
       'title' => $title,
       'text' => $comment->{text},
       'url' => $url,
-      'state' => ($comment->{state}||''),
+      'state' => ($comment->{state}||'null'),
     );
     $doc->add_fields('catchall' => $title);
     $doc->add_fields('catchall' => $comment->{text});

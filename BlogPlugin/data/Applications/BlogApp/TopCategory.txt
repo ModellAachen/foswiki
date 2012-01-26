@@ -1,0 +1,10 @@
+%META:TOPICINFO{author="ProjectContributor" comment="" date="1294080473" format="1.1" version="1"}%
+%META:TOPICPARENT{name="WebHome"}%
+%DBCALL{"Applications.ClassificationApp.RenderCategory"}%
+
+%META:FORM{name="Applications.ClassificationApp.Category"}%
+%META:FIELD{name="TopicType" title="TopicType" value="Category, CategorizedTopic, WikiTopic"}%
+%META:FIELD{name="TopicTitle" attributes="" title="<nop>TopicTitle" value="TOP"}%
+%META:FIELD{name="Summary" attributes="" title="Summary" value=""}%
+%META:FIELD{name="Category" attributes="" title="Category" value=""}%
+%META:FIELD{name="Icon" attributes="" title="Icon" value=""}%

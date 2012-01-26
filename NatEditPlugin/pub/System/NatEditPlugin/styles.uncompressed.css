@@ -3,6 +3,9 @@
   font-size:12px;
   line-height:1.5em;
 }
+.natEditContainer {
+  margin-top:1em;
+}
 .natEditContainer .jqTabContents {
   overflow-x:hidden;
   overflow-y:auto;
@@ -42,6 +45,7 @@ ul.natEditHelpTools {
   list-style:none;
   background:inherit;
 }
+#topic_resize,
 #topic_2WYSIWYG,
 #wysiwyg {
   display:none;
@@ -53,11 +57,11 @@ ul.natEditHelpTools {
   display:none;
 }
 
-/* temporary IE hack: disable preview button */
+/* IE hack to disable preview button for IE and below 
 .natEditBottomBar ul li.natEditPreviewButton {
-  display: none\9; /* IE8 and below */
+  display: none\9; 
 }
-
+*/
 
 .natEditToolBar a:hover,
 .natEditToolBar a {
@@ -159,14 +163,12 @@ ul.natEditHelpTools {
 .patternEditPage .foswikiForm {
   margin:0px;
 }
-
 #patternPage .foswikiFormTable {
   width:99%;
 }
 #patternPage .jqTab {
   background:white;
 }
-
 .patternEditPage .foswikiFormStep {
   height:auto;
 }
@@ -176,8 +178,11 @@ ul.natEditHelpTools {
 .patternEditPage .foswikiFormLast {
   border-bottom:0px;
 }
-.patternEditPage .foswikiFormSteps h2 {
-  margin-bottom:1em;
+.patternEditPage .natEditContainer h2:first-child {
+  margin-top:0;
+}
+.patternEditPage .natEditContainer th {
+  text-align:left;
 }
 
 /* temporarily switched off */

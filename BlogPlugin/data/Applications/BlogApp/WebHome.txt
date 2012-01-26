@@ -1,0 +1,10 @@
+%META:TOPICINFO{author="ProjectContributor" comment="reprev" date="1271763923" format="1.1" reprev="1.4" rev="5" version="1.5"}%
+%DBCALL{"Applications.RenderWikiApplicationWebHome"}%
+
+%META:FORM{name="Applications.ApplicationTopic"}%
+%META:FIELD{name="TopicType" title="TopicType" value="ApplicationTopic"}%
+%META:FIELD{name="TopicTitle" attributes="" title="<nop>TopicTitle" value="BlogApp"}%
+%META:FIELD{name="Summary" attributes="c" title="Summary" value=""}%
+%META:FIELD{name="WikiApplication" attributes="" title="WikiApplication" value="WikiWorkbench"}%
+%META:PREFERENCE{name="NATSKIN_SIDEBAR" title="NATSKIN_SIDEBAR" type="Local" value="off"}%
+%META:PREFERENCE{name="DISPLAYFORM" title="DISPLAYFORM" type="Local" value="off"}%

@@ -1,0 +1,52 @@
+%TMPL:INCLUDE{"foswiki"}%<!-- template: languageselector.nat.tmpl -->
+
+%{ ################################################################################ }%
+%TMPL:DEF{"dialog"}%<noautolink>
+<div class="jqUIDialog foswikiFormSteps {width:480, height:260, modal:true, draggable:true}" title="%TMPL:P{"heading"}%">
+ %TMPL:P{"DIS_languageselectorjavascript"}%<!-- -->
+  <form name="changelanguage" action="%SCRIPTURLPATH{"oops"}%/%BASEWEB%/%BASETOPIC%" method="post">
+    <input type="hidden" name="template" value="oopslanguagechanged" />
+    <div class="foswikiFormStep">
+      <table class='foswikiLayoutTable'>
+        <tr>
+          <th>%MAKETEXT{"Language"}%:</th>
+          <td>
+            <select name="language" class="foswikiSelect">
+              <option value="default">%MAKETEXT{"Default"}%</option>
+              %LANGUAGES{
+                format="<option $marker value='$langtag'>$langname</option>" 
+                selection="%LANGUAGE%" 
+                marker="selected='selected'"
+                separator=" "
+              }%
+            </select>
+          </td>
+        </tr>
+      </table>
+
+      <div class="foswikiFormDescription">
+        %MAKETEXT{"Select 'Default' to switch to the default language configured in your browser."}%
+
+        %MAKETEXT{"Note this will _only_ change the interface language, but not the default language of your content."}%      
+      </div>
+    </div>
+  </form>
+  <a class="jqUIDialogButton {icon:'ui-icon-circle-check', click: function() { $('form[name=changelanguage]').submit(); }}">%MAKETEXT{"Submit"}%</a>
+  <a class="jqUIDialogButton jqUIDialogClose {icon:'ui-icon-cancel'}">%MAKETEXT{"Cancel"}%</a>
+</div>
+</noautolink>%TMPL:END%
+
+%{ ################################################################################ }%
+%TMPL:DEF{"heading"}%%MAKETEXT{"Change interface language"}%%TMPL:END%
+
+%{ ################################################################################ }%
+%TMPL:DEF{"languageselectorjavascript"}%<!-- -->
+<literal><script>
+jQuery(function($) {
+  $("form[name='changelanguage']").each(function() {
+    var $form = $(this);
+  });
+});
+</script></literal>
+<!-- -->%TMPL:END%
+

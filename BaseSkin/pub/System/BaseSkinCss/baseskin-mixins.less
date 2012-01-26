@@ -2,86 +2,119 @@
 MIXINS
 */
 
-.border-radius-left(@radius: 5px) {
-  -webkit-border-top-left-radius: @radius;
-     -moz-border-top-left-radius: @radius;
-          border-top-left-radius: @radius;
-  -webkit-border-bottom-left-radius: @radius;
-     -moz-border-bottom-left-radius: @radius;
-          border-bottom-left-radius: @radius;
+.fw_border-radius-left(@radius: 5px) {
+	-webkit-border-top-left-radius: @radius;
+	-webkit-border-bottom-left-radius: @radius;
+	
+	-moz-border-top-left-radius: @radius;
+	-moz-border-bottom-left-radius: @radius;
+	
+	border-top-left-radius: @radius;
+	border-bottom-left-radius: @radius;
 }
-.border-radius-right(@radius: 5px) {
-  -webkit-border-top-right-radius: @radius;
-     -moz-border-top-right-radius: @radius;
-          border-top-right-radius: @radius;
-  -webkit-border-bottom-right-radius: @radius;
-     -moz-border-bottom-right-radius: @radius;
-          border-bottom-right-radius: @radius;
+.fw_border-radius-right(@radius: 5px) {
+	-webkit-border-top-right-radius: @radius;
+	-webkit-border-bottom-right-radius: @radius;
+	
+	-moz-border-top-right-radius: @radius;
+	-moz-border-bottom-right-radius: @radius;
+	
+	border-top-right-radius: @radius;
+	border-bottom-right-radius: @radius;
 }
 
+// HTML5 box model
+// See:
+// https://developer.mozilla.org/en/CSS/box-orient
+// https://developer.mozilla.org/en/CSS/box-pack
+// https://developer.mozilla.org/en/CSS/box-align
 
+.fw_box(@orient: horizontal, @pack: start, @align: stretch, @direction: normal) {
+	display: -webkit-box;
+	-webkit-box-orient: @orient;
+	-webkit-box-pack: @pack;
+	-webkit-box-align: @align;
+		
+	display: -moz-box;
+	-moz-box-orient: @orient;
+	-moz-box-pack: @pack;
+	-moz-box-align: @align;
+	
+	display: box;
+	box-orient: @orient;
+	box-pack: @pack;
+	box-align: @align;
+	
+	box-direction: @direction;
+	-moz-box-direction: @direction;
+	-webkit-box-direction: @direction;
+} 
 
+.fw_box_flex(@number: 1) {
+	-webkit-box-flex: @number;
+	-moz-box-flex: @number;
+	box-flex: @number;
+}
 
-/*
-.fw_dropdown_btn {
-	ul.dropdown-menu {
-		top: auto;
-		margin-top: -2px; // slightly overlap button above
-		background-color: @fw_color_background_neutral;
-		min-width: 180px;
-		max-width: 260px;
-		li {
-			float: none;
-			background: none;
-			.border-radius(0);
+.fw_box_sizing(@sizing: border-box) {
+	-webkit-box-sizing: @sizing;
+	-moz-box-sizing: @sizing;
+	box-sizing: @sizing;
+}
+
+.fw_tab_ul () {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	position: relative;
+	bottom: 0;
+	
+	li {
+	
+		&,
+		&.foswikiActiveTab,
+		&.current {
+			display: inline;
 			border: none;
-			
-			a {
-				color: @fw_color_text_toned_down;
-				text-shadow: none;
+			background: none;
+			margin: 0;
+		}
+		
+		& {
+			a,
+			a:hover,
+			span {
+				display: block;
+				float: left;
+				margin: 0 @fw_button_spacing 0 0;
+				padding: @fw_button_padding;
+				border-style: solid;
+				border-width: 1px;
+				text-decoration: none;
 			}
 		}
-		.active a {
-			color: @white;
+		
+		img {
+			vertical-align: text-top;
 		}
-		li.divider {
-			background-color: @fw_color_border_medium;
-			border-bottom: 1px solid @white;
-		}
-		a, p {
-			padding: 3px 9px 4px; // a bit smaller than .btn
-			margin: 0;
-			color: @fw_color_text;
-			line-height: inherit;
-			text-shadow: none;
-		}
-		p {
-			color: @fw_color_text_light;
-		}
-	}
-	a.dropdown-toggle::after {
-		border-top: 4px solid @fw_color_text_light;
-	}
-	a:hover.dropdown-toggle::after,
-	.dropdown.open a.dropdown-toggle::after {
-		border-top: 4px solid @fw_color_text;
-	}
-	.foswikiSecondaryDropdown {
-		border-left: none;
-	}
-	.foswikiSecondaryDropdown a:hover {
-		background-color: @fw_color_background_neutral;
-	}
-	.foswikiSecondaryDropdown a.dropdown-toggle {
-		padding-left: 6px; // even less wide
-		padding-right: 5px;
-	}
-	.foswikiSecondaryDropdown a.dropdown-toggle::after {
-		margin-left: 0;
-	}
-	.dropdown.open a.dropdown-toggle {
-		background-color: @fw_color_background_neutral;
-		color: #000;
 	}
 }
-*/
+
+.fw_button() {
+	.btn();
+	padding: @fw_button_padding;
+	.border-radius(@fw_corner_radius_button);
+	line-height: @baseline;
+	
+	&.small {
+		padding: 5px 9px;
+		.fw_em_font_size(@fw_size_small);
+	}
+	&.large {
+		.btn.large();
+	}
+}
+
+.fw_offset(@columnOffset: 1) {
+	margin-left: (@gridColumnWidth * @columnOffset) + (@gridGutterWidth * (@columnOffset - 1)) + @gridGutterWidth;
+}

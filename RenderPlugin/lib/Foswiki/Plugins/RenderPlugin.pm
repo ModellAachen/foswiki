@@ -1,6 +1,6 @@
 # Plugin for Foswiki - The Free and Open Source Wiki, http://foswiki.org/
 
-# Copyright (C) 2008-2009 Michael Daum http://michaeldaumconsulting.com
+# Copyright (C) 2008-2012 Michael Daum http://michaeldaumconsulting.com
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -15,17 +15,17 @@
 
 package Foswiki::Plugins::RenderPlugin;
 
-require Foswiki::Func;
-require Foswiki::Sandbox;
 use strict;
+use warnings;
 
-use vars qw( $VERSION $RELEASE $SHORTDESCRIPTION $NO_PREFS_IN_TOPIC );
+use Foswiki::Func ();
+use Foswiki::Sandbox() ;
+use Encode ();
 
-$VERSION = '$Rev$';
-$RELEASE = '3.0';
-
-$SHORTDESCRIPTION = 'Render <nop>WikiApplications asynchronously';
-$NO_PREFS_IN_TOPIC = 1;
+our $VERSION = '$Rev$';
+our $RELEASE = '3.1';
+our $SHORTDESCRIPTION = 'Render <nop>WikiApplications asynchronously';
+our $NO_PREFS_IN_TOPIC = 1;
 
 use constant DEBUG => 0; # toggle me
 
@@ -69,7 +69,7 @@ sub restExpand {
 
   return ' ' unless $theText; # must return at least on char as we get a
                               # premature end of script otherwise
-                              
+
   my $theTopic = $query->param('topic') || $session->{topicName};
   my $theWeb = $query->param('web') || $session->{webName};
   my ($web, $topic) = Foswiki::Func::normalizeWebTopicName($theWeb, $theTopic);
@@ -89,9 +89,6 @@ sub restTemplate {
   my $theExpand = $query->param('expand');
   return '' unless $theExpand;
 
-  my $theRender = $query->param('render') || 0;
-
-  $theRender = ($theRender =~ /^\s*(1|on|yes|true)\s*$/) ? 1:0;
   my $theTopic = $query->param('topic') || $session->{topicName};
   my $theWeb = $query->param('web') || $session->{webName};
   my ($web, $topic) = Foswiki::Func::normalizeWebTopicName($theWeb, $theTopic);
@@ -105,6 +102,8 @@ sub restTemplate {
 
   # and render it
   my $result = Foswiki::Func::expandCommonVariables($tmpl, $topic, $web) || ' ';
+
+  my $theRender = Foswiki::Func::isTrue($query->param('render'),  0);
   if ($theRender) {
     $result = Foswiki::Func::renderText($result, $web);
   }
@@ -120,6 +119,7 @@ sub restTag {
 
   # get params
   my $query = Foswiki::Func::getCgiQuery();
+
   my $theTag = $query->param('name') || 'INCLUDE';
   my $theDefault = $query->param('param') || '';
   my $theRender = $query->param('render') || 0;

@@ -2,7 +2,16 @@
 OVERRIDES
 */
 
+/* override reset.less */
 
+blockquote:before,
+blockquote:after {
+	content: none;
+}
+
+img {
+	vertical-align: text-bottom;
+}
 
 /* override forms.less */
 
@@ -11,7 +20,6 @@ input[type='file'] {
 	@select_baseline: 18px;
 	height: @select_baseline * 1.5; // In IE7, the height of the select element cannot be changed by height, only font-size
 	line-height: @select_baseline * 1.5;
-	color: @fw_color_text;
 }
 
 input[type='text'],
@@ -19,54 +27,38 @@ input[type='password'],
 textarea,
 select,
 .uneditable-input {
-	width: 0px + @fw_strand1_ratio_up_9;
+	.span4();
 }
 
 form {
 	margin-bottom: 0;
 }
 
+fieldset {
+	margin: 0;
+	padding: 0;
+}
 
+label,
+fieldset legend {
+	padding: 0;
+	margin: 0;
+	text-align: left;
+	float: none;
+}
 
 /* override patterns.less */
 
-.tabs {
+.tabs() {
   > li {
     > a {
       line-height: @baseline;
     }
   }
 }
-.nav {
-	&.secondary-nav {
-		margin-left: 6px;
-	}
-}
 
-.btn {
-	.border-radius(@fw_block_corner);
-}
-
-.alert-message {
-  &.block-message {
-    background-color: lighten(@fw_color_background_message, 5%);
-    border-color: @fw_color_background_message;
-  }
-}
-
-.topbar {
-	input[type='text'] {
-		&:hover {
-			background-color: @white;
-			color: @black;
-		}
-	}
-}
-
-
-/* override reset.less */
-
-blockquote:before,
-blockquote:after {
-	content: none;
+footer {
+	margin: 0;
+	padding: 0;
+	border: none;
 }

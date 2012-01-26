@@ -8,8 +8,9 @@
 ---------------------------------------------------
 }%%TMPL:DEF{"head:script"}%%TMPL:PREV%%TMPL:P{
 	"LIBJS"
+	name="base_edit"
 	id="BaseSkinJs/base_edit"
-	requires="JQUERYPLUGIN"
+	requires="JQUERYPLUGIN,TinyMCEPlugin,base"
 }%%TMPL:END%%{
 ===================================================
 </verbatim>}%

@@ -9,19 +9,12 @@ use Assert;
 # Package-private map object that stores hashes in memory. Used with
 # Storable and File archivists.
 
-sub setArchivist {
-    my ( $this, $archivist, $done ) = @_;
-    $this->SUPER::setArchivist( $archivist, $done, $this->getValues() );
-}
-
 sub DESTROY {
     my $this = shift;
 
     # prevent recursive destruction
     return if $this->{_destroying};
     $this->{_destroying} = 1;
-
-    $this->SUPER::setArchivist(undef);
 
     # destroy sub objects
     map {

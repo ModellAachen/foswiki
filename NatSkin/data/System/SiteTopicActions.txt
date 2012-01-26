@@ -24,6 +24,7 @@ Default site-level configuration for the !WebTopicActions !WebComponent
    * $action(print)
    * $action(pdf)
    * <hr />
+   * $action(changelanguage, i18n_enabled)
    * $action(webdavdir, WebDAVLinkPluginEnabled)
    * $action(subscribe, SubscribePluginEnabled)
    * $action(managetags, ClassificationPluginEnabled)

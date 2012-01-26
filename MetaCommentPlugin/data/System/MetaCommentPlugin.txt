@@ -1,4 +1,4 @@
-%META:TOPICINFO{author="micha" comment="reprev" date="1305044315" format="1.1" reprev="3" version="3"}%
+%META:TOPICINFO{author="ProjectContributor" comment="reprev" date="1305044315" format="1.1" reprev="3" version="3"}%
 ---+!! !MetaCommentPlugin
 <!--
    * Set SHORTDESCRIPTION = %$SHORTDESCRIPTION%
@@ -51,6 +51,10 @@ On a standard !PatternSkin install you will have to use preference variables to 
 First, to enable commenting add the =metacomment= skin overlay to your =SKIN= variable in %LOCALSITEPREFS%.
 
 <verbatim>   * Set SKIN = metacomment, pattern</verbatim>
+
+To display the comment interface like shown above you need to set the preference variable:
+
+<verbatim>   * Set DISPLAYCOMMENTS = on</verbatim>
 
 There are a couple of formats how comments are displayed on the topic:
 
@@ -170,11 +174,17 @@ When rendering a comment, the following variables can be used in the =format= st
 ---++ Info
 
 |  Author(s): | Foswiki:Main/MichaelDaum |
-|  Copyright &copy;: | 2009-2011, Michael Daum http://michaeldaumconsulting.com |
+|  Copyright &copy;: | 2009-2012, Michael Daum http://michaeldaumconsulting.com |
 |  License: | [[http://www.gnu.org/licenses/gpl.html][GPL (Gnu General Public License)]] |
 |  Release: | %$RELEASE% |
 |  Version: | %$VERSION% |
 |  Change History: | <!-- versions below in reverse order -->&nbsp; |
+|  10 Jan 2012: | 1.10 - added german translation; \
+                         added missing dependency on Foswiki:Extensions/RenderPlugin; \
+                         backwards compatibility to older foswiki engines; \
+                         adjusted index handler to latest changes in !SolrPlugin; \
+                         improved print css; \
+                         fixed js error together with newer jquery versions |
 |  10 May 2011: | 1.00 - partial rewrite to use Foswiki:Extensions/JsonRpcContrib; \
                   renamed preference COMMENTAPPROVAL to COMMENTMODERATION |
 |  20 Apr 2011: | fixed error in regular expression |

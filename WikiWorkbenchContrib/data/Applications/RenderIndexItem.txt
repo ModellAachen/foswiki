@@ -3,7 +3,7 @@
 %TOC{depth="2"}%
 
 ---++ Documentation
-%STARTSECTION{name="documentation" type="section"}%
+%STARTSECTION{"documentation"}%
 This method is called by Applications.ClassificationApp.RenderCategory to display
 a summary for an object. This method serves as a final fallback when no other TopicType-specific
 method was found.
@@ -11,7 +11,7 @@ method was found.
 ---+++++ Parameters
    * OBJECT
 
-%ENDSECTION{name="documentation" type="section"}%
+%ENDSECTION{"documentation"}%
 
 ---++ Implementation
 <verbatim class="tml">

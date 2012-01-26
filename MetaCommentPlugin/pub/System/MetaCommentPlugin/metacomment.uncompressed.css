@@ -17,6 +17,10 @@
   margin:0px;
 }
 
+.foswikiMetaData .cmtAddComment {
+  margin:1em 0em; /* 18px 0px */
+}
+
 #cmtReplyComment .cmtAddCommentTitle1,
 .cmtAddComment .jqSimpleModalCancel,
 .cmtAddCommentTitle2 {
@@ -109,6 +113,7 @@ h3.cmtCommentNr {
   width:98%;
 }
 
+.cmtComment .imagePlain_left,
 .cmtComment .imageSimple_left {
   margin:0em 0.6923em 0.3077em 0em; /* 0px 9px 4px 0px */
 }

@@ -37,7 +37,7 @@ The TopicType topic is the factory to create new <nop>TopicTypes as well.
 }%<!-- -->
 
 %DBCALL{"Applications.RenderTopicsOfType"
-  FIELDS="Topic,Inheritance,Summary,WikiApplication,Changed"
+  FIELDS="TopicTitle,Inheritance,Summary,WikiApplication,Changed"
   ROWS="20"
 }%
 %STOPINCLUDE%

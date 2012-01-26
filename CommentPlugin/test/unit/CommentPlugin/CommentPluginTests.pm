@@ -236,14 +236,13 @@ HERE
         $query->param( -name => 'comment_index', -value => $eidx );
     }
 
-    my $session = Foswiki->new( $Foswiki::cfg{DefaultUserLogin}, $query );
+    $this->createNewFoswikiSession( $Foswiki::cfg{DefaultUserLogin}, $query );
     my $text = "Ignore this text";
 
     # invoke the save handler
-    $this->captureWithKey( rest => $this->getUIFn('rest'), $session );
+    $this->captureWithKey( rest => $this->getUIFn('rest'), $this->{session} );
 
     $text = Foswiki::Func::readTopicText( $web, $topic );
-    $session->finish();
     $this->assert_matches( qr/$comm/, $text, "$web.$topic: $text" );
 
     #uncomment this to debug what the actual output looks like.
@@ -360,6 +359,89 @@ sub test_reverseCompat {
     return;
 }
 
+sub test_redirectto_redirects {
+    my $this = shift;
+
+    # If requested topic exists, redirect after post
+    my $html = Foswiki::Func::expandCommonVariables(
+"%COMMENT{type=\"bottom\" target=\"$this->{test_web}.ATopic#AAnchor\" redirectto=\"WebPreferences\"}%"
+    );
+
+    $this->assert_matches(
+qr/<input ([^>]*name="endPoint" value="$this->{test_web}.WebPreferences".*?)\s*\/>/,
+        $html
+    );
+
+    # If requested topic missing, return an error to the user.
+    $html = Foswiki::Func::expandCommonVariables(
+"%COMMENT{type=\"bottom\" target=\"$this->{test_web}.ATopic#AAnchor\" redirectto=\"MissingAnRE\"}%"
+    );
+
+    # If requested target web is  missing, return an error to the user.
+    $html = Foswiki::Func::expandCommonVariables(
+"%COMMENT{type=\"bottom\" target=\"$this->{test_web}MISSING.ATopic#AAnchor\" }%"
+    );
+
+    $this->assert_matches(
+
+qr/<span class='foswikiAlert'> Target web does not exist: '$this->{test_web}MISSING' <\/span>/,
+        $html
+    );
+
+    # Redirect also works if an anchor is specified
+    $html = Foswiki::Func::expandCommonVariables(
+"%COMMENT{type=\"bottom\" target=\"$this->{test_web}.ATopic#AAnchor\" redirectto=\"WebPreferences#AnchOr\"}%"
+    );
+
+    $this->assert_matches(
+qr/<input ([^>]*name="endPoint" value="$this->{test_web}.WebPreferences#AnchOr".*?)\s*\/>/,
+        $html
+    );
+
+    # Redirect also works if a querystring is specified
+    $html = Foswiki::Func::expandCommonVariables(
+"%COMMENT{type=\"bottom\" target=\"$this->{test_web}.ATopic#AAnchor\" redirectto=\"WebPreferences?blah=01\"}%"
+    );
+
+    $this->assert_matches(
+qr/<input ([^>]*name="endPoint" value="$this->{test_web}.WebPreferences\?blah=01".*?)\s*\/>/,
+        $html
+    );
+
+    # Redirect also works if a querystring and Anchor is specified
+    $html = Foswiki::Func::expandCommonVariables(
+"%COMMENT{type=\"bottom\" target=\"$this->{test_web}.ATopic#AAnchor\" redirectto=\"WebPreferences?blah=01#AnchOr\"}%"
+    );
+
+    $this->assert_matches(
+qr/<input ([^>]*name="endPoint" value="$this->{test_web}.WebPreferences\?blah=01#AnchOr".*?)\s*\/>/,
+        $html
+    );
+
+    # Redirect with fully qualified web.topic?uri#anchor
+    my $systemweb = $Foswiki::cfg{SystemWebName};
+    $html = Foswiki::Func::expandCommonVariables(
+"%COMMENT{type=\"bottom\" target=\"$this->{test_web}.ATopic#AAnchor\" redirectto=\"%SYSTEMWEB%.WebPreferences?blah=01#AnchOr\"}%"
+    );
+
+    $this->assert_matches(
+qr/<input ([^>]*name="endPoint" value="$systemweb.WebPreferences\?blah=01#AnchOr".*?)\s*\/>/,
+        $html
+    );
+
+# Redirect also works if Anchor and querystring reversed.  Not really correct but is seen
+    $html = Foswiki::Func::expandCommonVariables(
+"%COMMENT{type=\"bottom\" target=\"$this->{test_web}.ATopic#AAnchor\" redirectto=\"WebPreferences#AnchOr?blah=01\"}%"
+    );
+
+    $this->assert_matches(
+qr/<input ([^>]*name="endPoint" value="$this->{test_web}.WebPreferences#AnchOr\?blah=01".*?)\s*\/>/,
+        $html
+    );
+
+    return;
+}
+
 sub test_locationOverridesAnchor {
     my $this = shift;
     my $html = Foswiki::Func::expandCommonVariables(
@@ -400,15 +482,14 @@ HERE
     );
     $query->path_info("/CommentPlugin/comment");
 
-    my $session = Foswiki->new( $Foswiki::cfg{DefaultUserLogin}, $query );
+    $this->createNewFoswikiSession( $Foswiki::cfg{DefaultUserLogin}, $query );
     my $text = "Ignore this text";
 
     # invoke the save handler
-    $this->captureWithKey( rest => $this->getUIFn('rest'), $session );
+    $this->captureWithKey( rest => $this->getUIFn('rest'), $this->{session} );
 
     $text =
       Foswiki::Func::readTopicText( $this->{test_web}, $this->{test_topic} );
-    $session->finish();
 
     # make sure it hasn't changed
     $text =~ s/^%META.*?\n//gm;
@@ -446,15 +527,14 @@ HERE
     );
     $query->path_info("/CommentPlugin/comment");
 
-    my $session = Foswiki->new( $Foswiki::cfg{DefaultUserLogin}, $query );
+    $this->createNewFoswikiSession( $Foswiki::cfg{DefaultUserLogin}, $query );
     my $text = "Ignore this text";
 
     # invoke the save handler
-    $this->captureWithKey( rest => $this->getUIFn('rest'), $session );
+    $this->captureWithKey( rest => $this->getUIFn('rest'), $this->{session} );
 
     $text =
       Foswiki::Func::readTopicText( $this->{test_web}, $this->{test_topic} );
-    $session->finish();
 
     # make sure it hasn't changed
     $text =~ s/^%META.*?\n//gm;
@@ -515,15 +595,14 @@ HERE
     );
     $query->path_info("/CommentPlugin/comment");
 
-    my $session = Foswiki->new( $Foswiki::cfg{DefaultUserLogin}, $query );
+    $this->createNewFoswikiSession( $Foswiki::cfg{DefaultUserLogin}, $query );
     my $text = "Ignore this text";
 
     # invoke the save handler
-    $this->captureWithKey( rest => $this->getUIFn('rest'), $session );
+    $this->captureWithKey( rest => $this->getUIFn('rest'), $this->{session} );
 
     $text =
       Foswiki::Func::readTopicText( $this->{test_web}, $this->{test_topic} );
-    $session->finish();
 
     # make sure it hasn't changed
     $text =~ s/^%META.*?\n//gm;
@@ -572,15 +651,14 @@ HERE
     );
     $query->path_info("/CommentPlugin/comment");
 
-    my $session = Foswiki->new( $Foswiki::cfg{DefaultUserLogin}, $query );
+    $this->createNewFoswikiSession( $Foswiki::cfg{DefaultUserLogin}, $query );
     my $text = "Ignore this text";
 
     # invoke the save handler
-    $this->captureWithKey( rest => $this->getUIFn('rest'), $session );
+    $this->captureWithKey( rest => $this->getUIFn('rest'), $this->{session} );
 
     $text =
       Foswiki::Func::readTopicText( $this->{test_web}, $this->{test_topic} );
-    $session->finish();
 
     # make sure it hasn't changed
     $text =~ s/^%META.*?\n//gm;
@@ -625,17 +703,18 @@ HERE
 
     $Foswiki::cfg{Plugins}{CommentPlugin}{RequiredForSave} = 'CHANGE';
 
-    my ( $responseText, $result, $stdout, $stderr, $session );
+    my ( $responseText, $result, $stdout, $stderr );
 
     # First make sure we can't *change* it
-    $session = Foswiki->new( $Foswiki::cfg{DefaultUserLogin}, $query );
+    $this->createNewFoswikiSession( $Foswiki::cfg{DefaultUserLogin}, $query );
 
     # invoke the save handler
     eval {
-        ( $responseText, $result, $stdout, $stderr ) =
-          $this->captureWithKey( rest => $this->getUIFn('rest'), $session );
+        ( $responseText, $result, $stdout, $stderr ) = $this->captureWithKey(
+            rest => $this->getUIFn('rest'),
+            $this->{session}
+        );
     };
-    $session->finish();
 
     $this->assert($@);
     $this->assert_matches( qr"AccessControlException", $@ );
@@ -643,19 +722,20 @@ HERE
     # Now make sure we *can* change it, given COMMENT access
     $Foswiki::cfg{Plugins}{CommentPlugin}{RequiredForSave} = 'COMMENT';
 
-    $session = Foswiki->new( $Foswiki::cfg{DefaultUserLogin}, $query );
+    $this->createNewFoswikiSession( $Foswiki::cfg{DefaultUserLogin}, $query );
 
     # invoke the save handler
     eval {
-        ( $responseText, $result, $stdout, $stderr ) =
-          $this->captureWithKey( rest => $this->getUIFn('rest'), $session );
+        ( $responseText, $result, $stdout, $stderr ) = $this->captureWithKey(
+            rest => $this->getUIFn('rest'),
+            $this->{session}
+        );
     };
     $this->assert( !$@ );
     $this->assert_matches( qr/Status: 200/, $responseText );
 
     my ( $meta, $text ) =
       Foswiki::Func::readTopic( $this->{test_web}, $this->{test_topic} );
-    $session->finish();
     $text =~ s/- \d\d [A-Z][a-z]{2} \d{4}/- DATE/;
     $this->assert_str_equals( <<HERE, $text );
    * Set DENYTOPICCHANGE = WikiGuest
@@ -691,14 +771,144 @@ HERE
     );
     $query->path_info("/CommentPlugin/comment");
     my ( $responseText, $result, $stdout, $stderr );
-    my $session = new Foswiki( undef, $query );
+    $this->createNewFoswikiSession( undef, $query );
     eval {
-        ( $responseText, $result, $stdout, $stderr ) =
-          $this->captureWithKey( rest => $this->getUIFn('rest'), $session );
+        ( $responseText, $result, $stdout, $stderr ) = $this->captureWithKey(
+            rest => $this->getUIFn('rest'),
+            $this->{session}
+        );
     };
     $this->assert_matches( qr/Status: 404/, $responseText );
-    $session->finish();
 
+}
+
+sub test_guest_comment_redirect {
+    my $this = shift;
+    $Foswiki::cfg{Plugins}{CommentPlugin}{GuestCanComment} = 0;
+
+    my $sample = <<HERE;
+   * Set ALLOWTOPICCHANGE = $Foswiki::cfg{DefaultUserWikiName}
+%COMMENT%
+HERE
+    Foswiki::Func::saveTopic( $this->{test_web}, $this->{test_topic}, undef,
+        $sample );
+
+    my $query = Unit::Request->new(
+        {
+            'comment_action' => 'save',
+            'comment_type'   => 'returntab',
+            'redirectto' =>
+              "$this->{test_web}.$this->{test_topic}\?tab=discuss",
+            'endPoint' => "$this->{test_web}.$this->{test_topic}#BLAH",
+            'comment'  => "This is the comment",
+            'topic'    => "$this->{test_web}.$this->{test_topic}"
+        }
+    );
+    $query->path_info("/CommentPlugin/comment");
+
+    $this->createNewFoswikiSession( $Foswiki::cfg{DefaultUserLogin}, $query );
+    my $text = "Ignore this text";
+
+    # invoke the save handler
+    # $responseText, $result, $stdout, $stderr
+    my ( $response, $result, $stdout, $stderr ) =
+      $this->captureWithKey( rest => $this->getUIFn('rest'), $this->{session} );
+
+    $this->assert_matches( qr/^Status: 302/ms, $response );
+    $this->assert_matches(
+qr/Location:.*\/restauth\/CommentPlugin\/comment\?foswiki_redirect_cache.*/ms,
+        $response
+    );
+
+}
+
+sub test_rev1_template_redirectto {
+    my $this = shift;
+
+    my $tmplate = <<"HERE";
+---++++ returntab
+
+Post to a different topic and return to here. The comment =target= is set in the =PROMPT=. In the form below the =redirectto= is set to the current (including) topic.
+
+<verbatim>
+%TMPL:DEF{returnpromptboxtab}%
+<input type="hidden" name="redirectto" value="%BASEWEB%.%BASETOPIC%?tab=discuss" />
+%TMPL:P{promptbox}%
+%TMPL:END%
+</verbatim>
+<verbatim>
+%TMPL:DEF{PROMPT:returntab}%%TMPL:P{returnpromptboxtab}%%TMPL:END%
+</verbatim>
+<verbatim>
+%TMPL:DEF{OUTPUT:returntab}%%POS:BEFORE%%TMPL:P{OUTPUT:threadmode}%%TMPL:END%
+</verbatim>
+
+HERE
+
+    Foswiki::Func::saveTopic( $this->{test_web}, 'UserCommentsTemplate', undef,
+        $tmplate );
+
+    my $sample = <<"HERE";
+before
+%COMMENT{type="returntab"}%
+after
+HERE
+
+    Foswiki::Func::saveTopic( $this->{test_web}, $this->{test_topic}, undef,
+        $sample );
+    my $html = Foswiki::Func::expandCommonVariables($sample);
+
+    $this->assert_matches(
+qr/<input type="hidden" name="redirectto" value="$this->{test_web}.$this->{test_topic}\?tab=discuss"/,
+        $html
+    );
+
+    my $warningLog = "$Foswiki::cfg{TempfileDir}/CommentPluginTestsWarnings";
+    unlink "$warningLog"
+      if ( -f "$warningLog" );
+    $Foswiki::cfg{WarningFileName} = "$warningLog";
+
+    # Compose the query
+    my $comm  = "This is the comment";
+    my $query = Unit::Request->new(
+        {
+            'comment_action' => 'save',
+            'comment_type'   => 'returntab',
+            'redirectto' =>
+              "$this->{test_web}.$this->{test_topic}\?tab=discuss",
+            'endPoint' => "$this->{test_web}.$this->{test_topic}#BLAH",
+            'comment'  => $comm,
+            'topic'    => "$this->{test_web}.$this->{test_topic}"
+        }
+    );
+    $query->path_info("/CommentPlugin/comment");
+
+    $this->createNewFoswikiSession( $Foswiki::cfg{DefaultUserLogin}, $query );
+    my $text = "Ignore this text";
+
+    # invoke the save handler
+    # $responseText, $result, $stdout, $stderr
+    my ( $response, $result, $stdout, $stderr ) =
+      $this->captureWithKey( rest => $this->getUIFn('rest'), $this->{session} );
+
+    $this->assert_matches( qr/^Status: 302/ms, $response );
+    $this->assert_matches(
+        qr/^Location:.*\/$this->{test_web}\/$this->{test_topic}\?tab=discuss/ms,
+        $response
+    );
+
+    open( my $fh, '<', $warningLog )
+      || die "$warningLog: $!";
+    local $/ = undef;
+    $this->assert_matches(
+        qr/CommentPlugin: obsolete redirectto parameter overriding endPoint/ms,
+        <$fh>
+    );
+    close($fh) || die "$warningLog: $!";
+    unlink "$warningLog"
+      if ( -f "$warningLog" );
+
+    return;
 }
 
 1;

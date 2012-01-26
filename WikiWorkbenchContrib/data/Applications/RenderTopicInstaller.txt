@@ -2,7 +2,7 @@
 %TOC{depth="2"}%
 
 ---++ Documentation
-%STARTSECTION{name="documentation" type="section"}%
+%STARTSECTION{"documentation"}%
 This is a tool to add a topic based application, or part of it to another web.
 This is done by creating a TopicStub that points back to the implementation.
 For example, to add a new TopicType to web, you create a TopicStub that points
@@ -22,7 +22,7 @@ TopicStub is to be created.
    * WIKIAPP: the name of the WikiApllication this topic belongs to, defaults to BASEWEB
    * EXTRA: extra stuff to be send during =save=
 
-%ENDSECTION{name="documentation" type="section"}%
+%ENDSECTION{"documentation"}%
 
 ---++ Implementation
 <verbatim class="tml">

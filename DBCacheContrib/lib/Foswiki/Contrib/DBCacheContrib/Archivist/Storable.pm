@@ -21,8 +21,10 @@ sub DESTROY {
 }
 
 sub sync {
-    my ($this) = @_;
-    require Storable;
+    my $this = shift;
+
+#my ($package, $filename, $line) = caller(2);
+#print STDERR "called sync $this->{_file} from $package, $line\n";
 
     # Clear the archivist to avoid having pointers in the Storable
     $this->{root}->setArchivist(undef) if $this->{root};

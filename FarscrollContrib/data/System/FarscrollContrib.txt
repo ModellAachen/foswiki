@@ -1,0 +1,92 @@
+%META:TOPICINFO{author="ProjectContributor" comment="reprev" date="1326128525" format="1.1" reprev="2" version="2"}%
+---+!! %TOPIC%
+%SHORTDESCRIPTION%
+
+%TOC%
+
+---++ Summary
+%STARTSECTION{"summary"}%
+This simple plugin enhances elements that have a overflowing fixed width but no
+fixed height, the ones with the horizontal scrollbar like pre. If the element
+overlaps the page fold the scrollbar is not visible. With this Plugin a cloned
+scrollbar is positioned over the element when needed.
+%ENDSECTION{"summary"}%
+
+Homepage: https://github.com/mustardamus/farscroll-plugin %BR%
+Author: Sebastian Senf %BR%
+Version: 0.1.0
+
+---++ Usage
+
+By default all =&lt;pre>...&lt;/pre>= tags are far-scroll-ed. Use the =.jqFarscroll to apply this 
+feature onto other html nodes.
+
+<verbatim class="tml">
+here goes some text
+here goes some text
+here goes some text
+here goes some text
+here goes some text
+here goes some text
+here goes some text
+here goes some text
+here goes some text
+here goes some text
+here goes some text
+here goes some text
+here goes some text
+here goes some text
+here goes some text
+here goes some text
+here goes some text
+here goes some text
+here goes some text
+here goes some text
+here goes some text
+here goes some text
+here goes some text
+here goes some text this line is very long and potentially creates horizontal scroll bar on your screen. you might have to resize your browser window until you see a the horizontal scroll bar. with farscroll, it will always stay on the screen no matter how far you scroll up or donw the area.
+here goes some text
+here goes some text
+here goes some text
+here goes some text
+here goes some text
+here goes some text
+here goes some text
+here goes some text
+here goes some text
+here goes some text
+here goes some text
+here goes some text
+here goes some text
+here goes some text
+here goes some text
+here goes some text
+here goes some text
+here goes some text
+here goes some text
+here goes some text
+here goes some text
+here goes some text
+here goes some text
+</verbatim>
+
+---++ Installation Instructions
+
+%$INSTALL_INSTRUCTIONS%
+
+---++ Info
+<!--
+   * Set SHORTDESCRIPTION = %$SHORTDESCRIPTION%
+-->
+
+|  Author(s): | Michael Daum|
+|  Copyright: | &copy; 2012 Michael Daum http://michaeldaumconsulting.com; &copy; 2011 Sebastian Senf |
+|  License: | Dual licensed under the MIT and GPL licenses. http://www.opensource.org/licenses/mit-license.php, http://www.gnu.org/licenses/gpl.html |
+|  Release: | %$RELEASE% |
+|  Version: | %$VERSION% |
+|  Change History: | <!-- versions below in reverse order -->&nbsp; |
+|  09 Jan 2012: | initial version |
+|  Dependencies: | %$DEPENDENCIES% |
+|  Home page: | Foswiki:Extensions/%TOPIC% |
+|  Support: | Foswiki:Support/%TOPIC% |

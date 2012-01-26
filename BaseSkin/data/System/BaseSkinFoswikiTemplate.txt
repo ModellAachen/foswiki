@@ -8,25 +8,38 @@
 	
 ===================================================
 }%%TMPL:INCLUDE{"foswiki"}%
+%TMPL:INCLUDE{"zoneformats"}%
 %TMPL:INCLUDE{"baseskinwebtopbar"}%
 %TMPL:INCLUDE{"baseskinwebbottombar"}%
-%TMPL:INCLUDE{"topicactionbuttons"}%%{
+%TMPL:INCLUDE{"viewtopicactionbuttons"}%%{
 -------------------------------------------------
 	Empty elements from the old default tmpl files
 -------------------------------------------------
-}%
-%TMPL:DEF{"standardheader"}%%TMPL:END%
+}%%TMPL:DEF{"standardheader"}%%TMPL:END%
 %TMPL:DEF{"simpleheader"}%%TMPL:END%
-%TMPL:DEF{"topicinfo"}%%TMPL:END%
-%TMPL:DEF{"copyright"}%%TMPL:END%
-%{
+%TMPL:DEF{"copyright"}%%TMPL:END%%TMPL:END%%{
+---------------------------------------------------
+	Elements that are in use by extensions.
+	So these are now part of the spec. 
+---------------------------------------------------
+}%%TMPL:DEF{"JavascriptFiles/foswikiString"}%
+%TMPL:P{"LIBJS" id="JavascriptFiles/foswikiString" requires="JQUERYPLUGIN::FOSWIKI"}%%TMPL:END%%{
+---------------------------------------------------
+}%%TMPL:DEF{"JavascriptFiles/foswikiStringUnicodeChars"}%%{
+}%%TMPL:P{"LIBJS" id="JavascriptFiles/foswikiStringUnicodeChars" requires="JQUERYPLUGIN::FOSWIKI,JavascriptFiles/foswikiString"}%%TMPL:END%%{
+---------------------------------------------------
+}%%TMPL:DEF{"JavascriptFiles/foswikiPref"}%%{
+}%%TMPL:P{"LIBJS" id="JavascriptFiles/foswikiPref" requires="JQUERYPLUGIN::FOSWIKI"}%%TMPL:END%%{
+---------------------------------------------------
+}%%TMPL:DEF{"JavascriptFiles/foswikiForm"}%%{
+}%%TMPL:P{"LIBJS" id="JavascriptFiles/foswikiForm" requires="JQUERYPLUGIN::FOSWIKI,JavascriptFiles/foswikiString"}%%TMPL:END%%{
 ---------------------------------------------------
 	Empty elements that will be filled by other templates
 ---------------------------------------------------
-}%%TMPL:DEF{"titleaction"}%%TMPL:END%
-%TMPL:DEF{"breadcrumb"}%%TMPL:END%%{
+}%%TMPL:DEF{"titleaction"}%%TMPL:END%%{
 -------------------------------------------------
-	Document structure
+	"document"
+		Document structure
 ---------------------------------------------------
 }%%TMPL:DEF{"document"}%
 %TMPL:P{"htmldoctype"}%
@@ -37,33 +50,44 @@
 	HTML5 doctype
 }%%TMPL:DEF{"htmldoctype"}%<!DOCTYPE html>%TMPL:END%%{
 ---------------------------------------------------
-	HTML5 root element
-	Add class "no-js" for Modernizr script
+	"htmlstart"
+		HTML5 root element
+		Add class "no-js" for Modernizr script
 ---------------------------------------------------
-}%%TMPL:DEF{"htmlstart"}%<html lang="%LANG%" class="no-js">%TMPL:END%
+}%%TMPL:DEF{"htmlstart"}%<html lang="%LANG%" class='no-js'>%TMPL:END%
 %TMPL:DEF{"htmlend"}%</html>%TMPL:END%%{
 ---------------------------------------------------
-	head
+	"head"
+		<head>
+			head:windowtitle
+			Reads TMPL:Ps and adds to zones:
+				head:meta
+				head:script
+				head:css
+			Renders zones:
+				head
+				script
+				inline-css
 ---------------------------------------------------
 }%%TMPL:DEF{"head"}%<head>
 %TMPL:P{"head:windowtitle"}%
 %TMPL:P{"head:meta"}%%TMPL:P{"head:script"}%%TMPL:P{"head:css"}%%{
 	Render head css and js after all TMPL:DEFs are read
-}%%RENDERZONE{"head"}%%{
-	Render base skin CSS files after all other CSS files
-}%%RENDERZONE{"head-meta"}%%RENDERZONE{"head-base"}%%RENDERZONE{"script"}%</head>%TMPL:END%%{
+}%%TMPL:P{"renderzone" zone="head"}%%TMPL:P{"renderzone" zone="script"}%%TMPL:P{"renderzone:jsonpreference"}%%TMPL:P{"renderzone" zone="webfont-css"}%%TMPL:P{"renderzone" zone="inline-css"}%</head>%TMPL:END%%{
 ---------------------------------------------------
-	TODO: add more meta macros for author, keywords, dublincore (see natskin)
+	"head:meta"
+		TODO: add more meta macros for author, keywords, dublincore (see natskin)
 ---------------------------------------------------
-}%%TMPL:DEF{"head:meta"}%%TMPL:P{context="edit" then="head:meta:ie8compatibilitymode"}%<meta charset="%CHARSET%" /><meta name="robots" content="noindex" />%HTTP_EQUIV_ON_VIEW%
-<link rel="icon" href="%FAVICON%" type="image/x-icon" />
-<link rel="shortcut icon" href="%FAVICON%" />
-<link rel="alternate" href="%SCRIPTURL{edit}%/%BASEWEB%/%BASETOPIC%?t=%GMTIME{"$epoch"}%" type="application/x-wiki" title="%MAKETEXT{"Edit this page"}%" />
-<meta name="description" content="%TMPL:P{"head:meta:description"}%" />
+}%%TMPL:DEF{"head:meta"}%<meta charset='%CHARSET%' />
+<meta name='robots' content='noindex' />%HTTP_EQUIV_ON_VIEW%
+<link rel='icon' href='%FAVICON%' type='image/x-icon' />
+<link rel='shortcut icon' href='%FAVICON%' />
+<link rel='alternate' href='%SCRIPTURL{edit}%/%BASEWEB%/%BASETOPIC%?t=%GMTIME{"$epoch"}%' type='application/x-wiki' title='%MAKETEXT{"Edit this page"}%' />
+<meta name='description' content='%TMPL:P{"head:meta:description"}%' />
 %{
 	Item1157: In Internet Explorer 6 a self closing base tag causes the browser to not allow selecting text in the topic area. Solution is to put the closing tag inside a IE conditional tag.
 }%
-<base href="%SCRIPTURL{%SCRIPTNAME%}%/%WEB%/%TOPIC%" /><!--[if IE]></base><![endif]-->%TMPL:END%%{
+<base href='%SCRIPTURL{%SCRIPTNAME%}%/%WEB%/%TOPIC%' /><!--[if IE]></base><![endif]-->%TMPL:END%%{
 ---------------------------------------------------
 	Default Base Skin javascripts.
 	
@@ -72,15 +96,14 @@
 ---------------------------------------------------
 }%%TMPL:DEF{"head:script"}%%TMPL:P{
 	"LIBJS"
+	name="modernizr"
 	id="BaseSkinJs/modernizr-1.7"
-	requires=""
 }%%TMPL:END%%{
 ---------------------------------------------------
 }%%TMPL:DEF{"head:css"}%%TMPL:END%%{
 ---------------------------------------------------
-	Item2476: Put IE8 into compatibility mode to work around slow, erratic textarea
----------------------------------------------------
-}%%TMPL:DEF{"head:meta:ie8compatibilitymode"}%%IF{"$EDIT_FORCE_IE8_COMPATIBILITYMODE='on'" then="<meta http-equiv=\"X-UA-Compatible\" content=\"IE=EmulateIE7\"/>"}%%TMPL:END%%{
+	It should be possible to write a more elaborate description of the topic.
+	The description is used by search engines to show the search result summary.
 ---------------------------------------------------
 }%%TMPL:DEF{"head:meta:description"}%%TOPIC%%TMPL:END%%{
 ---------------------------------------------------
@@ -88,187 +111,255 @@
 ---------------------------------------------------
 }%%TMPL:DEF{"head:windowtitle"}%<title>%TMPL:P{"titleaction"}% <nop>%BASETOPIC%%TMPL:P{"head:windowtitle:separator"}%%BASEWEB%%TMPL:P{"head:windowtitle:separator"}%<nop>%WIKITOOLNAME%</title>%TMPL:END%%{
 ---------------------------------------------------
-	body
+	"body"
 ---------------------------------------------------
-}%%TMPL:DEF{"body"}%<body class="%TMPL:P{"body:class"}%">
+}%%TMPL:DEF{"body"}%<body class='%TMPL:P{"body:class"}%'>
 %TMPL:P{"page"}%
 </body>%TMPL:END%%{
----------------------------------------------------
-	page:
-		- top bar
-		- controls
-		- content
-		- bottom bar
----------------------------------------------------
-}%%TMPL:DEF{"page"}%<div class="foswikiPage">%TMPL:P{"topbar"}%%TMPL:P{"controls"}%%TMPL:P{"content"}%%TMPL:P{"bottombar"}%</div>%TMPL:END%%{
----------------------------------------------------
-	Provide empty defaults
----------------------------------------------------
-}%%TMPL:DEF{"content"}%%TMPL:END%%{
 ---------------------------------------------------
 	Allow other templates to easy add body class names. These should make sure that class 'foswikiNoJs' is always written.
 ---------------------------------------------------
 }%%TMPL:DEF{"body:class"}%foswikiNoJs%TMPL:END%%{
 ---------------------------------------------------
-	Topic action buttons
+	"startsection"
 ---------------------------------------------------
-}%%TMPL:DEF{"controls:topicactionbuttons"}%<div class="foswikiTopicActionButtons">
-	<ul class="nav secondary-nav foswikiButtonGroup">
-		<li>%TMPL:P{"edit_or_create"}%</li>
-		<li class='dropdown foswikiSecondaryDropdown' data-dropdown='dropdown'>
-			<a href='#' class='dropdown-toggle nolabel'></a>
-			<ul class='dropdown-menu'>
-				<li><p>Topic</p></li>
-				<li><a href='#'>Edit topic</a></li>
-				<li><a href='#'>Edit plain wiki text</a></li>
-				<li><a href='#'>Attach files or images</a></li>
-				<li class='divider'></li>
-				<li><p>Data &amp; settings</p></li>
-				<li><a href='#'>Edit topic data</a></li>
-				<li><a href='#'>Edit topic settings</a></li>
-				<li><a href='#'>Select parent topic</a></li>
-				<li class='divider'></li>
-				<li><p>Manage</p></li>
-				<li><a href='#'>Restore to previous version</a></li>
-				<li><a href='#'>Rename topic</a></li>
-				<li><a href='#'>Move to different Web</a></li>
-				<li><a href='#'>Move to trash</a></li>
-			</ul>
-		</li>
-	</ul>
-	<ul class="nav secondary-nav">
-		<li>
-			<a href='#' class="menu">Info</a>
-			<ul class="menu-dropdown">
-				<li><p>Topic</p></li>
-				<li><a href='#'>View wiki text</a></li>
-				<li><a href='#'>Revision history</a></li>
-				<li class='divider'></li>
-				<li><p>Connections</p></li>
-				<li><a href='#'>Topics that link to here</a></li>
-				<li><a href='#'>Child topics</a></li>
-			</ul>
-		</li>
-	</ul>
-	<ul class="nav secondary-nav">
-		<li>
-			<a href='#' class="menu">%ICON{"cog"}%</a>
-			<ul class="menu-dropdown">
-				<li><p>Export</p></li>
-				<li><a href='#'>Print</a></li>
-				<li><a href='#'>PDF</a></li>
-				<li class='divider'></li>
-				<li><p>Display</p></li>
-				<li><a href='#'>Wide</a></li>
-				<li><a href='#'>Nice</a></li>
-				<li><a href='#'>Small</a></li>
-			</ul>
-		</li>
-	</ul><!--
-	<ul class="nav secondary-nav foswikiButtonGroup">
-		<li>%TMPL:P{"subscribe_link"}%</li>
-	</ul>-->
-</div>%TMPL:END%%{
+}%%TMPL:DEF{"startsection" class="foswikiColorPrimary"}%<div class='foswikiSection %class%'><div class='foswikiContainer'>%TMPL:END%%{
 ---------------------------------------------------
-	Controls:
+	"endsection"
+---------------------------------------------------
+}%%TMPL:DEF{"endsection"}%</div></div>%TMPL:END%%{
+---------------------------------------------------
+	"page"
+		- top bar
+		- controls
+		- content
+		- bottom bar
+---------------------------------------------------
+}%%TMPL:DEF{"page"}%<div class='foswikiPage'>%TMPL:P{"topbar"}%%TMPL:P{"main"}%%TMPL:P{"bottombar"}%</div>%TMPL:END%%{
+---------------------------------------------------
+	"main"
+		- controls
+		- topic
+		- meta
+---------------------------------------------------
+}%%TMPL:DEF{"main"}%<div class='foswikiMain'>
+%TMPL:P{"controls"}%<div class='foswikiTopic'>
+%TMPL:P{"topic"}%</div>
+%TMPL:P{"meta"}%</div>%TMPL:END%%{
+---------------------------------------------------
+	"topic"
+		- topic:before
+		- content
+		- topic:after
+---------------------------------------------------
+}%%TMPL:DEF{"topic"}%<span id='PageTop'></span>
+%TMPL:P{"topic:before"}%%TMPL:P{"startsection" class="foswikiTopicText foswikiColorPrimary"}%
+%TMPL:P{"content"}%%TMPL:P{"endsection"}%
+%TMPL:P{"topic:after"}%<span id='PageBottom'></span>
+%TMPL:END%%{
+---------------------------------------------------
+	"content"
+		In templates always define the content DEF.
+---------------------------------------------------
+}%%TMPL:DEF{"content"}%%TEXT%%TMPL:END%%{
+---------------------------------------------------
+	"controls"
 		- topic actions
-		- contextual zone
+		If you need to have the controls fixed to the browser window: surround contents with <div class='foswikiMakeSticky'>...</div>
 ---------------------------------------------------
-}%%TMPL:DEF{"controls"}%%TMPL:P{"controls:topicactions"}%%TMPL:END%%{
+}%%TMPL:DEF{"controls"}%%TMPL:P{"startsection" class="foswikiBar foswikiTopicActions foswikiColorNavigationSecondary foswikiClearfix"}%
+	%TMPL:P{"breadcrumb"}%
+	%TMPL:P{"controls:topicactions"}%
+%TMPL:P{"endsection"}%%TMPL:END%%{
 ---------------------------------------------------
 	Controls: topic actions
+		Implemented in sub skin baseeditable - see BaseeditableSkinFoswikiTemplate
 ---------------------------------------------------
-}%%TMPL:DEF{"controls:topicactions"}%<div class="foswikiBar foswikiTopicActions foswikiColorSecundary" data-dropdown="dropdown" data-minpadding="2">
-	<div class="foswikiContainer">
-		%TMPL:P{"breadcrumb"}%
-		%TMPL:P{"controls:topicactionbuttons"}%
-		<div class="foswikiClear"></div>
+}%%TMPL:DEF{"controls:topicactions"}%<div data-dropdown='dropdown' data-minpadding='2'>
+	<div class='foswikiTopicActionButtons'>
+		<ul class='foswikiNavigationSecondary foswikiButtonGroup'>
+			<li>%TMPL:P{"edit_or_create"}%</li>
+			<li class='dropdown foswikiSecondaryDropdown'>
+				<a href='#' class='menu nolabel'></a>
+				<ul class='dropdown-menu'>
+					<li><p>Topic</p></li>
+					<li>%TMPL:P{"edit_or_create"}%</li>
+					<li>%TMPL:P{"raw_edit_link"}%</li>
+					<li><a href='#'>Attach files or images</a></li>
+					<li class='divider'></li>
+					<li><p>Data &amp; settings</p></li>
+					<li><a href='#'>Edit topic data</a></li>
+					<li><a href='#'>Edit topic settings</a></li>
+					<li><a href='#'>Select parent topic</a></li>
+					<li class='divider'></li>
+					<li><p>Manage</p></li>
+					<li><a href='#'>Restore topic</a></li>
+					<li><a href='#'>Rename topic</a></li>
+					<li><a href='#'>Move to different Web</a></li>
+					<li><a href='#'>Move to trash</a></li>
+				</ul>
+			</li>
+		</ul>
+		<ul class='foswikiNavigationSecondary'>
+			<li>
+				<a href='#' class='menu'>Info</a>
+				<ul class='menu-dropdown'>
+					<li><p>Topic</p></li>
+					<li><a href='#'>View wiki text</a></li>
+					<li><a href='#'>Revision history</a></li>
+					<li class='divider'></li>
+					<li><p>Connections</p></li>
+					<li><a href='#'>Topics that link to here</a></li>
+					<li><a href='#'>Child topics</a></li>
+				</ul>
+			</li>
+		</ul>
+		<ul class='foswikiNavigationSecondary'>
+			<li>
+				<a href='#' class='menu'>%ICON{"cog"}%</a>
+				<ul class='menu-dropdown'>
+					<li><p>Export</p></li>
+					<li><a href='#'>Print</a></li>
+					<li><a href='#'>PDF</a></li>
+					<li class='divider'></li>
+					<li><p>Display</p></li>
+					<li><a href='#' class='foswikiDisplaySpatious'>Spatious</a></li>
+					<li><a href='#' class='foswikiDisplayAverage'>Nice</a></li>
+					<li><a href='#' class='foswikiDisplayMaxscreen'>Max screen</a></li>
+				</ul>
+			</li>
+		</ul><!--
+		<ul class='foswikiNavigationSecondary foswikiButtonGroup'>
+			<li>%TMPL:P{"subscribe_link"}%</li>
+		</ul>-->
 	</div>
 </div>%TMPL:END%%{
 ---------------------------------------------------
-	Title bar
+	"breadcrumb"
 ---------------------------------------------------
-}%%TMPL:DEF{"titlebar"}%<div class="foswikiBar foswikiTopBar foswikiColorNavigationSecundary">
-<div class="foswikiContainer">
-<ul class="foswikiTitle">	<li>[[%BASEWEB%.%BASETOPIC%][%BASETOPIC%]]</li>%TMPL:P{"titlebar:titleaction"}%
-</ul>
-</div>
-</div>%TMPL:END%%{
+}%%TMPL:DEF{"breadcrumb"}%<div class='foswikiBreadcrumb'><ul><li>%TMPL:P{"breadcrumb:title"}%</li>
+<li>%TMPL:P{"breadcrumb:wikitoolname"}%</li><li>%TMPL:P{"breadcrumb:separator"}%%TMPL:P{"breadcrumb:currentweb"}%</li><li>%TMPL:P{"breadcrumb:parents"}%</li><li>%TMPL:P{"breadcrumb:separator"}%%TMPL:P{"breadcrumb:currenttopic"}%<span class='foswikiTopicInfo'>%TMPL:P{"breadcrumb:annotation"}%</span></li></ul></div>%TMPL:END%%{
 ---------------------------------------------------
-	Title action
+}%%TMPL:DEF{"breadcrumb:separator"}%<span class='foswikiSeparator'>/</span>%TMPL:END%%{
 ---------------------------------------------------
-}%%TMPL:DEF{"titlebar:titleaction"}%<li class='foswikiSeparator'>/</li>
-<li><p>%TMPL:P{"titleaction"}%</p></li>%TMPL:END%%{
+}%%TMPL:DEF{"breadcrumb:parents"}%%META{"parent" nowebhome="on" prefix="%TMPL:P{"breadcrumb:separator"}%" separator="%TMPL:P{"breadcrumb:separator"}%" suffix=""}%%TMPL:END%%{
 ---------------------------------------------------
-	Controls: contextual
+}%%TMPL:DEF{"breadcrumb:topic"}%<nop>%TOPIC%%TMPL:END%%{
 ---------------------------------------------------
-}%%TMPL:DEF{"controls:contextual"}%%TMPL:END%%{
+}%%TMPL:DEF{"breadcrumb:title"}%%TMPL:END%%{
+---------------------------------------------------
+}%%TMPL:DEF{"breadcrumb:wikitoolname"}%[[%USERSWEB%.%HOMETOPIC%][%WIKITOOLNAME%]]%TMPL:END%%{
+---------------------------------------------------
+}%%TMPL:DEF{"breadcrumb:currentweb"}%<a href="%SCRIPTURLPATH{"view"}%/%WEB%/%HOMETOPIC%">%MAKETEXT{"[_1] Web" args="<nop>%WEB%"}%</a>%TMPL:END%%{
+---------------------------------------------------
+}%%TMPL:DEF{"breadcrumb:annotation"}%%TMPL:P{"topicinfo"}%%TMPL:END%%{
+---------------------------------------------------
+}%%TMPL:DEF{"breadcrumb:currenttopic"}%<a href='%SCRIPTURL{view}%/%WEB%/%TOPIC%' title='%MAKETEXT{"Topic revision:"}% %REVINFO{format="$rev ($date - $time)"}%'>%TMPL:P{"breadcrumb:topic"}%</a>%TMPL:END%%{
+---------------------------------------------------
+
+---------------------------------------------------
+}%%TMPL:DEF{"topicinfo"}%%IF{
+	"defined rev"
+	then=" %MAKETEXT{"revision [_1]" args="%URLPARAM{"rev"}%"}%"
+	else=" <span>%REVINFO{format="%MAKETEXT{"revision [_1]: [_2] by [_3]" args="$rev, $date, $percntIF{$quotistopic '%USERSWEB%.$wikiname'$quot then=$quot[[%USERSWEB%.$wikiname][$wikiname]]$quot else=$quot$wikiname"}%$quot}$percnt"
+}%</span>"}%%IF{
+	"defined raw"
+	then=" %MAKETEXT{"(raw view)"}%"
+}%%TMPL:END%%{
 ---------------------------------------------------
 	Macro for including JavaScript files from system paths
 	Takes as arguments:
-		- id
-		- file url, must NOT include .css extension
+		- name
+		- id: resource id
 		- requires
 ---------------------------------------------------
-}%%TMPL:DEF{"LIBJS"}%%ADDTOZONE{
+}%%TMPL:DEF{"LIBJS" requires=""}%%ADDTOZONE{
 	"script"
-	id="%id%"
+	id="%name%"
 	text="<script type='text/javascript' src='%PUBURLPATH%/%SYSTEMWEB%/%id%%FWSRC%.js'></script>"
 	requires="%requires%"
 }%%TMPL:END%%{
 ---------------------------------------------------
 	Macro for including CSS files from *system* paths
 	Takes as arguments:
-		- id
-		- file url, must NOT include .css extension
+		- name
+		- id: resource id
 		- requires
 ---------------------------------------------------
-}%%TMPL:DEF{"LIBCSS"}%%ADDTOZONE{
-	"head-base"
-	id="%id%"
+}%%TMPL:DEF{"LIBCSS" requires=""}%%ADDTOZONE{
+	"head"
+	id="%name%"
 	text="<link rel='stylesheet' href='%PUBURLPATH%/%SYSTEMWEB%/%id%%FWSRC%.css' />"
 	requires="%requires%"
 }%%TMPL:END%%{
 ---------------------------------------------------
 	Macro for including CSS files from other paths
 	Takes as arguments:
-		- id
-		- file url, must include .css extension
+		- name
+		- id: resource id
+		- url: file url, must include .css extension
 		- requires
 ---------------------------------------------------
-}%%TMPL:DEF{"CSS"}%%ADDTOZONE{
-	"head-base"
-	id="%id%"
+}%%TMPL:DEF{"CSS" requires=""}%%ADDTOZONE{
+	"head"
+	id="%name%"
 	text="$percntFORMAT{
 		\"%url%\"
 		type=\"string\"
 		format=\"<link rel='stylesheet' href='$item' />\"
 	}$percnt"
 	requires="%requires%"
+}%%{
+---------------------------------------------------
+	Macro for including CSS text
+	Takes as arguments:
+		- name
+		- text: css string, will be written inside <literal> tags
+		- requires
+---------------------------------------------------
+}%%TMPL:DEF{"INLINE_CSSTEXT" requires=""}%%ADDTOZONE{
+	"inline-css"
+	id="%name%"
+	text="<style type='text/css'><literal>%text%</literal></style>"
+	requires="%requires%"
+}%%TMPL:END%%{
+---------------------------------------------------
+	Macro for including CSS file
+	Takes as arguments:
+		- name
+		- url: css URL
+		- requires
+---------------------------------------------------
+}%%TMPL:DEF{"WEBFONT_CSSFILE" requires=""}%%ADDTOZONE{
+	"webfont-css"
+	id="%name%"
+	text="<link rel='stylesheet' href='%url%' />"
+	requires="%requires%"
 }%%TMPL:END%%{
 ---------------------------------------------------
 	Macro for including Less files from *system* paths
 	Takes as arguments:
-		- id
-		- file url, must NOT include .css extension
+		- name
+		- id: resource id
+		- url: file url, must NOT include .css extension
 		- requires
 ---------------------------------------------------
-}%%TMPL:DEF{"LIBLESS"}%%ADDTOZONE{
-	"head-base"
-	id="%id%"
+}%%TMPL:DEF{"LIBLESS" requires=""}%%ADDTOZONE{
+	"head"
+	id="%name%"
 	text="<link rel='stylesheet/less' href='%PUBURLPATH%/%SYSTEMWEB%/%id%%FWSRC%.less' />"
 	requires="%requires%"
 }%%TMPL:END%%{
 ---------------------------------------------------
 	Macro for including LESS files from other paths
 	Takes as arguments:
-		- id
-		- file url, must include .less extension
+		- name
+		- url: file url, must include .less extension
 		- requires
 ---------------------------------------------------
-}%%TMPL:DEF{"LESS"}%%ADDTOZONE{
-	"head-base"
-	id="%id%"
+}%%TMPL:DEF{"LESS" requires=""}%%ADDTOZONE{
+	"head"
+	id="%name%"
 	text="$percntFORMAT{
 		\"%url%\"
 		type=\"string\"
@@ -279,9 +370,9 @@
 ---------------------------------------------------
 	Note: non-wikiword
 ---------------------------------------------------
-}%%TMPL:DEF{"nonwikiwordwarning"}%<p class="foswikiAllowNonWikiWord"><label><input type="checkbox" class="foswikiCheckbox" name="nonwikiword" %IF{
-	"$ 'URLPARAM{nonwikiword}'='on'"
-	then="checked=\"checked\""
+}%%TMPL:DEF{"nonwikiwordwarning"}%<p class='foswikiAllowNonWikiWord'><label><input type='checkbox' class='foswikiCheckbox' name='nonwikiword' %IF{
+	"$'URLPARAM{nonwikiword}'='on'"
+	then="checked='checked'"
 }% />%MAKETEXT{"Allow non <nop>WikiWord for the new topic name"}%</label> %TMPL:P{"nonwikiwordhelp"}%</p>%TMPL:END%%{
 ---------------------------------------------------
 }%%TMPL:DEF{"nonwikiwordhelp"}%%TWISTY{
@@ -291,7 +382,7 @@
 	label="WikiWord"
 }%"}%%JQREQUIRE{"popupwindow"}%%ENDTWISTY%%TMPL:END%%{
 ---------------------------------------------------
-}%%TMPL:DEF{"nonwikiwordallowed"}%<input type="hidden" name="nonwikiword" value="%URLPARAM{"nonwikiword" default="on"}%" />%TMPL:END%%{
+}%%TMPL:DEF{"nonwikiwordallowed"}%<input type='hidden' name='nonwikiword' value='%URLPARAM{"nonwikiword" default="on"}%" />%TMPL:END%%{
 ---------------------------------------------------
 }%%TMPL:DEF{"nonwikiword"}%%IF{"$HIDE_NON_WIKI_WORD_WARNINGS!='on'" then="$percntTMPL:P{$quotnonwikiwordwarning$quot}$percnt" else="$percntTMPL:P{$quotnonwikiwordallowed$quot}$percnt"}%%TMPL:END%%{
 ===================================================

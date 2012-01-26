@@ -475,7 +475,7 @@ jQuery(function($) {
       %SOLRFORMAT{"solr1" 
         header="<div class='solrNumResults'>
                   $percntIF{\"$count>0\" 
-                    then=\"$percntMAKETEXT{\"Results [_1] of <strong>[_2]</strong>\" args=\"$from - $to, $count\"}$percnt\"
+                    then=\"<nop>$percntMAKETEXT{\"Results [_1] of <strong>[_2]</strong>\" args=\"$from - $to, $count\"}$percnt\"
                     else=\"<span class='foswikiAlert'>%MAKETEXT{"nothing found"}%</span>\"
                   }$percnt
                 </div>"
@@ -799,7 +799,7 @@ jQuery(function($) {
         format="\"$1\""
         footer="]}"
         separator=", "
-      }%' name='search' size='60' value='%URLPARAM{"search" encode="entity"}%' style='margin-right:8px;'/>
+      }%' name='search' size='50' value='%URLPARAM{"search" encode="entity"}%' style='margin-right:8px;'/>
     </td>
     <td>
       %BUTTON{"%MAKETEXT{"Search"}%" type="submit" title="%MAKETEXT{"submit the query"}%" icon="find" class="solrSubmitButton"}%
@@ -839,7 +839,7 @@ jQuery(function($) {
       <select class='foswikiSelect' id='solrSorting'>
         <option class='foswikiOption' value='score desc' %IF{"'%URLPARAM{"sort" default="%TMPL:P{"solr::defaultsort"}%"}%'='sort desc'" then="selected"}%>%MAKETEXT{"Relevance"}%</option>
         <option class='foswikiOption' value='date desc' %IF{"'%URLPARAM{"sort" default="%TMPL:P{"solr::defaultsort"}%"}%'='date desc'" then="selected"}%>%MAKETEXT{"Last changed"}%</option>
-        <option class='foswikiOption' value='topic_sort asc' %IF{"'%URLPARAM{"sort" default="%TMPL:P{"solr::defaultsort"}%"}%'='topic_sort asc'" then="selected"}%>%MAKETEXT{"Name"}%</option>
+        <option class='foswikiOption' value='title_sort asc' %IF{"'%URLPARAM{"sort" default="%TMPL:P{"solr::defaultsort"}%"}%'='title_sort asc'" then="selected"}%>%MAKETEXT{"Name"}%</option>
       </select>
     </td>
   </tr>
@@ -926,7 +926,7 @@ jQuery(function($) {
 %TMPL:DEF{"solr::format::list::topic"}%<!-- -->
 <div class='solrSearchHit solrTopicHit'>
   <h3 style='background-image:url(%icon%)' title='%type%'>
-    [[%web%.%topic%][%topic%]]
+    [[%web%.%topic%]]
     <span class='foswikiGrayText'>
       %WEBLINK{"%web%" 
         format="<a class='webLink' href='$url'>%MAKETEXT{"in [_1]" args="$title"}%</a>"
@@ -969,7 +969,7 @@ jQuery(function($) {
 <div class='solrSearchHit solrAttachmentHit'>
   <h3 style='background-image:url(%icon%)' title='%type%'>
     [[%url%][%name%]]
-    <span class='foswikiGrayText'>%MAKETEXT{"in [_1]" args="[[%web%.%topic%][%topic%]]"}%</span>
+    <span class='foswikiGrayText'>%MAKETEXT{"in [_1]" args="[[%web%.%topic%]]"}%</span>
     %IF{"'%comment%'!=''" then="<div class='foswikiGrayText'>%comment%</div>" else="<!-- -->"}%
   </h3>
   <div class='solrHilite'>
@@ -1007,7 +1007,7 @@ jQuery(function($) {
   </div>
   <h3>
     [[%url%][%name%]]
-    <span class='foswikiGrayText'>%MAKETEXT{"in [_1]" args="[[%web%.%topic%][%topic%]]"}%</span>
+    <span class='foswikiGrayText'>%MAKETEXT{"in [_1]" args="[[%web%.%topic%]]"}%</span>
     %IF{"'%comment%'!=''" then="<div class='foswikiGrayText'>%comment%</div>" else="<!-- -->"}%
   </h3>
   <div class='solrHilite'>
@@ -1030,7 +1030,7 @@ jQuery(function($) {
 <div class='solrSearchHit solrCommentHot'>
   <h3 style='background-image:url(%icon%)' type='%type%'>
     [[%url%][%title%]]
-    <span class='foswikiGrayText'>%MAKETEXT{"in [_1]" args="[[%web%.%topic%][%topic%]]"}%</span>
+    <span class='foswikiGrayText'>%MAKETEXT{"in [_1]" args="[[%web%.%topic%]]"}%</span>
   </h3>
   <div class='solrHilite'>
     <literal>%hilite%</literal>
@@ -1073,7 +1073,7 @@ jQuery(function($) {
   <h3>
     [[%url%][%SPACEOUT{%title%}%]]
   </h3>
-  <div class='foswikiGrayText'>in&nbsp;[[%web%.%topic%][%topic%]]</div>
+  <div class='foswikiGrayText'>in&nbsp;[[%web%.%topic%]]</div>
   <div class='solrRevision'>
     %date%, %USERINFO{"%author%" format="[[$wikiusername][$wikiname]]"}%
   </div>
@@ -1099,7 +1099,7 @@ jQuery(function($) {
     }%
   </div>
   <div class='solrImageCaption'>
-    [[%web%.%topic%][%topic%]]
+    [[%web%.%topic%]]
   </div>
 </div>
 <!-- -->%TMPL:END%

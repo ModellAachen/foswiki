@@ -11,19 +11,12 @@ use Assert;
 # Package-private array object that stores arrays in memory. Used with
 # Storable and File archivists.
 
-sub setArchivist {
-    my ( $this, $archivist, $done ) = @_;
-    $this->SUPER::setArchivist( $archivist, $done, @{ $this->{values} } );
-}
-
 sub DESTROY {
     my $this = shift;
 
     # prevent recursive destruction
     return if $this->{_destroying};
     $this->{_destroying} = 1;
-
-    $this->SUPER::setArchivist(undef);
 
     # destroy sub objects
     foreach my $value ( @{ $this->{values} } ) {

@@ -1,0 +1,99 @@
+%META:TOPICINFO{author="ProjectContributor" comment="reprev" date="1320868361" format="1.1" reprev="10" version="10"}%
+%META:TOPICPARENT{name="TopicFunction"}%
+%TOC{depth="2"}%
+
+---++ Documentation
+%STARTSECTION{"documentation"}%
+%RED%TODO%ENDCOLOR%
+
+---+++++ Parameters
+   * SIDEBAR: kind of sidebar to display 
+
+%ENDSECTION{"documentation"}%
+
+---++ Implementation
+<verbatim class="tml">
+%STARTINCLUDE%%DBCALL{
+  "%WEB%.%TOPIC%" 
+  section="%IF{"defined SIDEBAR" 
+    then="%SIDEBAR%" 
+    else="%FORMATLIST{"%FORMFIELD{"TopicType" topic="%BASEWEB%.%BASETOPIC"}%" limit="1" null="Default"}%"
+  }%"
+}%%JQREQUIRE{"serialpager"}%%STOPINCLUDE%
+</verbatim>
+
+---++ Default sidebar
+<verbatim class="tml">
+%STARTSECTION{"Default"}%<!-- -->
+<div class="blogSideBarSection blogAbout"> 
+  <h2 >%MAKETEXT{"About"}%</h2>
+  <p>%WEBSUMMARY%</p>
+</div> 
+%DBCALL{"Applications.BlogApp.RenderAuthorTools"}%<!-- -->
+%DBCALL{"Applications.BlogApp.RenderRecentComments" LIMIT="5"}%<!-- -->
+%DBCALL{"Applications.BlogApp.RenderCategories"}%<!-- -->
+%DBCALL{"Applications.BlogApp.RenderArchives"}%<!-- -->
+<!-- -->%ENDSECTION{"Default"}%
+</verbatim>
+
+---++ Admin sidebar
+<verbatim class="tml">
+%STARTSECTION{"Admin"}%<!-- -->
+<div class="blogSideBarSection blogAbout"> 
+  <h2 >%MAKETEXT{"About"}%</h2>
+  <p>You are in the admin section. This area should only be accessible to admins of this blog.</p>
+</div> 
+%DBCALL{"Applications.BlogApp.RenderAuthorTools"}%<!-- -->
+<!-- -->%ENDSECTION{"Admin"}%
+</verbatim>
+
+---++ BlogEntry sidebar
+<verbatim class="tml">
+%STARTSECTION{"BlogEntry"}%<!-- -->
+<div class="blogSideBarSection blogAbout"> 
+  <h2 >%MAKETEXT{"About"}%</h2>
+  <p>%WEBSUMMARY%</p>
+</div> 
+%DBCALL{"Applications.BlogApp.RenderAuthorTools"}%<!-- -->
+%DBCALL{"Applications.BlogApp.RenderSimilarBlogEntries"}%<!-- -->
+%DBCALL{"Applications.BlogApp.RenderRecentBlogEntries" LIMIT="10"}%<!-- -->
+<!-- -->%ENDSECTION{"BlogEntry"}%
+</verbatim>
+
+---++ Category sidebar
+<verbatim class="tml">
+%STARTSECTION{"Category"}% <!-- -->
+<div class="blogSideBarSection blogAbout"> 
+  <h2 >%MAKETEXT{"About"}%</h2>
+  <p>%WEBSUMMARY%</p>
+</div> 
+%DBCALL{"Applications.BlogApp.RenderAuthorTools"}%<!-- -->
+%DBCALL{"Applications.BlogApp.RenderCategories" CAT="%URLPARAM{"catname" default="%BASETOPIC%"}%"}%<!-- -->
+%DBCALL{"Applications.BlogApp.RenderRecentComments" 
+  CAT="%URLPARAM{"catname" default="%BASETOPIC%"}%" 
+  LIMIT="5"
+}%<!-- -->
+%DBCALL{"Applications.BlogApp.RenderArchives"
+  CAT="%URLPARAM{"catname" default="%BASETOPIC%"}%" 
+}%<!-- -->%ENDSECTION{"Category"}%
+</verbatim>
+
+---++ Nosidebar 
+<verbatim class="tml">
+%STARTSECTION{"Nosidebar"}%%ENDSECTION{"Nosidebar"}%
+</verbatim>
+
+%DBCALL{"Applications.RenderFunctionCallers"}%
+
+---++ Copyright
+&copy; 2005-2011 http://michaeldaumconsulting.com
+
+%DBCALL{"Applications.GnuGeneralPublicLicense" section="notice"}%
+
+
+%META:FORM{name="Applications.ApplicationTopic"}%
+%META:FIELD{name="TopicType" title="TopicType" value="DocuTopic, TopicFunction"}%
+%META:FIELD{name="TopicTitle" attributes="" title="<nop>TopicTitle" value=""}%
+%META:FIELD{name="Summary" attributes="c" title="Summary" value="sidebar for the blog app"}%
+%META:FIELD{name="WikiApplication" attributes="" title="WikiApplication" value="BlogApp"}%
+%META:PREFERENCE{name="EDIT_TEMPLATE" title="EDIT_TEMPLATE" type="Set" value="Applications.WikiTopicEdit"}%

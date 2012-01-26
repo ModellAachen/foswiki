@@ -182,7 +182,7 @@ sub test_singlequoted_params {
     my $this = shift;
     my $text =
       $this->{test_topicObject}
-      ->expandMacros( "%INCLUDE{'Oneweb.SomeTopic' section='suction'}%" );
+      ->expandMacros("%INCLUDE{'Oneweb.SomeTopic' section='suction'}%");
     $this->assert_str_equals(
         "<span class='foswikiAlert'>
    Warning: Can't INCLUDE '<nop>'Oneweb.SomeTopic' section='suction'', path is empty or contains illegal characters. 
@@ -191,7 +191,7 @@ sub test_singlequoted_params {
 
     $text =
       $this->{test_topicObject}
-      ->expandMacros( '%INCLUDE{"I can\'t beleive its not butter"}%' );
+      ->expandMacros('%INCLUDE{"I can\'t beleive its not butter"}%');
     $this->assert_str_equals(
         "<span class='foswikiAlert'>
    Warning: Can't INCLUDE '<nop>I can't beleive its not butter', path is empty or contains illegal characters. 
@@ -290,7 +290,7 @@ sub test_docInclude {
     my $text = $this->{test_topicObject}->expandMacros("%INCLUDE{doc:$class}%");
     my $expected = <<"EXPECTED";
 
----+ =package= Foswiki::IncludeHandlers::doc
+---+ =internal package= Foswiki::IncludeHandlers::doc
 
 This package is designed to be lazy-loaded when Foswiki sees
 an INCLUDE macro with the doc: protocol. It implements a single

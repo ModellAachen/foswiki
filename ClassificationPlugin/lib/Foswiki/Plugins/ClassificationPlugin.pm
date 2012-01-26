@@ -32,17 +32,56 @@ $css = '<link rel="stylesheet" href="%PUBURLPATH%/%SYSTEMWEB%/ClassificationPlug
 sub initPlugin {
   ($baseTopic, $baseWeb) = @_;
 
-  Foswiki::Func::registerTagHandler('HIERARCHY', \&handleHIERARCHY);
-  Foswiki::Func::registerTagHandler('ISA', \&handleISA);
-  Foswiki::Func::registerTagHandler('SUBSUMES', \&handleSUBSUMES);
-  Foswiki::Func::registerTagHandler('SIMILARTOPICS', \&handleSIMILARTOPICS_DEPRECATED); # use SolrPlugin instead
-  Foswiki::Func::registerTagHandler('CATINFO', \&handleCATINFO);
-  Foswiki::Func::registerTagHandler('TAGINFO', \&handleTAGINFO);
-  Foswiki::Func::registerTagHandler('DISTANCE', \&handleDISTANCE);
+  Foswiki::Func::registerTagHandler('HIERARCHY', sub {
+    initCore();
+    return Foswiki::Plugins::ClassificationPlugin::Core::handleHIERARCHY(@_);
+  });
 
-  Foswiki::Func::registerRESTHandler('splitfacet', \&restSplitFacet );
-  Foswiki::Func::registerRESTHandler('renametag', \&restRenameTag );
-  Foswiki::Func::registerRESTHandler('normalizetags', \&restNormalizeTags );
+  Foswiki::Func::registerTagHandler('ISA', sub {
+    initCore();
+    return Foswiki::Plugins::ClassificationPlugin::Core::handleISA(@_);
+  });
+
+  Foswiki::Func::registerTagHandler('SUBSUMES', sub {
+    initCore();
+    return Foswiki::Plugins::ClassificationPlugin::Core::handleSUBSUMES(@_);
+  });
+
+  # WARNING: use SolrPlugin instead
+  Foswiki::Func::registerTagHandler('SIMILARTOPICS', sub {
+    initCore();
+    return Foswiki::Plugins::ClassificationPlugin::Core::handleSIMILARTOPICS(@_);
+  });
+
+  Foswiki::Func::registerTagHandler('CATINFO', sub {
+    initCore();
+    return Foswiki::Plugins::ClassificationPlugin::Core::handleCATINFO(@_);
+  });
+
+  Foswiki::Func::registerTagHandler('TAGINFO', sub {
+    initCore();
+    return Foswiki::Plugins::ClassificationPlugin::Core::handleTAGINFO(@_);
+  });
+
+  Foswiki::Func::registerTagHandler('DISTANCE', sub {
+    initCore();
+    return Foswiki::Plugins::ClassificationPlugin::Core::handleDISTANCE(@_);
+  });
+
+  Foswiki::Func::registerRESTHandler('splitfacet', sub {
+    initServices();
+    return Foswiki::Plugins::ClassificationPlugin::Services::splitFacet(@_);
+  });
+
+  Foswiki::Func::registerRESTHandler('renametag', sub {
+    initServices();
+    return Foswiki::Plugins::ClassificationPlugin::Services::renameTag(@_);
+  });
+
+  Foswiki::Func::registerRESTHandler('normalizetags', sub {
+    initServices();
+    return Foswiki::Plugins::ClassificationPlugin::Services::normalizeTags(@_);
+  });
 
   Foswiki::Contrib::DBCacheContrib::Search::addOperator(
     name=>'SUBSUMES', 
@@ -156,67 +195,6 @@ sub OP_isa {
 sub OP_distance {
   initCore();
   return Foswiki::Plugins::ClassificationPlugin::Core::OP_distance(@_);
-}
-
-###############################################################################
-sub handleHIERARCHY {
-  initCore();
-  return Foswiki::Plugins::ClassificationPlugin::Core::handleHIERARCHY(@_);
-}
-
-###############################################################################
-sub handleISA {
-  initCore();
-  return Foswiki::Plugins::ClassificationPlugin::Core::handleISA(@_);
-}
-
-###############################################################################
-sub handleSUBSUMES {
-  initCore();
-  return Foswiki::Plugins::ClassificationPlugin::Core::handleSUBSUMES(@_);
-}
-
-###############################################################################
-sub handleCATINFO {
-  initCore();
-  return Foswiki::Plugins::ClassificationPlugin::Core::handleCATINFO(@_);
-}
-
-###############################################################################
-sub handleTAGINFO {
-  initCore();
-  return Foswiki::Plugins::ClassificationPlugin::Core::handleTAGINFO(@_);
-}
-
-###############################################################################
-sub handleDISTANCE {
-  initCore();
-  return Foswiki::Plugins::ClassificationPlugin::Core::handleDISTANCE(@_);
-}
-
-###############################################################################
-sub handleSIMILARTOPICS_DEPRECATED {
-  initCore();
-  return Foswiki::Plugins::ClassificationPlugin::Core::handleSIMILARTOPICS(@_);
-}
-
-
-###############################################################################
-sub restSplitFacet {
-  initServices();
-  return Foswiki::Plugins::ClassificationPlugin::Services::splitFacet(@_);
-}
-
-###############################################################################
-sub restRenameTag {
-  initServices();
-  return Foswiki::Plugins::ClassificationPlugin::Services::renameTag(@_);
-}
-
-###############################################################################
-sub restNormalizeTags {
-  initServices();
-  return Foswiki::Plugins::ClassificationPlugin::Services::normalizeTags(@_);
 }
 
 1;

@@ -4,19 +4,19 @@
 %TMPL:INCLUDE{"edithelp"}%<!-- edithelp// -->
 %TMPL:INCLUDE{"editdialog"}%<!-- editdialog// -->
 %TMPL:INCLUDE{"uploadplugin"}%<!-- uploadplugin// -->
-%TMPL:DEF{"titleaction"}%(%IF{"defined 'rev'" 
+%TMPL:DEF{"titleaction"}%%IF{"defined 'rev'" 
   then="%MAKETEXT{"restore"}%" 
   else="%IF{"istopic '%WEB%.%TOPIC%'" 
     then="%MAKETEXT{"edit"}%" 
     else="%MAKETEXT{"new"}%"
   }%"
-}%)%TMPL:END%
+}%%TMPL:END%
 %TMPL:DEF{"pagetitlestylewrapper"}%<!-- backwards compatibility -->%TMPL:END%
 %TMPL:DEF{"contenttitle"}%<h1 class="natEditTitle">%IF{
   "istopic '%WEB%.%TOPIC%'" 
   then="[[%WEB%.%TOPIC%][%URLPARAM{"TopicTitle" default="%TMPL:P{"topictitle"}%"}%]]" 
   else="<nop>%URLPARAM{"TopicTitle" default="%TMPL:P{"topictitle"}%"}%"
-}% %TMPL:P{"titleaction"}%</h1>%TMPL:END%
+}% (%TMPL:P{"titleaction"}%)</h1>%TMPL:END%
 
 %TMPL:DEF{"topictitle"}%%TMPL:P{context="DBCachePluginEnabled" then="topictitle_dbcache" else="topictitle_default" hideautoinc="%hideautoinc%"}%%TMPL:END%
 %TMPL:DEF{"topictitle_default"}%%IF{"defined 'TOPICTITLE'" then="%TOPICTITLE%" else="%BASETOPIC%"}%%TMPL:END%
@@ -24,8 +24,8 @@
 %TMPL:DEF{"sig_textareabuttons"}%%TMPL:END%
 
 %TMPL:DEF{"content"}%<!-- -->
-%TMPL:P{"messages"}%<!-- -->
 %TMPL:P{"contenttitle"}%<!-- -->
+%TMPL:P{"messages"}%<!-- -->
 %TMPL:P{"formstart"}%<!-- -->
 %TMPL:P{"formattop"}%<!-- -->
 %TMPL:P{"tabpane"}%<!-- -->
@@ -69,10 +69,10 @@
 
 %TMPL:DEF{"messages"}%<div id="natEditMessageContainer"></div>%TMPL:END%
 
-%TMPL:DEF{"formend"}%<!-- formend -->
+%TMPL:DEF{"formend"}%<!-- -->
 <input type="hidden" name="forcenewrevision" value="%URLPARAM{"forcenewrevision"}%" />
 </form></div>
-<!-- //formend -->%TMPL:END%
+<!-- -->%TMPL:END%
 
 %TMPL:DEF{"help"}%%TMPL:P{"edithelp"}%%TMPL:END%
 %TMPL:DEF{"pagehelp"}%<!-- pagehelp-->

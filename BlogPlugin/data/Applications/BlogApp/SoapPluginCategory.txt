@@ -1,0 +1,9 @@
+%META:TOPICINFO{author="ProjectContributor" comment="" date="1278345446" format="1.1" version="1"}%
+%DBCALL{"Applications.ClassificationApp.RenderCategory"}%
+
+%META:FORM{name="Applications.ClassificationApp.Category"}%
+%META:FIELD{name="TopicType" title="TopicType" value="Category, CategorizedTopic, WikiTopic"}%
+%META:FIELD{name="TopicTitle" attributes="" title="<nop>TopicTitle" value="SoapPlugin"}%
+%META:FIELD{name="Summary" attributes="" title="Summary" value=""}%
+%META:FIELD{name="Category" attributes="" title="Category" value="SoftwareCategory"}%
+%META:FIELD{name="Icon" attributes="" title="Icon" value=""}%

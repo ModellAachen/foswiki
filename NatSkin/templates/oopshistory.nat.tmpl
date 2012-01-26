@@ -1,9 +1,9 @@
 %TMPL:INCLUDE{"history"}%
 
 %{ ################################################################################ }%
-%TMPL:DEF{"title"}%%TOPIC% (%MAKETEXT{"History"}%) - %WIKITOOLNAME%%TMPL:END%
+%TMPL:DEF{"titleaction"}%%MAKETEXT{"history"}%%TMPL:END%
 %TMPL:DEF{"headingstyle"}%natNoteHeading%TMPL:END%
-%TMPL:DEF{"breadcrumbstail"}%%TMPL:P{"sep"}%<a href="%SCRIPTURLPATH{"oops"}%/%BASEWEB%/%BASETOPIC%?template=oopshistory;%QUERYSTRING%">%MAKETEXT{"History"}%</a>%TMPL:END%
+%TMPL:DEF{"breadcrumbs::tail"}%%TMPL:P{"sep"}%<a href="%SCRIPTURLPATH{"oops"}%/%BASEWEB%/%BASETOPIC%?template=oopshistory;%QUERYSTRING%">%MAKETEXT{"History"}%</a>%TMPL:END%
 
 %{ ################################################################################ }%
 %TMPL:DEF{"message"}%<!-- -->

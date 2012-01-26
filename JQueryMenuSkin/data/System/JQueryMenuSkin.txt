@@ -1,14 +1,14 @@
-%META:TOPICINFO{author="ProjectContributor" date="1292936279" version="1.1"}%
+%META:TOPICINFO{author="ProjectContributor" date="1326323056" format="1.1" version="1"}%
 %META:TOPICPARENT{name="Skins"}%
----+!! !JQueryMenuSkin
+---+!! <nop>JQueryMenuSkin
 
-A functional skin that replaces the left bar with a customizable menu system based on the JQuery Superfish plugin.
+A functional skin that provides a customisable menu navigation system based on the JQuery Superfish plugin.
 
 %TOC%
 
 ---++ Overview
 
-JQueryMenuSkin is a simple JQuery-based skin which utilises the <a href="http://users.tpg.com.au/j_birch/plugins/superfish" target="_blank">Superfish menu plugin</a> (which is supplied with the JQueryPlugin extension) to provide an alternative menu-based navigation system for Foswiki users. 
+<nop>JQueryMenuSkin is a simple JQuery-based skin which utilises the <a href="http://users.tpg.com.au/j_birch/plugins/superfish" target="_blank">Superfish menu plugin</a> (which is supplied with the JQueryPlugin extension) to provide an alternative menu-based navigation system for Foswiki users. 
 
 This lightweight skin is designed to run on top of the default Pattern skin. (See [[#Settings][Settings]] section below for details) 
 
@@ -18,37 +18,43 @@ This lightweight skin is designed to run on top of the default Pattern skin. (Se
 
    * Install the skin using the [[%SCRIPTURL{"configure"}%?action=FindMoreExtensions][Install and Update Extensions]] %ICON{"lock"}% (Admins only)
    * Test if installed:
-      * Standalone:	%SCRIPTURL{"view"}%/%WEB%/%TOPIC%?skin=jqmenu
-      * With <nop>PatternSkin:	%SCRIPTURL{"view"}%/%WEB%/%TOPIC%?skin=jqmenu,pattern
+      * Standalone:   %SCRIPTURL{"view"}%/%WEB%/%TOPIC%?skin=jqmenu
+      * With <nop>PatternSkin:   %SCRIPTURL{"view"}%/%WEB%/%TOPIC%?skin=jqmenu,pattern
    * For skin activation see [[%SYSTEMWEB%.Skins]]
 
 ---++ Settings
 
 To activate the skin you can use the following settings just add them to [[%USERSWEB%.SitePreferences]], WebPreferences, or your personal page.
 
+The minimal requirement to use the skin is to set your *SKIN* definition to include *jqmenu* as shown: (Order is important!)
 <pre>
----++ JQueryMenuSkin Settings
-   * User Style settings
-      * <nop>Set USERSTYLEURL = !%PUBURL%/System/PatternSkinCssCookbookNoLeftBar/hideleftbar.css
-      * <nop>Set USERTHEMEURL = !%PUBURL%/System/JQueryMenuSkin/theme.css
-
-   * Global skin styles. To change the look of the site, point these variables to custom CSS attachments.
-      * <nop>Set FOSWIKI_STYLE_URL = !%PUBURL%/System/JQueryMenuSkin/style.css
-      * <nop>Set FOSWIKI_COLORS_URL = !%PUBURL%/System/JQueryMenuSkin/colors.css
-
-   * Skins to apply
       * <nop>Set SKIN = jqmenu,pattern
 </pre>
 
----++ Customization
+Typically this skin is used where the Web Left Bar is hidden. You should set the following in the same location as you defined the *SKIN* setting above if you wish to hide the (details of how to do this can be found here: System.PatternSkinCssCookbookNoLeftBar)
 
-In order to be able to safely upgrade this skin it is recommended that you define your own menu by copying the topic [[%SYSTEMWEB%.JQueryMenuSkinBarDefault]] to something of your own preference. You can define the name of the topic using a preference setting in [[%USERSWEB%.SitePreferences]], WebPreferences, or your personal page. 
+---++ Customisation
+
+In order to be able to safely upgrade this skin it is recommended that you define your own menu by copying the topic [[%SYSTEMWEB%.JQueryMenuSkinBarDefault]] to a new topic of your preference. You can define the name of the topic using a [[%SYSTEMWEB%.PreferenceSettings][Preference]] setting in [[%USERSWEB%.SitePreferences]], WebPreferences, or your personal home topic as follows: 
 
 <pre>
    * <nop>Set JQUERYMENUSKINBAR = %<nop>USERSWEB%.MyMenuBar
 </pre>
 
-%I% WYSIWYG editing should be disabled on your personalized topic to ensure the menu does not get corrupted. See TinyMCEPlugin on how to do this.
+%I% WYSIWYG editing should be disabled on your personalised topic to ensure the menu does not get corrupted. You can do this as follows in your customised menu topic: (See %SYSTEMWEB%.TinyMCEPlugin for full details)
+
+<pre>
+   * <nop>Set TINYMCEPLUGIN_DISABLE = 1
+</pre>
+
+---+++ CSS Styling
+You can also customise the CSS applied to the menu by copying the default *menu.css* file %PUBURL%/%SYSTEMWEB%/%TOPIC%BarDefault/menu.css and attaching it to your customised  menu topic as follows:
+
+<pre>
+   * Set <nop>JQUERYMENUSKINCSS = %<nop>PUBURLPATH%/%<nop>USERSWEB%/MyMenuBar/menu.css
+</pre>
+
+You can also simply overwrite CSS for the default menu definition JQueryMenuSkinBarDefault with the above setting.
 
 ---++ Installation Instructions
 
@@ -57,7 +63,7 @@ In order to be able to safely upgrade this skin it is recommended that you defin
 ---++ Info
 
 |  Author(s): | Padraig Lennon |
-|  Copyright: | &copy; Padraig Lennon |
+|  Copyright: | &copy; Foswiki:Main.PadraigLennon |
 |  Screenshot: | <a href="%ATTACHURL%/screenshot.png"><img src="%ATTACHURL%/screenshot.png" style="border:1px solid #eee;" alt="Click for full screen image" width="600" /></a> |
 |  Preview: | [[%SCRIPTURL{view}%/%WEB%/%TOPIC%?skin=jqmenu][Preview with this skin]] |
 |  Base Name: | jqmenu |
@@ -65,13 +71,14 @@ In order to be able to safely upgrade this skin it is recommended that you defin
 |  Release: | %$RELEASE% |
 |  Version: | %$VERSION% |
 |  Change History: | <!-- versions below in reverse order -->&nbsp; |
+|  11 Jan 2012: | Foswiki:Tasks.Item10244 (v0.1.0) |
 |  27 Dec 2010: | Foswiki:Tasks.Item10180 (v0.0.5) |
 |  23 Dec 2010: | Foswiki:Tasks.Item10180 (v0.0.4) |
 |  22 Dec 2010: | Foswiki:Tasks.Item10180 (v0.0.3) |
 |  21 Dec 2010: | Added missing arrows (v0.0.2) |
 |  21 Dec 2010: | Initial version (v0.0.1) |
 |  Dependencies: | %$DEPENDENCIES% |
-|  Home page: | http://foswiki.org/bin/view/Extensions/JQueryMenuSkin |
-|  Support: | http://foswiki.org/bin/view/Support/JQueryMenuSkin |
+|  Home page: | Foswiki:Extensions.JQueryMenuSkin |
+|  Support: | Foswiki:Support.JQueryMenuSkin |
 
-%META:FILEATTACHMENT{name="screenshot.png" attr="h" autoattached="1" comment="" date="1292936279" path="screenshot.png" size="8839" user="ProjectContributor" version=""}%
+%META:FILEATTACHMENT{name="screenshot.png" attr="h" autoattached="1" comment="" date="1326323056" path="screenshot.png" size="8839" user="ProjectContributor" version=""}%

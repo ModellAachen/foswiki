@@ -41,5 +41,3 @@ templates/formplugin.dojo.tmpl 0666 (deprecated)
 templates/formplugin.jquery.tmpl 0666 (deprecated)
 templates/formplugin.pattern.tmpl 0666 (deprecated)
 templates/formplugin.tmpl 0666
-test/unit/FormPlugin/FormPluginSuite.pm 0666
-test/unit/FormPlugin/FormPluginTests.pm 0666

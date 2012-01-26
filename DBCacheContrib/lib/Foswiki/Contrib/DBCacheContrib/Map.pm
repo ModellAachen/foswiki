@@ -55,32 +55,13 @@ use Assert;
 # Tie::Hash, except TIEHASH, and must implement new(). Additional new()
 # parameters are passed by name.
 # Parameters required to be supported by new() in subclasses are as follows:
-#    * =archivist= - reference to an object that implements
-#      Foswiki::Contrib::DBCacheContrib::Archivist
-#    * =existing= - if defined, reference to an existing object that implements
-#      the class being tied to.
 #    * =initial= - initial string representing the contents of the map as
 #      a space-separated list of equals-separated settings e.g. "a=1 b=2"
-# If =existing= is defined, then =archivist= will be ignored.
-# For example,
-# =my $obj = new Foswiki::Contrib::DBCacheContrib::MemMap(initial=>"a=1 b=2")=
-# will create a new MemMap that is not tied to a backing archive and has the
-# initial content { a => 1, b => 2 }
-# =tie(%map, ref($obj), existing=>$obj)= will tie %map to $obj so you can
-# refer to $map{a} and $map{b}.
 
 sub new {
     my $class = shift;
-    ASSERT( scalar(@_) % 2 == 0 ) if DEBUG;
     my %args = @_;
     my $this = bless( {}, $class );
-    if ( $args{existing} ) {
-        ASSERT( UNIVERSAL::isa( $args{existing}, __PACKAGE__ ) ) if DEBUG;
-        $this->setArchivist( $args{existing}->getArchivist() );
-    }
-    elsif ( $args{archivist} ) {
-        $this->setArchivist( $args{archivist} );
-    }
     if ( $args{initial} ) {
         if (ref($args{initial}) eq 'HASH') {
             while (my ($k, $v) = each %{$args{initial}}) {
@@ -97,10 +78,6 @@ sub TIEHASH {
     my $class = shift;
     ASSERT( scalar(@_) % 2 == 0 ) if DEBUG;
     my %args = @_;
-    if ( $args{existing} ) {
-        ASSERT( UNIVERSAL::isa( $args{existing}, __PACKAGE__ ) ) if DEBUG;
-        return $args{existing};
-    }
     return $class->new(@_);
 }
 

@@ -76,9 +76,32 @@ sub prompt {
             $topic = $target;
         }
     }
+    return _alert("Target web does not exist: '$web'")
+      unless ( Foswiki::Func::webExists($web) );
 
-    # Build the endpoint before we munge the web and topic
+    # see if an alternate return is specified.  Sanitize and set the endpoint
+    # if set.
+    my $endPointReq = $attrs->{redirectto} || '';
     my $endPoint = "$web.$topic";
+
+    if ($endPointReq) {
+        my $epParam = '';
+
+        # extract ur
+        if ( $endPointReq =~ s/([\?\#].*)$// ) {
+            $epParam = $1;
+        }
+        my ( $epWeb, $epTopic ) =
+          Foswiki::Func::normalizeWebTopicName( $web, $endPointReq );
+
+        if ( Foswiki::Func::topicExists( $epWeb, $epTopic ) ) {
+            $endPoint = $epWeb . '/' . $epTopic . $epParam;
+        }
+        else {
+            return _alert(
+                "redirectto location does not exist: '$epWeb.$epTopic'");
+        }
+    }
 
     # See if a save url has been defined in the template
     my $url = Foswiki::Func::expandTemplate('save_url');
@@ -198,6 +221,21 @@ sub save {
 
     my ( $text, $web, $topic ) = @_;
 
+    $text = '' unless defined $text;
+
+    my $query = Foswiki::Func::getCgiQuery();
+    return undef unless $query;
+
+    unless ( $Foswiki::cfg{Plugins}{CommentPlugin}{GuestCanComment} ) {
+        unless ( Foswiki::Func::getContext()->{'authenticated'} ) {
+            my $authRest =
+              Foswiki::Func::getScriptUrl( undef, undef, 'restauth' )
+              . '/CommentPlugin/comment';
+            Foswiki::Func::redirectCgiQuery( undef, $authRest, 1 );
+            throw Error::Simple('restauth-redirect');
+        }
+    }
+
     my $wikiName = Foswiki::Func::getWikiName();
     my $mode     = $Foswiki::cfg{Plugins}{CommentPlugin}{RequiredForSave}
       || 'change';
@@ -207,17 +245,9 @@ sub save {
     unless ($access) {
 
         # user has no permission to change the topic
-        throw Foswiki::AccessControlException(
-            $mode,
-            $wikiName,
-            web   => $web,
-            topic => $topic,
-            ''
-        );
+        throw Foswiki::AccessControlException( $mode, $wikiName, $web, $topic,
+            'Comment on topic not permitted' );
     }
-
-    my $query = Foswiki::Func::getCgiQuery();
-    return unless $query;
 
     # The type of the comment dictates where in the target topic it
     # will be saved.
@@ -266,30 +296,6 @@ sub save {
     $output = Foswiki::Func::expandVariablesOnTopicCreation($output);
 
     $output = '' unless defined($output);
-
-    # SMELL: Reverse the process that inserts meta-data just performed
-    # by the Foswiki core, but this time without the support of the
-    # methods in the core. Fortunately this will work even if there is
-    # no embedded meta-data.
-    my $premeta   = '';
-    my $postmeta  = '';
-    my $inpost    = 0;
-    my $innerText = '';
-    foreach my $line ( split( /\r?\n/, $text ) ) {
-        if ( $line =~ /^%META:[A-Z]+{[^}]*}%$/ ) {
-            if ($inpost) {
-                $postmeta .= $line . "\n";
-            }
-            else {
-                $premeta .= $line . "\n";
-            }
-        }
-        else {
-            $innerText .= $line . "\n";
-            $inpost = 1;
-        }
-    }
-    $text = $innerText;
 
     #make sure the anchor or location exits
     if ( defined($location) and not( $text =~ /(?<!location\=\")($location)/ ) )
@@ -367,7 +373,7 @@ sub save {
         $text =~ s/(%COMMENT({.*?})?%)/_remove_nth($1,\$idx,$remove)/eg;
     }
 
-    return $premeta . $text . $postmeta;
+    return $text;
 }
 
 # PRIVATE embed output if this comment is the interesting one
@@ -398,7 +404,7 @@ sub _remove_nth {
 __END__
 Foswiki - The Free and Open Source Wiki, http://foswiki.org/
 
-Copyright (C) 2008-2010 Foswiki Contributors. Foswiki Contributors
+Copyright (C) 2008-2012 Foswiki Contributors. Foswiki Contributors
 are listed in the AUTHORS file in the root of this distribution.
 NOTE: Please extend that file, not this notice.
 

@@ -1,25 +1,24 @@
 # See bottom of file for license and copyright information
+package EditTablePluginTests;
 use strict;
 use warnings;
 
 # tests for basic formatting
 
-package EditTablePluginTests;
-
-use FoswikiFnTestCase;
+use FoswikiFnTestCase();
 our @ISA = qw( FoswikiFnTestCase );
 
 use strict;
 use warnings;
-use Foswiki::UI::Save;
+use Foswiki::UI::Save();
+use Foswiki::Plugins::EditTablePlugin();
+use Foswiki::Plugins::EditTablePlugin::Core();
+use Foswiki::Plugins::EditTablePlugin::EditTableData();
 use Error qw( :try );
-use Foswiki::Plugins::EditTablePlugin;
-use Foswiki::Plugins::EditTablePlugin::Core;
-use Foswiki::Plugins::EditTablePlugin::EditTableData;
 
 sub new {
-    my $self = shift()->SUPER::new( 'EditTableFunctions', @_ );
-    return $self;
+    my ($class, @args) = @_;
+    return $class->SUPER::new( 'EditTableFunctions', @args );
 }
 
 sub set_up {
@@ -33,7 +32,9 @@ sub set_up {
     $Foswiki::cfg{Plugins}{TablePlugin}{DefaultAttributes} =
 'tableborder="1" valign="top" headercolor="#fff" headerbg="#687684" headerbgsorted="#334455" databg="#ddd,#edf4f9" databgsorted="#f1f7fc,#ddebf6" tablerules="rows" headerrules="cols"';
 
-    $ENV{SCRIPT_NAME} = '';    #  required by fake sort URLs in expected text
+    local $ENV{SCRIPT_NAME} = '';    #  required by fake sort URLs in expected text
+
+    return;
 }
 
 =pod
@@ -50,6 +51,8 @@ sub trimSpaces {
 
     $_[0] =~ s/^[[:space:]]+//s;    # trim at start
     $_[0] =~ s/[[:space:]]+$//s;    # trim at end
+
+    return;
 }
 
 =pod
@@ -80,6 +83,8 @@ sub do_testHtmlOutput {
     $actual   =~ s/rules\=\"*(cols|rows|all)\"*//go;
 
     $this->assert_html_equals( $expected, $actual );
+
+    return;
 }
 
 =pod
@@ -101,7 +106,7 @@ sub test_render_simple_before_after {
       . $Foswiki::cfg{SystemWebName};
 
     my $input    = 'BEFORE %EDITTABLE{}% AFTER';
-    my $expected = <<END;
+    my $expected = <<"END";
 BEFORE AFTER<a name="edittable1"></a>
 <div class="editTable">
 <form name="edittable1" action="$viewUrlAuth#edittable1" method="post">
@@ -117,6 +122,8 @@ END
     my $result =
       Foswiki::Func::expandCommonVariables( $input, $topicName, $webName );
     $this->do_testHtmlOutput( $expected, $result, 0 );
+
+    return;
 }
 
 =pod
@@ -140,7 +147,7 @@ sub test_render_simple_pre {
     my $input = '%EDITTABLE{}%
    | ABCDEF |
    | QWERTY |';
-    my $expected = <<END;
+    my $expected = <<"END";
 <a name="edittable1"></a>
 <div class="editTable">
 <form name="edittable1" action="$viewAuthUrl#edittable1" method="post">
@@ -158,6 +165,8 @@ END
     my $result =
       Foswiki::Func::expandCommonVariables( $input, $topicName, $webName );
     $this->do_testHtmlOutput( $expected, $result, 0 );
+
+    return;
 }
 
 =pod
@@ -179,7 +188,7 @@ sub test_render_simple {
       . $Foswiki::cfg{SystemWebName};
 
     my $input    = '%EDITTABLE{}%';
-    my $expected = <<END;
+    my $expected = <<"END";
 <a name="edittable1"></a>
 <div class="editTable">
 <form name="edittable1" action="$viewUrlAuth#edittable1" method="post">
@@ -195,6 +204,8 @@ END
     my $result =
       Foswiki::Func::expandCommonVariables( $input, $topicName, $webName );
     $this->do_testHtmlOutput( $expected, $result, 0 );
+
+    return;
 }
 
 =pod
@@ -215,13 +226,13 @@ sub test_do_not_add_newline {
       . Foswiki::Func::getPubUrlPath() . '/'
       . $Foswiki::cfg{SystemWebName};
 
-    my $input = <<INPUT;
+    my $input = <<'INPUT';
 %EDITTABLE{}%
 | *text* |
 
 LINE
 INPUT
-    my $query = new Unit::Request(
+    my $query = Unit::Request->new(
         {
             etedit    => ['on'],
             ettablenr => ['1'],
@@ -230,10 +241,9 @@ INPUT
 
     $query->path_info("/$webName/$topicName");
 
-    my $fatwilly = new Foswiki( undef, $query );
-    $Foswiki::Plugins::SESSION = $fatwilly;
+    $this->createNewFoswikiSession( undef, $query );
 
-    $query = new Unit::Request(
+    $query = Unit::Request->new(
         {
             etsave    => ['on'],
             ettablenr => ['1'],
@@ -246,9 +256,8 @@ INPUT
     Foswiki::Func::saveTopic( $this->{test_web}, $this->{test_topic}, undef,
         $input );
 
-    $fatwilly = new Foswiki( undef, $query );
-    my $response = new Unit::Response;
-    $Foswiki::Plugins::SESSION = $fatwilly;
+    $this->createNewFoswikiSession( undef, $query );
+    my $response = Unit::Response->new();
 
     my ( $saveResult, $ecode ) = $this->capture(
         sub {
@@ -262,7 +271,7 @@ INPUT
 
     my ( $meta, $newtext ) = Foswiki::Func::readTopic( $webName, $topicName );
 
-    my $expected = <<NEWEXPECTED;
+    my $expected = <<'NEWEXPECTED';
 %EDITTABLE{}%
 | *text* |
 
@@ -270,7 +279,7 @@ LINE
 NEWEXPECTED
     $this->assert_str_equals( $expected, $newtext, 0 );
 
-    $fatwilly->finish();
+    return;
 }
 
 =pod
@@ -294,7 +303,7 @@ sub test_param_editbutton {
     Foswiki::Func::saveTopic( $webName, $topicName, undef, "XXX" );
 
     my $input    = '%EDITTABLE{editbutton="Edit me"}%';
-    my $expected = <<END;
+    my $expected = <<"END";
 <a name="edittable1"></a>
 <div class="editTable">
 <form name="edittable1" action="$viewUrlAuth#edittable1" method="post">
@@ -311,6 +320,8 @@ END
       Foswiki::Func::expandCommonVariables( $input, $topicName, $webName );
 
     $this->do_testHtmlOutput( $expected, $result, 0 );
+
+    return;
 }
 
 =pod
@@ -331,14 +342,14 @@ sub test_editSimple {
       . Foswiki::Func::getPubUrlPath() . '/'
       . $Foswiki::cfg{SystemWebName};
 
-    my $query = new Unit::Request(
+    my $query = Unit::Request->new(
         {
             etedit    => ['on'],
             ettablenr => ['1'],
         }
     );
 
-    my $text = <<INPUT;
+    my $text = <<'INPUT';
 %EDITTABLE{}%
 INPUT
 
@@ -346,7 +357,7 @@ INPUT
       Foswiki::Func::expandCommonVariables( $text, $topicName, $webName,
         undef );
 
-    my $expected = <<EXPECTED;
+    my $expected = <<"EXPECTED";
 <a name="edittable1"></a>
 <div class="editTable">
 <form name="edittable1" action="$viewUrlAuth#edittable1" method="post">
@@ -361,6 +372,8 @@ INPUT
 EXPECTED
 
     $this->do_testHtmlOutput( $expected, $result, 0 );
+
+    return;
 }
 
 =pod
@@ -379,11 +392,11 @@ sub test_param_format_edit {
     my $pubUrlSystemWeb =
       Foswiki::Func::getPubUrlPath() . '/' . $Foswiki::cfg{SystemWebName};
 
-    my $input = <<INPUT;
+    my $input = <<'INPUT';
 %EDITTABLE{format="| row, -1 | text, 10, init | textarea, 3x10, init | select, 3, option 1, option 2, option 3 | radio, 3, A, B, C, D, E | checkbox, 3, A, B, C, D, E | label, 0, LABEL | date,11,,%d %b %Y |"}%
 INPUT
 
-    my $query = new Unit::Request(
+    my $query = Unit::Request->new(
         {
             etedit    => ['on'],
             ettablenr => ['1'],
@@ -392,14 +405,13 @@ INPUT
 
     $query->path_info("/$webName/$topicName");
 
-    my $fatwilly = new Foswiki( undef, $query );
-    $Foswiki::Plugins::SESSION = $fatwilly;
+    $this->createNewFoswikiSession( undef, $query );
 
     my $result =
       Foswiki::Func::expandCommonVariables( $input, $this->{test_topic},
         $this->{test_web}, undef );
 
-    my $expected = <<EXPECTED;
+    my $expected = <<"EXPECTED";
 %TABLE{disableallsort="on" databg="#fff"}%
 <noautolink>
 <a name="edittable1"></a>
@@ -420,7 +432,8 @@ INPUT
 </div><!-- /editTable --></noautolink>
 EXPECTED
     $this->do_testHtmlOutput( lc $expected, lc $result, 0 );
-    $fatwilly->finish();
+
+    return;
 }
 
 =pod
@@ -441,12 +454,12 @@ sub test_editAddRow {
       . Foswiki::Func::getPubUrlPath() . '/'
       . $Foswiki::cfg{SystemWebName};
 
-    my $input = <<INPUT;
+    my $input = <<'INPUT';
 %EDITTABLE{format="| row, -1 | text, 10, init|"}%
 | 0 | init |
 INPUT
 
-    my $query = new Unit::Request(
+    my $query = Unit::Request->new(
         {
             etedit    => ['on'],
             ettablenr => ['1'],
@@ -455,15 +468,14 @@ INPUT
 
     $query->path_info("/$webName/$topicName");
 
-    my $fatwilly = new Foswiki( undef, $query );
-    $Foswiki::Plugins::SESSION = $fatwilly;
+    $this->createNewFoswikiSession( undef, $query );
 
     my $expected = '';
     my $result =
       Foswiki::Func::expandCommonVariables( $input, $this->{test_topic},
         $this->{test_web}, undef );
 
-    $expected = <<EXPECTED;
+    $expected = <<"EXPECTED";
 %TABLE{disableallsort="on" databg="#fff"}%
 <noautolink>
 <a name="edittable1"></a>
@@ -487,7 +499,7 @@ EXPECTED
     $this->do_testHtmlOutput( $expected, $result, 0 );
 
     # Add 1 row
-    $query = new Unit::Request(
+    $query = Unit::Request->new(
         {
             etedit    => ['on'],
             etaddrow  => ['1'],
@@ -499,14 +511,13 @@ EXPECTED
 
     $query->path_info("/$webName/$topicName");
 
-    $fatwilly = new Foswiki( undef, $query );
-    $Foswiki::Plugins::SESSION = $fatwilly;
+    $this->createNewFoswikiSession( undef, $query );
 
     $result =
       Foswiki::Func::expandCommonVariables( $input, $this->{test_topic},
         $this->{test_web}, undef );
 
-    $expected = <<EXPECTED;
+    $expected = <<"EXPECTED";
 <nop>
 <noautolink>
 <a name="edittable1"></a>
@@ -541,7 +552,7 @@ EXPECTED
 
     $this->do_testHtmlOutput( $expected, $result, 1 );
 
-    $fatwilly->finish();
+    return;
 }
 
 sub test_delete_last_row {
@@ -556,7 +567,7 @@ sub test_delete_last_row {
       . Foswiki::Func::getPubUrlPath() . '/'
       . $Foswiki::cfg{SystemWebName};
 
-    my $input = <<INPUT;
+    my $input = <<'INPUT';
 %TABLE{headerrows="1" footerrows="1"}%
 %EDITTABLE{header="| *HEADER* |"}%
 | *HEADER* |
@@ -566,7 +577,7 @@ sub test_delete_last_row {
 | *FOOTER* |
 INPUT
 
-    my $query = new Unit::Request(
+    my $query = Unit::Request->new(
         {
             etedit    => ['on'],
             ettablenr => ['1'],
@@ -574,7 +585,7 @@ INPUT
     );
 
     # delete row
-    $query = new Unit::Request(
+    $query = Unit::Request->new(
         {
             etedit    => ['on'],
             etdelrow  => ['1'],
@@ -584,14 +595,13 @@ INPUT
 
     $query->path_info("/$webName/$topicName");
 
-    my $fatwilly = new Foswiki( undef, $query );
-    $Foswiki::Plugins::SESSION = $fatwilly;
+    $this->createNewFoswikiSession( undef, $query );
 
     my $result =
       Foswiki::Func::expandCommonVariables( $input, $this->{test_topic},
         $this->{test_web}, undef );
 
-    my $expected = <<EXPECTED;
+    my $expected = <<"EXPECTED";
 <nop>
 <noautolink>
 <a name="edittable1"></a>
@@ -636,7 +646,7 @@ EXPECTED
 
     $this->do_testHtmlOutput( $expected, $result, 1 );
 
-    $fatwilly->finish();
+    return;
 }
 
 =pod
@@ -657,7 +667,7 @@ sub test_param_format_selectbox {
       . Foswiki::Func::getPubUrlPath() . '/'
       . $Foswiki::cfg{SystemWebName};
 
-    my $query = new Unit::Request(
+    my $query = Unit::Request->new(
         {
             etedit    => ['on'],
             ettablenr => ['1'],
@@ -665,18 +675,17 @@ sub test_param_format_selectbox {
     );
     $query->path_info("/$webName/$topicName");
 
-    my $text = <<INPUT;
+    my $text = <<'INPUT';
 %EDITTABLE{format="|select, 1, a, b, c, d|select,1,a,b,c,d|select,1 ,a , b, c, d|select, 1 , a , b , c , d |" }%
 | c | c | c | c |
 INPUT
 
-    my $fatwilly = new Foswiki( undef, $query );
-    $Foswiki::Plugins::SESSION = $fatwilly;
+    $this->createNewFoswikiSession( undef, $query );
     my $result =
       Foswiki::Func::expandCommonVariables( $text, $topicName, $webName,
         undef );
 
-    my $expected = <<END;
+    my $expected = <<"END";
 <nop>
 <noautolink>
 <a name="edittable1"></a>
@@ -708,7 +717,8 @@ INPUT
 END
 
     $this->do_testHtmlOutput( $expected, $result, 1 );
-    $fatwilly->finish();
+
+    return;
 }
 
 =pod
@@ -727,7 +737,7 @@ sub test_param_format_variable_expansion_in_checkbox_and_radio_buttons {
     my $pubPathSystemWeb =
       Foswiki::Func::getPubUrlPath() . '/' . $Foswiki::cfg{SystemWebName};
 
-    my $query = new Unit::Request(
+    my $query = Unit::Request->new(
         {
             etedit    => ['on'],
             ettablenr => ['1'],
@@ -735,17 +745,16 @@ sub test_param_format_variable_expansion_in_checkbox_and_radio_buttons {
     );
     $query->path_info("/$webName/$topicName");
 
-    my $text = <<INPUT;
+    my $text = <<'INPUT';
 %EDITTABLE{format="| radio, 1, :skull:, :cool: | checkbox, 1, :skull:, :cool: |"}%
 INPUT
 
-    my $fatwilly = new Foswiki( undef, $query );
-    $Foswiki::Plugins::SESSION = $fatwilly;
+    $this->createNewFoswikiSession( undef, $query );
     my $result =
       Foswiki::Func::expandCommonVariables( $text, $topicName, $webName,
         undef );
 
-    my $expected = <<END;
+    my $expected = <<"END";
 <nop>
 <noautolink>
 <a name="edittable1"></a>
@@ -775,7 +784,8 @@ INPUT
 END
 
     $this->do_testHtmlOutput( $expected, $result, 1 );
-    $fatwilly->finish();
+
+    return;
 }
 
 =pod
@@ -802,7 +812,7 @@ sub test_param_format_with_variables {
       . Foswiki::Func::getPubUrlPath() . '/'
       . $Foswiki::cfg{SystemWebName};
 
-    my $text = <<INPUT;
+    my $text = <<'INPUT';
 %EDITTABLE{format="| text, 30, %Y% | text, 30, %TOPIC% |"}%
 | %Y% | %TOPIC% |
 INPUT
@@ -811,7 +821,7 @@ INPUT
       Foswiki::Func::expandCommonVariables( $text, $topicName, $webName,
         undef );
 
-    my $expected = <<END;
+    my $expected = <<"END";
 <a name="edittable1"></a>
 <div class="editTable">
 <form name="edittable1" action="$viewUrlAuth#edittable1" method="post">
@@ -837,6 +847,8 @@ END
     $expected =~ s/%SYSTEMWEB%/$Foswiki::cfg{SystemWebName}/g;
 
     $this->do_testHtmlOutput( $expected, $result, 1 );
+
+    return;
 }
 
 =pod
@@ -858,11 +870,11 @@ sub test_param_format_with_macro_placeholders_edit {
       . $Foswiki::cfg{SystemWebName};
     my $userName = $this->{users_web} . '.' . 'WikiGuest';
 
-    my $text = <<INPUT;
+    my $text = <<"INPUT";
 %EDITTABLE{format="| text, 30, \$percntY\$percnt | text, 30, \$percntTOPIC\$percnt |"}%
 INPUT
 
-    my $query = new Unit::Request(
+    my $query = Unit::Request->new(
         {
             etedit    => ['on'],
             ettablenr => ['1'],
@@ -870,13 +882,12 @@ INPUT
     );
     $query->path_info("/$webName/$topicName");
 
-    my $fatwilly = new Foswiki( undef, $query );
-    $Foswiki::Plugins::SESSION = $fatwilly;
+    $this->createNewFoswikiSession( undef, $query );
     my $result =
       Foswiki::Func::expandCommonVariables( $text, $topicName, $webName,
         undef );
 
-    my $expected = <<END;
+    my $expected = <<"END";
 <nop>
 <noautolink>
 <a name="edittable1"></a>
@@ -907,7 +918,7 @@ END
 
     $this->do_testHtmlOutput( $expected, $result, 1 );
 
-    $fatwilly->finish();
+    return;
 }
 
 =pod
@@ -928,12 +939,12 @@ sub test_save {
       . Foswiki::Func::getPubUrlPath() . '/'
       . $Foswiki::cfg{SystemWebName};
 
-    my $input = <<INPUT;
+    my $input = <<'INPUT';
 %EDITTABLE{}%
 | *URL* | *Name* | *By* | *Comment* |
 | http://foswiki.org | Foswiki | me | dodo |
 INPUT
-    my $query = new Unit::Request(
+    my $query = Unit::Request->new(
         {
             etedit    => ['on'],
             ettablenr => ['1'],
@@ -942,10 +953,9 @@ INPUT
 
     $query->path_info("/$webName/$topicName");
 
-    my $fatwilly = new Foswiki( undef, $query );
-    $Foswiki::Plugins::SESSION = $fatwilly;
+    $this->createNewFoswikiSession( undef, $query );
 
-    $query = new Unit::Request(
+    $query = Unit::Request->new(
         {
             etsave    => ['on'],
             ettablenr => ['1'],
@@ -958,9 +968,8 @@ INPUT
     Foswiki::Func::saveTopic( $this->{test_web}, $this->{test_topic}, undef,
         $input );
 
-    $fatwilly = new Foswiki( undef, $query );
-    my $response = new Unit::Response;
-    $Foswiki::Plugins::SESSION = $fatwilly;
+    $this->createNewFoswikiSession( undef, $query );
+    my $response = Unit::Response->new();
 
     my ( $saveResult, $ecode ) = $this->capture(
         sub {
@@ -974,14 +983,14 @@ INPUT
 
     my ( $meta, $newtext ) = Foswiki::Func::readTopic( $webName, $topicName );
 
-    my $expected = <<NEWEXPECTED;
+    my $expected = <<'NEWEXPECTED';
 %EDITTABLE{}%
 | *URL* | *Name* | *By* | *Comment* |
 | http://foswiki.org | Foswiki | me | dodo |
 NEWEXPECTED
     $this->assert_str_equals( $expected, $newtext, 0 );
 
-    $fatwilly->finish();
+    return;
 }
 
 =pod
@@ -1004,7 +1013,7 @@ sub _DEPRECATED_test_param_headerrows_and_footerrows_save {
       . Foswiki::Func::getPubUrlPath() . '/'
       . $Foswiki::cfg{SystemWebName};
 
-    my $input = <<INPUT;
+    my $input = <<'INPUT';
 %TABLE{columnwidths="80,80,50,110,150,50,50,50,50,50,70,70,50" dataalign="left,left,center,left,left,center,center,center,center,center,center,right,right,center" headeralign="center" headerrows="1" footerrows="1" headerislabel="on"}%%EDITTABLE{format="|text,10|text,10|text,3|text,15|text,15|text,3|text,3|text,3|text,3|text,3|text,3|text,10|label,0|text,5|" }%
 | *Project* | *Customer* | *Pass* | *Type* | *Purpose* | *Qty* | *Radios* | *Controllers* | *Hubs* | *Tuners* | *Hybrid* | *Unit Cost (USD)* | *Total Cost (USD)* | *When (Q)* |
 | Project A | Engineering | A | PK2 | Eng Test | 2 | 4 || 2 | 2 || 6214 | %CALC{"\$EVAL(\$T(R\$ROW():C6) * \$T(R\$ROW():C\$COLUMN(-1)))"}% | Q1 |
@@ -1013,7 +1022,7 @@ sub _DEPRECATED_test_param_headerrows_and_footerrows_save {
 | Project D | SW | P1 | CT5 | SW Dev | 2 | 4 | 2 || 2 || 6345 | %CALC{"\$EVAL(\$T(R\$ROW():C6) * \$T(R\$ROW():C\$COLUMN(-1)))"}% | Q4 |
 | Total ||||| *%CALC{"\$SUM(\$ABOVE())"}%* | *%CALC{"\$SUMPRODUCT(R2:C6..R\$ROW(-1):C6, R2:C\$COLUMN(0)..R\$ROW(-1):C\$COLUMN(0))"}%* | *%CALC{"\$SUMPRODUCT(R2:C6..R\$ROW(-1):C6, R2:C\$COLUMN(0)..R\$ROW(-1):C\$COLUMN(0))"}%* | *%CALC{"\$SUMPRODUCT(R2:C6..R\$ROW(-1):C6, R2:C\$COLUMN(0)..R\$ROW(-1):C\$COLUMN(0))"}%* | *%CALC{"\$SUMPRODUCT(R2:C6..R\$ROW(-1):C6, R2:C\$COLUMN(0)..R\$ROW(-1):C\$COLUMN(0))"}%* | *%CALC{"\$SUMPRODUCT(R2:C6..R\$ROW(-1):C6, R2:C\$COLUMN(0)..R\$ROW(-1):C\$COLUMN(0))"}%* || *%CALC{"\$SUM(\$ABOVE())"}%* ||
 INPUT
-    my $query = new Unit::Request(
+    my $query = Unit::Request->new(
         {
             etedit    => ['on'],
             ettablenr => ['1'],
@@ -1022,10 +1031,9 @@ INPUT
 
     $query->path_info("/$webName/$topicName");
 
-    my $fatwilly = new Foswiki( undef, $query );
-    $Foswiki::Plugins::SESSION = $fatwilly;
+    $this->createNewFoswikiSession( undef, $query );
 
-    $query = new Unit::Request(
+    $query = Unit::Request->new(
         {
             etsave    => ['on'],
             etaddrow  => ['1'],
@@ -1039,9 +1047,8 @@ INPUT
     Foswiki::Func::saveTopic( $this->{test_web}, $this->{test_topic}, undef,
         $input );
 
-    $fatwilly = new Foswiki( undef, $query );
-    my $response = new Unit::Response;
-    $Foswiki::Plugins::SESSION = $fatwilly;
+    $this->createNewFoswikiSession( undef, $query );
+    my $response = Unit::Response->new();
 
     my ( $saveResult, $ecode ) = $this->capture(
         sub {
@@ -1056,7 +1063,7 @@ INPUT
     my ( $meta, $newtext ) = Foswiki::Func::readTopic( $webName, $topicName );
 
 # Expected is that saving causes the TABLE and EDITTABLE tags to be saved on two lines.
-    my $expected = <<NEWEXPECTED;
+    my $expected = <<'NEWEXPECTED';
 %TABLE{columnwidths="80,80,50,110,150,50,50,50,50,50,70,70,50" dataalign="left,left,center,left,left,center,center,center,center,center,center,right,right,center" headeralign="center" headerrows="1" footerrows="1" headerislabel="on"}%
 %EDITTABLE{format="|text,10|text,10|text,3|text,15|text,15|text,3|text,3|text,3|text,3|text,3|text,3|text,10|label,0|text,5|" }%
 | *Project* | *Customer* | *Pass* | *Type* | *Purpose* | *Qty* | *Radios* | *Controllers* | *Hubs* | *Tuners* | *Hybrid* | *Unit Cost (USD)* | *Total Cost (USD)* | *When (Q)* |
@@ -1069,7 +1076,7 @@ INPUT
 NEWEXPECTED
     $this->assert_str_equals( $expected, $newtext, 0 );
 
-    $fatwilly->finish();
+    return;
 }
 
 =pod
@@ -1092,7 +1099,7 @@ sub _DEPRECATED_test_param_headerrows_and_footerrows_save_table_above {
       . Foswiki::Func::getPubUrlPath() . '/'
       . $Foswiki::cfg{SystemWebName};
 
-    my $input = <<INPUT;
+    my $input = <<'INPUT';
 BEFORE_TABLE %TABLE{columnwidths="80,80,50,110,150,50,50,50,50,50,70,70,50" dataalign="left,left,center,left,left,center,center,center,center,center,center,right,right,center" headeralign="center" headerrows="1" footerrows="1" headerislabel="on"}%
 BEFORE_EDITTABLE %EDITTABLE{format="|text,10|text,10|text,3|text,15|text,15|text,3|text,3|text,3|text,3|text,3|text,3|text,10|label,0|text,5|" }%
 | *Project* | *Customer* | *Pass* | *Type* | *Purpose* | *Qty* | *Radios* | *Controllers* | *Hubs* | *Tuners* | *Hybrid* | *Unit Cost (USD)* | *Total Cost (USD)* | *When (Q)* |
@@ -1102,7 +1109,7 @@ BEFORE_EDITTABLE %EDITTABLE{format="|text,10|text,10|text,3|text,15|text,15|text
 | Project D | SW | P1 | CT5 | SW Dev | 2 | 4 | 2 || 2 || 6345 | %CALC{"\$EVAL(\$T(R\$ROW():C6) * \$T(R\$ROW():C\$COLUMN(-1)))"}% | Q4 |
 | Total ||||| *%CALC{"\$SUM(\$ABOVE())"}%* | *%CALC{"\$SUMPRODUCT(R2:C6..R\$ROW(-1):C6, R2:C\$COLUMN(0)..R\$ROW(-1):C\$COLUMN(0))"}%* | *%CALC{"\$SUMPRODUCT(R2:C6..R\$ROW(-1):C6, R2:C\$COLUMN(0)..R\$ROW(-1):C\$COLUMN(0))"}%* | *%CALC{"\$SUMPRODUCT(R2:C6..R\$ROW(-1):C6, R2:C\$COLUMN(0)..R\$ROW(-1):C\$COLUMN(0))"}%* | *%CALC{"\$SUMPRODUCT(R2:C6..R\$ROW(-1):C6, R2:C\$COLUMN(0)..R\$ROW(-1):C\$COLUMN(0))"}%* | *%CALC{"\$SUMPRODUCT(R2:C6..R\$ROW(-1):C6, R2:C\$COLUMN(0)..R\$ROW(-1):C\$COLUMN(0))"}%* || *%CALC{"\$SUM(\$ABOVE())"}%* ||
 INPUT
-    my $query = new Unit::Request(
+    my $query = Unit::Request->new(
         {
             etedit    => ['on'],
             ettablenr => ['1'],
@@ -1111,10 +1118,9 @@ INPUT
 
     $query->path_info("/$webName/$topicName");
 
-    my $fatwilly = new Foswiki( undef, $query );
-    $Foswiki::Plugins::SESSION = $fatwilly;
+    $this->createNewFoswikiSession( undef, $query );
 
-    $query = new Unit::Request(
+    $query = Unit::Request->new(
         {
             etsave    => ['on'],
             etrows    => ['5'],
@@ -1128,9 +1134,8 @@ INPUT
     Foswiki::Func::saveTopic( $this->{test_web}, $this->{test_topic}, undef,
         $input );
 
-    $fatwilly = new Foswiki( undef, $query );
-    my $response = new Unit::Response;
-    $Foswiki::Plugins::SESSION = $fatwilly;
+    $this->createNewFoswikiSession( undef, $query );
+    my $response = Unit::Response->new();
 
     my ( $saveResult, $ecode ) = $this->capture(
         sub {
@@ -1144,7 +1149,7 @@ INPUT
 
     my ( $meta, $newtext ) = Foswiki::Func::readTopic( $webName, $topicName );
 
-    my $expected = <<NEWEXPECTED;
+    my $expected = <<"NEWEXPECTED";
 BEFORE_TABLE %TABLE{columnwidths="80,80,50,110,150,50,50,50,50,50,70,70,50" dataalign="left,left,center,left,left,center,center,center,center,center,center,right,right,center" headeralign="center" headerrows="1" footerrows="1" headerislabel="on"}%
 BEFORE_EDITTABLE %EDITTABLE{format="|text,10|text,10|text,3|text,15|text,15|text,3|text,3|text,3|text,3|text,3|text,3|text,10|label,0|text,5|" }%
 | *Project* | *Customer* | *Pass* | *Type* | *Purpose* | *Qty* | *Radios* | *Controllers* | *Hubs* | *Tuners* | *Hybrid* | *Unit Cost (USD)* | *Total Cost (USD)* | *When (Q)* |
@@ -1157,7 +1162,7 @@ BEFORE_EDITTABLE %EDITTABLE{format="|text,10|text,10|text,3|text,15|text,15|text
 NEWEXPECTED
     $this->assert_str_equals( $expected, $newtext, 0 );
 
-    $fatwilly->finish();
+    return;
 }
 
 =pod
@@ -1176,22 +1181,21 @@ sub test_keepSpacesInEmptyCellsWithTexts {
         Foswiki::Func::getUrlHost()
       . Foswiki::Func::getPubUrlPath() . '/'
       . $Foswiki::cfg{SystemWebName};
-    my $input = <<INPUT;
+    my $input = <<'INPUT';
 %EDITTABLE{format="|text,40|text,10|"}% 
 | *Milestone* | *Plan* |
 | ABC | X |
 | DEF | |
 INPUT
-    my $query = new Unit::Request(
+    my $query = Unit::Request->new(
         {
             etedit    => ['on'],
             ettablenr => ['1'],
         }
     );
     $query->path_info("/$webName/$topicName");
-    my $fatwilly = new Foswiki( undef, $query );
-    $Foswiki::Plugins::SESSION = $fatwilly;
-    $query                     = new Unit::Request(
+    $this->createNewFoswikiSession( undef, $query );
+    $query = Unit::Request->new(
         {
             etsave    => ['on'],
             ettablenr => ['1'],
@@ -1201,9 +1205,8 @@ INPUT
     $query->method('POST');
     Foswiki::Func::saveTopic( $this->{test_web}, $this->{test_topic}, undef,
         $input );
-    $fatwilly = new Foswiki( undef, $query );
-    my $response = new Unit::Response;
-    $Foswiki::Plugins::SESSION = $fatwilly;
+    $this->createNewFoswikiSession( undef, $query );
+    my $response = Unit::Response->new();
     my ( $saveResult, $ecode ) = $this->capture(
         sub {
             $response->print(
@@ -1214,14 +1217,15 @@ INPUT
         }
     );
     my ( $meta, $newtext ) = Foswiki::Func::readTopic( $webName, $topicName );
-    my $expected = <<NEWEXPECTED;
+    my $expected = <<'NEWEXPECTED';
 %EDITTABLE{format="|text,40|text,10|"}% 
 | *Milestone* | *Plan* |
 | ABC | X |
 | DEF | |
 NEWEXPECTED
     $this->assert_str_equals( $expected, $newtext, 0 );
-    $fatwilly->finish();
+
+    return;
 }
 
 =pod
@@ -1240,23 +1244,22 @@ sub test_keepSpacesInEmptyCellsWithDates {
         Foswiki::Func::getUrlHost()
       . Foswiki::Func::getPubUrlPath() . '/'
       . $Foswiki::cfg{SystemWebName};
-    my $input = <<INPUT;
+    my $input = <<'INPUT';
 %EDITTABLE{format="|text,40|date,10,,%d %b %Y|date,10,,%d %b %Y|date,10,,%d %b %Y|"}% 
 %TABLE{columnwidths="300,130,130,130" dataalign="left,center,center,center" tablerules="all"}%
 | *Milestone* | *Plan* | *Forecast* | *Actual* |
 | Blabla 1 | 07 Sep 2007 | | 07 Sep 2007 |
 | Blabla 5 | 16 Nov 2007 | 21 Nov 2007 | |
 INPUT
-    my $query = new Unit::Request(
+    my $query = Unit::Request->new(
         {
             etedit    => ['on'],
             ettablenr => ['1'],
         }
     );
     $query->path_info("/$webName/$topicName");
-    my $fatwilly = new Foswiki( undef, $query );
-    $Foswiki::Plugins::SESSION = $fatwilly;
-    $query                     = new Unit::Request(
+    $this->createNewFoswikiSession( undef, $query );
+    $query = Unit::Request->new(
         {
             etsave    => ['on'],
             ettablenr => ['1'],
@@ -1266,9 +1269,8 @@ INPUT
     $query->method('POST');
     Foswiki::Func::saveTopic( $this->{test_web}, $this->{test_topic}, undef,
         $input );
-    $fatwilly = new Foswiki( undef, $query );
-    my $response = new Unit::Response;
-    $Foswiki::Plugins::SESSION = $fatwilly;
+    $this->createNewFoswikiSession( undef, $query );
+    my $response = Unit::Response->new();
     my ( $saveResult, $ecode ) = $this->capture(
         sub {
             $response->print(
@@ -1279,7 +1281,7 @@ INPUT
         }
     );
     my ( $meta, $newtext ) = Foswiki::Func::readTopic( $webName, $topicName );
-    my $expected = <<NEWEXPECTED;
+    my $expected = <<'NEWEXPECTED';
 %EDITTABLE{format="|text,40|date,10,,%d %b %Y|date,10,,%d %b %Y|date,10,,%d %b %Y|"}% 
 %TABLE{columnwidths="300,130,130,130" dataalign="left,center,center,center" tablerules="all"}%
 | *Milestone* | *Plan* | *Forecast* | *Actual* |
@@ -1287,7 +1289,8 @@ INPUT
 | Blabla 5 | 16 Nov 2007 | 21 Nov 2007 | |
 NEWEXPECTED
     $this->assert_str_equals( $expected, $newtext, 0 );
-    $fatwilly->finish();
+
+    return;
 }
 
 =pod
@@ -1309,21 +1312,20 @@ sub test_addSpacesToEmptyCells {
         Foswiki::Func::getUrlHost()
       . Foswiki::Func::getPubUrlPath() . '/'
       . $Foswiki::cfg{SystemWebName};
-    my $input = <<INPUT;
+    my $input = <<'INPUT';
 %EDITTABLE{format="|text,40|text,10|"}% 
 || X |
 | DEF ||
 INPUT
-    my $query = new Unit::Request(
+    my $query = Unit::Request->new(
         {
             etedit    => ['on'],
             ettablenr => ['1'],
         }
     );
     $query->path_info("/$webName/$topicName");
-    my $fatwilly = new Foswiki( undef, $query );
-    $Foswiki::Plugins::SESSION = $fatwilly;
-    $query                     = new Unit::Request(
+    $this->createNewFoswikiSession( undef, $query );
+    $query = Unit::Request->new(
         {
             etsave    => ['on'],
             ettablenr => ['1'],
@@ -1333,9 +1335,8 @@ INPUT
     $query->method('POST');
     Foswiki::Func::saveTopic( $this->{test_web}, $this->{test_topic}, undef,
         $input );
-    $fatwilly = new Foswiki( undef, $query );
-    my $response = new Unit::Response;
-    $Foswiki::Plugins::SESSION = $fatwilly;
+    $this->createNewFoswikiSession( undef, $query );
+    my $response = Unit::Response->new();
     my ( $saveResult, $ecode ) = $this->capture(
         sub {
             $response->print(
@@ -1346,13 +1347,14 @@ INPUT
         }
     );
     my ( $meta, $newtext ) = Foswiki::Func::readTopic( $webName, $topicName );
-    my $expected = <<NEWEXPECTED;
+    my $expected = <<'NEWEXPECTED';
 %EDITTABLE{format="|text,40|text,10|"}% 
 | | X |
 | DEF | |
 NEWEXPECTED
     $this->assert_str_equals( $expected, $newtext, 0 );
-    $fatwilly->finish();
+
+    return;
 }
 
 =pod
@@ -1373,7 +1375,7 @@ sub test_TMLFormattingInsideCell_BR {
       . Foswiki::Func::getPubUrlPath() . '/'
       . $Foswiki::cfg{SystemWebName};
 
-    my $input = <<INPUT;
+    my $input = <<'INPUT';
 %EDITTABLE{}%
 | blablabla%BR%there's still a bug%BR%lurking around%BR%_italic_%BR%*bold* %EDITCELL{textarea,6x40,}% |
 INPUT
@@ -1382,7 +1384,7 @@ INPUT
       Foswiki::Func::expandCommonVariables( $input, $topicName, $webName,
         undef );
 
-    my $expected = <<NEWEXPECTED;
+    my $expected = <<"NEWEXPECTED";
 <a name="edittable1"></a>
 <div class="editTable">
 <form name="edittable1" action="$viewUrlAuth#edittable1" method="post">
@@ -1403,6 +1405,8 @@ INPUT
 NEWEXPECTED
 
     $this->do_testHtmlOutput( $expected, $result, 1 );
+
+    return;
 }
 
 =pod
@@ -1423,7 +1427,7 @@ sub test_TMLFormattingInsideCell_tag_br {
       . Foswiki::Func::getPubUrlPath() . '/'
       . $Foswiki::cfg{SystemWebName};
 
-    my $input = <<INPUT;
+    my $input = <<'INPUT';
 %EDITTABLE{}%
 | blablabla<br />there's still a bug<br />lurking around<br />_italic_<br />*bold* %EDITCELL{textarea,6x40,}% |
 INPUT
@@ -1432,7 +1436,7 @@ INPUT
       Foswiki::Func::expandCommonVariables( $input, $topicName, $webName,
         undef );
 
-    my $expected = <<NEWEXPECTED;
+    my $expected = <<"NEWEXPECTED";
 <a name="edittable1"></a>
 <div class="editTable">
 <form name="edittable1" action="$viewUrlAuth#edittable1" method="post">
@@ -1453,6 +1457,8 @@ INPUT
 NEWEXPECTED
 
     $this->do_testHtmlOutput( $expected, $result, 1 );
+
+    return;
 }
 
 =pod
@@ -1471,20 +1477,19 @@ sub test_keepStars {
         Foswiki::Func::getUrlHost()
       . Foswiki::Func::getPubUrlPath() . '/'
       . $Foswiki::cfg{SystemWebName};
-    my $input = <<INPUT;
+    my $input = <<'INPUT';
 %EDITTABLE{}%
 | * <small>Name of the client (prefilled)</small> |
 INPUT
-    my $query = new Unit::Request(
+    my $query = Unit::Request->new(
         {
             etedit    => ['on'],
             ettablenr => ['1'],
         }
     );
     $query->path_info("/$webName/$topicName");
-    my $fatwilly = new Foswiki( undef, $query );
-    $Foswiki::Plugins::SESSION = $fatwilly;
-    $query                     = new Unit::Request(
+    $this->createNewFoswikiSession( undef, $query );
+    $query = Unit::Request->new(
         {
             etsave    => ['on'],
             ettablenr => ['1'],
@@ -1494,9 +1499,8 @@ INPUT
     $query->method('POST');
     Foswiki::Func::saveTopic( $this->{test_web}, $this->{test_topic}, undef,
         $input );
-    $fatwilly = new Foswiki( undef, $query );
-    my $response = new Unit::Response;
-    $Foswiki::Plugins::SESSION = $fatwilly;
+    $this->createNewFoswikiSession( undef, $query );
+    my $response = Unit::Response->new();
     my ( $saveResult, $ecode ) = $this->capture(
         sub {
             $response->print(
@@ -1507,12 +1511,13 @@ INPUT
         }
     );
     my ( $meta, $newtext ) = Foswiki::Func::readTopic( $webName, $topicName );
-    my $expected = <<NEWEXPECTED;
+    my $expected = <<'NEWEXPECTED';
 %EDITTABLE{}%
 | * <small>Name of the client (prefilled)</small> |
 NEWEXPECTED
     $this->assert_str_equals( $expected, $newtext, 0 );
-    $fatwilly->finish();
+
+    return;
 }
 
 =pod
@@ -1531,20 +1536,19 @@ sub test_lineBreaksInsideInputField {
         Foswiki::Func::getUrlHost()
       . Foswiki::Func::getPubUrlPath() . '/'
       . $Foswiki::cfg{SystemWebName};
-    my $input = <<INPUT;
+    my $input = <<'INPUT';
 %EDITTABLE{ changerows="off" quietsave="off"  }%
 | <small><table><tr><td>TD...Technical Documentation <br />TM...Translation Management <br />PC...Product Catalogs </td><td>PS...Processes and Systems <br />FM...Feedback Management <br />KL...Knowledge Logistics</td></tr></table></small> |
 INPUT
-    my $query = new Unit::Request(
+    my $query = Unit::Request->new(
         {
             etedit    => ['on'],
             ettablenr => ['1'],
         }
     );
     $query->path_info("/$webName/$topicName");
-    my $fatwilly = new Foswiki( undef, $query );
-    $Foswiki::Plugins::SESSION = $fatwilly;
-    $query                     = new Unit::Request(
+    $this->createNewFoswikiSession( undef, $query );
+    $query = Unit::Request->new(
         {
             etsave    => ['on'],
             ettablenr => ['1'],
@@ -1554,9 +1558,8 @@ INPUT
     $query->method('POST');
     Foswiki::Func::saveTopic( $this->{test_web}, $this->{test_topic}, undef,
         $input );
-    $fatwilly = new Foswiki( undef, $query );
-    my $response = new Unit::Response;
-    $Foswiki::Plugins::SESSION = $fatwilly;
+    $this->createNewFoswikiSession( undef, $query );
+    my $response = Unit::Response->new();
     my ( $saveResult, $ecode ) = $this->capture(
         sub {
             $response->print(
@@ -1567,12 +1570,13 @@ INPUT
         }
     );
     my ( $meta, $newtext ) = Foswiki::Func::readTopic( $webName, $topicName );
-    my $expected = <<NEWEXPECTED;
+    my $expected = <<'NEWEXPECTED';
 %EDITTABLE{ changerows="off" quietsave="off"  }%
 | <small><table><tr><td>TD...Technical Documentation <br />TM...Translation Management <br />PC...Product Catalogs </td><td>PS...Processes and Systems <br />FM...Feedback Management <br />KL...Knowledge Logistics</td></tr></table></small> |
 NEWEXPECTED
     $this->assert_str_equals( $expected, $newtext, 0 );
-    $fatwilly->finish();
+
+    return;
 }
 
 =pod
@@ -1594,7 +1598,7 @@ sub test_param_buttonrow_top {
     Foswiki::Func::saveTopic( $webName, $topicName, undef, "XXX" );
 
     my $input    = '%EDITTABLE{buttonrow="top"}%';
-    my $expected = <<END;
+    my $expected = <<"END";
 <a name="edittable1"></a>
 <div class="editTable">
 <form name="edittable1" action="$viewUrlAuth#edittable1" method="post">
@@ -1610,6 +1614,8 @@ END
     my $result =
       Foswiki::Func::expandCommonVariables( $input, $topicName, $webName );
     $this->do_testHtmlOutput( $expected, $result, 0 );
+
+    return;
 }
 
 sub test_param_buttonrow_top_edit {
@@ -1624,26 +1630,25 @@ sub test_param_buttonrow_top_edit {
       . Foswiki::Func::getPubUrlPath() . '/'
       . $Foswiki::cfg{SystemWebName};
 
-    my $query = new Unit::Request(
+    my $query = Unit::Request->new(
         {
             etedit    => ['on'],
             ettablenr => ['1'],
         }
     );
 
-    my $text = <<INPUT;
+    my $text = <<'INPUT';
 %EDITTABLE{buttonrow="top"}%
 INPUT
 
     $query->path_info("/$webName/$topicName");
 
-    my $fatwilly = new Foswiki( undef, $query );
-    $Foswiki::Plugins::SESSION = $fatwilly;
+    $this->createNewFoswikiSession( undef, $query );
     my $result =
       Foswiki::Func::expandCommonVariables( $text, $topicName, $webName,
         undef );
 
-    my $expected = <<EXPECTED;
+    my $expected = <<"EXPECTED";
 %TABLE{disableallsort="on" databg="#fff"}%
 <noautolink>
 <a name="edittable1"></a>
@@ -1665,6 +1670,8 @@ INPUT
 EXPECTED
 
     $this->do_testHtmlOutput( $expected, $result, 0 );
+
+    return;
 }
 
 =pod
@@ -1685,12 +1692,12 @@ sub test_save_with_verbatim_inside_table {
       . Foswiki::Func::getPubUrlPath() . '/'
       . $Foswiki::cfg{SystemWebName};
 
-    my $input = <<INPUT;
+    my $input = <<'INPUT';
 %EDITTABLE{}%
 | *text* |
 | <verbatim class="foswikiAlert">inside verbatim</verbatim> |
 INPUT
-    my $query = new Unit::Request(
+    my $query = Unit::Request->new(
         {
             etedit    => ['on'],
             ettablenr => ['1'],
@@ -1699,10 +1706,9 @@ INPUT
 
     $query->path_info("/$webName/$topicName");
 
-    my $fatwilly = new Foswiki( undef, $query );
-    $Foswiki::Plugins::SESSION = $fatwilly;
+    $this->createNewFoswikiSession( undef, $query );
 
-    $query = new Unit::Request(
+    $query = Unit::Request->new(
         {
             etsave    => ['on'],
             ettablenr => ['1'],
@@ -1715,9 +1721,8 @@ INPUT
     Foswiki::Func::saveTopic( $this->{test_web}, $this->{test_topic}, undef,
         $input );
 
-    $fatwilly = new Foswiki( undef, $query );
-    my $response = new Unit::Response;
-    $Foswiki::Plugins::SESSION = $fatwilly;
+    $this->createNewFoswikiSession( undef, $query );
+    my $response = Unit::Response->new();
 
     my ( $saveResult, $ecode ) = $this->capture(
         sub {
@@ -1731,14 +1736,14 @@ INPUT
 
     my ( $meta, $newtext ) = Foswiki::Func::readTopic( $webName, $topicName );
 
-    my $expected = <<NEWEXPECTED;
+    my $expected = <<'NEWEXPECTED';
 %EDITTABLE{}%
 | *text* |
 | <verbatim class="foswikiAlert">inside verbatim</verbatim> |
 NEWEXPECTED
     $this->assert_str_equals( $expected, $newtext, 0 );
 
-    $fatwilly->finish();
+    return;
 }
 
 =pod
@@ -1759,7 +1764,7 @@ sub test_save_with_verbatim_in_topic {
       . Foswiki::Func::getPubUrlPath() . '/'
       . $Foswiki::cfg{SystemWebName};
 
-    my $input = <<INPUT;
+    my $input = <<'INPUT';
 %EDITTABLE{}%
 | *text* |
 
@@ -1767,7 +1772,7 @@ sub test_save_with_verbatim_in_topic {
 INSIDE VERBATIM
 </verbatim>
 INPUT
-    my $query = new Unit::Request(
+    my $query = Unit::Request->new(
         {
             etedit    => ['on'],
             ettablenr => ['1'],
@@ -1776,10 +1781,9 @@ INPUT
 
     $query->path_info("/$webName/$topicName");
 
-    my $fatwilly = new Foswiki( undef, $query );
-    $Foswiki::Plugins::SESSION = $fatwilly;
+    $this->createNewFoswikiSession( undef, $query );
 
-    $query = new Unit::Request(
+    $query = Unit::Request->new(
         {
             etsave    => ['on'],
             ettablenr => ['1'],
@@ -1792,9 +1796,8 @@ INPUT
     Foswiki::Func::saveTopic( $this->{test_web}, $this->{test_topic}, undef,
         $input );
 
-    $fatwilly = new Foswiki( undef, $query );
-    my $response = new Unit::Response;
-    $Foswiki::Plugins::SESSION = $fatwilly;
+    $this->createNewFoswikiSession( undef, $query );
+    my $response = Unit::Response->new();
 
     my ( $saveResult, $ecode ) = $this->capture(
         sub {
@@ -1808,7 +1811,7 @@ INPUT
 
     my ( $meta, $newtext ) = Foswiki::Func::readTopic( $webName, $topicName );
 
-    my $expected = <<NEWEXPECTED;
+    my $expected = <<'NEWEXPECTED';
 %EDITTABLE{}%
 | *text* |
 
@@ -1818,7 +1821,7 @@ INSIDE VERBATIM
 NEWEXPECTED
     $this->assert_str_equals( $expected, $newtext, 0 );
 
-    $fatwilly->finish();
+    return;
 }
 
 =pod
@@ -1832,7 +1835,7 @@ sub test_INCLUDE_view {
 
     # Create topic to include
     my $includedTopic = "TopicToInclude";
-    Foswiki::Func::saveTopic( $this->{test_web}, $includedTopic, undef, <<THIS);
+    Foswiki::Func::saveTopic( $this->{test_web}, $includedTopic, undef, <<'THIS');
 %EDITTABLE{ format="| row, -1 | text, 20, init | select, 1, not started, starting, ongoing, completed | checkbox, 3,:-),:-I,:-( | date, 20 |" changerows="on" quietsave="on"}%
 | *URL* | *Name* | *By* | *Comment* | *Timestamp* |
 | 1 | Unified field theory | not started | :-) , :-I , :-( | 1 Apr 2012 |
@@ -1859,7 +1862,7 @@ THIS
 
 %EDITTABLE{}%';
 
-    my $expected = <<END;
+    my $expected = <<"END";
 <a name="edittable1"></a>
 <div class="editTable">
 <form name="edittable1" action="$viewUrlAuthTestTopic#edittable1" method="post">
@@ -1903,6 +1906,8 @@ END
     my $result =
       Foswiki::Func::expandCommonVariables( $input, $topicName, $webName );
     $this->do_testHtmlOutput( $expected, $result, 0 );
+
+    return;
 }
 
 =pod
@@ -1916,12 +1921,12 @@ sub test_INCLUDE_include {
 
     # Create topic with table definition
     my $tableDefTopic = "QmsCommentTable";
-    Foswiki::Func::saveTopic( $this->{test_web}, $tableDefTopic, undef, <<THIS);
+    Foswiki::Func::saveTopic( $this->{test_web}, $tableDefTopic, undef, <<'THIS');
 %EDITTABLE{ header="|* Section *|* Description *|* Severity *|*  Status *|* Originator & Date *|" format="| text, 10 | textarea, 10x60  | select, 1, Major, Minor, Note | select, 1, Originated, Assessed, Performed, Rejected | text, 20 |" changerows="on" }%
 THIS
 
     my $includeTopic = "ProcedureSysarch000Comments";
-    Foswiki::Func::saveTopic( $this->{test_web}, $includeTopic, undef, <<THIS);
+    Foswiki::Func::saveTopic( $this->{test_web}, $includeTopic, undef, <<'THIS');
 %EDITTABLE{ include="QmsCommentTable" }%
 |*Section*|*Description*|*Severity*|*Status*|*Originator & Date*|
 THIS
@@ -1942,7 +1947,7 @@ THIS
 
     my $input = '%INCLUDE{"ProcedureSysarch000Comments"}%';
 
-    my $expected = <<END;
+    my $expected = <<"END";
 <div class="editTable">
 <form name="edittable1_TemporaryEditTableFunctionsTestWebEditTableFunctions_TestTopicEditTableFunctions" action="$viewUrlAuthTestTopic#edittable1" method="post">
 <input type="hidden" name="ettablenr" value="1" />
@@ -1958,6 +1963,8 @@ END
     my $result =
       Foswiki::Func::expandCommonVariables( $input, $topicName, $webName );
     $this->do_testHtmlOutput( $expected, $result, 0 );
+
+    return;
 }
 
 =pod
@@ -1978,7 +1985,7 @@ sub test_macro_EDITCELL_save {
       . Foswiki::Func::getPubUrlPath() . '/'
       . $Foswiki::cfg{SystemWebName};
 
-    my $input = <<INPUT;
+    my $input = <<'INPUT';
 %EDITTABLE{}% 
 | a | Some text |
 | b | More text |
@@ -1988,7 +1995,7 @@ sub test_macro_EDITCELL_save {
 | Gender: | F %EDITCELL{select, 1, , F, M}% |
 | DOB: | 8 February 2009 %EDITCELL{date, 10}% |
 INPUT
-    my $query = new Unit::Request(
+    my $query = Unit::Request->new(
         {
             etedit    => ['on'],
             ettablenr => ['1'],
@@ -1997,10 +2004,9 @@ INPUT
 
     $query->path_info("/$webName/$topicName");
 
-    my $fatwilly = new Foswiki( undef, $query );
-    $Foswiki::Plugins::SESSION = $fatwilly;
+    $this->createNewFoswikiSession( undef, $query );
 
-    $query = new Unit::Request(
+    $query = Unit::Request->new(
         {
             etsave    => ['on'],
             ettablenr => ['1'],
@@ -2013,9 +2019,8 @@ INPUT
     Foswiki::Func::saveTopic( $this->{test_web}, $this->{test_topic}, undef,
         $input );
 
-    $fatwilly = new Foswiki( undef, $query );
-    my $response = new Unit::Response;
-    $Foswiki::Plugins::SESSION = $fatwilly;
+    $this->createNewFoswikiSession( undef, $query );
+    my $response = Unit::Response->new();
 
     my ( $saveResult, $ecode ) = $this->capture(
         sub {
@@ -2029,7 +2034,7 @@ INPUT
 
     my ( $meta, $newtext ) = Foswiki::Func::readTopic( $webName, $topicName );
 
-    my $expected = <<NEWEXPECTED;
+    my $expected = <<'NEWEXPECTED';
 %EDITTABLE{}% 
 | a | Some text |
 | b | More text |
@@ -2041,7 +2046,7 @@ INPUT
 NEWEXPECTED
     $this->assert_str_equals( $expected, $newtext, 0 );
 
-    $fatwilly->finish();
+    return;
 }
 
 =pod
@@ -2107,6 +2112,8 @@ sub test_CALC_in_table_other_than_EDITTABLE {
     trimSpaces($result);
 
     $this->assert_str_equals( $expected, $result, 0 );
+
+    return;
 }
 
 =pod
@@ -2138,10 +2145,10 @@ sub test_TABLE_on_same_line_as_EDITTABLE_TABLE_last {
     my $result =
       Foswiki::Func::expandCommonVariables( $input, $topicName, $webName );
 
-    my $expected = <<EXPECTED;
+    my $expected = <<"EXPECTED";
  <ul>
 <li> Set MYNAMES = Ed, Kenneth,Benny 
-</li> <li> Set EXTRACT =  R0:C0..R0:C-1  
+</li> <li> Set EXTRACT =  R0:C1..R0:C-1
 </li></ul> 
 <p />
 <nop>
@@ -2181,6 +2188,8 @@ sub test_TABLE_on_same_line_as_EDITTABLE_TABLE_last {
 EXPECTED
 
     $this->do_testHtmlOutput( $expected, $result, 1 );
+
+    return;
 }
 
 =pod
@@ -2212,10 +2221,10 @@ sub test_TABLE_on_same_line_as_EDITTABLE_TABLE_first {
     my $result =
       Foswiki::Func::expandCommonVariables( $input, $topicName, $webName );
 
-    my $expected = <<EXPECTED;
+    my $expected = <<"EXPECTED";
  <ul>
 <li> Set MYNAMES = Ed, Kenneth,Benny 
-</li> <li> Set EXTRACT =  R0:C0..R0:C-1  
+</li> <li> Set EXTRACT =  R0:C1..R0:C-1
 </li></ul> 
 <p />
 <nop>
@@ -2255,6 +2264,8 @@ sub test_TABLE_on_same_line_as_EDITTABLE_TABLE_first {
 EXPECTED
 
     $this->do_testHtmlOutput( $expected, $result, 1 );
+
+    return;
 }
 
 =pod
@@ -2273,13 +2284,13 @@ sub test_CALC_substitution {
     my $pubUrlSystemWeb =
       Foswiki::Func::getPubUrlPath() . '/' . $Foswiki::cfg{SystemWebName};
 
-    my $input = <<INPUT;
+    my $input = <<"INPUT";
 %EDITTABLE{}%
 | Project A | SW | P1 | CT5 | SW Dev | 2 | 4 | 2 || 2 || 6345 | %CALC{"\$EVAL(\$T(R\$ROW():C6) * \$T(R\$ROW():C\$COLUMN(-1)))"}% | Q4 |
 | Total ||||| *%CALC{"\$SUM(\$ABOVE())"}%* | *%CALC{"\$SUMPRODUCT(R2:C6..R\$ROW(-1):C6, R2:C\$COLUMN(0)..R\$ROW(-1):C\$COLUMN(0))"}%* | *%CALC{"\$SUMPRODUCT(R2:C6..R\$ROW(-1):C6, R2:C\$COLUMN(0)..R\$ROW(-1):C\$COLUMN(0))"}%* | *%CALC{"\$SUMPRODUCT(R2:C6..R\$ROW(-1):C6, R2:C\$COLUMN(0)..R\$ROW(-1):C\$COLUMN(0))"}%* | *%CALC{"\$SUMPRODUCT(R2:C6..R\$ROW(-1):C6, R2:C\$COLUMN(0)..R\$ROW(-1):C\$COLUMN(0))"}%* | *%CALC{"\$SUMPRODUCT(R2:C6..R\$ROW(-1):C6, R2:C\$COLUMN(0)..R\$ROW(-1):C\$COLUMN(0))"}%* || *%CALC{"\$SUM(\$ABOVE())"}%* ||
 INPUT
 
-    my $query = new Unit::Request(
+    my $query = Unit::Request->new(
         {
             etedit    => ['on'],
             ettablenr => ['1'],
@@ -2288,8 +2299,7 @@ INPUT
 
     $query->path_info("/$webName/$topicName");
 
-    my $fatwilly = new Foswiki( undef, $query );
-    $Foswiki::Plugins::SESSION = $fatwilly;
+    $this->createNewFoswikiSession( undef, $query );
 
     my $result =
       Foswiki::Func::expandCommonVariables( $input, $this->{test_topic},
@@ -2317,7 +2327,8 @@ INPUT
 </div><!-- /editTable --></noautolink>';
 
     $this->do_testHtmlOutput( lc $expected, lc $result, 0 );
-    $fatwilly->finish();
+
+    return;
 }
 
 =pod
@@ -2336,11 +2347,11 @@ sub test_param_changerows_off {
     my $pubUrlSystemWeb =
       Foswiki::Func::getPubUrlPath() . '/' . $Foswiki::cfg{SystemWebName};
 
-    my $input = <<INPUT;
+    my $input = <<'INPUT';
 %EDITTABLE{changerows="off"}%
 INPUT
 
-    my $query = new Unit::Request(
+    my $query = Unit::Request->new(
         {
             etedit    => ['on'],
             ettablenr => ['1'],
@@ -2349,14 +2360,13 @@ INPUT
 
     $query->path_info("/$webName/$topicName");
 
-    my $fatwilly = new Foswiki( undef, $query );
-    $Foswiki::Plugins::SESSION = $fatwilly;
+    $this->createNewFoswikiSession( undef, $query );
 
     my $result =
       Foswiki::Func::expandCommonVariables( $input, $this->{test_topic},
         $this->{test_web}, undef );
 
-    my $expected = <<EXPECTED;
+    my $expected = <<"EXPECTED";
 %TABLE{disableallsort="on" databg="#fff"}%
 <noautolink>
 <a name="edittable1"></a>
@@ -2375,7 +2385,8 @@ INPUT
 </div><!-- /editTable --></noautolink>
 EXPECTED
     $this->do_testHtmlOutput( lc $expected, lc $result, 0 );
-    $fatwilly->finish();
+
+    return;
 }
 
 =pod
@@ -2396,14 +2407,14 @@ sub test_save_with_encode_param_and_footerrows {
       . Foswiki::Func::getPubUrlPath() . '/'
       . $Foswiki::cfg{SystemWebName};
 
-    my $input = <<INPUT;
+    my $input = <<'INPUT';
 %TABLE{columnwidths="%ENCODE{"80"}%,80" dataalign="left,center" headeralign="left,center" headerrows="1" footerrows="1"}%
 %EDITTABLE{}%
 | *Customer* | *Pass* |
 | A | B |
 | *Customer* | *Pass* |
 INPUT
-    my $query = new Unit::Request(
+    my $query = Unit::Request->new(
         {
             etedit    => ['on'],
             ettablenr => ['1'],
@@ -2412,10 +2423,9 @@ INPUT
 
     $query->path_info("/$webName/$topicName");
 
-    my $fatwilly = new Foswiki( undef, $query );
-    $Foswiki::Plugins::SESSION = $fatwilly;
+    $this->createNewFoswikiSession( undef, $query );
 
-    $query = new Unit::Request(
+    $query = Unit::Request->new(
         {
             etsave    => ['on'],
             etaddrow  => ['1'],
@@ -2429,9 +2439,8 @@ INPUT
     Foswiki::Func::saveTopic( $this->{test_web}, $this->{test_topic}, undef,
         $input );
 
-    $fatwilly = new Foswiki( undef, $query );
-    my $response = new Unit::Response;
-    $Foswiki::Plugins::SESSION = $fatwilly;
+    $this->createNewFoswikiSession( undef, $query );
+    my $response = Unit::Response->new();
 
     my ( $saveResult, $ecode ) = $this->capture(
         sub {
@@ -2445,7 +2454,7 @@ INPUT
 
     my ( $meta, $newtext ) = Foswiki::Func::readTopic( $webName, $topicName );
 
-    my $expected = <<NEWEXPECTED;
+    my $expected = <<'NEWEXPECTED';
 %TABLE{columnwidths="%ENCODE{"80"}%,80" dataalign="left,center" headeralign="left,center" headerrows="1" footerrows="1"}%
 %EDITTABLE{}%
 | *Customer* | *Pass* |
@@ -2454,7 +2463,7 @@ INPUT
 NEWEXPECTED
     $this->assert_str_equals( $expected, $newtext, 0 );
 
-    $fatwilly->finish();
+    return;
 }
 
 =pod
@@ -2479,7 +2488,7 @@ sub test_render_simple_with_verbatim_and_unfinished_table_rows {
 | x | <verbatim> y
 z </verbatim> |';
 
-    my $expected = <<END;
+    my $expected = <<"END";
 <a name="edittable1"></a>
 <div class="editTable">
 <form name="edittable1" action="$viewUrlAuth#edittable1" method="post">
@@ -2497,6 +2506,8 @@ END
     my $result =
       Foswiki::Func::expandCommonVariables( $input, $topicName, $webName );
     $this->do_testHtmlOutput( $expected, $result, 0 );
+
+    return;
 }
 
 # EditTableData tests
@@ -2514,6 +2525,8 @@ sub test_createTableChangesMap {
     $this->assert_equals( $map->{0}, 0 );
     $this->assert_equals( $map->{1}, 1 );
     $this->assert_equals( $map->{3}, -1 );
+
+    return;
 }
 
 =pod
@@ -2533,6 +2546,8 @@ sub test_tableChangesMapToParamString {
       Foswiki::Plugins::EditTablePlugin::EditTableData::tableChangesMapToParamString(
         $map);
     $this->assert_equals( $paramString, '0=0,1=-1,5=1' );
+
+    return;
 }
 
 =pod

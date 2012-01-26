@@ -1,0 +1,35 @@
+%META:TOPICPARENT{name="Plugins"}%
+<!--
+One line description, required for extensions repository catalog.
+   * Set SHORTDESCRIPTION = Download all attachments at once in a zip archive.
+-->
+---+!! Download Zip Plugin
+
+%SHORTDESCRIPTION%
+
+---++ Syntax Rules
+
+   * Zip all attachments from a topic
+      * Either use the %<nop>DOWNLOADZIP% macro to render a link to the zip archive of the current topics attachments or
+      * use %SCRIPTURL{rest}%/%TOPIC%/zip?topic=webname.topicname
+   * Zip all attachments from a web
+      * Either use the %<nop>DOWNLOADWEBZIP% macro to render a link to the zip archive of the current web attachments or
+      * use %SCRIPTURL{rest}%/%TOPIC%/webzip?topic=webname.WebHome
+
+   * %X% *Note*: You need read access to the topic you are referring to.
+
+---++ Installation
+%$INSTALL_INSTRUCTIONS%
+
+---++ Info
+
+|  Author: | Foswiki:Main.OliverKrueger, (wiki-one.net) |
+|  Copyright: | &copy; 2012, Oliver Krueger |
+|  License: | GPL ([[http://www.gnu.org/copyleft/gpl.html][GNU General Public License]]) |
+|  Release: | %$RELEASE% |
+|  Version: | %$VERSION% |
+|  Change&nbsp;History: | <!-- versions below in reverse order -->&nbsp; |
+|  1.0.0 (23 Jan 2012): | Initial version |
+|  Home: | http://foswiki.org/Extensions/%TOPIC% |
+|  Support: | http://foswiki.org/Support/%TOPIC% |
+

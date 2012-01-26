@@ -1,23 +1,21 @@
 %TMPL:INCLUDE{"foswiki"}%<!-- template: viewraw.nat.tmpl -->
-%TMPL:DEF{"dialog"}%<div class="foswikiDialog foswikiFormSteps">
-%TMPL:P{"content"}%<!-- -->
-%TMPL:P{"viewrawjavascript"}%<!-- -->
-</div>%TMPL:END%
 
-%TMPL:DEF{"content"}% %TMPL:P{"viewrawform"}%%TMPL:END%
-
-%TMPL:DEF{"viewrawform"}%<!-- -->
-<div id="natPreviewRaw" class="foswikiFormStep jqSimpleModalResizable {alsoResize:'textarea'}">
-  <h2 class="foswikiDialogTitle jqSimpleModalDraggable">%MAKETEXT{"Wiki markup of [_1]" args="%BASEWEB%.%BASETOPIC%"}%</h2>
-    <textarea class="foswikiTextarea" rows="20" cols="80" style="width:99%" readonly></textarea>
+%{ ################################################################################ }%
+%TMPL:DEF{"dialog"}%<noautolink>
+<div class="jqUIDialog foswikiFormSteps {width:800, height:600, modal:true, resizable:true, draggable:true, alsoResize:'textarea'}" title="%TMPL:P{"heading"}%">
+  %TMPL:P{"viewrawjavascript"}%<!-- -->
+  <div id="natPreviewRaw" class="foswikiFormStep">
+    <textarea class="foswikiTextarea" rows="20" cols="80" style="width:99%; height:460px; resize:none;" readonly></textarea>
+  </div>
+ <a class="jqUIDialogButton {icon:'ui-icon-newwin', click: function() { window.location.href='%SCRIPTURL{"view"}%/%BASEWEB%/%BASETOPIC%?raw=text&skin=text&contenttype=text/plain&rev=%URLPARAM{"rev"}%'; }}">%MAKETEXT{"Open in separate window"}%</a>
+ <a class="jqUIDialogButton {icon:'ui-icon-cancel', click: function() { $(this).dialog('close'); }}">%MAKETEXT{"Close"}%</a>
 </div>
-<div class="foswikiFormStep">
-  %BUTTON{"%MAKETEXT{"Close"}%" class="jqSimpleModalCancel" icon="cross"}% 
-  %BUTTON{"%MAKETEXT{"Open in separate window"}%" href="%SCRIPTURL{"view"}%/%BASEWEB%/%BASETOPIC%?raw=text&skin=text&contenttype=text/plain&rev=%URLPARAM{"rev"}%" icon="application_double" class="simple separate foswikiRight"}%
-  %CLEAR%
-</div>
-<!-- -->%TMPL:END%
+</noautolink>%TMPL:END%
 
+%{ ################################################################################ }%
+%TMPL:DEF{"heading"}%%MAKETEXT{"Wiki markup of [_1]" args="%GETTOPICTITLE{"%BASEWEB%.%BASETOPIC%"}%"}%%TMPL:END%
+
+%{ ################################################################################ }%
 %TMPL:DEF{"viewrawjavascript"}%<!-- -->
 <literal><script>
 jQuery(function($) {

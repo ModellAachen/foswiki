@@ -2,8 +2,8 @@
 
 %{ ################################################################################ }%
 %TMPL:DEF{"title"}%%HTMLTITLE{"%TOPICTITLE% (%MAKETEXT{"backlinks"}%)" separator=" %IF{"defined 'HTMLTITLESEP'" then="%HTMLTITLESEP%" else="::"}% "}%%TMPL:END%
-%TMPL:DEF{"breadcrumbstail"}%%TMPL:P{"sep"}%<a href="%SCRIPTURLPATH{"view"}%/%WEB%/%TOPIC%?template=backlinksweb">%MAKETEXT{"Backlinks"}%</a>%TMPL:END%
-%TMPL:DEF{"contenttitle"}%<h1>%MAKETEXT{"Backlinks to [_1] in the [_2] Web" args="<nop>%TOPIC%, <nop>%WEB%"}%</h1>%TMPL:END%
+%TMPL:DEF{"breadcrumbs::tail"}%%TMPL:P{"sep"}%<a href="%SCRIPTURLPATH{"view"}%/%WEB%/%TOPIC%?template=backlinksweb">%MAKETEXT{"Backlinks"}%</a>%TMPL:END%
+%TMPL:DEF{"contenttitle"}%<h1>%MAKETEXT{"Backlinks to [_1] in the [_2] web" args="<nop>%TOPIC%, <nop>%WEB%"}%</h1>%TMPL:END%
 %TMPL:DEF{"sidebar"}%%TMPL:END%
 
 %{ ################################################################################ }%

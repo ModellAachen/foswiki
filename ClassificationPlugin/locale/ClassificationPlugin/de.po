@@ -1,0 +1,238 @@
+# ClassificationPlugin translations
+msgid ""
+msgstr ""
+"Project-Id-Version: ClassificationPlugin $Id\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: 2011-12-20 12:56+0000\n"
+"Last-Translator: Michael Daum <daum@michaeldaumconsulting.com>\n"
+"Language-Team: Foswiki German Translation Team <none>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: de\n"
+
+#: data/_ClassificationTemplate/WebLeftBar.txt:3
+msgid "%1 Web"
+msgstr "%1 Web"
+
+#: data/Applications/ClassificationApp/NatSkinSearchViewTemplate.txt:21
+msgid "<span>%1</span> topics found"
+msgstr "<span>%1</span> Topics gefunden"
+
+#: data/Applications/ClassificationApp/ClassifiedTopicEditTemplate.txt:24
+msgid "Categories"
+msgstr "Kategorien"
+
+#: data/_ClassificationTemplate/WebLeftBar.txt:7
+msgid "Changes"
+msgstr "Änderungen"
+
+#: data/Applications/ClassificationApp/RenderCategoryEditor.txt:86
+msgid "Clear"
+msgstr "Formularinhalt löschen"
+
+#: data/_ClassificationTemplate/WebLeftBar.txt:4
+msgid "Create New Topic"
+msgstr "Neues Topic anlegen"
+
+#: data/Applications/ClassificationApp/RenderCategoryFactory.txt:25
+msgid "Create a new category in the %1 web"
+msgstr "Neue Kategorie im %1 Web anlegen"
+
+#: data/Applications/ClassificationApp/RenderCategoryFactory.txt:44
+msgid "Enter a short summary line describing what this category is about."
+msgstr "Geben Sie eine kurze Beschreibung der Kategorie an."
+
+#: data/Applications/ClassificationApp/RenderCategoryFactory.txt:37
+msgid ""
+"Enter the category topic name. This must be a unique ID among all categories "
+"within a taxonomy."
+msgstr ""
+
+#: data/Applications/ClassificationApp/RenderCategoryFactory.txt:30
+msgid ""
+"Enter the title of the new category. This is a free-form text that the topic "
+"name will be derived from by default."
+msgstr ""
+
+#: data/Applications/ClassificationApp/CategoryViewTemplate.txt:40
+#: data/Applications/ClassificationApp/RenderClassifiedTopicView.txt:21
+msgid "Filed in %1"
+msgstr "Abgelegt in %1"
+
+#: data/Applications/ClassificationApp/RenderCategoryEditor.txt:88
+msgid "Filter"
+msgstr "Filter"
+
+#: data/Applications/ClassificationApp/ClassifiedTopic.txt:33
+msgid "Hide advanced options"
+msgstr "Erweiterte Optionen verstecken"
+
+#: data/Applications/ClassificationApp/CategoryEditTemplate.txt:31
+#: data/Applications/ClassificationApp/RenderCategoryFactory.txt:55
+#: data/Applications/ClassificationApp/RenderCategorySettings.txt:30
+msgid "Icon"
+msgstr "Icon"
+
+#: data/Applications/ClassificationApp/CategoryEditTemplate.txt:27
+#: data/Applications/ClassificationApp/RenderCategorySettings.txt:26
+msgid "Imported Categories"
+msgstr "Importierte Kategorien"
+
+#: data/_ClassificationTemplate/WebLeftBar.txt:5
+msgid "Index"
+msgstr "Index"
+
+#: data/Applications/ClassificationApp/CategorizedTopic.txt:19
+#: data/Applications/ClassificationApp/Category.txt:23
+#: data/Applications/ClassificationApp/ClassifiedTopic.txt:16
+#: data/Applications/ClassificationApp/TaggedTopic.txt:15
+msgid "New"
+msgstr "Neu"
+
+#: data/Applications/ClassificationApp/RenderCategoryEditor.txt:31
+msgid "Nothing found"
+msgstr "Keine Treffer"
+
+#: data/_ClassificationTemplate/WebLeftBar.txt:8
+msgid "Notifications"
+msgstr "Benachrichtigungen"
+
+#: data/Applications/ClassificationApp/CategoryEditTemplate.txt:23
+msgid "Order"
+msgstr "Sortierung"
+
+#: data/Applications/ClassificationApp/RenderCategoryFactory.txt:48
+msgid "Parent category"
+msgstr "Ober-Kategorie"
+
+#: data/Applications/ClassificationApp/RenderCategorySettings.txt:22
+msgid "Parent topic"
+msgstr "Ober-Topic"
+
+#: data/_ClassificationTemplate/WebLeftBar.txt:11
+msgid "Preferences"
+msgstr "Einstellungen"
+
+#: data/_ClassificationTemplate/WebLeftBar.txt:9
+msgid "RSS Feed"
+msgstr "RSS Feed"
+
+#: data/_ClassificationTemplate/WebLinks.txt:24
+msgid "Recent Changes"
+msgstr "Letzte Änderungen"
+
+#: data/Applications/ClassificationApp/RenderTagEditor.txt:54
+msgid "Related tags"
+msgstr "Verwandte Schlüsselworte"
+
+#: data/Applications/ClassificationApp/WebTagCloud.txt:22
+#: data/_ClassificationTemplate/WebLeftBar.txt:6
+msgid "Search"
+msgstr "Suchen"
+
+#: data/Applications/ClassificationApp/NatSkinSearchViewTemplate.txt:5
+msgid "Search result for %1"
+msgstr "Treffer für %1"
+
+#: data/Applications/ClassificationApp/RenderCategoryFactory.txt:62
+msgid ""
+"Select an icon to be used when displaying this category in a list or "
+"hierarchy tree."
+msgstr ""
+
+#: data/Applications/ClassificationApp/RenderCategoryFactory.txt:51
+msgid ""
+"Select one or more parent categories that the newly created category is "
+"subordinated to."
+msgstr ""
+
+#: data/Applications/ClassificationApp/ClassifiedTopic.txt:32
+msgid "Show advanced options"
+msgstr "Erweiterte Optionen anzeigen"
+
+#: data/Applications/ClassificationApp/RenderClassifiedTopicView.txt:31
+msgid "Show all tags"
+msgstr "Alle Schlüsselworte anzeigen"
+
+#: data/_ClassificationTemplate/WebLeftBar.txt:10
+msgid "Statistics"
+msgstr "Statistiken"
+
+#: data/Applications/ClassificationApp/CategorizedTopic.txt:40
+#: data/Applications/ClassificationApp/ClassifiedTopic.txt:53
+#: data/Applications/ClassificationApp/RenderCategoryFactory.txt:66
+#: data/Applications/ClassificationApp/TaggedTopic.txt:33
+#: data/Applications/ClassificationApp/WebTagCloud.txt:27
+msgid "Submit"
+msgstr "Übermitteln"
+
+#: data/Applications/ClassificationApp/RenderCategoryFactory.txt:41
+msgid "Summary"
+msgstr "Zusammenfassung"
+
+#: data/Applications/ClassificationApp/ClassifiedTopicEditTemplate.txt:28
+msgid "Tags"
+msgstr "Schlüsselworte"
+
+#: data/Applications/ClassificationApp/WebAtom.txt:3
+#: data/Applications/ClassificationApp/WebRss.txt:5
+#: data/_ClassificationTemplate/WebAtom.txt:3
+#: data/_ClassificationTemplate/WebRss.txt:5
+msgid "The %1 web of Foswiki, the Free and Open Source Wiki."
+msgstr "Das %1 Web von Foswiki, dem Freien Open Source Wiki."
+
+#: data/_ClassificationTemplate/WebNotify.txt:2
+msgid ""
+"This is a subscription service to be automatically notified by e-mail when "
+"topics change in this %1 web. This is a convenient service, so you do not "
+"have to come back and check all the time if something has changed. To "
+"subscribe, please add a bullet with your %2 in alphabetical order to this "
+"list:"
+msgstr ""
+"Dies ist ein Abonnement-Service, um automatisch per E-Mail benachrichtigt zu "
+"werden, wenn ein Topic im %1 Web sich geändert hat. Um sich für diesen "
+"Service anzumelden fügen Sie einfach ihren %2 in alphabetischer Reihenfolge "
+"zu dieser Liste hinzu."
+
+#: data/Applications/ClassificationApp/ClassifiedTopic.txt:28
+#: data/Applications/ClassificationApp/RenderCategoryFactory.txt:27
+msgid "Title"
+msgstr "Titel"
+
+#: data/Applications/ClassificationApp/RenderCategoryFactory.txt:34
+msgid "Topic"
+msgstr "Topic"
+
+#: data/Applications/ClassificationApp/RenderCategoryEditor.txt:87
+msgid "Undo"
+msgstr "Rückgängig"
+
+#: data/Applications/ClassificationApp/CategorizedTopicEditTemplate.txt:5
+msgid "categorized topic"
+msgstr "kategorisiertes Topic"
+
+#: data/Applications/ClassificationApp/CategoryEditTemplate.txt:8
+msgid "category"
+msgstr "Kategorien"
+
+#: data/Applications/ClassificationApp/ClassifiedTopicEditTemplate.txt:8
+msgid "classified topic"
+msgstr "klassifiziertes Topic"
+
+#: data/Applications/ClassificationApp/RenderTagEditor.txt:56
+msgid "found in %1 other topic(s)"
+msgstr "in %1 anderen Topic(s) gefunden"
+
+#: data/Applications/ClassificationApp/CategoryRenderIndexItem.txt:22
+#: data/Applications/ClassificationApp/RenderClassifiedTopicView.txt:31
+msgid "more"
+msgstr "mehr"
+
+msgid "Tagged %1"
+msgstr "Verschlagwortet als %1"
+
+msgid "tagged %1"
+msgstr "verschlagwortet als %1"

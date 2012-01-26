@@ -1,4 +1,4 @@
-%META:TOPICINFO{author="ProjectContributor" comment="save topic" date="1299849161" format="1.1" reprev="10" version="11"}%
+%META:TOPICINFO{author="ProjectContributor" comment="save topic" date="1326183328" format="1.1" reprev="10" version="13"}%
 %TOC{depth="2"}%
 
 ---++ Documentation
@@ -16,35 +16,21 @@ showing its category and tagging info in the top.
 <verbatim class="tml">
 %STARTINCLUDE%<!-- -->
 %DBCALL{"Applications.RenderWikiTopicView" TITLE_EXTRA="%TITLE_EXTRA%"}%
-%IFDEFINED{
-  "$percntCATINFO{
-    \"%BASEWEB%.%BASETOPIC%\" 
-    header=\"$dollarpercntMAKETEXT{\\"Filed in [_1]\\" args=\\"\"
-    separator=\"&#44; \"
-    footer=\"\\"}$dollarpercnt\"
-   }$percnt" 
-  then="$test$percntTAGINFO{
-    \"%BASEWEB%.%BASETOPIC%\" 
-    header=\", $dollarpercntMAKETEXT{\\"tagged [_1]\\" args=\\"\"
-    separator=\"&#44; \"
-    limit=\"30\"
-    footer=\"$dollarpercntIF{\\"$count > $index\\" 
-        then=\\"<span class='clsTopicInfoMoreContainer'> &#8230; 
-          <a href='#' class='clsTopicInfoMore' title='%MAKETEXT{"Show all tags"}%'>%MAKETEXT{"more"}%</a>
-          </span>\\"
-      }$dollarpercnt\\"}$dollarpercnt\"
-  }$percnt"
-  else="$percntTAGINFO{
-    \"%BASEWEB%.%BASETOPIC%\" 
-    header=\"$dollarpercntMAKETEXT{\\"Tagged [_1]\\" args=\\"\"
-    separator=\"&#44; \"
-    limit=\"30\"
-    footer=\"$dollarpercntIF{\\"$count > $index\\" 
-        then=\\" <span class='clsTopicInfoMoreContainer'>&#8230; 
-          <a href='#' class='clsTopicInfoMore' title='%MAKETEXT{"Show all tags"}%'>%MAKETEXT{"more"}%</a>
-          </span>\\"
-      }$dollarpercnt\\"}$dollarpercnt\"
-  }$percnt"
+%CATINFO{
+  "%BASEWEB%.%BASETOPIC%" 
+  header="$percntMAKETEXT{\"Filed in [_1]\" args=\""
+  separator="&#44; "
+  footer="\"}$percnt$percntCALC{\"$SET(catinfo, 1)\"}$percnt"
+}%%TAGINFO{
+  "%BASEWEB%.%BASETOPIC%" 
+  header="%CALC{"$IF($GET(catinfo),&#44; $percntMAKETEXT{\\"tagged [_1]\\" args=\\",$percntMAKETEXT{\\"Tagged [_1]\\" args=\\")"}%"
+  separator="&#44; "
+  limit="30"
+  footer="$percntIF{\"$count > $index\" 
+    then=\"<span class='clsTopicInfoMoreContainer'> &#8230; 
+      <a href='#' class='clsTopicInfoMore' title='%MAKETEXT{"Show all tags"}%'>%MAKETEXT{"more"}%</a>
+      </span>\"
+    }$percnt\"}$percnt"
 }%
 %JQREQUIRE{"ui"}%<!-- -->
 %ADDTOZONE{
@@ -55,15 +41,6 @@ showing its category and tagging info in the top.
 }%<!-- -->%STOPINCLUDE%
 </verbatim>
 
----++ More tags
-<verbatim class="tml">
-%STARTSECTION{"more"}%%TAGINFO{
-  "%URLPARAM{"source"}%" 
-  skip="30"
-  header=", "
-}%%ENDSECTION{"more"}%
-</verbatim>
-
 ---++ Test
 <div class="alt">
 %DBCALL{"%TOPIC%"}%
@@ -72,7 +49,7 @@ showing its category and tagging info in the top.
 %DBCALL{"Applications.RenderFunctionCallers"}%
 
 ---++ Copyright
-&copy; 2007-2010 Michael Daum http://michaeldaumconsulting.com
+&copy; 2007-2012 Michael Daum http://michaeldaumconsulting.com
 
 %DBCALL{"Applications.GnuGeneralPublicLicense" section="notice"}%
 

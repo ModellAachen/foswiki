@@ -428,7 +428,7 @@ sub handleCATINFO {
       my $parent = $category;
       unless ($theCat) {
         if (Foswiki::Func::topicExists($thisWeb, $thisTopic)) {
-          push @breadCrumbs, "[[$thisWeb.$thisTopic][$thisTopic]]";
+          push @breadCrumbs, "[[$thisWeb.$thisTopic]]";
           push @breadCrumbNames, $thisTopic;
           $seen{$thisTopic} = 1;
         }

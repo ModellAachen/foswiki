@@ -92,9 +92,10 @@ sub readThemeInfos {
 
   # get style path
   my $systemWeb = $Foswiki::cfg{SystemWebName};
-  my $themePath = $Foswiki::cfg{NatSkin}{ThemePath} 
-    || Foswiki::Func::getPreferencesValue('NATSKIN_THEMEPATH') 
+  my $themePath = 
+    Foswiki::Func::getPreferencesValue('NATSKIN_THEMEPATH') 
     || Foswiki::Func::getPreferencesValue('STYLEPATH') # backwards compatibility
+    || $Foswiki::cfg{NatSkin}{ThemePath} 
     || "$systemWeb.JazzyNoteTheme, $systemWeb.NatSkin";
   $themePath =~ s/\%SYSTEMWEB\%/$systemWeb/go;
 
@@ -429,9 +430,12 @@ sub run {
     my $agent = $request->user_agent() || '';
     if ($agent =~ /MSIE/) {
       $context->{msie} = 1;
+      # SMELL: better use Trident version to detect the physical version of the browser
       $context->{msie6} = 1 if $agent =~ /MSIE 6/;
       $context->{msie7} = 1 if $agent =~ /MSIE 7/;
-      $context->{msie8} = 1 if $agent =~ /MSIE 8/;
+      $context->{msie8} = 1 if $agent =~ /MSIE 8/; 
+      $context->{msie9} = 1 if $agent =~ /MSIE 9/;
+      $context->{msie10} = 1 if $agent =~ /MSIE 10/;
     } elsif ($agent =~ /Chrome/) {
       $context->{chrome} = 1;
     } elsif ($agent =~ /Firefox/) {

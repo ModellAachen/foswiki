@@ -1,0 +1,33 @@
+%META:TOPICINFO{author="ProjectContributor" comment="reprev" date="1319538700" format="1.1" reprev="6" version="10"}%
+%META:TOPICPARENT{name="BlogPluginCategory"}%
+Maecenas nec enim at mauris varius porta. Praesent elementum ullamcorper diam in pellentesque. Donec in mauris gravida est sollicitudin feugiat ullamcorper non ipsum. Pellentesque rhoncus imperdiet dui, a interdum enim blandit ac. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. In eleifend vulputate pretium? Donec id purus ante; vel pharetra erat. In ante dui, dapibus quis semper ac, pretium vel nisi. Etiam nec arcu nisl, eu interdum enim. Duis justo ante, accumsan eget rutrum a, dictum at orci. Maecenas leo orci; vehicula facilisis convallis in, lobortis lobortis nibh. Cras dignissim pharetra rhoncus!
+
+Etiam malesuada elit non sem eleifend ornare? Sed porttitor suscipit lobortis. Cras in eros et lorem tempor aliquet sed et diam. Ut ipsum diam, consequat nec egestas pulvinar, dignissim quis nibh. Phasellus non velit sapien, non posuere nunc. Phasellus lorem diam, auctor dapibus euismod eget, egestas sit amet ipsum. Morbi facilisis, enim id hendrerit porta, odio nisi ultrices tortor, eget rhoncus nunc justo et ante. Nam sit amet arcu augue. Nulla risus mauris, rhoncus a interdum at, blandit vel magna. Mauris in lorem nisl. Nullam tortor neque; vestibulum ut condimentum eget, tristique in metus. Donec pretium elit ut nisl vestibulum malesuada.
+
+Sed fermentum orci quis ante commodo bibendum. Maecenas rutrum ultrices nunc; ut volutpat mi vehicula in. Duis porttitor diam sed metus dignissim fermentum. Maecenas pretium diam eget urna consectetur mattis sit amet ac neque massa nunc.
+
+Author=%QUERY{"Author"}%
+
+Summary=%QUERY{"Summary"}%
+
+FORMFIELD=%FORMFIELD{"Author" format="$dollarvalue=$value"}%
+
+FORMFIELD=%FORMFIELD{"Summary" format="$dollarvalue=$value"}%
+
+FORMFIELD=%FORMFIELD{"TopicTitle" format="$dollarvalue=$value"}%
+
+%META:FORM{name="Applications/BlogApp.BlogEntry"}%
+%META:FIELD{name="TopicType" title="TopicType" value="BlogEntry, ClassifiedTopic, CategorizedTopic, TaggedTopic, WikiTopic"}%
+%META:FIELD{name="TopicTitle" attributes="" title="<nop>TopicTitle" value="This is a  test"}%
+%META:FIELD{name="Summary" attributes="" title="Summary" value="Etiam sit amet nisl odio. Mauris pretium consectetur feugiat. Nam volutpat."}%
+%META:FIELD{name="Tag" attributes="" title="Tag" value="foo, bar, baz"}%
+%META:FIELD{name="Category" attributes="" title="Category" value="BlogPluginCategory, HumorCategory, KnowledgeManagementCategory"}%
+%META:FIELD{name="State" attributes="" title="State" value="published"}%
+%META:FIELD{name="Sticky" attributes="" title="Sticky" value="frontpage"}%
+%META:FIELD{name="MetaTitle" attributes="" title="<nop>MetaTitle" value="This is a  test"}%
+%META:FIELD{name="MetaDescription" attributes="" title="<nop>MetaDescription" value="Etiam sit amet nisl odio. Mauris pretium consectetur feugiat. Nam volutpat."}%
+%META:FIELD{name="MetaKeywords" attributes="" title="<nop>MetaKeywords" value="bar, baz, foo"}%
+%META:COMMENT{name="1.1278346545" author="MichaelDaum" date="1278346545" modified="1278357408" ref="" text="Nullam vel purus et ante dignissim lobortis! Vivamus suscipit lacinia libero, eu laoreet dui consectetur eu. Sed non hendrerit metus. Mauris et mollis massa. Maecenas non lorem arcu. Suspendisse ultrices vulputate magna, eget vehicula velit luctus eget. Nulla facilisi. Proin eros quam, blandit sit amet malesuada eu, fringilla ac libero! Cras consequat laoreet imperdiet. Duis molestie ullamcorper neque, id suscipit augue placerat eget. Aliquam quis mauris et lorem mattis placerat? Proin pulvinar fringilla nulla. Etiam in diam orci; id vestibulum lectus.%0a%0aNam velit ante, pellentesque ut condimentum a, consequat vitae massa? Maecenas eu turpis ut dolor dapibus imperdiet. Ut hendrerit nisi dui; id faucibus nunc. Nunc lectus quam, pharetra id posuere at, interdum eget erat. Donec vehicula nullam. x%0a" title="Donec ut libero eu odio sodales condimentum. Nulla ac metus."}%
+%META:COMMENT{name="2.1278346558" author="MichaelDaum" date="1278346558" modified="1278346558" ref="" text="In hendrerit, nulla id ultricies convallis, turpis mauris placerat lectus, congue mollis purus lectus eu elit. Integer consectetur, nibh hendrerit lobortis consectetur, ante velit aliquam orci, nec tristique elit quam non dui. Donec a lacus massa; ac dapibus lacus. Proin blandit ligula sit amet est rutrum molestie. Maecenas lectus tortor, convallis eu rutrum ac, accumsan eget sem. Duis faucibus, nisl a vehicula sagittis, augue felis convallis tellus, non scelerisque lorem lacus vel dolor? Suspendisse non diam mattis quam dictum egestas eu at magna. Nulla euismod pretium massa, eget ullamcorper enim imperdiet vitae. Etiam semper vehicula nisi. Proin diam sapien, dignissim in interdum sed, feugiat a nulla. Sed porta venenatis adipiscing. Sed pretium sem sed magna volutpat faucibus! volutpat.%0d%0a" title=""}%
+%META:COMMENT{name="3.1278346563" author="MichaelDaum" date="1278346563" modified="1278346563" ref="" text="Aliquam erat volutpat. Vestibulum pellentesque rutrum tempor. Fusce dapibus, dolor vel laoreet sollicitudin, tellus enim ultricies odio, eu scelerisque nibh metus ac massa. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Aliquam pulvinar venenatis aliquam! Morbi et metus et felis tristique gravida a nec orci. Proin vitae turpis ac arcu pellentesque tempor. Aenean quis turpis eu turpis commodo porttitor eleifend a felis. Pellentesque consequat augue mi, id porttitor dolor. Quisque vitae magna orci, sit amet pretium metus. Nam id metus libero? Phasellus tincidunt rhoncus quam in scelerisque. Nunc porta, ipsum sit amet vulputate ultrices, ipsum nulla posuere sapien, volutpat ornare nunc elit a ligula. Pellentesque sollicitudin, nunc eget volutpat.%0d%0a" title=""}%
+%META:PREFERENCE{name="DISPLAYCOMMENTS" title="DISPLAYCOMMENTS" type="Local" value="on"}%

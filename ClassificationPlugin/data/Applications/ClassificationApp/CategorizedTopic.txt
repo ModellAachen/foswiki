@@ -45,7 +45,7 @@ See also: CategorizedTopicTemplate, ClassifiedTopic, TaggedTopic
 %ENDTWISTY%
 
 %DBCALL{"Applications.RenderTopicsOfType"
-  FIELDS="Topic, Summary, Category"
+  FIELDS="TopicTitle, Summary, Category"
 }%
 %STOPINCLUDE%
 

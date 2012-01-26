@@ -12,10 +12,55 @@
 %TMPL:DEF{"sidebar"}%%TMPL:END%
 %TMPL:DEF{"bodyclass"}%natEditBody%TMPL:END%
 %TMPL:DEF{"meta"}% %HTTP_EQUIV_ON_EDIT% %TMPL:END%
-%TMPL:DEF{"title"}%%TOPIC% - %WEBLINK{format="$web"}% - (%IF{"defined 'rev'" then="%MAKETEXT{"restore"}%" else="%MAKETEXT{"edit"}%"}%) - %WIKITOOLNAME%%TMPL:END%
-%TMPL:DEF{"moresettings"}%%TMPL:P{"showonscreen"}%%TMPL:P{context="MetaCommentPluginEnabled" then="commentpreferences"}%%TMPL:END%
+%TMPL:DEF{"titleaction"}%%IF{"defined 'rev'" then="%MAKETEXT{"restore"}%" else="%MAKETEXT{"edit"}%"}%%TMPL:END%
 %TMPL:DEF{"moretabs"}%%TMPL:P{"permissionstab"}%%TMPL:END%
 %TMPL:DEF{"contentheader"}%%TMPL:END%
+
+%{ ################################################################################ 
+  SMELL: should come from cfg
+}%
+%TMPL:DEF{"supportedlanguages"}%
+  %MAKETEXT{"Chinese"}%=cjk,
+  %MAKETEXT{"Danish"}%=da,
+  %MAKETEXT{"Dutch"}%=nl,
+  %MAKETEXT{"English"}%=en,
+  %MAKETEXT{"Finnish"}%=fi,
+  %MAKETEXT{"French"}%=fr,
+  %MAKETEXT{"German"}%=de,
+  %MAKETEXT{"Italian"}%=it,
+  %MAKETEXT{"Japanese"}%=cjk,
+  %MAKETEXT{"Korean"}%=cjk,
+  %MAKETEXT{"Portuguese"}%=pt,
+  %MAKETEXT{"Russian"}%=ru,
+  %MAKETEXT{"Spanish"}%=es,
+  %MAKETEXT{"Swedish"}%=se,
+  %MAKETEXT{"Turkish"}%=tr
+%TMPL:END%
+
+%TMPL:DEF{"settings"}%<!-- -->
+<h2>%MAKETEXT{"Topic preferences"}%</h2>
+<div class="foswikiFormSteps">
+  <div class="foswikiFormStep">
+    <h3>%MAKETEXT{"Parent topic"}%:</h3>
+    <input class="foswikiInputField jqUIAutocomplete" autocomplete="%SCRIPTURL{"view"}%/%SYSTEMWEB%/JQueryAjaxHelper?section=topic&contenttype=text/plain&skin=text&baseweb=%BASEWEB%" type="text" name="topicparent" id="topicparent" size="40" value="%TOPICPARENT%"  />
+  </div>
+  <div class="foswikiFormStep foswikiFormLast">
+    <h3>%MAKETEXT{"Content language"}%:</h3>
+    <input type='hidden' name='Default+CONTENT_LANGUAGE' value='%GETVAR{"CONTENT_LANGUAGE" scope="web" default="en"}%' />
+    <select name="Local+CONTENT_LANGUAGE" class="foswikiSelect">
+      %FORMATLIST{
+        "%TMPL:P{"supportedlanguages"}%"
+        split="\s*,\s*"
+        pattern="(.*)=(.*)"
+        separator="$n"
+        format="<option value='$2' $percntIF{\"$'CONTENT_LANGUAGE'='$2' or (not defined CONTENT_LANGUAGE and '$2'='en')\" then=\"selected\"}$percnt>$1</option>"
+      }%
+    </select>
+  </div>
+</div>
+%TMPL:P{"showonscreen"}%%TMPL:P{context="MetaCommentPluginEnabled" then="commentpreferences"}%
+%TMPL:P{"moresettings"}%<!--  -->
+<!-- -->%TMPL:END%
 
 %{ ################################################################################ }%
 %TMPL:DEF{"showonscreen"}%<!-- -->
@@ -37,46 +82,46 @@
 
 %{ ################################################################################ }%
 %TMPL:DEF{"showonscreen::sidebar"}%<tr>
-  <th>%MAKETEXT{"Sidebar"}%<input type='hidden' name='Default+NATSKIN_SIDEBAR' value="%GETVAR{"NATSKIN_SIDEBAR" scope="web" default="on"}%" /></th>
-  <td><input type='radio' class='foswikiRadioButton' id="displayform_on" name='Local+NATSKIN_SIDEBAR' value="on" %IF{"$'NATSKIN_SIDEBAR'=~'on|left|right|both' OR isempty 'NATSKIN_SIDEBAR'" then="checked='checked'"}% /></td>
+  <th>%MAKETEXT{"Sidebar"}%<input type='hidden' name='Default+NATSKIN_SIDEBAR' value='%GETVAR{"NATSKIN_SIDEBAR" scope="web" default="on"}%' /></th>
+  <td><input type='radio' class='foswikiRadioButton' id="displayform_on" name='Local+NATSKIN_SIDEBAR' value='%GETVAR{"NATSKIN_SIDEBAR" scope="web" default="on"}%' %IF{"$'NATSKIN_SIDEBAR'=~'on|left|right|both' OR isempty 'NATSKIN_SIDEBAR'" then="checked='checked'"}% /></td>
   <td><label for="displayform_on">%MAKETEXT{"on"}%</label></td>
-  <td><input type='radio' class='foswikiRadioButton' id="displayform_off" name='Local+NATSKIN_SIDEBAR' value="off" %IF{"$'NATSKIN_SIDEBAR'='off'" then="checked='checked'"}% /></td>
+  <td><input type='radio' class='foswikiRadioButton' id="displayform_off" name='Local+NATSKIN_SIDEBAR' value='off' %IF{"$'NATSKIN_SIDEBAR'='off'" then="checked='checked'"}% /></td>
   <td><label for="displayform_off">%MAKETEXT{"off"}%</label></td>
 </tr>%TMPL:END%
 
 %{ ################################################################################ }%
 %TMPL:DEF{"showonscreen::dataform"}%<tr>
-  <th>%MAKETEXT{"Data form"}%<input type='hidden' name='Default+DISPLAYFORM' value="%GETVAR{"DISPLAYFORM" scope="web" default="on"}%" /></th>
-  <td><input type='radio' class='foswikiRadioButton' id="displayform_on" name='Local+DISPLAYFORM' value="on" %IF{"$'DISPLAYFORM'='on' OR isempty 'DISPLAYFORM'" then="checked='checked'"}% /></td>
+  <th>%MAKETEXT{"Data form"}%<input type='hidden' name='Default+DISPLAYFORM' value='%GETVAR{"DISPLAYFORM" scope="web" default="on"}%' /></th>
+  <td><input type='radio' class='foswikiRadioButton' id="displayform_on" name='Local+DISPLAYFORM' value='on' %IF{"$'DISPLAYFORM'='on' OR isempty 'DISPLAYFORM'" then="checked='checked'"}% /></td>
   <td><label for="displayform_on">%MAKETEXT{"on"}%</label></td>
-  <td><input type='radio' class='foswikiRadioButton' id="displayform_off" name='Local+DISPLAYFORM' value="off" %IF{"$'DISPLAYFORM'='off'" then="checked='checked'"}% /></td>
+  <td><input type='radio' class='foswikiRadioButton' id="displayform_off" name='Local+DISPLAYFORM' value='off' %IF{"$'DISPLAYFORM'='off'" then="checked='checked'"}% /></td>
   <td><label for="displayform_off">%MAKETEXT{"off"}%</label></td>
 </tr>%TMPL:END%
 
 %{ ################################################################################ }%
 %TMPL:DEF{"showonscreen::attachments"}%<tr>
-  <th>%MAKETEXT{"Attachments"}%<input type='hidden' name='Default+DISPLAYATTACHMENTS' value="%GETVAR{"DISPLAYATTACHMENTS" scope="web" default="on"}%" /></th>
-  <td><input type="radio" class="foswikiRadioButton" id="displayattachments_on" name="Local+DISPLAYATTACHMENTS" value="on" %IF{"$'DISPLAYATTACHMENTS'='on' OR isempty 'DISPLAYATTACHMENTS'" then="checked='checked'"}% /></td>
+  <th>%MAKETEXT{"Attachments"}%<input type='hidden' name='Default+DISPLAYATTACHMENTS' value='%GETVAR{"DISPLAYATTACHMENTS" scope="web" default="on"}%' /></th>
+  <td><input type="radio" class="foswikiRadioButton" id="displayattachments_on" name="Local+DISPLAYATTACHMENTS" value='on' %IF{"$'DISPLAYATTACHMENTS'='on' OR isempty 'DISPLAYATTACHMENTS'" then="checked='checked'"}% /></td>
   <td><label for="displayattachments_on">%MAKETEXT{"on"}%</label></td>
-  <td><input type='radio' class="foswikiRadioButton" id="displayattachments_off" name='Local+DISPLAYATTACHMENTS' value="off" %IF{"$'DISPLAYATTACHMENTS'='off'" then="checked='checked'"}% /></td>
+  <td><input type='radio' class="foswikiRadioButton" id="displayattachments_off" name='Local+DISPLAYATTACHMENTS' value='off' %IF{"$'DISPLAYATTACHMENTS'='off'" then="checked='checked'"}% /></td>
   <td><label for="displayattachments_off">%MAKETEXT{"off"}%</label></td>
 </tr>%TMPL:END%
 
 %{ ################################################################################ }%
 %TMPL:DEF{"showonscreen::comments"}%<tr>
-  <th>%MAKETEXT{"Comments"}%<input type='hidden' name='Default+DISPLAYCOMMENTS' value="%GETVAR{"DISPLAYCOMMENTS" scope="web" default="off"}%" /></th>
-  <td><input type="radio" class="foswikiRadioButton" id="displaycomments_on" name="Local+DISPLAYCOMMENTS" value="on" %IF{"$'DISPLAYCOMMENTS'='on'" then="checked='checked'"}% /></td>
+  <th>%MAKETEXT{"Comments"}%<input type='hidden' name='Default+DISPLAYCOMMENTS' value='%GETVAR{"DISPLAYCOMMENTS" scope="web" default="off"}%' /></th>
+  <td><input type="radio" class="foswikiRadioButton" id="displaycomments_on" name="Local+DISPLAYCOMMENTS" value='on' %IF{"$'DISPLAYCOMMENTS'='on'" then="checked='checked'"}% /></td>
   <td><label for="displaycomments_on">%MAKETEXT{"on"}%</label></td>
-  <td><input type='radio' class="foswikiRadioButton" id="displaycomments_off" name='Local+DISPLAYCOMMENTS' value="off" %IF{"$'DISPLAYCOMMENTS'='off' OR isempty 'DISPLAYCOMMENTS'" then="checked='checked'"}% /></td>
+  <td><input type='radio' class="foswikiRadioButton" id="displaycomments_off" name='Local+DISPLAYCOMMENTS' value='off' %IF{"$'DISPLAYCOMMENTS'='off' OR isempty 'DISPLAYCOMMENTS'" then="checked='checked'"}% /></td>
   <td><label for="displaycomments_off">%MAKETEXT{"off"}%</label></td>
 </tr>%TMPL:END%
 
 %{ ################################################################################ }%
 %TMPL:DEF{"showonscreen::topicactions"}%<tr>
-  <th>%MAKETEXT{"Topic actions"}%<input type='hidden' name='Default+DISPLAYTOPICACTIONS' value="%GETVAR{"DISPLAYTOPICACTIONS" scope="web" default="on"}%" /></th>
-  <td><input type="radio" class="foswikiRadioButton" id="displaytopicactions_on" name="Local+DISPLAYTOPICACTIONS" value="on" %IF{"$'DISPLAYTOPICACTIONS'='on' OR isempty 'DISPLAYTOPICACTIONS'" then="checked='checked'"}% /></td>
+  <th>%MAKETEXT{"Topic actions"}%<input type='hidden' name='Default+DISPLAYTOPICACTIONS' value='%GETVAR{"DISPLAYTOPICACTIONS" scope="web" default="on"}%' /></th>
+  <td><input type="radio" class="foswikiRadioButton" id="displaytopicactions_on" name="Local+DISPLAYTOPICACTIONS" value='on' %IF{"$'DISPLAYTOPICACTIONS'='on' OR isempty 'DISPLAYTOPICACTIONS'" then="checked='checked'"}% /></td>
   <td><label for="displaytopicactions_on">%MAKETEXT{"on"}%</label></td>
-  <td><input type='radio' class="foswikiRadioButton" id="displaytopicactions_off" name='Local+DISPLAYTOPICACTIONS' value="off" %IF{"$'DISPLAYTOPICACTIONS'='off'" then="checked='checked'"}% /></td>
+  <td><input type='radio' class="foswikiRadioButton" id="displaytopicactions_off" name='Local+DISPLAYTOPICACTIONS' value='off' %IF{"$'DISPLAYTOPICACTIONS'='off'" then="checked='checked'"}% /></td>
   <td><label for="displaytopicactions_off">%MAKETEXT{"off"}%</label></td>
 </tr>%TMPL:END%
 

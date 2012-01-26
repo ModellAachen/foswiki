@@ -1,6 +1,6 @@
 # Plugin for Foswiki - The Free and Open Source Wiki, http://foswiki.org/
 #
-# Copyright (C) 2005-2011 Michael Daum http://michaeldaumconsulting.com
+# Copyright (C) 2005-2012 Michael Daum http://michaeldaumconsulting.com
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -41,6 +41,10 @@ sub new {
   $this->{_loadTime} = 0;
   $this->{web} = $this->{_web};
   $this->{web} =~ s/\./\//go;
+
+  $this->{prevTopicCache} = ();
+  $this->{nextTopicCache} = ();
+
   return $this;
 }
 
@@ -76,7 +80,7 @@ sub load {
 sub _getCacheFile {
   my $this = shift;
 
-  my $cacheFile = $this->{archivist}->{_file};
+  my $cacheFile = $this->getArchivist()->{_file};
   writeDebug("cacheFile=$cacheFile");
   return $cacheFile if -f $cacheFile;
 
@@ -246,8 +250,9 @@ sub onReload {
     my @comments = $meta->find('COMMENT');
     my $commentDate = 0;
     my $cmts;
+    my $archivist = $this->getArchivist();
     foreach my $comment (@comments) {
-      my $cmt = $this->{archivist}->newMap(initial => $comment) ;
+      my $cmt = $archivist->newMap(initial => $comment) ;
       my $cmtDate = $comment->{date};
       if ($cmtDate > $commentDate) {
         $commentDate = $cmtDate;
@@ -256,7 +261,7 @@ sub onReload {
       $cmt->set('_web', $this->{_cache});
       $cmts = $topic->get('comments');
       if (!defined($cmts)) {
-        $cmts = $this->{archivist}->newArray();
+        $cmts = $archivist->newArray();
         $topic->set('comments', $cmts);
       }
       $cmts->add($cmt);
@@ -289,8 +294,48 @@ sub getFormField {
   $fieldName =~ s/<nop>//g;
   $fieldName =~ s/[^A-Za-z0-9_\.]//g;
 
-  my $formfield = $form->fastget($fieldName) || '';
+  my $formfield = $form->fastget($fieldName);
+  $formfield = '' unless  defined $formfield;
+
   return urlDecode($formfield);
+}
+
+###############################################################################
+sub getNeighbourTopics {
+  my ($this, $theTopic, $theSearch, $theOrder, $theReverse) = @_;
+
+  my $key = $this->{web}.'.'.$theTopic.':'.$theSearch.':'.$theOrder.':'.$theReverse;
+  my $prevTopic = $this->{prevTopicCache}{$key};
+  my $nextTopic = $this->{nextTopicCache}{$key};
+
+  unless ($prevTopic && $nextTopic) {
+
+    my ($resultList) = $this->dbQuery($theSearch, undef, $theOrder, $theReverse);
+    my $state = 0;
+    foreach my $t (@$resultList) {
+      if ($state == 1) {
+        $state = 2;
+        $nextTopic = $t;
+        last;
+      }
+      $state = 1 if $t eq $theTopic;
+      $prevTopic = $t if $state == 0;
+      #writeDebug("t=$t, state=$state");
+    }
+
+    $prevTopic = '_notfound' if !$prevTopic || $state == 0;
+    $nextTopic = '_notfound' if !$nextTopic || !$state == 2;
+    $this->{prevTopicCache}{$key} = $prevTopic;
+    $this->{nextTopicCache}{$key} = $nextTopic;
+
+    #writeDebug("prevTopic=$prevTopic, nextTopic=$nextTopic");
+
+  }
+
+  $prevTopic = '' if $prevTopic eq '_notfound';
+  $nextTopic = '' if $nextTopic eq '_notfound';
+
+  return ($prevTopic, $nextTopic);
 }
 
 ###############################################################################
@@ -384,7 +429,11 @@ sub dbQuery {
           $format =~ s/\$nop//go;
           $format =~ s/\$n/\n/go;
           $format =~ s/\$dollar/\$/go;
-          $sorting{$topicName} = $this->expandPath($topicObj, $format);
+          my @sorting = ();
+          foreach my $item (split(/\s*,\s*/, $format)) {
+            push @sorting, $item;
+          }
+          $sorting{$topicName} = $this->expandPath($topicObj, join(" and ", @sorting));
           $doNumericalSort = 0 
             if ($doNumericalSort == 1) && $sorting{$topicName} && !($sorting{$topicName} =~ /^[+-]?\d+(\.\d+)?$/);
           #print STDERR "topicName=$topicName - sorting=$sorting{$topicName} - doNumericalSort=$doNumericalSort\n";
@@ -416,7 +465,7 @@ sub dbQuery {
 sub expandPath {
   my ($this, $theRoot, $thePath) = @_;
 
-  return '' if !$thePath || !$theRoot;
+  return '' if !defined($thePath) || !defined($theRoot);
   $thePath =~ s/^\.//o;
   $thePath =~ s/\[([^\]]+)\]/$1/o;
 
@@ -473,9 +522,9 @@ sub expandPath {
     my $form = $theRoot->fastget('form');
     $form = $theRoot->fastget($form) if $form;
     $root = $form->fastget($first) if $form;
-    $root = $theRoot->fastget($first) unless $root;
+    $root = $theRoot->fastget($first) unless defined $root;
     return $this->expandPath($root, $tail) if ref($root);
-    return '' unless $root;
+    return '' unless defined $root;
     return $root if $first eq 'text';    # not url encoded
     my $field = urlDecode($root);
 

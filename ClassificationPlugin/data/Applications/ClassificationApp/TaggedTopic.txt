@@ -38,7 +38,7 @@ See also: ClassifiedTopic, CategorizedTopic, TaggedTopicTemplate, TaggedTopicVie
 %ENDTWISTY%
 
 %DBCALL{"Applications.RenderTopicsOfType"
-  FIELDS="Topic, Summary, Tag, Changed"
+  FIELDS="TopicTitle, Summary, Tag, Changed"
   ROWS="20"
 }%
 %STOPINCLUDE%

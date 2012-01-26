@@ -5,16 +5,18 @@
 <h2>%MAKETEXT{"Search result for [_1]" args="<span class='natSearchString'>\"%URLPARAM{"search"}%\"</span>"}%</h2>
 %DBCALL{"Applications.ClassificationApp.CategorySearch" VALUE="%SEARCHSTRING%"}%%SPLIT%
 %SPLIT%<div class='natSearchResult'>%REPEAT% 
-%~~ DBQUERY{topic="%BASEWEB%.%TOPICNAME%"
-~~~   format="<div class='natSearchHit'>
-~~~             <a class='natSearchTarget' href='%SCRIPTURLPATH{"view"}%/$web/$topic'>$expand(topictitle)</a>
-~~~             <div class='natSearchSummary'>$formfield(Summary)</div>
-~~~             <div class="natSearchRevision">
-~~~               changed on <a href='%SCRIPTURLPATH{"rdiff"}%/$web/$topic?type=last'>$formatTime(info.date)</a> 
-~~~               by <span class='natSearchAuthor'> [[%USERSWEB%.$expand(info.author)][$expand(info.author)]] </span>
-~~~             </div>
-~~~           </div>"
-~~~ }%
+%DBQUERY{
+  topic="%BASEWEB%.%TOPICNAME%"
+  format="<div class='natSearchHit'>
+    <a class='natSearchTarget' href='%SCRIPTURLPATH{"view"}%/$web/$topic'>$expand(topictitle)</a>
+    <div class='natSearchSummary'>$formfield(Summary)</div>
+    <div class="natSearchRevision">
+      changed on 
+      <a href='%SCRIPTURLPATH{"rdiff"}%/$web/$topic?type=last'>$formatTime(info.date)</a> 
+      by <span class='natSearchAuthor'> [[%USERSWEB%.$expand(info.author)][$expand(info.author)]] </span>
+   </div>
+   </div>"
+}%
 %REPEAT%</div>%SPLIT%<div class="natSearchTotal">
   %MAKETEXT{"<span>[_1]</span> topics found" args="%NTOPICS%"}%
 </div>%SPLIT%

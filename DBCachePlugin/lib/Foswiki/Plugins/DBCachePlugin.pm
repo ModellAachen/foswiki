@@ -1,6 +1,6 @@
 # Plugin for Foswiki - The Free and Open Source Wiki, http://foswiki.org/
 #
-# Copyright (C) 2005-2011 Michael Daum http://michaeldaumconsulting.com
+# Copyright (C) 2005-2012 Michael Daum http://michaeldaumconsulting.com
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -29,7 +29,7 @@ use vars qw(
 );
 
 $VERSION = '$Rev$';
-$RELEASE = '3.70';
+$RELEASE = '4.10';
 $NO_PREFS_IN_TOPIC = 1;
 $SHORTDESCRIPTION = 'Lightweighted frontend to the DBCacheContrib';
 
@@ -43,16 +43,57 @@ sub initPlugin {
   #    return 0;
   #  }
 
-  Foswiki::Func::registerTagHandler('DBQUERY', \&DBQUERY);
-  Foswiki::Func::registerTagHandler('DBCALL', \&DBCALL);
-  Foswiki::Func::registerTagHandler('DBSTATS', \&DBSTATS);
-  Foswiki::Func::registerTagHandler('DBDUMP', \&DBDUMP);    # for debugging
-  Foswiki::Func::registerTagHandler('DBRECURSE', \&DBRECURSE);
-  Foswiki::Func::registerTagHandler('TOPICTITLE', \&TOPICTITLE);
-  Foswiki::Func::registerTagHandler('GETTOPICTITLE', \&TOPICTITLE);
+  Foswiki::Func::registerTagHandler('DBQUERY', sub {
+    initCore();
+    return Foswiki::Plugins::DBCachePlugin::Core::handleDBQUERY(@_);
+  });
+
+  Foswiki::Func::registerTagHandler('DBCALL', sub {
+    initCore();
+    return Foswiki::Plugins::DBCachePlugin::Core::handleDBCALL(@_);
+  });
+
+  Foswiki::Func::registerTagHandler('DBSTATS', sub {
+    initCore();
+    return Foswiki::Plugins::DBCachePlugin::Core::handleDBSTATS(@_);
+  });
+
+  Foswiki::Func::registerTagHandler('DBDUMP', sub {
+    initCore();
+    return Foswiki::Plugins::DBCachePlugin::Core::handleDBDUMP(@_);
+  });
+
+  Foswiki::Func::registerTagHandler('DBRECURSE', sub {
+    initCore();
+    return Foswiki::Plugins::DBCachePlugin::Core::handleDBRECURSE(@_);
+  });
+
+  Foswiki::Func::registerTagHandler('DBPREV', sub {
+    initCore();
+    return Foswiki::Plugins::DBCachePlugin::Core::handleNeighbours(1, @_);
+  });
+
+  Foswiki::Func::registerTagHandler('DBNEXT', sub {
+    initCore();
+    return Foswiki::Plugins::DBCachePlugin::Core::handleNeighbours(0, @_);
+  });
+
+  Foswiki::Func::registerTagHandler('TOPICTITLE', sub {
+    initCore();
+    return Foswiki::Plugins::DBCachePlugin::Core::handleTOPICTITLE(@_);
+  });
+
+  Foswiki::Func::registerTagHandler('GETTOPICTITLE', sub {
+    initCore();
+    return Foswiki::Plugins::DBCachePlugin::Core::handleTOPICTITLE(@_);
+  });
 
   Foswiki::Func::registerRESTHandler('UpdateCache', \&restUpdateCache);
-  Foswiki::Func::registerRESTHandler('dbdump', \&restDBDUMP);
+
+  Foswiki::Func::registerRESTHandler('dbdump', sub {
+    initCore();
+    return Foswiki::Plugins::DBCachePlugin::Core::restDBDUMP(@_);
+  });
 
   # SMELL: remove this when Foswiki::Cache got into the core
   my $cache = $Foswiki::Plugins::SESSION->{cache}
@@ -87,13 +128,6 @@ sub restUpdateCache {
 
   my $db = getDB($web);
   $db->load(1) if $db;
-}
-
-###############################################################################
-# REST handler to debug a topic in cache
-sub restDBDUMP {
-  initCore();
-  return Foswiki::Plugins::DBCachePlugin::Core::restDBDUMP(@_);
 }
 
 ###############################################################################
@@ -193,35 +227,6 @@ sub renderWikiWordHandler {
 
 ###############################################################################
 # tags
-sub DBQUERY {
-  initCore();
-  return Foswiki::Plugins::DBCachePlugin::Core::handleDBQUERY(@_);
-}
-
-sub DBCALL {
-  initCore();
-  return Foswiki::Plugins::DBCachePlugin::Core::handleDBCALL(@_);
-}
-
-sub DBSTATS {
-  initCore();
-  return Foswiki::Plugins::DBCachePlugin::Core::handleDBSTATS(@_);
-}
-
-sub DBDUMP {
-  initCore();
-  return Foswiki::Plugins::DBCachePlugin::Core::handleDBDUMP(@_);
-}
-
-sub DBRECURSE {
-  initCore();
-  return Foswiki::Plugins::DBCachePlugin::Core::handleDBRECURSE(@_);
-}
-
-sub TOPICTITLE {
-  initCore();
-  return Foswiki::Plugins::DBCachePlugin::Core::handleTOPICTITLE(@_);
-}
 
 ###############################################################################
 # perl api
@@ -245,5 +250,4 @@ sub addDependencyHandler {
   return $cache->addDependency(@_) if $cache;
 }
 
-###############################################################################
 1;

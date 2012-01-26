@@ -1,4 +1,4 @@
-<noautolink><div class="foswikiBar foswikiBottomBar">
+<noautolink><div class="foswikiSection foswikiBottomBar">
 	<div class="foswikiContainer">
 		%WEBCOPYRIGHT%
 	</div>

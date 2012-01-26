@@ -1,14 +1,14 @@
-%META:TOPICINFO{author="micha" comment="reprev" date="1311861083" format="1.1" reprev="5" version="5"}%
+%META:TOPICINFO{author="ProjectContributor" comment="reprev" date="1311861083" format="1.1" reprev="5" version="5"}%
 ---+ %TOPIC%
 Definition of site wide horizontal menu
 
 ---++ Implementation
 <verbatim class="tml">
 %STARTINCLUDE%<ul>
-  <li>[[%USERSWEB%.%HOMETOPIC%][Home]]</li>
-  <!-- li>[[News.%HOMETOPIC%][News]]</li -->
-  <!-- li>[[Knowledge.%HOMETOPIC%][Knowledge]]</li -->
-  <!-- li>[[Projects.%HOMETOPIC%][Projects]]</li -->
+  <li>[[%USERSWEB%.%HOMETOPIC%][%MAKETEXT{"Home"}%]]</li>
+  <!-- li>[[News.%HOMETOPIC%][%MAKETEXT{"News"}%]]</li -->
+  <!-- li>[[Knowledge.%HOMETOPIC%][%MAKETEXT{"Knowledge"}%]]</li -->
+  <!-- li>[[Projects.%HOMETOPIC%][%MAKETEXT{"Projects"}%]]</li -->
 %IF{"'%USERNAME%' ingroup 'AdminGroup'" 
   then="$percntINCLUDE{\"%SYSTEMWEB%.SiteMenu\" section=\"adminmenu\"}$percnt"
 }% %INCLUDE{"%SYSTEMWEB%.SiteMenu" section="helpmenu"}%
@@ -37,13 +37,13 @@ Definition of site wide horizontal menu
 %STARTSECTION{"helpmenu"}%<li>[[%SYSTEMWEB%.WebHome][%MAKETEXT{"Help"}%]]
   <ul>
     <li>[[%SYSTEMWEB%.WelcomeGuest][%JQICON{"house"}% %MAKETEXT{"Welcome"}%]]</li>
-    <li>[[%SYSTEMWEB%.UserDocumentationCategory][%JQICON{"book"}% %MAKETEXT{"User Docs"}%]]</li>
-    <li>[[%SYSTEMWEB%.AdminDocumentationCategory][%JQICON{"book_key"}% %MAKETEXT{"Admin Docs"}%]]</li>
-    <li>[[%SYSTEMWEB%.DeveloperDocumentationCategory][%JQICON{"book_edit"}% %MAKETEXT{"Developer Docs"}%]]</li>
-    <li>[[%SYSTEMWEB%.ReferenceManual][%JQICON{"book_open"}% %MAKETEXT{"Reference Manual"}%]]</li>
+    <li>[[%SYSTEMWEB%.UserDocumentationCategory][%JQICON{"book"}% %MAKETEXT{"User docs"}%]]</li>
+    <li>[[%SYSTEMWEB%.AdminDocumentationCategory][%JQICON{"book_key"}% %MAKETEXT{"Admin docs"}%]]</li>
+    <li>[[%SYSTEMWEB%.DeveloperDocumentationCategory][%JQICON{"book_edit"}% %MAKETEXT{"Developer docs"}%]]</li>
+    <li>[[%SYSTEMWEB%.ReferenceManual][%JQICON{"book_open"}% %MAKETEXT{"Reference manual"}%]]</li>
     <li>[[%SYSTEMWEB%.InstalledPlugins][%JQICON{"plugin"}% %MAKETEXT{"Installed plugins"}%]]</li>
     <li><hr /></li>
-    <li>[[Sandbox.%HOMETOPIC%][%JQICON{"briefcase"}% Sandbox]]</li>
+    <li>[[Sandbox.%HOMETOPIC%][%JQICON{"briefcase"}% %MAKETEXT{"Sandbox"}%]]</li>
     <li>[[%SYSTEMWEB%.ResetPassword][%JQICON{"key"}% %MAKETEXT{"Password forgotten"}%]]</li>
     <li><hr /></li>
     <li>[[http://foswiki.org/Support][%JQICON{"user_comment"}% %MAKETEXT{"Online support forum"}%]]</li>
@@ -65,11 +65,11 @@ Definition of site wide horizontal menu
          <ul class=\"ajaxMenu {url:'%SCRIPTURL{"view"}%/%SYSTEMWEB%/SiteMenu?skin=text;section=subwebs;theweb=Applications;icon=application%IF{"defined EXCLUDEWIKIAPPS" then=";excludeweb=%EXCLUDEWIKIAPPS%"}%'}\"></ul>
        </li>"
     }%<!-- -->
-    <li>[[%BASEWEB%.%WEBPREFSTOPIC%][%JQICON{"wrench"}% %MAKETEXT{"Web Preferences"}%]]</li>
-    <li>[[%LOCALSITEPREFS%][%JQICON{"wrench_orange"}% %MAKETEXT{"Site Preferences"}%]]</li>
-    <li>[[%SYSTEMWEB%.SitePermissions][%JQICON{"key"}% %MAKETEXT{"Site Permissions"}%]]</li>
+    <li>[[%BASEWEB%.%WEBPREFSTOPIC%][%JQICON{"wrench"}% %MAKETEXT{"Web preferences"}%]]</li>
+    <li>[[%LOCALSITEPREFS%][%JQICON{"wrench_orange"}% %MAKETEXT{"Site preferences"}%]]</li>
+    <li>[[%SYSTEMWEB%.SitePermissions][%JQICON{"key"}% %MAKETEXT{"Site permissions"}%]]</li>
     %IF{"context ActivityStreamPluginEnabled" 
-      then="<li>[[%SYSTEMWEB%.SiteActivityStream][%JQICON{"user"}% %MAKETEXT{"Site Activities"}%]]</li>"
+      then="<li>[[%SYSTEMWEB%.SiteActivityStream][%JQICON{"user"}% %MAKETEXT{"Site activities"}%]]</li>"
     }%<!-- -->
     <li>[[%SCRIPTURLPATH{"configure"}%][%JQICON{"wand"}% %MAKETEXT{"Configure Foswiki"}%]]</li>
     <li> <hr /> </li>

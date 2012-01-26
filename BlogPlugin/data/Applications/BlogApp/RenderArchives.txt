@@ -1,0 +1,60 @@
+%META:TOPICINFO{author="ProjectContributor" comment="reprev" date="1320867705" format="1.1" reprev="7" version="8"}%
+%META:TOPICPARENT{name="TopicFunction"}%
+%TOC{depth="2"}%
+
+---++ Documentation
+%STARTSECTION{name="documentation" type="section"}%
+%RED%TODO%ENDCOLOR%
+
+---+++++ Parameters
+   * CAT: render archive links in this Category (optional)
+
+%ENDSECTION{name="documentation" type="section"}%
+
+---++ Implementation
+<verbatim class="tml">
+%STARTINCLUDE%<noautolink>
+%DBSTATS{
+   "TopicType=~'\bBlogEntry\b' %IF{"defined CAT and '%CAT%'!=''" then="AND topic ISA '%CAT%'"}% AND State!='unpublished' AND topic != 'WebTopicEditTemplate'"
+   web="%BASEWEB%"
+   field="createdate"
+   hidenull="on"
+   sort="created"
+   reverse="on"
+   pattern="((\w+) (\d\d\d\d))"
+   header="<div class='blogSideBarSection blogSideBarArchive'>
+     <h2 >
+       %IF{"defined CAT and '%CAT%'!=''" 
+         then="%MAKETEXT{"[_1] Archive" args="%CATINFO{cat="%CAT%" format="$title"}%"}%"
+         else="%MAKETEXT{"Archive"}%"
+       }%
+     </h2>
+     <div class='jqSerialPager'><ul>"
+   format="<li>
+     <a href='%SCRIPTURLPATH{"view"}%/%BASEWEB%/WebSearch?filter=$percntENCODE{createdate:[$percntCALC{\"$FORMATTIME($TIME(01 $key2 $key3), $year-$month-01T00:00:00Z)\"}$percnt/MONTH TO $percntCALC{\"$FORMATTIME($TIME(01 $key2 $key3), $year-$month-01T00:00:00Z)\"}$percnt/MONTH+1MONTH]}$percnt'>
+       <span class='foswikiRight'>$count</span>
+       $key
+     </a></li>"
+   footer="</ul></div></div>"
+}%<!-- -->%STOPINCLUDE%
+</verbatim>
+
+---++ Test
+%DBCALL{"%TOPIC%"}%
+%JQREQUIRE{"serialpager"}%
+
+%DBCALL{"Applications.RenderFunctionCallers"}%
+
+---++ Copyright
+&copy; 2005-2011 http://michaeldaumconsulting.com
+
+%DBCALL{"Applications.GnuGeneralPublicLicense" section="notice"}%
+
+</verbatim>
+
+%META:FORM{name="Applications.ApplicationTopic"}%
+%META:FIELD{name="TopicType" title="TopicType" value="DocuTopic, TopicFunction"}%
+%META:FIELD{name="TopicTitle" attributes="" title="<nop>TopicTitle" value=""}%
+%META:FIELD{name="Summary" attributes="c" title="Summary" value="display a list of months and the numbers of BlogEntries in it for the sidebar"}%
+%META:FIELD{name="WikiApplication" attributes="" title="WikiApplication" value="BlogApp"}%
+%META:PREFERENCE{name="EDIT_TEMPLATE" title="EDIT_TEMPLATE" type="Set" value="Applications.WikiTopicEdit"}%

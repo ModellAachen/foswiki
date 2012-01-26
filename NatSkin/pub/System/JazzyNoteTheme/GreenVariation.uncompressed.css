@@ -13,9 +13,6 @@
   border-top:0px;
   border-bottom:1px solid #555;
 }
-.natTopLeft, .natTopRight {
-  border-bottom:1px solid #2F7A1C;
-}
 .natBodyFixed .natSideBarHeaderLeft,
 .natBodyFixed .natWebMenuLeft {
   border-left:1px #4a4a4a solid;

@@ -1,6 +1,6 @@
 # Plugin for Foswiki - The Free and Open Source Wiki, http://foswiki.org/
 #
-# Copyright (C) 2006-2009 Michael Daum http://michaeldaumconsulting.com
+# Copyright (C) 2006-2012 Michael Daum http://michaeldaumconsulting.com
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -25,7 +25,7 @@ use Foswiki::Plugins ();
 use constant DEBUG => 0; # toggle me
 
 $VERSION = '$Rev: 3642 (2009-04-23) $';
-$RELEASE = '2.20';
+$RELEASE = '2.30';
 $SHORTDESCRIPTION = 'Create a user topic if it does not exist yet';
 $NO_PREFS_IN_TOPIC = 1;
 
@@ -110,6 +110,7 @@ sub createUserTopic {
   my $systemWeb = $Foswiki::cfg{SystemWebName};
   my $usersWeb = $Foswiki::cfg{UsersWebName};
   my $newUserTemplate =
+    $Foswiki::cfg{NewUserPlugin}{NewUserTemplate} ||
     Foswiki::Func::getPreferencesValue('NEWUSERTEMPLATE') || 'NewUserTemplate';
   my $tmplTopic;
   my $tmplWeb;
@@ -138,7 +139,7 @@ sub createUserTopic {
   writeDebug("newusertemplate = $tmplWeb.$tmplTopic");
 
   # read the template
-  my $text = Foswiki::Func::readTopicText($tmplWeb, $tmplTopic);
+  my ($meta, $text) = Foswiki::Func::readTopic($tmplWeb, $tmplTopic);
   unless ($text) {
     writeWarning("can't read $tmplWeb.$tmplTopic");
     return;
@@ -165,9 +166,9 @@ sub createUserTopic {
   $session->{user} = $registrationAgentCUID;
 
   writeDebug("saving new home topic $usersWeb.$wikiName");
-  my $errorMsg = Foswiki::Func::saveTopicText($usersWeb, $wikiName, $text);
+  my $errorMsg = Foswiki::Func::saveTopic($usersWeb, $wikiName, $meta, $text);
   if ($errorMsg) {
-    writeWarning("error during save of $tmplWeb.$tmplTopic: $errorMsg");
+    writeWarning("error during save of $usersWeb.$wikiName: $errorMsg");
     $session->{user} = $origCUID;
     return;
   } 

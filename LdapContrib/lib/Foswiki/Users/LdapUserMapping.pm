@@ -1,6 +1,6 @@
 # Module of Foswiki - The Free and Open Source Wiki, http://foswiki.org/
 #
-# Copyright (C) 2006-2010 Michael Daum http://michaeldaumconsulting.com
+# Copyright (C) 2006-2012 Michael Daum http://michaeldaumconsulting.com
 # Portions Copyright (C) 2006 Spanlink Communications
 #
 # This program is free software; you can redistribute it and/or
@@ -332,7 +332,7 @@ sub eachGroupMember {
   my ($this, $groupName, $options) = @_;
 
   writeDebug("called eachGroupMember($groupName)");
-  return $this->SUPER::eachGroupMember($groupName, $options) 
+  return $this->SUPER::eachGroupMember($groupName, $options)
     unless $this->{ldap}{mapGroups};
 
   my $expand = $options->{expand};
@@ -352,13 +352,14 @@ sub eachGroupMember {
       my $members = $this->{ldap}->getGroupMembers($groupName) || [];
 
       unless (@$members) {
+
         # fallback to native groups,
         # try also to find the SuperAdminGroup
-        if ($this->{ldap}{nativeGroupsBackoff} 
-          || $groupName eq $Foswiki::cfg{SuperAdminGroup}) {
+        if ($this->{ldap}{nativeGroupsBackoff} || $groupName eq $Foswiki::cfg{SuperAdminGroup}) {
+
           #writeDebug("asking SUPER");
           my $listResult = $this->SUPER::eachGroupMember($groupName, $options);
-          $result = [$listResult->all] if $listResult;
+          $result = [ $listResult->all ] if $listResult && $listResult->{list};    # SMELL: breaks encapsulation of list iterator, but hey
         }
       } else {
         foreach my $login (@$members) {

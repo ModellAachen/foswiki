@@ -7,7 +7,7 @@
 %TMPL:DEF{"bodyclass"}%natRenameWebBody%TMPL:END%
 %TMPL:DEF{"meta"}% <meta name="robots" content="noindex, nofollow" /> %TMPL:END%
 %TMPL:DEF{"title"}%%WEB% (%MAKETEXT{"rename web"}%) - %WIKITOOLNAME%%TMPL:END%
-%TMPL:DEF{"contenttitle"}%%MAKETEXT{"Rename the <nop>[_1] web" args="%WEB%"}%%TMPL:END%
+%TMPL:DEF{"contenttitle"}%%MAKETEXT{"Rename the [_1] web" args="<nop>%WEB%"}%%TMPL:END%
 %TMPL:DEF{"buttons"}%<!-- buttons -->
   %BUTTON{type="save" value="%MAKETEXT{"Rename"}%" icon="tick"}%
   %BUTTON{type="button" value="%MAKETEXT{"Cancel"}%" icon="cross" target="%WEB%.%TOPIC%"}%
@@ -30,7 +30,7 @@
 
     <input type="checkbox" class="foswikiCheckbox" name="totrash" id="totrash" onclick="document.renameweb.newparentweb.value = (this.checked)?'Trash':'';this.blur();">&nbsp;
     <label for="totrash">
-      %MAKETEXT{"Move to Trash"}%
+      %MAKETEXT{"Move to [_1]" args="%TRASHWEB%"}%
     </label>
   </div>
 ---
@@ -54,16 +54,16 @@
     </div>
 ---
     <div class="foswikiFormStep">
-      <h3>%MAKETEXT{"Locked Topics"}%:</h3>
-      *%MAKETEXT{"No permission:"}%* 
+      <h3>%MAKETEXT{"Locked topics"}%:</h3>
+      *%MAKETEXT{"No permission"}%:* 
       <div class="natSearchRenameContents">
 %REF_DENIED%
       </div>
-      *%MAKETEXT{"Currently being edited:"}%* 
+      *%MAKETEXT{"Currently being edited"}%:* 
       <div class="natSearchRenameContents">
 %MOVE_LOCKED%
       </div>
-      *%MAKETEXT{"Referring topics currently being edited:"}%* 
+      *%MAKETEXT{"Referring topics currently being edited:}%:* 
       <div class="natSearchRenameContents">
 %REF_LOCKED%
       </div>
@@ -85,7 +85,7 @@
 %{ ################################################################################ }%
 %TMPL:DEF{"notes"}%<!-- notes -->
 
-%MAKETEXT{"Get help on <a target=\"_blank\" href=\"[_1]\" rel='nofollow'>Renaming and moving webs</a>." args="%SCRIPTURLPATH{"view"}%/%SYSTEMWEB%/ManagingWebs"}% 
+%MAKETEXT{"Get help on <a target='_blank' href='[_1]' rel='nofollow'>Renaming and moving webs</a>." args="%SCRIPTURLPATH{"view"}%/%SYSTEMWEB%/ManagingWebs"}% 
 
 %MAKETEXT{"Characters not allowed in topic names, such as spaces will automatically be removed."}%
 

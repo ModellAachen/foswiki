@@ -99,7 +99,6 @@ sub handleSOLRSEARCH {
     }
   }
 
-
   return $this->formatResponse($params, $theWeb, $theTopic, $response);
 }
 
@@ -331,14 +330,15 @@ HERE
 
       # date facets
       elsif ($this->isDateField($facetID)) {
-        my $facet = $facets->{facet_dates}{$facetLabel};
+        my $facet = $facets->{facet_ranges}{$facetLabel};
         next unless $facet;
+        $facet = $facet->{counts};
 
         # count rows
         my $len = 0;
-        foreach my $key (keys %$facet) { # SMELL: sorting lost in perl interface
-          next if $key =~ /^(gap|end|before)$/;
-          my $count = $facet->{$key};
+        for(my $i = 0; $i < scalar(@$facet); $i+=2) {
+          my $key = $facet->[$i];
+          my $count = $facet->[$i+1];
           next unless $count;
           next if $theFacetExclude && $key =~ /$theFacetExclude/;
           next if $theFacetInclude && $key !~ /$theFacetInclude/;
@@ -346,11 +346,11 @@ HERE
         }
 
         unless ($hideSingleFacets{$facetID} && $len <= 1) {
-          foreach my $key (reverse sort keys %$facet) { # SMELL: sorting lost in perl interface
-            my $count = $facet->{$key};
+          for(my $i = 0; $i < scalar(@$facet); $i+=2) {
+            my $key = $facet->[$i];
+            my $count = $facet->[$i+1];
             next unless $count;
             $key = $this->fromUtf8($key);
-            next if $key =~ /^(gap|end|before)$/;
             next if $theFacetExclude && $key =~ /$theFacetExclude/;
             next if $theFacetInclude && $key !~ /$theFacetInclude/;
             $facetTotal += $count;
@@ -466,7 +466,7 @@ HERE
 
   #$this->log("result=$result");
 
-  return $result;
+  return $this->toSiteCharSet($result);
 }
 
 ##############################################################################
@@ -611,7 +611,6 @@ sub restSOLRAUTOCOMPLETE {
   my $thePrefix;
   my $foundPrefix = 0;
 
-
   my $wikiUser = Foswiki::Func::getWikiName();
   my @filter = $this->parseFilter($theFilter);
   push(@filter, "(access_granted:$wikiUser OR access_granted:all)") 
@@ -623,6 +622,8 @@ sub restSOLRAUTOCOMPLETE {
   $theQuery =~ s/([$Foswiki::regex{lowerAlpha}])([$Foswiki::regex{upperAlpha}$Foswiki::regex{numeric}]+)/$1 $2/go;
   $theQuery =~ s/([$Foswiki::regex{numeric}])([$Foswiki::regex{upperAlpha}])/$1 $2/go;
 
+  # work around solr not doing case-insensitive facet queries
+  $theQuery = lc($theQuery);
 
   if ($theQuery =~ /^(.+) (.+?)$/) {
     $theQuery = $1;
@@ -650,7 +651,7 @@ sub restSOLRAUTOCOMPLETE {
 
   if ($theRaw) {
     my $result = $response->raw_response->content()."\n\n";
-    $result = $this->fromUtf8($result);
+    #$result = $this->fromUtf8($result);
     return $result;
   }
   $this->log($response->raw_response->content()) if DEBUG;
@@ -659,7 +660,7 @@ sub restSOLRAUTOCOMPLETE {
   return '' unless $facets;
 
   # format autocompletion
-  $theQuery = $this->fromUtf8($theQuery); 
+  #$theQuery = $this->fromUtf8($theQuery); 
 
   my @result = ();
   foreach my $facet (keys %{$facets->{facet_fields}}) {
@@ -1003,7 +1004,7 @@ sub doSearch {
   # gather different types of filters
   foreach my $item (@tmpfilter) {
 
-    if ($item =~ /^(.*):"?(.*?)"?$/) {
+    if ($item =~ /^(.*):(.*?)$/) {
       my $facetName = $1;
       my $facetValue = $2;
 
@@ -1199,12 +1200,14 @@ sub getFacetParams {
   }
 
   # date facets params
+  # TODO: provide general interface to range facets
   if ($dateFacets) {
-    $solrParams->{"facet.date"} = $dateFacets;
-    $solrParams->{"facet.date.start"} = $params->{facetdatestart} || 'NOW/DAY-7DAYS';
-    $solrParams->{"facet.date.end"} = $params->{facetdateend} || 'NOW/DAY+1DAYS';
-    $solrParams->{"facet.date.gap"} = $params->{facetdategap} || '+1DAY';
-    $solrParams->{"facet.date.other"} = $params->{facetdateother} || 'before';
+    $solrParams->{"facet.range"} = $dateFacets;
+    $solrParams->{"facet.range.start"} = $params->{facetdatestart} || 'NOW/DAY-7DAYS';
+    $solrParams->{"facet.range.end"} = $params->{facetdateend} || 'NOW/DAY+1DAYS';
+    $solrParams->{"facet.range.gap"} = $params->{facetdategap} || '+1DAY';
+    $solrParams->{"facet.range.other"} = $params->{facetdateother} || 'before';
+    $solrParams->{"facet.range.hardend"} = 'true'; # TODO
   }
 
   $solrParams->{"facet.query"} = $queryFacets if $queryFacets;
@@ -1553,7 +1556,7 @@ sub parseFilter {
       }
       $item =~ s/\$field/$field/g;
       $item =~ s/\$value/$value/g;
-      #print STDERR "...adding=$item\n";
+      #print STDERR "... adding=$item\n";
       push(@filter, $item);
     }
   }

@@ -1,4 +1,4 @@
-%META:TOPICINFO{author="micha" comment="reprev" date="1315999368" format="1.1" reprev="11" version="13"}%
+%META:TOPICINFO{author="ProjectContributor" comment="reprev" date="1315999368" format="1.1" reprev="11" version="13"}%
 %META:TOPICPARENT{name="TopicFunction"}%
 %TOC{depth="2"}%
 
@@ -14,7 +14,7 @@
    * CAT: restrict tag cloud to this category; displays all tags of all categories if unspecified
    * KEYWORDS: keywords to filter for
    * THEWEB: web to restrict search to, defaults to all
-   * TYPE: content type to restrict results to, e.g. "topic", "image", "video", "pdf", "zip", <!-- ALIAS:... -->&hellip;<!-- //ALIAS -->
+   * TYPE: content type to restrict results to, e.g. "topic", "image", "video", "pdf", "zip", ...
 %ENDSECTION{name="documentation" type="section"}%
 
 ---++ Implementation

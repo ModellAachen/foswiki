@@ -116,8 +116,10 @@ pre {
 
 /* typography ****************************************************************/
 pre, code, textarea {
-  line-height:1.3846em;
   font-family:"Bitstream Vera Sans Mono", "Andale Mono", monospace;
+}
+pre, textarea {
+  line-height:1.3846em;
 }
 
 .natBody .natEdit {
@@ -142,10 +144,10 @@ p + p {
 */
 
 blockquote {
-  border-top:1px solid #ddd;
+  border:1px solid #ddd;
   border-left:4px solid #ddd;
-  margin:1.3846em 0em 1.3846em 1.3846em; /* 18px 0px 18px 18px */
-  padding:1.3076em 0 1.3846em 1.3846em; /* 17px 0 18px 18px */
+  margin:1.3076em 0px; /* 17px  0px */
+  padding:1.3846em; /* 18px */
 }
 
 .foswikiCite {
@@ -191,15 +193,14 @@ h4 {
   margin-bottom: 0em; 
 }
 h5 { 
-  font-size: 1em; /* 14px */ 
-  line-height: 1.2857em; /* 18px */ 
-  margin-top: 1.2857em; 
+  font-size: 1em; /* 13px */ 
+  line-height: 1.3846em; /* 18px */ 
+  margin: 1.3846em 0; 
 }
 h6 { 
   font-size: 1em; /* 13px */ 
   line-height: 1.5em; /* 18px */ 
-  margin-top: 1.5em; 
-  margin-bottom: 0em; 
+  margin: 1.5em 0em 0em; 
 }
 
 
@@ -309,6 +310,45 @@ div.error,
 div.foswikiErrorSummary {
   padding:1em 0em;
 }
+
+/* colors */
+.foswikiYellowFG { color:#ffff00; } .foswikiYellowFG a { color:#dede00; }
+.foswikiOrangeFG { color:#ff6600; } .foswikiOrangeFG a { color:#ff0000; }
+.foswikiRedFG    { color:#ff0000; } .foswikiRedFG a    { color:#ff6600; }
+.foswikiPinkFG   { color:#ff00ff; } .foswikiPinkFG a   { color:#800080; }
+.foswikiPurpleFG { color:#800080; } .foswikiPurpleFG a { color:#ff00ff; }
+.foswikiNavyFG   { color:#000080; } .foswikiNavyFG a   { color:#0000ff; }
+.foswikiBlueFG   { color:#0000ff; } .foswikiBlueFG a   { color:#000080; }
+.foswikiTealFG   { color:#008080; } .foswikiTealFG a   { color:#00c0c0; }
+.foswikiAquaFG   { color:#00ffff; } .foswikiAquaFG a   { color:#008080; }
+.foswikiLimeFG   { color:#00ff00; } .foswikiLimeFG a   { color:#00c400; }
+.foswikiGreenFG  { color:#008000; } .foswikiGreenFG a  { color:#004000; }
+.foswikiOliveFG  { color:#808000; } .foswikiOliveFG a  { color:#047C04; }
+.foswikiMaroonFG { color:#800000; } .foswikiMaroonFG a { color:#cc0000; }
+.foswikiBrownFG  { color:#996633; } .foswikiBrownFG a  { color:#694623; }
+.foswikiBlackFG  { color:#000000; } .foswikiBlackFG a  { color:#000000; }
+.foswikiGrayFG   { color:#808080; } .foswikiGrayFG a   { color:#000000; }
+.foswikiSilverFG { color:#c0c0c0; } .foswikiSilverFG a { color:#808080; }
+.foswikiWhiteFG  { color:#ffffff; } .foswikiWhiteFG a  { color:#c0c0c0; }
+
+.foswikiYellowBG { background-color:#ffff00; }
+.foswikiOrangeBG { background-color:#ff6600; } 
+.foswikiRedBG    { background-color:#ff0000; } 
+.foswikiPinkBG   { background-color:#ff00ff; } 
+.foswikiPurpleBG { background-color:#800080; } 
+.foswikiNavyBG   { background-color:#000080; } 
+.foswikiBlueBG   { background-color:#0000ff; } 
+.foswikiTealBG   { background-color:#008080; } 
+.foswikiAquaBG   { background-color:#00ffff; } 
+.foswikiLimeBG   { background-color:#00ff00; } 
+.foswikiGreenBG  { background-color:#008000; } 
+.foswikiOliveBG  { background-color:#808000; } 
+.foswikiMaroonBG { background-color:#800000; } 
+.foswikiBrownBG  { background-color:#996633; } 
+.foswikiBlackBG  { background-color:#000000; } 
+.foswikiGrayBG   { background-color:#808080; } 
+.foswikiSilverBG { background-color:#c0c0c0; } 
+.foswikiWhiteBG  { background-color:#ffffff; } 
 
 /* grid **********************************************************************/
 .showgrid-40x18 {
@@ -439,6 +479,11 @@ h4 a:hover, h5 a:hover, h6 a:hover {
   text-decoration:none;
 }
 
+.foswikiCenter {
+  text-align:center;
+  margin-left:auto;
+  margin-right:auto;
+}
 .foswikiLeft {
   float:left;
   position:relative;
@@ -460,6 +505,16 @@ h4 a:hover, h5 a:hover, h6 a:hover {
   border-style:solid;
   border-color:#eee;
   background-color:#fff;
+}
+
+.foswikiIndent {
+  margin-left:3em;
+}
+
+.foswikiNoBullet > ul,
+.foswikiNoBullet {
+  list-style:none;
+  margin-left:0px;
 }
 
 /* http://sonspring.com/journal/clearing-floats */
@@ -512,9 +567,11 @@ h4 a:hover, h5 a:hover, h6 a:hover {
 }
 .foswikiSmall {
   font-size:0.7692em;  /* 10px */
+  line-height:1.35; /* 13.5px ... 4 small fit in 3 normal lines */ 
 }
 .foswikiSmallish {
   font-size:0.923em; /* 12px */
+  line-height:1.5;
 }
 
 .foswikiFormSteps .foswikiNullTable,
@@ -759,25 +816,14 @@ h4 a:hover, h5 a:hover, h6 a:hover {
 .natBacklinks .fltMakeIndexWrapper {
   margin:0px;
 }
-.foswikiDialog .natChildTopicsContainer,
-.foswikiDialog .natBacklinksContainer {
-  height:25em;
-  overflow-x:auto;
-}
 
 /* helpers */
-.natUserAction {
-  padding:1px 2px;
-}
-
 .natUserAction img {
   border:0;
   vertical-align:text-bottom;
   width:1.2308em; /* 16px */
   max-width:16px;
-}
-.natUserAction span {
-  padding-left:0.1538em; /* 2px */
+  margin-right:5px;
 }
 
 .natAction {
@@ -973,17 +1019,43 @@ td.foswikiDiffChangedText {
 
 /* TOC */
 .foswikiToc {
-  margin-top:5px;
-  margin-bottom:5px;
-  padding-top:5px;
-  padding-bottom:5px;
+  margin:1.3076em 0em 1.3846em;
+  padding:0em;
+}
+.foswikiTocTitle {
+  font-size: 1.2308em; /* 16px */ 
+  line-height: 1.125em; /* 18px */ 
+  margin: 1.125em 0px; 
+  display:block;
+  color:#222;
+}
+.foswikiToc ul {
+  list-style:none;
+  margin:1.3846em 0em;
+  padding:1.3846em 0em;
+  border-top:1px solid #ddd;
+  border-left:4px solid #ddd;
+}
+.foswikiToc ul ul {
+  padding:0em 0em 0em .5em;
+  margin-top:0px;
+  margin-bottom:0px;
+  border:0px;
 }
 
 /* see also page.nat.tmpl */
-.natMiddle .natExternalLink:after {
-  margin-left:3px;
-  margin-right:3px;
-  content:url("external.png");
+.natMainContents .natExternalLink:after {
+  content:"";
+  background-image:url("external.png");
+  background-repeat:no-repeat;
+  background-position:0 0;
+  margin:0px 3px 0px 5px;
+  width:9px;
+  height:9px;
+  display:inline-block;
+}
+.natMainContents .natExternalLink:hover:after {
+  background-position:0px -9px;
 }
 
 
@@ -1137,6 +1209,9 @@ table.craSideBySide .craCell {
 .fltMakeIndexWrapper {
   margin:1em 0em;
 }
+.foswikiFormSteps .fltMakeIndexWrapper {
+  margin:0px;
+}
 .fltMakeIndexWrapper a {
   text-decoration:none;
 }
@@ -1262,7 +1337,7 @@ h1 .foswikiTopicSummary {
 .natPrintBody,
 .natPrintBody .natMain,
 .natPrintBody .natMiddle {
-  background-color:white !important;
+  background:white !important;
   color:black !important;
 }
 th, /* opera */
@@ -1387,6 +1462,12 @@ th, /* opera */
 }
 
 /* search box */
+.natSearchBox {
+  width:180px;
+}
+.natSideBar .natSearchBox {
+  width:auto;
+}
 .natSearchBox input {
   margin:0px;
   padding:0px;
@@ -1473,22 +1554,31 @@ body .natSideBar .natMySideBarRedDot a:hover {
 }
 
 /* edit */
+.natEditBody .natTopBar {
+  display:none;
+}
+
 .natEditBody {
   margin:0px;
 }
-.natEditBody .natBodyContents {
+.natEditBody .natBodyContents,
+.natEditBody.natBodyFixed .natBodyContents {
   margin-top:0px;
   margin-bottom:0px;
   padding-top:0px;
   padding-bottom:0px;
+  width:auto;
+  max-width:initial;
 }
 .natEditBody .natLayoutTable {
   table-layout:auto; /* firefox fix to preven collapsing tables */
+  margin-top:0px;
 }
 *:first-child+html 
 .natEditBody .natLayoutTable {
   table-layout:fixed; /* and IE7 as well */
 }
+.natEditBody .natMainHeaderContents,
 .natEditBody .natMainFooterContents,
 .natEditBody .natBottomBar,
 .natEditBody .natWebMenu {
@@ -1498,10 +1588,17 @@ body .natSideBar .natMySideBarRedDot a:hover {
 .natEditBody .natMainContents {
   min-height:0em;
 }
-.natEditBody .natMain {
-  padding-top:0px;
-  padding-bottom:0px;
+.natEditBody .natMain,
+.natEditBody.natBodyFixed .natMain {
+  padding:1.3846em 1.923em 0em 1.923em;
+  border:0px;
 }
+
+.natEditTitle {
+  margin-top:0px;
+  border-bottom:0px;
+}
+
 .natEditTopicInfo {
   margin:0.5em 0em 1em 0em;
 }
@@ -1606,7 +1703,7 @@ body .natSideBar .natMySideBarRedDot a:hover {
 }
 
 .natWebMenu ul li.sfHover {
-  z-index:999;
+  z-index:999999;
 }
 
 /* web menu, second tier */
@@ -1655,7 +1752,7 @@ body .natSideBar .natMySideBarRedDot a:hover {
 .natMoreActionsMenu ul {
   margin:0px;
   line-height:2.3076em; 
-  z-index:99; 
+  z-index:99999; 
   position:absolute;
   background-color:#fff;
   width:16.45em; 
@@ -1699,3 +1796,66 @@ body .natSideBar .natMySideBarRedDot a:hover {
   font-size:100%;
 }
 
+/* slideshow fixes */
+.natSlideShowBody .slideshowHeader {
+  border:0px;
+  padding:0px;
+  margin:1em 25px;
+
+}
+
+.natSlideShowBody .slideshowFooter {
+  display:none;
+}
+
+.natSlideShowBody .slideshowToolbar { /* see ui-widget-header */ 
+  color: #111;
+  text-shadow: 0px 1px #fff;
+  border-top: 1px solid #ddd;
+  background: #f0f0f0; 
+  background: -moz-linear-gradient(top, #ffffff 0%, #f0f0f0 100%); 
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(100%,#f0f0f0)); 
+  background: -webkit-linear-gradient(top, #ffffff 0%,#f0f0f0 100%); 
+  background: -o-linear-gradient(top, #ffffff 0%,#f0f0f0 100%); 
+  background: -ms-linear-gradient(top, #ffffff 0%,#f0f0f0 100%); 
+  background: linear-gradient(top, #ffffff 0%,#f0f0f0 100%); /* W3C */
+  padding:0px;
+  position:fixed;
+  width:100%;
+  bottom:0px;
+  z-index:99999;
+}
+.natSlideShowBody .slideshowToolbarContents {
+  margin:0px 25px;
+}
+.natSlideShowBody .slideshowContent {
+  font-size:150%;
+  line-height:139%;
+}
+
+.natSlideShowBody a.slideshowBtnStop:visited,
+.natSlideShowBody a.slideshowBtnStop:link { /* see .ui-dialog .ui-dialog-titlebar-close */
+  background-image:url(../JQueryPlugin/themes/foswiki/images/x.png);
+  background-repeat: no-repeat; 
+  background-position:0px 0px;
+  display: block;
+  position: absolute;
+  top: 50%;
+  right: 0px;
+  width: 16px;
+  height: 16px;
+  margin-top:-8px;
+}
+.natSlideShowBody a.slideshowBtnStop:hover {
+  background-position:-16px 0px;
+}
+
+.natSlideShowBody .slideshowJumpSlideMax {
+  background:none;
+  border:none;
+}
+
+.natSlideShowBody .slideshowJump input {
+  font-size:1em;
+  padding:2px;
+}

@@ -1,4 +1,4 @@
-%META:TOPICINFO{author="micha" comment="save topic" date="1311861522" format="1.1" reprev="3" version="3"}%
+%META:TOPICINFO{author="ProjectContributor" comment="save topic" date="1311861522" format="1.1" reprev="3" version="3"}%
 %TOC%
 
 ---++ Appearance

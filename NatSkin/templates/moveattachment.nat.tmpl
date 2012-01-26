@@ -3,7 +3,7 @@
 %TMPL:INCLUDE{"moveattachmentsidebar"}%<!-- moveattachmentsidebar// -->
 %TMPL:INCLUDE{"moveattachmenttopicactions"}%<!-- moveattachmenttopicactions// -->
 %TMPL:DEF{"bodyclass"}%natMoveAttachmentBody%TMPL:END%
-%TMPL:DEF{"title"}%%TOPIC% (%MAKETEXT{"move attachment"}%) - %WIKITOOLNAME%%TMPL:END%
+%TMPL:DEF{"titleaction"}%%MAKETEXT{"move attachment"}%%TMPL:END%
 %TMPL:DEF{"contenttitle"}%<!-- contenttitle-->
 <h1>%IF{"$'URLPARAM{newweb}'='%TRASHWEB%'"
   then="%MAKETEXT{"Delete attachment '[_1]'" args="<nop>%FILENAME%"}%"
@@ -52,11 +52,11 @@
 %TMPL:DEF{"content_move"}%<!-- content_move -->
 <div class="foswikiFormSteps">
 <div class="foswikiFormStep">
-  <h4>%MAKETEXT{"To web:"}%</h4>
+  <h4>%MAKETEXT{"To web"}%:</h4>
   <input type="text" class="foswikiInputField jqUIAutocomplete" name="newweb" id="newweb" autocomplete="%SCRIPTURL{"view"}%/%SYSTEMWEB%/JQueryAjaxHelper?section=web;contenttype=text/plain" size="60" value="%IF{"defined NEW_WEB" then="%NEW_WEB%" else="%WEB%"}%" />
 </div>
 <div class="foswikiFormStep">
-  <h4>%MAKETEXT{"To topic:"}%</h4>
+  <h4>%MAKETEXT{"To topic"}%:</h4>
   <input type="text" class="foswikiInputField jqUIAutocomplete {extraParams:{baseweb:function() {return jQuery('#neweb').val()}}}" name="newtopic" id="newtopic" autocomplete="%SCRIPTURL{"view"}%/%SYSTEMWEB%/JQueryAjaxHelper?section=topic;contenttype=text/plain;skin=text" size="60" value="%TOPIC%" />
   <div class="foswikiFormDescription">
     %MAKETEXT{"The new topic chosen must already exist."}%
@@ -71,7 +71,7 @@
 </div>
 <!-- //content_move -->%TMPL:END%
 %TMPL:DEF{"toattachment"}%<div class="foswikiFormStep">
-  <h4>%MAKETEXT{"To attachment:"}%</h4>
+  <h4>%MAKETEXT{"To attachment"}%:</h4>
   <input name="newattachment" class="foswikiInputField" value="%URLPARAM{"attachment"}%" size="36" />
   <div class="foswikiFormDescription">
     %MAKETEXT{"The attachment may be renamed (by appending a number to the name) if an attachment of that name already exists in the target topic."}%
@@ -79,7 +79,7 @@
 </div>%TMPL:END%
 %TMPL:DEF{"notes_trash"}%<!-- notes_trash -->
 <p>
-  %MAKETEXT{"When the file is deleted, it is moved to the %TRASHWEB% web and attached to the %TRASHWEB%.TrashAttachment topic."}%
+  %MAKETEXT{"When the file is deleted, it is moved to the [_1] web and attached to the [_2] topic." args="%TRASHWEB%, %TRASHWEB%.TrashAttachment"}%
 </p>
 <p> 
   %MAKETEXT{"The attachment and its history will be moved as well."}%

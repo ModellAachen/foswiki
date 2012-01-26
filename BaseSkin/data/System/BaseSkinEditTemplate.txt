@@ -18,39 +18,33 @@ Base Skin topic template
 ---------------------------------------------------
 }%%TMPL:DEF{"body:class"}%foswikiManagePage foswikiEditPage%TMPL:END%%{
 ---------------------------------------------------
-	Top bar (not used)
----------------------------------------------------
-}%%TMPL:DEF{"topbar"}%%TMPL:P{"titlebar"}%%TMPL:END%%{
----------------------------------------------------
 	Title action
 ---------------------------------------------------
-}%%TMPL:DEF{"titleaction"}%%MAKETEXT{"edit"}%%TMPL:END%%{
+}%%TMPL:DEF{"titleaction"}%%MAKETEXT{"(edit)"}%%TMPL:END%%{
 ---------------------------------------------------
-	Controls: topic actions
+	Main (content container)
 ---------------------------------------------------
-}%%TMPL:DEF{"controls:topicactions"}%<div class="foswikiBar foswikiTopicActions foswikiColorSecundary foswikiMakeSticky">
-	<div class="foswikiContainer">
-		%TMPL:P{"controls:topicactionbuttons"}%
-		<div class="foswikiClear"></div>
+}%%TMPL:DEF{"topic"}%%TMPL:P{"formstart"}%
+%TMPL:P{"editcontrols"}%
+%TMPL:P{"startsection" class="foswikiTopicText foswikiColorPrimary foswikiNoBorder"}%
+%TMPL:P{"content"}%%TMPL:P{"endsection"}%
+%TMPL:P{"formend"}%%TMPL:END%%{
+---------------------------------------------------
+	Edit controls
+---------------------------------------------------
+}%%TMPL:DEF{"editcontrols"}%<div class='foswikiMakeSticky foswikiColorNavigationSecondary'>
+	<div class='foswikiContainer'>
+		<div id='foswikiEditControlsContainer' class='foswikiBar foswikiColorSecondary'>
+			<div class='foswikiEditControls'>
+				<input type='submit' class='foswikiSubmit' name='action_save' value='%MAKETEXT{"Save"}%' id='save' /><input type='submit' class='foswikiButtonCancel' name='action_cancel' value='%MAKETEXT{"Cancel"}%' id='cancel' /><input type='submit' class='foswikiButton' name='action_preview' value='%MAKETEXT{"Preview"}%' id='preview' /><input type='submit' class='foswikiButton' value='%MAKETEXT{"WYSIWYG"}%' id='topic_2WYSIWYG' />
+			</div>
+		</div>
 	</div>
 </div>%TMPL:END%%{
 ---------------------------------------------------
-	Controls: contextual
-	Is made visible by javascript, if an editor can provide content for it
+	Topic content
 ---------------------------------------------------
-}%%TMPL:DEF{"controls:topicactionbuttons"}%<!-- contents set by javascript -->%TMPL:END%%{
----------------------------------------------------
-	Page
----------------------------------------------------
-}%%TMPL:DEF{"page"}%<div class="foswikiPage">%TMPL:P{"topbar"}%%TMPL:P{"formstart"}%%TMPL:P{"controls"}%%TMPL:P{"content"}%%TMPL:P{"formend"}%%TMPL:P{"bottombar"}%</div>%TMPL:END%%{
----------------------------------------------------
-	Content
----------------------------------------------------
-}%%TMPL:DEF{"content"}%<div class="foswikiMain foswikiColorPrimary">
-<div class="foswikiContainer"><div class="foswikiTopic">
-%TMPL:P{"textarea"}%
-</div>
-</div>%TMPL:END%%{
+}%%TMPL:DEF{"content"}%%TMPL:P{"textarea"}%%TMPL:END%%{
 ---------------------------------------------------
 	Textarea
 ---------------------------------------------------
@@ -60,15 +54,38 @@ Base Skin topic template
 }%%IF{
 	"defined 'EDITOR_MESSAGE'"
 	then="<div class='foswikiAlert'>%EDITOR_MESSAGE%</div>"
-}%<div class="foswikiEditTextarea">
-<textarea class="foswikiWysiwygEdit" id="topic" name="text" rows="%EDITBOXHEIGHT%" cols="%EDITBOXWIDTH%" style='%EDITBOXSTYLE%'>
+}%<div class='foswikiEditTextarea'>
+<textarea class='foswikiWysiwygEdit' id='topic' name='text'>
 %TEXT%
 </textarea></div>%TMPL:END%%{
 ---------------------------------------------------
 	Form start
 ---------------------------------------------------
-}%%TMPL:DEF{"formstart"}%<div class="foswikiFormHolder">
-<form name="main" class="foswikiEditForm" action="%SCRIPTURLPATH{"save"}%/%WEB%/%TOPIC%" method="post">%TMPL:END%%{
+}%%TMPL:DEF{"formstart"}%<div class='foswikiFormHolder'>
+<form name='main' class='foswikiEditForm' action='%SCRIPTURLPATH{"save"}%/%WEB%/%TOPIC%' method='post'>%TMPL:END%%{
+---------------------------------------------------
+	Form parameters
+---------------------------------------------------
+}%%TMPL:DEF{"formparameters"}%%TMPL:P{"formparameters:edit"}%%TMPL:END%%{
+---------------------------------------------------
+}%%TMPL:DEF{"formparameters:edit"}%<input type='hidden' name='originalrev' value='%ORIGINALREV%' />
+<input type='hidden' name='skin' value='%URLPARAM{"skin"}%' />
+<input type='hidden' name='cover' value='%URLPARAM{"cover"}%' />
+<input type='hidden' name='redirectto' value='%REDIRECTTO%' />
+<input type='hidden' name='formtemplate' value='%FORMTEMPLATE%' />
+<input type='hidden' name='templatetopic' value='%TEMPLATETOPIC%' />
+<input type='hidden' name='settingstopic' value='%SETTINGSTOPIC%' />
+<input type='hidden' name='topicparent' value='%TOPICPARENT%' />
+<input type='hidden' name='newtopic' value='%NEWTOPIC%' />
+<input type='hidden' name='forcenewrevision' value='%URLPARAM{"forcenewrevision"}%' />
+<input type='hidden' name='rev' value='%URLPARAM{"rev"}%' />
+<input type='hidden' name='cmd' value='%CMD%' />
+<input type='hidden' name='nowysiwyg' value='%IF{
+	"'%NOWYSIWYG%'='1'"
+	then="1"
+	else="%URLPARAM{"nowysiwyg"}%"
+}%' />
+<input type='hidden' name='action' value='%URLPARAM{"action"}%' />%TMPL:END%%{
 ---------------------------------------------------
 	Form end
 ---------------------------------------------------

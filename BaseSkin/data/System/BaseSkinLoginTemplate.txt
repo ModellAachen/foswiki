@@ -1,0 +1,145 @@
+%{<verbatim class="tml">
+===================================================
+Base Skin topic template
+
+	The login template defines the display of contents through the login script.
+		
+===================================================
+}%%TMPL:INCLUDE{"foswiki"}%%{
+---------------------------------------------------
+}%%TMPL:DEF{"body:class"}%foswikiManagePage%TMPL:END%%{
+---------------------------------------------------
+}%%TMPL:DEF{"titleaction"}%%MAKETEXT{"(login)"}% %TMPL:END%%{
+---------------------------------------------------
+
+---------------------------------------------------
+}%%TMPL:DEF{"LOGGED_IN_BANNER"}%%MAKETEXT{"[_1] is currently logged in" args="%USERSWEB%.%WIKINAME%"}%%TMPL:END%%{
+---------------------------------------------------
+
+---------------------------------------------------
+}%%TMPL:DEF{"NEW_USER_NOTE"}%%MAKETEXT{"Enter a new username and password to change identity"}%%TMPL:END%%{
+---------------------------------------------------
+
+---------------------------------------------------
+}%%TMPL:DEF{"UNRECOGNISED_USER"}%%MAKETEXT{"Oops: we could not recognize you. Try again or [[[_1]][reset your password]]." args="%SCRIPTURLPATH{view}%/%SYSTEMWEB%/ResetPassword?username=%URLPARAM{usernamestep}%"}%%TMPL:END%%{
+---------------------------------------------------
+	"title" 
+---------------------------------------------------
+}%%TMPL:DEF{"title"}%%MAKETEXT{"Log on to [_1]" args="%WIKITOOLNAME%"}%%TMPL:END%%{
+-------------------------------------------------
+}%%TMPL:DEF{"notestep"}%%IF{
+	"defined NOTE AND $NOTE != ''"
+	then="<h3>%NOTE%</h3>"
+}%%TMPL:END%%{
+-------------------------------------------------
+}%%TMPL:DEF{"errorstep"}%%IF{
+	"defined BANNER AND $BANNER!=''"
+	then="<div class='foswikiNotification foswikiAlert foswikiUnvisited'>%BANNER%%IF{
+		"defined ERROR AND $ERROR != ''" 
+		then="<!--%TMPL:P{"error"}%-->"
+	}%</div>"
+}%%TMPL:END%%{
+-------------------------------------------------
+}%%TMPL:DEF{"error"}%%MAKETEXT{"Error: [_1]" args="%ERROR%"}%%TMPL:END%%{
+---------------------------------------------------
+	"formstart"
+---------------------------------------------------
+}%%TMPL:DEF{"formstart"}%<form action='%SCRIPTURLPATH{"login"}%%PATH_INFO%' name='loginform' method='post' class='foswikiInputForm' onsubmit='document.loginform.foswiki_origin.value+=window.location.hash'>%TMPL:END%%{
+---------------------------------------------------
+	"formend"
+---------------------------------------------------
+}%%TMPL:DEF{"formend"}%<literal>
+%QUERYPARAMS{encoding="entity" format="<input type='hidden' name='$name' value='$value' />"}%
+</literal><input type='hidden' name='foswiki_origin' value='%FOSWIKI_ORIGIN%' />
+</form>%TMPL:END%%{
+---------------------------------------------------
+	"titlestep"
+		Header with possible error notes
+---------------------------------------------------
+}%%TMPL:DEF{"titlestep"}%<div class='foswikiFormStep'>
+<legend>%TMPL:P{"title"}%</legend>
+%TMPL:P{"notestep"}%%TMPL:P{"errorstep"}%</div>%TMPL:END%%{
+---------------------------------------------------
+	Form field: user name
+---------------------------------------------------
+}%%TMPL:DEF{"usernamestep"}%<div class='foswikiFormStep'>
+	<label for='username' class='foswikiLabel'>%MAKETEXT{"Username"}%</label>
+	<div class='foswikiInputs'>
+		%TMPL:P{"usernamefield"}%%TMPL:P{"usernamenote"}%
+	</div>
+</div>%TMPL:END%%{
+---------------------------------------------------
+}%%TMPL:DEF{"usernamefield"}%<input tabindex='1' type='text' class='foswikiInputField foswikiFocus' size='40' name='username' id='username' value='<nop>%URLPARAM{"usernamestep"}%' %TMPL:P{
+	context="no_auto_complete_login"
+	then="autocomplete_off"
+}% />%TMPL:END%%{
+---------------------------------------------------
+}%%TMPL:DEF{"usernamenote"}%<div class="foswikiHint">
+	%TMPL:P{"authrealm"}%
+</div>%TMPL:END%%{
+---------------------------------------------------
+}%%TMPL:DEF{"authrealm"}%%MAKETEXT{"This is your name written as !WikiWord, for example: !JohnSmith. [[[_1]][Register]] if you do not have an account yet." args="%SYSTEMWEB%.UserRegistration"}%%TMPL:END%%{
+---------------------------------------------------
+	Form field: password
+---------------------------------------------------
+}%%TMPL:DEF{"passwordstep"}%<div class='foswikiFormStep'>
+	<label for='password' class='foswikiLabel'>%MAKETEXT{"Password"}%</label>
+	<div class='foswikiInputs'>
+		%TMPL:P{"passwordfield"}%
+	</div>
+	<div class='foswikiInputs'>
+		<ul>%TMPL:P{context="can_remember_login" then="rememberbox"}%
+		</ul>
+	</div>
+</div>%TMPL:END%%{
+---------------------------------------------------
+}%%TMPL:DEF{"passwordfield"}%<input tabindex='2' type='password' class='foswikiInputField' size='40' name='password' id='password' value='' %TMPL:P{context="no_auto_complete_login" then="autocomplete_off"}% />%TMPL:END%%{
+---------------------------------------------------
+}%%TMPL:DEF{"autocomplete_off"}% autocomplete='off' %TMPL:END%%{
+---------------------------------------------------
+}%%TMPL:DEF{"rememberbox"}%<li>
+  <label class='foswikiLabel'>
+	<input tabindex='3' id='remember' name='remember' type='checkbox' value='1' />
+	<span>%MAKETEXT{"Remember me on this computer"}%</span>
+  </label>
+</li>%TMPL:END%%{
+---------------------------------------------------
+	Form submit
+---------------------------------------------------
+}%%TMPL:DEF{"submitstep"}%<div class='foswikiFormStep'>
+	<div class='foswikiInputs'>
+		%TMPL:P{"submit"}%
+	</div>
+</div>%TMPL:END%%{
+---------------------------------------------------
+}%%TMPL:DEF{"submit"}%<input tabindex='4' type='submit' class='foswikiSubmit' value='%MAKETEXT{"Logon"}%' />%TMPL:END%%{
+---------------------------------------------------
+	"seealsostep"
+---------------------------------------------------
+}%%TMPL:DEF{"seealsostep"}%<div class='foswikiFormStep'>
+	<div class="foswikiInputs">
+	<span class='foswikiUnvisited'>[[%SCRIPTURLPATH{view}%/%SYSTEMWEB%/ResetPassword?username=%URLPARAM{usernamestep}%][%MAKETEXT{"Can't access your account?"}%]]</span>
+	</div>
+</div>%TMPL:END%%{
+---------------------------------------------------
+	Form
+---------------------------------------------------
+}%%TMPL:DEF{"form"}%<div class='foswikiLogin'>	
+	<div class='foswikiFormSteps'>
+		%TMPL:P{"formstart"}%
+		<fieldset>
+			%TMPL:P{"titlestep"}%
+			%TMPL:P{"usernamestep"}%
+			%TMPL:P{"passwordstep"}%
+			%TMPL:P{"submitstep"}%
+			%TMPL:P{"seealsostep"}%
+		</fieldset>
+		%TMPL:P{"formend"}%
+	</div>
+</div>%TMPL:END%%{
+---------------------------------------------------
+	Content
+---------------------------------------------------
+}%%TMPL:DEF{"content"}%%TMPL:P{"form"}%%TMPL:END%%{
+===================================================
+</verbatim>}%

@@ -12,7 +12,7 @@
   }%"
   pattern="\((.*)\);(.*)"
   split="\n"
-  cols="3"
+  cols="%IF{"defined WEBTOPICLIST_COLS" then="%WEBTOPICLIST_COLS%" else="3"}%"
   header="$anchors"
   format="[[%BASEWEB%.$2][$1]]"
   sort="nocase"

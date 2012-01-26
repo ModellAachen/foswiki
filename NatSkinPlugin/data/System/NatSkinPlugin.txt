@@ -239,7 +239,7 @@ See NatSkin#Installation_Instructions
                   added =restrictedactions= parameter to USERACTIONS to disable specific \
                   user actions if he/she has no write access to the current topic; \
                   fixed issue in WEBCOMPONENTS that could be used to reveil read-protected topics \
-                  (reported by Martin Dahlö); \
+                  (reported by Martin DahlÃ¶); \
                   implemented a google-like display of hit results in (nat)search; \
                   sorting natsearch results accross all webs - not per web |
 |  13 Nov 2007: | propagating skin state to context to speed up template resolution, \

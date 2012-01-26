@@ -1,0 +1,10 @@
+%META:TOPICINFO{author="ProjectContributor" date="1271449950" format="1.1" version="1.2"}%
+%META:TOPICPARENT{name="WebHome"}%
+
+%META:FORM{name="Applications.TopicStub"}%
+%META:FIELD{name="TopicType" title="TopicType" value="TopicStub, TopicType"}%
+%META:FIELD{name="TopicTitle" attributes="" title="<nop>TopicTitle" value=""}%
+%META:FIELD{name="Summary" attributes="" title="Summary" value=""}%
+%META:FIELD{name="WikiApplication" attributes="" title="WikiApplication" value="ClassificationApp"}%
+%META:FIELD{name="Target" attributes="" title="Target" value="Applications/ClassificationApp.ClassifiedTopic"}%
+%META:FIELD{name="Section" attributes="" title="Section" value=""}%

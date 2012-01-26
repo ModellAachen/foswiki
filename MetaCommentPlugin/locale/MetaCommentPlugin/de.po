@@ -1,0 +1,103 @@
+# MetaCommentPlugin translations
+msgid ""
+msgstr ""
+"Project-Id-Version: MetaCommentPlugin $Id\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2011-12-20 12:56+0000\n"
+"PO-Revision-Date: 2010-09-14 12:56+0000\n"
+"Last-Translator: Michael Daum <daum@michaeldaumconsulting.com>\n"
+"Language-Team: Foswiki German Translation Team <none>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: de\n"
+
+#: templates/metacomments.tmpl:32
+msgid "%1 comments"
+msgstr "%1 Kommentare"
+
+#: templates/metacomments.tmpl:324
+msgid "Add a comment"
+msgstr "Kommentar hinzufügen"
+
+#: templates/metacomments.tmpl:58
+msgid "Add a comment to this topic"
+msgstr "Dieses Topic kommentieren"
+
+#: templates/metacomments.tmpl:260
+msgid "Approve comment %1?"
+msgstr "Comment %1 freigeben?"
+
+#: templates/metacomments.tmpl:152
+msgid "Approve this comment"
+msgstr "Diesen Kommentar freigeben"
+
+#: templates/metacomments.tmpl:261
+msgid "Are you sure that you want to approve this comment posted by %1 on %2?"
+msgstr "Sind Sie sicher, dass Sie den Kommentar von %1 erstellt am %2 freigeben wollen?"
+
+#: templates/metacomments.tmpl:242
+msgid "Are you sure that you want to delete this comment posted by %1 on %2?"
+msgstr "Sind Sie sicher, dass Sie den Kommentar von %1 erstellt am %2 löschen wollen?"
+
+#: templates/metacomments.tmpl:293 templates/metacomments.tmpl:372
+msgid "Cancel"
+msgstr "Abbrechen"
+
+#: templates/metacommentsrss.tmpl:7
+msgid "Comments"
+msgstr "Kommentare"
+
+#: templates/metacomments.tmpl:241
+msgid "Delete comment %1?"
+msgstr "Kommentar %1 löschen?"
+
+#: templates/metacomments.tmpl:155
+msgid "Delete this comment"
+msgstr "Diesen Kommentar löschen"
+
+#: templates/metacomments.tmpl:283
+msgid "Edit comment %1"
+msgstr "Kommentar %1 bearbeiten"
+
+#: templates/metacomments.tmpl:149
+msgid "Edit this comment"
+msgstr "Diesen Kommentar bearbeiten"
+
+#: templates/metacomments.tmpl:248 templates/metacomments.tmpl:267
+msgid "No, thanks"
+msgstr "Nein, danke"
+
+#: templates/metacomments.tmpl:31
+msgid "One comment"
+msgstr "Ein Kommentar"
+
+#: templates/metacomments.tmpl:30
+msgid "RSS feed of the comments on this topic"
+msgstr "RSS Feed für Kommentar zu diesem Topic"
+
+#: templates/metacomments.tmpl:146 templates/metacomments.tmpl:323
+msgid "Reply to comment %1"
+msgstr "Auf Kommentar %1 antworten"
+
+#: templates/metacomments.tmpl:292
+msgid "Save"
+msgstr "Speichern"
+
+#: templates/metacomments.tmpl:371
+msgid "Submit"
+msgstr "Übermitteln"
+
+#: templates/metacomments.tmpl:266
+msgid "Yes, approve"
+msgstr "Ja, freigeben"
+
+#: templates/metacomments.tmpl:247
+msgid "Yes, delete"
+msgstr "Ja, löschen"
+
+#: templates/metacomments.tmpl:127 templates/metacomments.tmpl:184
+#: templates/metacomments.tmpl:221
+msgid "needs approval"
+msgstr "benötigt Freigabe"

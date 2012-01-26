@@ -57,7 +57,10 @@ jQuery(function($) {
   // init more actions menu
   $(".natMoreActionsMenu:not(.natInitedMoreActionsMenu)").livequery(function() {
     var $this = $(this), opts = $.extend({}, $this.metadata());
-    $this.addClass("natInitedMoreActionsMenu").superfish(opts);
+    $this.addClass("natInitedMoreActionsMenu").superfish(opts).
+    find("a[href]").click(function() {
+      $this.hideSuperfishUl();
+    });
   });
 
   // remove empty attachment comments
@@ -71,8 +74,8 @@ jQuery(function($) {
 
   $(".foswikiFormSteps").livequery(function() {
     var $this = $(this);
-    $this.children(".foswikiFormStep:last").addClass("foswikiFormLast");
-    $this.children(".foswikiFormStep:first").addClass("foswikiFormFirst");
+    $this.find("> .foswikiFormStep:last, > form > .foswikiFormStep:last").addClass("foswikiFormLast");
+    $this.find("> .foswikiFormStep:first, > form > .foswikiFormStep:first").addClass("foswikiFormFirst");
   });
 
   if (false) { // add foswikiLast to last row of a foswikiTable/foswikiLayoutTable/foswikiNullTable

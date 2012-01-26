@@ -6,14 +6,14 @@
 </html>
 %TMPL:END%
 
-%TMPL:DEF{"msie8::compatibility"}%%IF{"context 'msie8'"
+%TMPL:DEF{"msie::compatibility"}%%IF{"context 'msie'"
   then="%IF{"context 'edit' and $'EDIT_FORCE_IE8_COMPATIBILITYMODE'='on'" 
     then="$n<meta http-equiv='X-UA-Compatible' content='ie=emulateie7,chrome=1' />"
     else="$n<meta http-equiv='X-UA-Compatible' content='ie=edge,chrome=1' />"
   }%"
 }%%TMPL:END%
 
-%TMPL:DEF{"head"}%<head>%TMPL:P{"msie8::compatibility"}%
+%TMPL:DEF{"head"}%<head>%TMPL:P{"msie::compatibility"}%
 <title>%TMPL:P{"title"}%</title>
 <meta charset="%CHARSET%" />
 <meta name="date" content="%REVINFO{"$http"}%" /> 

@@ -1,3 +1,5 @@
+locale/ClassificationPlugin/de.po 0644
+locale/ClassificationPlugin/Foswiki.pot 0644
 data/Applications/ClassificationApp/AdministrationForum.txt 0644
 data/Applications/ClassificationApp/ApplicationLicense.txt 0644
 data/Applications/ClassificationApp/ApplicationTopic.txt 0644
@@ -87,7 +89,6 @@ data/Applications/ClassificationApp/RenderCategoryFactory.txt 0644
 data/Applications/ClassificationApp/RenderCategorySettings.txt 0644
 data/Applications/ClassificationApp/RenderCategory.txt 0644
 data/Applications/ClassificationApp/RenderClassifiedTopicView.txt 0644
-data/Applications/ClassificationApp/RenderEditTagCloud.txt 0644
 data/Applications/ClassificationApp/RenderHierarchyAsJSON.txt 0644
 data/Applications/ClassificationApp/RenderIconSelector.txt 0644
 data/Applications/ClassificationApp/RenderKnownCats.txt 0644

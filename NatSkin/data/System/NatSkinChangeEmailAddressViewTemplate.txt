@@ -4,15 +4,15 @@
 %{</verbatim>}%
 
 %{<verbatim class="tml">}%
-%TMPL:DEF{"title"}%%HTMLTITLE{"%MAKETEXT{"Change E-mail Address"}%" separator=" %IF{"defined 'HTMLTITLESEP'" then="%HTMLTITLESEP%" else="-"}% "}%%TMPL:END%
+%TMPL:DEF{"title"}%%HTMLTITLE{"%MAKETEXT{"Change e-mail address"}%" separator=" %IF{"defined 'HTMLTITLESEP'" then="%HTMLTITLESEP%" else="-"}% "}%%TMPL:END%
 %TMPL:DEF{"topicactions"}%%TMPL:END%
 %TMPL:DEF{"revinfo"}%%TMPL:END%
 %{</verbatim>}%
-%MAKETEXT{"Change E-mail Address"}%
+%MAKETEXT{"Change e-mail address"}%
 
 %{<verbatim class="tml">}%
 %TMPL:DEF{"content"}%<!-- -->
----+ %MAKETEXT{"Change E-mail Address"}%
+---+ %MAKETEXT{"Change e-mail address"}%
 %TMPL:P{context="passwords_modifyable" then="changeemailform" else="nochangeemail"}%
 <!-- -->%TMPL:END%
 %{</verbatim>}%
@@ -20,7 +20,7 @@
 %{<verbatim class="tml">}%
 %TMPL:DEF{"nochangeemail"}%<!-- -->
 %MAKETEXT{"Your registered e-mails are used by Foswiki for sending you e-mails, include notifications of password changes."}%
-%MAKETEXT{"You change your email address by setting the form field called Email in your user topic. If this form field does not exist it will look for a line like this:"}%
+%MAKETEXT{"You change your e-mail address by setting the form field called Email in your user topic. If this form field does not exist it will look for a line like this"}%:
 
 <verbatim>
    * Set Email = <nop>user@example.com=
@@ -144,7 +144,7 @@
 
 %{<verbatim class="tml">}%
 %TMPL:DEF{"submit"}%<!-- -->
-%BUTTON{"%MAKETEXT{"Change E-mail Address"}%" %IF{"not context passwords_modifyable" then="disabled=\"on\""}% type="submit" icon="email_edit" class="jqSimpleModalOK"}%
+%BUTTON{"%MAKETEXT{"Change e-mail address"}%" %IF{"not context passwords_modifyable" then="disabled=\"on\""}% type="submit" icon="email_edit" class="jqSimpleModalOK"}%
 <!-- -->%TMPL:END%
 %{</verbatim>}%
 

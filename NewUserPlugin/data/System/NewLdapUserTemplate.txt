@@ -1,8 +1,4 @@
-%META:TOPICINFO{author="ProjectContributor" date="1164910116" format="1.1" reprev="1.1" version="$Rev$"}%
----+ %SPACEOUT{"%WIKINAME%"}% @ <nop>%WIKITOOLNAME%
+%META:TOPICINFO{author="ProjectContributor" comment="save topic" date="1326992609" format="1.1" reprev="2" version="2"}%
 
-%$nopINCLUDE{"%SYSTEMWEB%.RenderLdapUser" KEY="%USERNAME%"}%
 
-<!--
-   * Set ALLOWTOPICCHANGE = %WIKIUSERNAME%
--->
+%META:PREFERENCE{name="VIEW_TEMPLATE" title="VIEW_TEMPLATE" type="Set" value="System.LdapUserView"}%

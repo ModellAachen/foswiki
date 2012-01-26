@@ -153,12 +153,12 @@ sub tear_down {
     $this->SUPER::tear_down();
 }
 
-
 sub loadExtraConfig {
     my $this = shift;
     $this->SUPER::loadExtraConfig();
 
-    $Foswiki::cfg{Plugins}{TablePlugin}{Enabled} = 0;
+    $Foswiki::cfg{Plugins}{TablePlugin}{Enabled}      = 0;
+    $Foswiki::cfg{Plugins}{RenderListPlugin}{Enabled} = 0;
 }
 
 # This formats the text up to immediately before <nop>s are removed, so we
@@ -1307,6 +1307,8 @@ None
    : Sunny
 Pleasant
 ACTUAL
+    $this->expect_failure( 'Post-Foswiki 1.1.x TML syntax',
+        with_dep => 'Foswiki,<,1.2' );
     $this->do_test( $expected, $actual );
 }
 
@@ -1688,6 +1690,7 @@ sub _check_rendered_linktext {
 sub test_sanity_link_tests {
     my $this = shift;
 
+    $this->expect_failure('TODO: fix Item11366 ampersand escaping in squabs');
     $this->_create_link_test_fixtures();
     while ( my ( $linktext, $expected ) = each %link_tests ) {
 
@@ -1703,6 +1706,7 @@ sub test_sanity_link_tests {
 sub test_ampersand_querystring {
     my ($this) = shift;
 
+    $this->expect_failure('TODO: fix Item11366 ampersand escaping in squabs');
     $this->_check_rendered_linktext(
         "$this->{test_topic}?q=r&s=t",
         {

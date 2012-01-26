@@ -12,13 +12,12 @@
 ---------------------------------------------------
 	Header definition for topic attachments and top table in attach screen
 ---------------------------------------------------
-}%%TMPL:DEF{FORM:display:header}%<div class='foswikiForm'>
+}%%TMPL:DEF{FORM:display:header}%<div class='foswikiForm foswikiClearfix'>
 <h3>%MAKETEXT{"Topic data"}%</h3>
 <div class='foswikiToolbar'>%TMPL:P{FORM:display:header:titlename}%%IF{
 	"not context preview"
 	then="%TMPL:P{FORM:display:header:titlelink}%"
 }%
-<div class='foswikiClear'></div>
 </div>
 <table class='foswikiTable foswikiFormTable' border='1' summary='%MAKETEXT{"Form data"}%'>%TMPL:END%%{
 ---------------------------------------------------
@@ -32,7 +31,7 @@
 ---------------------------------------------------
 	Title link in header
 ---------------------------------------------------
-}%%TMPL:DEF{FORM:display:header:titlelink}%<div class='foswikiToolButtonRow'><a href='%SCRIPTURL{edit}%/%WEB%/%TOPIC%?t=%GMTIME{$epoch}%;action=form' class='foswikiButton'>%MAKETEXT{"Edit form data"}%</a></div>%TMPL:END%%{
+}%%TMPL:DEF{FORM:display:header:titlelink}%<div class='xxx'><a href='%SCRIPTURL{edit}%/%WEB%/%TOPIC%?t=%GMTIME{$epoch}%;action=form' class='foswikiButton'>%MAKETEXT{"Edit form data"}%</a></div>%TMPL:END%%{
 ---------------------------------------------------
 	Title name in header
 ---------------------------------------------------

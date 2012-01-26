@@ -22,6 +22,47 @@ use Assert;
 use Error qw( :try );
 use Fcntl qw( :DEFAULT :flock );
 
+our ( $GlobalCache, $GlobalTimestamp );
+
+sub PasswordData {
+    my $this = shift;
+
+    if ( $Foswiki::cfg{Htpasswd}{GlobalCache} ) {
+        $HtPasswdUser::GlobalCache = shift if @_;
+        return $HtPasswdUser::GlobalCache;
+    }
+    else {
+        $this->{LocalCache} = shift if @_;
+        return $this->{LocalCache};
+    }
+}
+
+sub PasswordTimestamp {
+    my $this = shift;
+    if ( $Foswiki::cfg{Htpasswd}{GlobalCache} ) {
+        $HtPasswdUser::GlobalTimestamp = shift if @_;
+        return $HtPasswdUser::GlobalTimestamp;
+    }
+    else {
+        $this->{LocalTimestamp} = shift if @_;
+        return $this->{LocalTimestamp};
+    }
+}
+
+# Used in unit tests to reset the cache.  Also used to clear the cache if the
+# Password file has been modified externally.
+sub ClearCache {
+    my $this = shift;
+    if ( $Foswiki::cfg{Htpasswd}{GlobalCache} ) {
+        $HtPasswdUser::GlobalCache     = ();
+        $HtPasswdUser::GlobalTimestamp = 0;
+    }
+    else {
+        undef $this->{LocalCache};
+        undef $this->{LocalTimestamp};
+    }
+}
+
 # Set TRACE to 1 to enable detailed trace of password activity
 use constant TRACE => 0;
 
@@ -104,7 +145,8 @@ Break circular references.
 sub finish {
     my $this = shift;
     $this->SUPER::finish();
-    undef $this->{passworddata};
+    undef $this->{LocalCache};
+    undef $this->{LocalTimestamp};
 }
 
 =begin TML
@@ -119,11 +161,19 @@ sub readOnly {
     my $this = shift;
     my $path = $Foswiki::cfg{Htpasswd}{FileName};
 
-    #TODO: what if the data dir is also read only?
-    if ( ( !-e $path ) || ( -e $path && -r $path && !-d $path && -w $path ) ) {
-        $this->{session}->enterContext('passwords_modifyable');
-        return 0;
-    }
+    # We expect the path to exist and be writable.
+    return 0 if ( -e $path && -f _ && -w _ );
+
+    # Otherwise, log a problem.
+    $this->{session}->logger->log( 'warning',
+            'The password file does not exist or cannot be written.'
+          . 'Run =configure= and check the setting of {Htpasswd}{FileName}.'
+          . ' New user registration has been disabled until this is corrected.'
+    );
+
+    # And disable registration (which will also disable password changes)
+    $Foswiki::cfg{Register}{EnableNewUserRegistration} = 0;
+
     return 1;
 }
 
@@ -138,7 +188,7 @@ sub fetchUsers {
     my $db    = $this->_readPasswd(1);
     my @users = sort keys %$db;
     require Foswiki::ListIterator;
-    return new Foswiki::ListIterator( \@users );
+    return Foswiki::ListIterator->new( \@users );
 }
 
 # Lock the htpasswd semaphore file (create if it does not exist)
@@ -175,15 +225,15 @@ sub _readPasswd {
     my ( $this, $lockShared ) = @_;
 
     if (   $Foswiki::cfg{Htpasswd}{DetectModification}
-        && defined( $this->{passworddata} )
+        && $this->PasswordData()
         && -e $Foswiki::cfg{Htpasswd}{FileName} )
     {
-        my $fileTime = ( stat( $Foswiki::cfg{Htpasswd}{FileName} ) )[9];
-        delete $this->{passworddata}
-          if ( $fileTime > $this->{passwordtimestamp} );
+        my $fileTime = ( stat(_) )[9];
+        $this->ClearCache()
+          if ( $fileTime > $this->PasswordTimestamp() );
     }
 
-    return $this->{passworddata} if ( defined( $this->{passworddata} ) );
+    return $this->PasswordData() if ( $this->PasswordData() );
 
     my $data = {};
     if ( !-e $Foswiki::cfg{Htpasswd}{FileName} ) {
@@ -192,9 +242,10 @@ sub _readPasswd {
 
     $lockShared |= 0;
     my $lockHandle = _lockPasswdFile(LOCK_SH) if $lockShared;
-    $this->{passwordtimestamp} =
-      ( stat( $Foswiki::cfg{Htpasswd}{FileName} ) )[9];
-    print STDERR "Loading Passwords, timestamp $this->{passwordtimestamp} \n"
+    $this->PasswordTimestamp(
+        ( stat( $Foswiki::cfg{Htpasswd}{FileName} ) )[9] );
+    print STDERR "Loading Passwords, timestamp "
+      . $this->PasswordTimestamp() . " \n"
       if (TRACE);
     my $IN_FILE;
 
@@ -295,9 +346,12 @@ sub _readPasswd {
         }
     }
     close($IN_FILE);
+    $this->PasswordData($data);
+    $this->PasswordTimestamp(
+        ( stat( $Foswiki::cfg{Htpasswd}{FileName} ) )[9] );
+
     _unlockPasswdFile($lockHandle) if $lockShared;
 
-    $this->{passworddata} = $data;
     return $data;
 }
 
@@ -331,7 +385,8 @@ sub _dumpPasswd {
 }
 
 sub _savePasswd {
-    my $db = shift;
+    my $this = shift;
+    my $db   = shift;
 
     unless ( -e "$Foswiki::cfg{Htpasswd}{FileName}" ) {
 
@@ -362,7 +417,12 @@ EoT
     print $fh $content;
 
     close($fh);
-    umask($oldMask);             # Restore original umask
+
+    # Reset the cache timestamp
+    $this->PasswordData($db);
+    $this->PasswordTimestamp(
+        ( stat( $Foswiki::cfg{Htpasswd}{FileName} ) )[9] );
+    umask($oldMask);    # Restore original umask
 }
 
 sub encrypt {
@@ -538,7 +598,8 @@ sub setPassword {
         print STDERR
 "setPassword login $login pass $db->{$login}->{pass} enc $db->{$login}->{enc} realm $db->{$login}->{realm} emails $db->{$login}->{emails}\n"
           if (TRACE);
-        _savePasswd($db);
+        $this->_savePasswd($db);
+
     }
     catch Error::Simple with {
         my $e = shift;
@@ -572,7 +633,7 @@ sub removeUser {
         }
         else {
             delete $db->{$login};
-            _savePasswd($db);
+            $this->_savePasswd($db);
             $result = 1;
         }
     }
@@ -655,7 +716,7 @@ sub setEmails {
 
         $db->{$login}->{emails} = $emails;
 
-        _savePasswd($db);
+        $this->_savePasswd($db);
     }
     finally {
         _unlockPasswdFile($lockHandle) if $lockHandle;

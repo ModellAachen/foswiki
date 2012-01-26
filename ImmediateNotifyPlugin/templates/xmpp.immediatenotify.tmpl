@@ -1,1 +1,2 @@
-%USER% has created or changed the topic %SCRIPTURL{"view"}%/%WEB%/%TOPICNAME% - Revision %REV%
+%TMPL:DEF{xmppBody}%%WIKINAME% has %IF{"context NewTopic" then="created" else="changed"}% the topic %SCRIPTURL{"view"}%/%WEB%/%TOPIC% Rev:%REVINFO{format="r1.$rev"}% %INCLUDE{"%WEB%.%TOPIC%" section="NOTIFYTEXT" warn="off"}%%TMPL:END%
+%TMPL:P{xmppBody}%

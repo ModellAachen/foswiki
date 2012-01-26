@@ -1,6 +1,8 @@
 # See bottom of file for license and copyright
 
 package FoswikiFnTestCase;
+use strict;
+use warnings;
 
 =begin TML
 
@@ -24,16 +26,13 @@ targeting single classes).
 
 =cut
 
-
-use FoswikiTestCase;
+use FoswikiTestCase();
 our @ISA = qw( FoswikiTestCase );
 
-use strict;
-
-use Foswiki;
-use Unit::Request;
-use Unit::Response;
-use Foswiki::UI::Register;
+use Foswiki();
+use Unit::Request();
+use Unit::Response();
+use Foswiki::UI::Register();
 use Error qw( :try );
 
 our @mails;
@@ -47,7 +46,7 @@ sub new {
     $this->{test_web}   = 'Temporary' . $var . 'TestWeb' . $var;
     $this->{test_topic} = 'TestTopic' . $var;
     $this->{users_web}  = 'Temporary' . $var . 'UsersWeb';
-    $this->{session}    = undef;
+
     return $this;
 }
 
@@ -62,12 +61,18 @@ to add extra stuff to Foswiki::cfg.
 sub loadExtraConfig {
     my $this = shift;
     $this->SUPER::loadExtraConfig(@_);
-    
+
     $Foswiki::cfg{Store}{Implementation}    = "Foswiki::Store::RcsLite";
     $Foswiki::cfg{RCS}{AutoAttachPubFiles}  = 0;
     $Foswiki::cfg{Register}{AllowLoginName} = 1;
     $Foswiki::cfg{Htpasswd}{FileName} = "$Foswiki::cfg{WorkingDir}/htpasswd";
+    unless (-e $Foswiki::cfg{Htpasswd}{FileName} ) {
+	my $fh;
+	open($fh, ">", $Foswiki::cfg{Htpasswd}{FileName}) || die $!;
+	close($fh) || die $!;
+    }
     $Foswiki::cfg{PasswordManager}    = 'Foswiki::Users::HtPasswdUser';
+    $Foswiki::cfg{Htpasswd}{GlobalCache} = 0;
     $Foswiki::cfg{UserMappingManager} = 'Foswiki::Users::TopicUserMapping';
     $Foswiki::cfg{LoginManager}       = 'Foswiki::LoginManager::TemplateLogin';
     $Foswiki::cfg{Register}{EnableNewUserRegistration} = 1;
@@ -85,11 +90,10 @@ sub set_up {
     my $query = new Unit::Request("");
     $query->path_info("/$this->{test_web}/$this->{test_topic}");
 
-    $this->{session}           = new Foswiki( undef, $query );
-    $this->{request}           = $query;
-    $this->{response}          = new Unit::Response();
-    $Foswiki::Plugins::SESSION = $this->{session};
-    @mails                     = ();
+    # Note: some tests are testing Foswiki::UI which also creates a session
+    $this->createNewFoswikiSession( undef, $query );
+    $this->{response} = new Unit::Response();
+    @mails = ();
     $this->{session}->net->setMailHandler( \&FoswikiFnTestCase::sentMail );
     my $webObject = Foswiki::Meta->new( $this->{session}, $this->{test_web} );
     $webObject->populateNewWeb();
@@ -108,11 +112,12 @@ sub set_up {
     );
     $this->{test_user_cuid} =
       $this->{session}->{users}->getCanonicalUserID( $this->{test_user_login} );
+    $this->{test_topicObject}->finish() if $this->{test_topicObject};
     $this->{test_topicObject} = Foswiki::Meta->new(
         $this->{session},    $this->{test_web},
         $this->{test_topic}, "BLEEGLE\n"
     );
-    $this->{test_topicObject}->save(forcedate=>(time()+60));
+    $this->{test_topicObject}->save( forcedate => ( time() + 60 ) );
 }
 
 sub tear_down {
@@ -163,7 +168,7 @@ Can be used by subclasses to register test users.
 
 sub registerUser {
     my ( $this, $loginname, $forename, $surname, $email ) = @_;
-
+    my $q     = $this->{session}{request};
     my $query = new Unit::Request(
         {
             'TopicName'     => ['UserRegistration'],
@@ -180,13 +185,17 @@ sub registerUser {
 
     $query->path_info("/$this->{users_web}/UserRegistration");
 
-    my $fatwilly = new Foswiki( undef, $query );
-    $this->assert($fatwilly->topicExists(
-        $this->{test_web}, $Foswiki::cfg{WebPrefsTopicName}));
+    $this->createNewFoswikiSession( undef, $query );
+    $this->assert( $this->{session}
+          ->topicExists( $this->{test_web}, $Foswiki::cfg{WebPrefsTopicName} )
+    );
 
-    $fatwilly->net->setMailHandler( \&FoswikiFnTestCase::sentMail );
+    $this->{session}->net->setMailHandler( \&FoswikiFnTestCase::sentMail );
     try {
-        $this->captureWithKey( register_cgi => \&Foswiki::UI::Register::register_cgi, $fatwilly);
+        $this->captureWithKey(
+            register_cgi => \&Foswiki::UI::Register::register_cgi,
+            $this->{session}
+        );
     }
     catch Foswiki::OopsException with {
         my $e = shift;
@@ -204,12 +213,9 @@ sub registerUser {
     otherwise {
         $this->assert( 0, "expected an oops redirect" );
     };
-    $fatwilly->finish();
 
     # Reload caches
-    my $q = $this->{request};
-    $this->{session}->finish();
-    $this->{session} = new Foswiki( undef, $q );
+    $this->createNewFoswikiSession( undef, $q );
     $this->{session}->net->setMailHandler( \&FoswikiFnTestCase::sentMail );
 }
 

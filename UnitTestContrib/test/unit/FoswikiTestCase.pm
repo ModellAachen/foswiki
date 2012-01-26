@@ -18,6 +18,8 @@ you can always create a new web based on that web.
 
 use strict;
 use warnings;
+
+use Assert;
 use Unit::TestCase;
 our @ISA = qw( Unit::TestCase );
 
@@ -29,6 +31,9 @@ use Foswiki::Plugins;
 use Unit::Request;
 use Unit::Response;
 use Error qw( :try );
+
+sub SINGLE_SINGLETONS { 0 }
+sub TRACE             { 0 }
 
 BEGIN {
 
@@ -189,6 +194,7 @@ sub check_using {
     else {
         $result = $this->_check_using($what);
     }
+    print STDERR "check_using('$what') : $result\n" if TRACE;
 
     return $result;
 }
@@ -198,10 +204,12 @@ sub _check_using {
     my $result;
 
     if ( $what =~ /^[^:]+Plugin$/ ) {
+        print STDERR "_check_using, plugin enabled\n" if TRACE;
         $result = $this->check_plugin_enabled($what);
     }
     if ( !$result ) {
         if ( exists $foswiki_things{$what} ) {
+            print STDERR "_check_using, things\n" if TRACE;
             $result = $foswiki_things{$what}->($this);
         }
         else {
@@ -209,6 +217,7 @@ sub _check_using {
                 "Don't know how to check if we're using '$what'" );
         }
     }
+    print STDERR "_check_using('$what') : $result\n" if TRACE;
 
     return $result;
 }
@@ -244,6 +253,7 @@ sub check_dependency {
     if ( ref($what) eq 'ARRAY' ) {
         my $not_usingsomething;
 
+        print STDERR "check_dependency, multiple\n" if TRACE;
         foreach my $thing ( @{$what} ) {
             $not_usingsomething ||= !$this->_check_dependency($thing);
         }
@@ -251,8 +261,10 @@ sub check_dependency {
         $result = !$not_usingsomething;
     }
     else {
-        $result = $this->check_dependency($what);
+        print STDERR "check_dependency, single\n" if TRACE;
+        $result = $this->_check_dependency($what);
     }
+    print STDERR "check_dependency('$what'): '$result'\n" if TRACE;
 
     return $result;
 }
@@ -263,18 +275,20 @@ sub _check_dependency {
 
     # Eg. Foswiki::Plugins::ZonePlugin,>=3.1,perl
     # TODO: type?
-    if ( $what =~ /^([^,]+)\s*(,\s*([^,]+,[^,]+))?/ ) {
+    if ( $what =~ /^([^,]+)\s*(,\s*([^,]+),([^,]+))?/ ) {
         require Foswiki::Configure::Dependency;
-        my ( $module, $version ) = ( $1, $3 );
+        my ( $module, $equality, $version ) = ( $1, $3, $4 );
+        print STDERR "_check_dependency, testing $module $equality $version\n"
+          if TRACE;
         my $type = $module =~ /^(Foswiki|TWiki)\b/ ? 'perl' : 'cpan';
         my $dep =
           defined $version
-          ? Foswiki::Configure::Dependency(
+          ? Foswiki::Configure::Dependency->new(
             type    => $type,
             module  => $module,
-            version => $version
+            version => $equality . $version
           )
-          : Foswiki::Configure::Dependency(
+          : Foswiki::Configure::Dependency->new(
             type   => $type,
             module => $module
           );
@@ -284,6 +298,7 @@ sub _check_dependency {
     else {
         $this->assert( 0, "Don't know how to check for module '$what'" );
     }
+    print STDERR "_check_dependency('$what'): '$result'\n" if TRACE;
 
     return $result;
 }
@@ -436,11 +451,15 @@ sub set_up {
     }
     close(F);
 
+    ASSERT( !defined $Foswiki::Plugins::SESSION ) if SINGLE_SINGLETONS;
+
     # Force completion of %Foswiki::cfg
     # This must be done before moving the logging.
     my $query = new Unit::Request();
     my $tmp = new Foswiki( undef, $query );
+    ASSERT( defined $Foswiki::Plugins::SESSION ) if SINGLE_SINGLETONS;
     $tmp->finish();
+    ASSERT( !defined $Foswiki::Plugins::SESSION ) if SINGLE_SINGLETONS;
 
     my %tempDirOptions = ( CLEANUP => 1 );
     if ( $^O eq 'MSWin32' ) {
@@ -476,7 +495,11 @@ sub set_up {
 # Restores Foswiki::cfg and %ENV from backup
 sub tear_down {
     my $this = shift;
-    $this->{session}->finish() if $this->{session};
+
+    if ( $this->{session} ) {
+        ASSERT( $this->{session}->isa('Foswiki') ) if SINGLE_SINGLETONS;
+        $this->finishFoswikiSession();
+    }
     eval { File::Path::rmtree( $Foswiki::cfg{WorkingDir} ); };
     %Foswiki::cfg = eval $this->{__FoswikiSafe};
     foreach my $sym ( keys %ENV ) {
@@ -565,14 +588,18 @@ $result is the result of the function.
 =cut
 
 sub capture {
-    my $this = shift;
+    my ( $this, $fn, $session, @args ) = @_;
 
-    my ( $stdout, $stderr, $result ) = $this->captureSTD(@_);
-    my $fn = shift;
+    # $fn may create a new Foswiki singleton, so it should take care to avoid
+    # stomping on the existing one without $this->finishFoswikiSession() or
+    # createNewFoswikiSession()
+    my ( $stdout, $stderr, $result ) =
+      $this->captureSTD( $fn, $session, @args );
 
+    ASSERT( ref($session) || ref($Foswiki::Plugins::SESSION) );
     my $response =
-      UNIVERSAL::isa( $_[0], 'Foswiki' )
-      ? $_[0]->{response}
+      UNIVERSAL::isa( $session, 'Foswiki' )
+      ? $session->{response}
       : $Foswiki::Plugins::SESSION->{response};
 
     my $responseText = '';
@@ -705,14 +732,30 @@ __DO NOT CALL session->finish() yourself__
 =cut
 
 sub createNewFoswikiSession {
-    my $this = shift;
-    
-    $this->{session}->finish() if $this->{session};
-    $this->{session} = new Foswiki(@_ );
-    $Foswiki::Plugins::SESSION = $this->{session};
-    ($this->{test_topicObject}) = Foswiki::Func::readTopic($this->{test_web}, $this->{test_topic});
-    
+    my ( $this, $user, $query, @args ) = @_;
+
+    $this->{test_topicObject}->finish()           if $this->{test_topicObject};
+    $this->{session}->finish()                    if $this->{session};
+    ASSERT( !defined $Foswiki::Plugins::SESSION ) if SINGLE_SINGLETONS;
+    $this->{session} = Foswiki->new( $user, $query, @args );
+    $this->{request} = $this->{session}{request};
+    ASSERT( defined $Foswiki::Plugins::SESSION ) if SINGLE_SINGLETONS;
+    if ( $this->{test_web} && $this->{test_topic} ) {
+        ( $this->{test_topicObject} ) =
+          Foswiki::Func::readTopic( $this->{test_web}, $this->{test_topic} );
+    }
+
     return $this->{session};
+}
+
+sub finishFoswikiSession {
+    my ($this) = @_;
+
+    $this->{session}->finish() if defined $this->{session};
+    ASSERT( !$Foswiki::Plugins::SESSION ) if SINGLE_SINGLETONS;
+    $this->{session} = undef;
+
+    return;
 }
 
 1;

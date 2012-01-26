@@ -1,0 +1,28 @@
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+expand	@b@;
+
+
+1.1
+date	2011.11.13.00.32.26;	author BaseUserMapping_333;	state Exp;
+branches;
+next	;
+
+
+desc
+@none
+@
+
+
+1.1
+log
+@none
+@
+text
+@<?xml version="1.0"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xl="http://www.w3.org/1999/xlink" version="1.1" viewBox="-1 -7 72 68" width="6pc" height="68pt"><metadata xmlns:dc="http://purl.org/dc/elements/1.1/"><dc:date>2011-10-09 02:05Z</dc:date><!-- Produced by OmniGraffle Professional 4.2.1 --></metadata><defs></defs><g stroke="none" stroke-opacity="1" stroke-dasharray="none" fill="none" fill-opacity="1"><title>Canvas 1</title><rect fill="white" width="580.59998" height="827.6"/><g><title>Layer 1</title><path d="M 38146973e-13 32.985577 L 45.882683 7.514427 L 46.765373 59.98557 Z" fill="black"/></g></g></svg>
+@

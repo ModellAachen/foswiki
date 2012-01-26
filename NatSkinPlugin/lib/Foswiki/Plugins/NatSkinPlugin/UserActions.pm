@@ -36,11 +36,11 @@ sub render {
   my $footer = $params->{footer} || '';
   
   my $text = $params->{_DEFAULT} || $params->{format};
-  $text = '<div class="natTopicActions">$edit$sep$attach$sep$new$sep$raw$sep$delete$sep$history$sepprint$sep$more</div>'
+  $text = '$edit$sep$attach$sep$new$sep$raw$sep$delete$sep$history$sepprint$sep$more'
     unless defined $text;
 
   my $guestText = $params->{guest};
-  $guestText = '<div class="natTopicActions">$login$sep$register</div>' 
+  $guestText = '$login$sep$register' 
     unless defined $guestText;
 
   $text = $guestText unless Foswiki::Func::getContext()->{authenticated};
@@ -314,7 +314,7 @@ sub renderEditForm {
   return '' if (defined($context) && !Foswiki::Func::getContext()->{$context});
 
   my $session = $Foswiki::Plugins::SESSION;
-  my $topicObj = Foswiki::Meta->load($session, $params->{baseWeb}, $params->{baseTopic});
+  my ($topicObj) = Foswiki::Func::readTopic($params->{baseWeb}, $params->{baseTopic});
   if ($topicObj && $topicObj->getFormName) {
     if ($params->{isRestrictedAction}{'editform'}) {
       return '' if $params->{hiderestricted};

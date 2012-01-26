@@ -1,12 +1,12 @@
-%META:TOPICINFO{author="micha" comment="reprev" date="1311861958" format="1.1" reprev="6" version="6"}%
+%META:TOPICINFO{author="ProjectContributor" comment="reprev" date="1311861958" format="1.1" reprev="6" version="6"}%
 %META:TOPICPARENT{name="TopicFunction"}%
 %TOC{depth="2"}%
 
 ---++ Documentation
-%STARTSECTION{name="documentation" type="section"}%
+%STARTSECTION{"documentation"}%
 This is used to create a new WikiApplication
 
-%ENDSECTION{name="documentation" type="section"}%
+%ENDSECTION{"documentation"}%
 
 ---++ Implementation
 <verbatim class="tml">

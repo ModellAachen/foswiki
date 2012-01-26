@@ -3,7 +3,16 @@
 ---+!! Base Skin
 Base skin to build other skins upon.
 
-<div class="foswikiNotification">This is work in progress, not ready for use.</div>
+<div class="foswikiNotification">
+---++ Test settings
+Copy these settings to !SitePreferences:
+<verbatim>
+   * Set SKIN = basejs,basecss,base
+   * Set SKIN_USE_LESS = 1
+   * Set WIKILOGOIMG = %PUBURL%/%SYSTEMWEB%/BaseSkin/foswiki-logo-top.png
+   * Set SKIN_WEBFONTS_URL = %PUBURLPATH%/%SYSTEMWEB%/BaseSkinCss/webfonts.css
+</verbatim>
+</div>
 
 %TOC%
 
@@ -13,25 +22,26 @@ TO WRITE
 =basecss= and =basejs= use [[http://twitter.github.com/bootstrap/][Twitter bootstrap]] to provide a base layer of user interface functionality.
 
 ---++ Modular skin parts
-Base Skin is built with modular, progressive parts, making it possible to load only the parts you need. For instance, you might only need the CSS, not the javascript of Base Skin.
+Base Skin is built with modular, progressive parts, making it possible to load only the parts you need. For instance, you might only need the CSS, not !BaseSkin's javascript.
 
 The progressive loading is done by using a topic template for each part.
 
 %TABLE{columnwidths="10%,50%,40%" headeralign="left"}%
 | *Part name* | *What it does* | *Defined in topic template* |
-| =base=   | Sets the base structure of the document (HTML page). | %SYSTEMWEB%.BaseSkinViewTemplate (and this loads %SYSTEMWEB%.BaseSkinDocumentTemplate) |
-| =basecss= | Loads CSS file [[%PUBURLPATH%/%SYSTEMWEB%/BaseSkinCss/base_src.css][base.css]] that contains a style reset, sets default styling for HTML elements and implements Foswiki styles. %BR% =base.css= is not loaded if preference =BASESKIN_TAKE= is set to another CSS file. | %SYSTEMWEB%.BaseCssSkinViewTemplate |
-| =basejs= | Loads a javascript file that implements dynamic interaction with topic contents. | %SYSTEMWEB%.BaseJsSkinViewTemplate |
+| =base=   | Sets the base structure of the document (HTML page). | %SYSTEMWEB%.BaseSkinFoswikiTemplate |
+| =basecss= | Loads CSS file [[%PUBURLPATH%/%SYSTEMWEB%/BaseSkinCss/base_src.css][base.css]] that contains a style reset, sets default styling for HTML elements and implements Foswiki styles. %BR% =base.css= is not loaded if preference =BASESKIN_TAKE= is set to another CSS file. | %SYSTEMWEB%.BasecssSkinFoswikiTemplate |
+| =basejs= | Loads a javascript file that implements dynamic interaction with topic contents. | %SYSTEMWEB%.BasejsSkinFoswikiTemplate |
+| =basenocontrols= | Removes edit buttons from the page, useful for Foswiki as CMS. | %SYSTEMWEB%.BasenocontrolsSkinFoswikiTemplate |
 
----+++ From specific to generic
+---+++ Specifying the skin parts
 Base Skin parts can be loaded independently, as long as the rules for the [[%SYSTEMWEB%.Skins#Activating_Skins][skin path]] are met. As you may know, a skin is set using skin path elements, the most specific skin first.
 
 For example:
 <pre class="tml">
-   * <nop>Set SKIN = basecss,base
+   * <nop>Set SKIN = basejs,basecss,base
 </pre>
 
-When you are developing your own skin on top of the "full" Base Skin, your skin will be the most specific skin part. The skin path then becomes:
+When you are developing your own skin on top of Base Skin, your skin will be the most specific part. So the skin path will become:
 <pre class="tml">
    * <nop>Set SKIN = myskin,%SKIN_PATH%
 </pre>
@@ -41,34 +51,63 @@ How to choose the right skin parts from Base Skin? The table below describes wha
 %TABLE{columnwidths="30%,5%,30%,35%" headeralign="left"}%
 | *Skin setting* | *Try* | *What do you see* | *Why would I need this* |
 | =Set SKIN = %RED%base%ENDCOLOR%= | [[%SCRIPTURL{view}%/%WEB%/%TEST_TOPIC%?skin=base][test]] | No Base Skin CSS or Javascript is loaded, only that what is inserted by other extensions. | You are building something from scratch using the bare minimum. You might be developing a new skin that uses Foswiki's template structure, and you are building your own CSS and Javascript from the ground up. | 
-| =Set SKIN = %RED%basecss%ENDCOLOR%,base= | [[%SCRIPTURL{view}%/%WEB%/%TEST_TOPIC%?skin=basecss,base][test]] | Basic formatting and Foswiki styles like =foswikiNotification= and =foswikiAlert= are implemented. | You are using Foswiki topic contents and it would be handy to have some styles defined. You are developing your own application with your own Javascript. |
-| =Set SKIN = %RED%basejs%ENDCOLOR%,base= | [[%SCRIPTURL{view}%/%WEB%/%TEST_TOPIC%?skin=basejs,basecss,base][test]] | ... | You want to use Foswiki's functionalities like dynamic topic interaction. |
+| =Set SKIN = %RED%basecss%ENDCOLOR%,base= | [[%SCRIPTURL{view}%/%WEB%/%TEST_TOPIC%?skin=basecss,base][test]] | Pages are styled. Foswiki styles like =foswikiNotification= and =foswikiAlert= are implemented. But menu dropdowns, smooth scrolling or sticky navigation won't work. | You are using Foswiki topic contents and it would be handy to have styles already defined. You are developing your own application with your own Javascript. |
+| =Set SKIN = %RED%basejs%ENDCOLOR%,base= | [[%SCRIPTURL{view}%/%WEB%/%TEST_TOPIC%?skin=basejs,base][test]] | The page looks unstyled, but Javascript additions like smooth scrolling work. | You want to use Foswiki's Javascript functionalities but write your own stylesheets. |
+| =Set SKIN = %RED%basejs,basecss%ENDCOLOR%,base= | [[%SCRIPTURL{view}%/%WEB%/%TEST_TOPIC%?skin=basejs,basecss,base][test]] | The page looks styled, javascript additions work. | You want to build on top of existing functionalities and perhaps make small changes to styling. |
+| =Set COVER = %RED%basenocontrols%ENDCOLOR%= | [[%SCRIPTURL{view}%/%WEB%/%TEST_TOPIC%?skin=basejs,basecss,base;cover=basenocontrols][test]] | Everything works as normal, but edit and info buttons are missing. | You want to hide edit buttons from non-logged in users. Or you want to use this style to publish static HTML pages. |
 
-And as said above, you can also use all parts together:
+The default skin setting would be:
 <pre class="tml">
    * <nop>Set SKIN = %SKIN_PATH%
 </pre>
 
----++ Customizing
----+++ Using different styles
-TODO
+---++ Page structure
+Pages generated by the view template are divided into a number of horizontal (screen wide) sections:
+   * top bar
+   * actions bar
+   * topic text
+   * meta info (form and attachments)
+   * bottom bar
+
+Other templates use the same structure, but will have different content for  topic and meta info.
+
+---+++ Sections
+Sections have a consistent top and bottom padding, making them easy to stack.  Sections that are at the same time a navigation bar will have different paddings.
+
+Sections can be styled by adding a color class.
+
+You can create a new section anywhere in a topic. For instance, to create a section with a black background, write in a topic:
+<verbatim>
+%TMPL:P{"endsection"}%
+%TMPL:P{"startsection" class="foswikiColorBlack"}%
+</verbatim>
+
+
+
+---++ Colors
+
+---++ Developing
 
 ---+++ LESS instead of CSS
-You may use [[http://lesscss.org][LESS]] files instead of CSS. Write:
+Developing in [[http://lesscss.org][LESS]] without compiling to CSS works fine if you set:
 <pre class="tml">
    * <nop>Set BASESKIN_USE_LESS = 1
 </pre>
+Due to the fairly large compile time in the browser I suggest to always use the compiled CSS for production sites.
 
 
----++ Design decisions
----+++ Scroll javascript is needed when using a fixed top bar
-The topic action bar stays glued at the top, even when the page is scrolled. The height of the topic action bar overlaps the page contents. When clicking an anchor link, the anchored header would normally be hidden behind the topic action bar. A smart scrolling script reads the topic action bar height and lets the page scroll just a bit less to make the anchor visible.
+---+++ Rolling your own Javascript
+If you replace the default javascript, you'll need to take a few things into consideration.
 
-When no javascript is available the topic action bar does not have a fixed position and will scroll along with the page contents.
+---++++ Scroll javascript is needed when using a fixed top bar
+Base Skin default behaviour is to let the bar scroll with the page.
 
-So in the case you are using your own javascript, you either:
-   * include scrolling javascript; see =base_src.js= how it works
-   * make the topic action bar style =position: relative=
+But if you use Twitter's top bar style, the top bar stays glued at the top, even when the page is scrolled.
+
+The height of the top bar will overlap the page contents. When clicking an anchor link, the anchored header would then be hidden behind the top bar. A smart scrolling script reads the top bar height and lets the page scroll just a bit less to make the anchor visible. See =base_src.js= how this works.
+
+When no javascript is available the topic action bar will not have a fixed position and will scroll along with the page contents.
+
 
 
 ---++ Testing
@@ -79,12 +118,7 @@ A page with a lot of different markup:
 ---++ Background
 This skin has all templates as topics. This makes it easier to have access to template code. The downside is that template topics will be searchable and will show up in search results.
 
-   * CSS:
-      * =base.css=: implements =FoswikiXxx= classes (see %SYSTEMWEB%.AppendixCascadingStyleSheets) and provides the most basic defaults
-      * =grid.css=: implements a typographic grid
-   * Javascript:
-      * =basejs= loads nothing - yet...
-   
+
 ---++ Installation Instructions
 Note: this skin will not work with a Foswiki version earlier than 1.2.
 
@@ -93,7 +127,7 @@ Note: this skin will not work with a Foswiki version earlier than 1.2.
 
 ---++ Plugin Info
 |  Author(s): | Arthur Clemens |
-|  Copyright: | 2011 Arthur Clemens  |
+|  Copyright: | 2012 Arthur Clemens  |
 |  License: | GPL |
 |  Screenshot: | no screenshot yet |
 |  Preview: | [[%SCRIPTURL{view}%/%WEB%/%TOPIC%?skin=%SKIN_PATH%][Preview with this skin]] |

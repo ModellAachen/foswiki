@@ -1,4 +1,4 @@
-%META:TOPICINFO{author="micha" comment="save topic" date="1307611821" format="1.1" reprev="6" version="7"}%
+%META:TOPICINFO{author="ProjectContributor" comment="save topic" date="1307611821" format="1.1" reprev="6" version="7"}%
 ---+ Style Browser
 Explore the style variations of the %SYSTEMWEB%.NatSkin by changing the base
 _style_ and a _variation_ of it. In general, style variations are used to change

@@ -65,17 +65,17 @@ See also: %SYSTEMWEB%.BlogPlugin, %SYSTEMWEB%.BlogUp
 </div>
 </form>
 
-%IFDEFINEDTHEN{"%URLPARAM{"blogfactorymsg"}%" glue="off"}%
+%IF{
+  "'$URLPARAM{blogfactorymsg}'!=''" 
+  then="<!-- -->
 <div class="foswikiPageForm">
 <center>
-%URLPARAM{"blogfactorymsg"}%
+$percntURLPARAM{\"blogfactorymsg\"}$percnt
 
-<input type="button" value="OK" class="natOkButton" 
-~~~ onclick="window.location.href='%SCRIPTURL{"view"}%/%URLPARAM{"newweb"}%/WebHome'"
-~~~ />
+<input type='button' value='OK' class='natOkButton' onclick='window.location.href=\"%SCRIPTURL{"view"}%/%URLPARAM{"newweb"}%/WebHome\"' />
 </center>
-</div>
-%FIDEFINED%
+</div>"
+}%
 
 ---++ Known blogs on <nop>%WIKITOOLNAME%
 <table class="foswikiTable">

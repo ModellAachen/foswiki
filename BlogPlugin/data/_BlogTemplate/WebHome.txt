@@ -1,0 +1,9 @@
+%META:TOPICINFO{author="ProjectContributor" comment="save topic" date="1294050551" format="1.1" reprev="2" version="2"}%
+<!--
+   * Set VIEW_TEMPLATE = Applications.BlogApp.FrontPageView
+   * Set HTMLTITLE = Welcome to the new blog application
+   * Set CACHEABLE = on
+   * Set CACHEEXPIRE = 5min
+-->
+
+%META:PREFERENCE{name="TOPICTITLE" title="TOPICTITLE" type="Local" value="Blog"}%

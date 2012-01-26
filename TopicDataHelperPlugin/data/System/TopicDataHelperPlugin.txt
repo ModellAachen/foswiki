@@ -517,6 +517,8 @@ my $text = join "\n", @$list;
 |  Version: | %$VERSION% |
 |  Release: | %$RELEASE% |
 |  Change History: | <!-- versions below in reverse order --> |
+|  09 Jan 2012 | V.1.1.4 Paul Harvey: Fix perl 5.12+ =Use of uninitialized value in lc= warnings, \
+                                      fix code testing for compare mode 'integer' vs incorrect API doc 'numeric' (now works with both) |
 |  01 Apr 2010 | V.1.1.2 Arthur Clemens: Allow topic data to be used without data structure. |
 |  20 Jun 2009 | V.1.1.1 Arthur Clemens: Fixed reading of =web.topic= notation in =createTopicData=. |
 |   8 Jun 2009 | V.1.1: Foswiki:Main.WillNorris: Ported to Foswiki |

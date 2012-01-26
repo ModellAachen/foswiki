@@ -1,3 +1,4 @@
 Foswiki::Plugins::JsonRpcContrib,>=1.1,perl,Required. 
+Foswiki::Plugins::RenderPlugin,>=3.1,perl,Required. 
 ONLYIF ( $Foswiki::Plugins::VERSION < 2.1)
 Foswiki::Plugins::ZonePlugin,>=3.1,perl,Required. required for Foswiki < 1.1

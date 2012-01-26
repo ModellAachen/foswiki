@@ -1,0 +1,2 @@
+cd /Users/arthur/Sites/unittestfoswiki/BaseSkin/pub/System/BaseSkinCss
+lessc baseskin-bootstrap.less > baseskin_src.css

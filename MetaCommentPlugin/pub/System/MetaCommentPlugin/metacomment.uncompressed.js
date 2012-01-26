@@ -2,7 +2,7 @@
 
 Foswiki - The Free and Open Source Wiki, http://foswiki.org/
 
-(c)opyright 2010-2011 Michael Daum http://michaeldaumconsulting.com
+(c)opyright 2010-2012 Michael Daum http://michaeldaumconsulting.com
 
 are listed in the AUTHORS file in the root of this distribution.
 NOTE: Please extend that file, not this notice.
@@ -82,8 +82,8 @@ jQuery(function($) {
       $form.ajaxForm({
         dataType:"json",
         beforeSubmit: function() {
-          rev = $form.find("input[name=ref]").val(),
-          $errorContainer = rev?$this.find("a[name=comment"+rev+"]").parent().parent():$form.parent();
+          rev = $form.find("input[name='ref']").val(),
+          $errorContainer = rev?$this.find("a[name='comment"+rev+"']").parent().parent():$form.parent();
 
           $this.find(".foswikiErrorMessage").remove();
           $.blockUI({
@@ -119,9 +119,9 @@ jQuery(function($) {
       $form.ajaxForm({
         dataType:"json",
         beforeSubmit: function() {
-          id = $form.find("input[name=comment_id]").val();
-          index = $form.find("input[name=index]").val();
-          $errorContainer = $this.find("a[name=comment"+id+"]").parent().parent();
+          id = $form.find("input[name='comment_id']").val();
+          index = $form.find("input[name='index']").val();
+          $errorContainer = $this.find("a[name='comment"+id+"']").parent().parent();
           $this.find(".foswikiErrorMessage").remove();
           $.blockUI({
             message:"<h1>Updating comment "+index+" ...</h1>",
@@ -161,7 +161,7 @@ jQuery(function($) {
         },
         onShow: function(dialog) { 
           dialog.container.find(".cmtCommentIndex").text(commentOpts.index);
-          dialog.container.find("input[name=ref]").val(commentOpts.comment_id);
+          dialog.container.find("input[name='ref']").val(commentOpts.comment_id);
         }
       });
 
@@ -189,11 +189,11 @@ jQuery(function($) {
               width:600
             },
             onShow: function(dialog) { 
-              dialog.container.find("input[name=comment_id]").val(commentOpts.comment_id);
-              dialog.container.find("input[name=index]").val(commentOpts.index);
+              dialog.container.find("input[name='comment_id']").val(commentOpts.comment_id);
+              dialog.container.find("input[name='index']").val(commentOpts.index);
               dialog.container.find(".cmtCommentIndex").text(commentOpts.index);
-              dialog.container.find("input[name=title]").val(json.result.title);
-              dialog.container.find("textarea[name=text]").val(json.result.text);
+              dialog.container.find("input[name='title']").val(json.result.title);
+              dialog.container.find("textarea[name='text']").val(json.result.text);
             }
           });
         },

@@ -1,6 +1,6 @@
 # Plugin for Foswiki - The Free and Open Source Wiki, http://foswiki.org/
 #
-# Copyright (C) 2008-2011 Michael Daum http://michaeldaumconsulting.com
+# Copyright (C) 2008-2012 Michael Daum http://michaeldaumconsulting.com
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -15,12 +15,15 @@
 
 package Foswiki::Plugins::EditChapterPlugin::Core;
 
+use strict;
+use warnings;
+
 use Foswiki::Func ();
 use Foswiki::Plugins ();
 use Foswiki::Plugins::JQueryPlugin ();
 use Foswiki::Contrib::JsonRpcContrib::Error ();
 use Error qw(:try);
-use strict;
+
 use constant DEBUG => 0; # toggle me
 
 ###############################################################################
@@ -42,9 +45,7 @@ sub new {
     '<img src="%PUBURLPATH%/%SYSTEMWEB%/EditChapterPlugin/pencil.png" height="16" width="16" border="0" />';
   my $editLabelFormat = 
     Foswiki::Func::getPreferencesValue("EDITCHAPTERPLUGIN_EDITLABELFORMAT") || 
-    '<span id="$id" class="ecpHeading"> $heading <a href="#" class="ecpEdit {web:\'$web\', topic:\'$topic\', from:\'$from\', to:\'$to\'}">$img</a></span>';
-
-#    '<span id="$id" class="ecpHeading"> $heading <a href="#" class="ecpEdit jqSimpleModal {url:\'%SCRIPTURL{"rest"}%/RenderPlugin/template?name=edit.chapter;expand=dialog;topic=$web.$topic;from=$from;to=$to;title=%ENCODE{"$title" type="url"}%;id=$id\'}">$img</a></span>';
+    '<span id="$id" class="ecpHeading"> $heading <a href="$url" class="ecpEdit {web:\'$web\', topic:\'$topic\'}">$img</a></span>';
 
   my $wikiName = Foswiki::Func::getWikiName();
 
@@ -217,17 +218,25 @@ sub handleSection {
 
     #$from = 0 if $from == 1; # include chapter 0 in chapter 1
 
-    my %args = (
-      from=>$from,
-      to=>$to,
-      t=>time(),
-      cover=>'chapter',
-      nowysiwyg=>'on',
-    );
+    my $title = $heading;
+    $title =~ s/['"]//g;
+    $title =~ s/^\s+//;
+    $title =~ s/\s+$//;
 
     my $id = lc($web.'_'.$topic);
     $id =~ s/\//_/go;
     $id = 'chapter_'.$id.'_'.$$chapterNumber;
+
+    my %args = (
+      name => "edit.chapter",
+      expand => "dialog",
+      topic => "$web.$topic",
+      from => $from,
+      to => $to,
+      title => $title,
+      id => $id,
+      t => time(),
+    );
 
     my $query = Foswiki::Func::getCgiQuery();
     my $queryString = $query->query_string();
@@ -238,13 +247,9 @@ sub handleSection {
       $queryString.
       "#$id";
 
-    my $url = Foswiki::Func::getScriptUrl($web, $topic, 'edit', %args);
+    my $url = Foswiki::Func::getScriptUrl('RenderPlugin', 'template', 'rest', %args);
 
     my $anchor = '<a name="'.$id.'"></a>';
-    my $title = $heading;
-    $title =~ s/['"]//g;
-    $title =~ s/^\s+//;
-    $title =~ s/\s+$//;
 
     # format
     $result = $this->{editLabelFormat};

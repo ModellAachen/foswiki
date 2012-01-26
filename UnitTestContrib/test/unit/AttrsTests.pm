@@ -1,11 +1,11 @@
-use strict;
-
 package AttrsTests;
+use strict;
+use warnings;
 
-use FoswikiTestCase;
+use FoswikiTestCase();
 our @ISA = qw( FoswikiTestCase );
 
-use Foswiki::Attrs;
+use Foswiki::Attrs();
 
 sub new {
     my $self = shift()->SUPER::new(@_);
@@ -308,7 +308,7 @@ sub test_doubleBackslash {
 sub test_endsWithEscapedQuote {
     my $this = shift;
     my $attrs = new Foswiki::Attrs( 'separator=" \\\\"" format="$topic"', 0 );
-    $this->assert_str_equals( ' \\"', $attrs->remove("separator") );
+    $this->assert_str_equals( ' \\"',   $attrs->remove("separator") );
     $this->assert_str_equals( '$topic', $attrs->remove("format") );
     $this->assert( $attrs->isEmpty() );
 }

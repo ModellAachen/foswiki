@@ -1,3 +1,5 @@
+locale/TopicInteractionPlugin/de.po 0644
+locale/TopicInteractionPlugin/Foswiki.pot 0644
 data/System/TopicInteractionPlugin.txt 0644
 lib/Foswiki/Plugins/TopicInteractionPlugin/Action/ChangeProperties.pm 0644
 lib/Foswiki/Plugins/TopicInteractionPlugin/Action/CreateImageGallery.pm 0644

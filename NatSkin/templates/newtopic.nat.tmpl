@@ -1,15 +1,37 @@
 %TMPL:INCLUDE{"WebCreateNewTopic"}%
 
+%{ ################################################################################ }%
+%TMPL:DEF{"dialog"}%<noautolink>
+<div class="jqUIDialog foswikiFormSteps {width:500, modal:true, draggable:true}" title="%TMPL:P{"formtitle"}%">
+  %TMPL:P{"formstartstep"}%<!-- -->
+  %TMPL:P{"topictitlestep"}%<!-- -->
+  %TMPL:P{"topictemplatestep"}%<!-- -->
+  %TMPL:P{"hiddenoptionsstep"}%<!-- -->
+  %TMPL:P{"formbuttons"}%<!-- -->
+  %TMPL:P{"formendstep"}%<!-- -->
+  %TMPL:P{"javascript"}%<!-- -->
+</div>
+</noautolink>%TMPL:END%
+
+%{ ################################################################################ }%
+%TMPL:DEF{"formbuttons"}%<!-- -->
+  <a class="jqUIDialogButton {icon:'ui-icon-circle-check', click: function() { $('#newTopicForm').submit(); }}">%MAKETEXT{"Submit"}%</a>
+  <a class="jqUIDialogButton {icon:'ui-icon-cancel', click: function() { $(this).dialog('close'); }}">%MAKETEXT{"Cancel"}%</a>
+<!-- -->%TMPL:END%
+
+%{ ################################################################################ }%
 %TMPL:DEF{"excludetopics"}%%IF{"defined DONTCREATETOPICS" 
   then="%DONTCREATETOPICS%"
   else="^(TopicType|TopicStub|TopicTemplate|WebTopicEditTemplate)$"
 }%%TMPL:END%
 
+%{ ################################################################################ }%
 %TMPL:DEF{"topictemplatestep"}%<!-- -->
 %TMPL:P{"topictemplatestep::templates"}%
 %TMPL:P{"topictemplatestep::css"}%
 <!-- -->%TMPL:END%
 
+%{ ################################################################################ }%
 %TMPL:DEF{"topictemplatestep::templates"}%<!-- -->
 ---
 <noautolink>
@@ -39,6 +61,7 @@
 }%
 <!-- -->%TMPL:END%
 
+%{ ################################################################################ }%
 %TMPL:DEF{"topictemplatestep::topictype"}%<!-- -->
 ---
 <noautolink>
@@ -69,6 +92,7 @@
 </noautolink>
 <!-- -->%TMPL:END%
 
+%{ ################################################################################ }%
 %TMPL:DEF{"topictemplatestep::css"}%<literal>
 <style>
 .natTopicTemplateSelector .natTopicTemplate,

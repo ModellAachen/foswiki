@@ -1,9 +1,9 @@
 %TMPL:INCLUDE{"rename"}%<!-- template: renamedelete.nat.tmpl -->
 
 %{ ################################################################################ }%
-%TMPL:DEF{"title"}%%TOPIC% (%MAKETEXT{"delete"}%) - %WIKITOOLNAME%%TMPL:END%
+%TMPL:DEF{"titleaction"}%%MAKETEXT{"delete"}%%TMPL:END%
 %TMPL:DEF{"contenttitle"}%%MAKETEXT{"Delete [_1]"  args="<nop>%TOPIC%"}%%TMPL:END%
-%TMPL:DEF{"breadcrumbstail"}%%TMPL:P{"sep"}%<a href="%SCRIPTURLPATH{"rename"}%/%BASEWEB%/%BASETOPIC%?%QUERYSTRING%">%MAKETEXT{"Delete"}%</a>%TMPL:END%
+%TMPL:DEF{"breadcrumbs::tail"}%%TMPL:P{"sep"}%<a href="%SCRIPTURLPATH{"rename"}%/%BASEWEB%/%BASETOPIC%?%QUERYSTRING%">%MAKETEXT{"Delete"}%</a>%TMPL:END%
 %TMPL:DEF{"buttons"}%<!-- buttons -->
 %BUTTON{type="save" "%MAKETEXT{"Delete"}%" icon="bin"}%
 %BUTTON{"%MAKETEXT{"Cancel"}%" icon="cross" target="%WEB%.%TOPIC%"}%

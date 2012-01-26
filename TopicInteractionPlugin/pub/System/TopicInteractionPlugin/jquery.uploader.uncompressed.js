@@ -1,7 +1,7 @@
 /**
  * jquery.uploader.js
  *
- * Copyright 2010-2011, Michael Daum http://michaeldaumconsulting.com
+ * Copyright 2010-2012, Michael Daum http://michaeldaumconsulting.com
  *
  * based on jquery.plupload.queue.js  Copyright 2009, Moxiecode Systems AB
  *

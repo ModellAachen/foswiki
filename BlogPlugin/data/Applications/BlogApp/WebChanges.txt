@@ -1,0 +1,8 @@
+%META:TOPICINFO{author="ProjectContributor" date="1268484865" format="1.1" version="1.1"}%
+%INCLUDE{"%SYSTEMWEB%.WebChanges"}%
+
+%META:FORM{name="Applications.ApplicationTopic"}%
+%META:FIELD{name="TopicType" attributes="" title="TopicType" value=""}%
+%META:FIELD{name="TopicTitle" attributes="" title="<nop>TopicTitle" value="WebChanges"}%
+%META:FIELD{name="Summary" attributes="" title="Summary" value="Most recent changes in this web"}%
+%META:FIELD{name="WikiApplication" attributes="" title="WikiApplication" value="WikiWorkbench"}%

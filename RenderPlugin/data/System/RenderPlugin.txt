@@ -1,4 +1,4 @@
-%META:TOPICINFO{author="ProjectContributor" date="1215778439" format="1.1"  version="$Rev$"}%
+%META:TOPICINFO{author="ProjectContributor" date="1311320241" format="1.1" version="3"}%
 ---+!! %TOPIC%
 <!--
 One line description, required for extensions repository catalog.
@@ -60,11 +60,11 @@ The available REST handlers are:
 ---++ Usage
 The REST handlers are called like this:
 <verbatim>
-%SCRIPTURLPATH{"rest"}/RenderPlugin/render?text=%ENCODE{"This is _very_ cool."}%
+%SCRIPTURLPATH{"rest"}%/RenderPlugin/render?text=%ENCODE{"This is _very_ cool."}%
 </verbatim>
 
 <verbatim>
-%SCRIPTURLPATH{"rest"}/RenderPlugin/tag?name=INCLUDE;param=Applications.RenderWebTagCloud;search=screenshot
+%SCRIPTURLPATH{"rest"}%/RenderPlugin/tag?name=INCLUDE;param=Applications.RenderWebTagCloud;search=screenshot
 </verbatim>
 (equivalent to a =%<nop>INCLUDE{"Applications.RenderWebTagCloud" search="screenshot"}%=)
 
@@ -72,8 +72,9 @@ This can be schedule using jQuery like this:
 <verbatim>
 <div id="container"></div>
 
-<script type="text/javascript">
-$(function() {
+<literal>
+<script>
+jQuery(function($) {
   $("#container").load("<url-to-rest-handler->");
 });
 </script>
@@ -93,9 +94,10 @@ $(function() {
 <div id="message" style="border:2px solid red;padding:5px;margin:10px;width:100px;background:yellow;display:none;">
 </div>
 
-<script type="text/javascript">
+<literal>
+<script>
 function getTheMessage() {
-  $("#message").load(
+  jQuery("#message").load(
     "%SCRIPTURLPATH{"rest"}%/%TOPIC%/tag",
     { 
       name: 'INCLUDE',
@@ -104,13 +106,14 @@ function getTheMessage() {
       render: true
     }, 
     function () {
-      $(this).show()
+      jQuery(this).show()
     });
 }
 function clearTheMessage() {
-  $("#message").empty().hide();
+  jQuery("#message").empty().hide();
 }
 </script>
+</literal>
 
 ---+++ Previewing TML
 <div class="foswikiPageForm">
@@ -124,10 +127,11 @@ function clearTheMessage() {
 <div id="mypreview" style="border:1px solid #eee;padding:5px">
 </div>
 
-<script type type="text/javascript">
+<literal>
+<script>
 function preview() {
-  var text = $("#mytext").val();
-  $("#mypreview").load("%SCRIPTURLPATH{"rest"}%/RenderPlugin/render",
+  var text = jQuery("#mytext").val();
+  jQuery("#mypreview").load("%SCRIPTURLPATH{"rest"}%/RenderPlugin/render",
     {
       'text': text,
       'topic': '%WEB%.%TOPIC%'
@@ -135,6 +139,7 @@ function preview() {
   );
 }
 </script>
+</literal>
 
 Okay, your turn to create an example calling SEARCH.
 
@@ -144,11 +149,12 @@ Okay, your turn to create an example calling SEARCH.
 ---++ Plugin Info
 
 |  Plugin Author: | Michael Daum |
-|  Copyright &copy;: | 2006-2009, Michael Daum http://michaeldaumconsulting.com |
+|  Copyright &copy;: | 2006-2012, Michael Daum http://michaeldaumconsulting.com |
 |  License: | GPL ([[http://www.gnu.org/copyleft/gpl.html][GNU General Public License]]) |
 |  Release: | %$RELEASE% |
 |  Version: | %$VERSION% |
 |  Change History: | <!-- versions below in reverse order -->&nbsp; |
+|  10 Jan 2012: | some docu fixes |
 |  12 May 2009: | added =template= handler |
 |  24 Apr 2009: | converted to foswiki plugin |
 |  07 Jan 2009: | added upload rest handler; \

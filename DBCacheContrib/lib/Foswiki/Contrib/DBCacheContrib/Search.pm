@@ -311,6 +311,7 @@ sub OP_d2n {
     my $rval = $r->matches($map);
     return undef unless defined $rval;
 
+    return $rval if $rval =~ /^\d+$/;
     require Foswiki::Time;
     return Foswiki::Time::parseTime( $rval, 1 );
 }

@@ -1,0 +1,11 @@
+%META:TOPICINFO{author="ProjectContributor" date="1275569719" format="1.1" reprev="1" version="2"}%
+%META:TOPICPARENT{name="WebHome"}%
+
+%META:FORM{name="Applications.TopicStub"}%
+%META:FIELD{name="TopicType" title="TopicType" value="TopicStub, TopicType"}%
+%META:FIELD{name="TopicTitle" attributes="" title="<nop>TopicTitle" value="TopicType"}%
+%META:FIELD{name="Summary" attributes="" title="Summary" value="TopicType of all possible <nop>TopicTypes"}%
+%META:FIELD{name="WikiApplication" attributes="" title="WikiApplication" value="WikiWorkbench"}%
+%META:FIELD{name="Target" attributes="" title="Target" value="Applications.TopicType"}%
+%META:FIELD{name="Section" attributes="" title="Section" value=""}%
+%META:PREFERENCE{name="SIDEBAR" title="SIDEBAR" type="Set" value="Admin"}%

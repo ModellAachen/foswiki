@@ -8,7 +8,7 @@ Base Skin topic template
 		- attachments
 		
 ===================================================
-}%%TMPL:INCLUDE{"view"}%%{
+}%%TMPL:INCLUDE{"foswiki"}%%{
 ---------------------------------------------------
 	Include TopicInteractionPlugin, if installed
 ---------------------------------------------------
@@ -22,55 +22,34 @@ Base Skin topic template
 ---------------------------------------------------
 }%%TMPL:DEF{"controls:title"}%%TMPL:END%%{
 ---------------------------------------------------
-	Content container
----------------------------------------------------
-}%%TMPL:DEF{"content"}%<div class="foswikiMain foswikiColorPrimary"><div class="foswikiContainer"><div class="foswikiTopic">
-<div class="foswikiContentHeader">%TMPL:P{"topic:before"}%</div>
-#PageTop
-<article class='foswikiTopicText'>
-%TEXT%
-</article>
-#TopicEnd
-</div>
-<div class="foswikiContentFooter">%TMPL:P{"breadcrumb"}%%TMPL:P{"topic:after"}%</div>
-</div>
-<div class="foswikiClear"></div>
-</div>
-</div>%TMPL:END%%{
----------------------------------------------------
-	breadcrumb
----------------------------------------------------
-}%%TMPL:DEF{"breadcrumb"}%<div class='foswikiBreadcrumb'>%TMPL:P{"breadcrumb:title"}%%TMPL:P{"breadcrumb:wikitoolname"}%%TMPL:P{"breadcrumb:currentweb"}%%TMPL:P{"breadcrumb:parents"}%%TMPL:P{"breadcrumb:currenttopic"}%</div>%TMPL:END%
-
-%TMPL:DEF{"breadcrumb:separator"}%<span class='foswikiSeparator'>/</span>%TMPL:END%
-
-%TMPL:DEF{"breadcrumb:parents"}%%META{"parent" nowebhome="on" prefix="%TMPL:P{"breadcrumb:separator"}%" separator="%TMPL:P{"breadcrumb:separator"}%" suffix=""}%%TMPL:END%
-
-%TMPL:DEF{"breadcrumb:topic"}%<nop>%TOPIC%%TMPL:END%
-
-%TMPL:DEF{"breadcrumb:title"}%<span class="patternHomePathTitle">%MAKETEXT{"You are here:"}% </span>%TMPL:END%
-
-%TMPL:DEF{"breadcrumb:wikitoolname"}%[[%USERSWEB%.%HOMETOPIC%][%WIKITOOLNAME%]]%TMPL:END%
-
-%TMPL:DEF{"breadcrumb:currentweb"}%%TMPL:P{"breadcrumb:separator"}%<a href="%SCRIPTURLPATH{"view"}%/%WEB%/%HOMETOPIC%">%MAKETEXT{"[_1] Web" args="<nop>%WEB%"}%</a>%TMPL:END%
-
-%TMPL:DEF{"breadcrumb:annotation"}%%IF{"defined rev" then=" %MAKETEXT{"(revision [_1])" args="%URLPARAM{"rev"}%"}%" else=" <span class='patternRevInfo'>(%REVINFO{format="$date, $percntIF{$quotistopic '%USERSWEB%.$wikiname'$quot then=$quot[[%USERSWEB%.$wikiname][$wikiname]]$quot else=$quot$wikiname"}%$quot}$percnt)</span>"}%%IF{"defined raw" then=" %MAKETEXT{"(raw view)"}%"}%%TMPL:END%
-
-%TMPL:DEF{"breadcrumb:currenttopic"}%%TMPL:P{"breadcrumb:separator"}%<a href="%SCRIPTURL{view}%/%WEB%/%TOPIC%" title='%MAKETEXT{"Topic revision:"}% %REVINFO{format="$rev ($date - $time)"}%'>%TMPL:P{"breadcrumb:topic"}%</a>%TMPL:P{"breadcrumb:annotation"}%%TMPL:END%%{
----------------------------------------------------
 	topic:before contains the form:top and attachments:top, if set (not inside a tab pane)
 	TODO: test this
 ---------------------------------------------------
 }%%TMPL:DEF{"topic:before"}%%TMPL:P{"form:top"}%%TMPL:P{"attachments:top"}%%TMPL:P{"topic:actions"}%%TMPL:END%%{
 ---------------------------------------------------
-	topic:after contains the form and attachment tab pane
+	meta contains the form and attachment tab pane
 	Conditionally include TopicInteractionPlugin meta data
 ---------------------------------------------------
-}%%TMPL:DEF{"topic:after"}%%TMPL:P{context="TopicInteractionPluginEnabled" then="metadata" else="topic:metadata:base"}%%TMPL:END%%{
+}%%TMPL:DEF{"meta"}%%IF{
+	"%QUERY{
+		"length(attachments[NOT lc(attributes)=~'h']) AND length(fields[NOT lc(attributes)=~'h'])"
+	}% > 0"
+	then="$percntTMPL:P{
+		\"meta:contents\"
+	}$percnt"
+}%%TMPL:END%%{
+---------------------------------------------------
+	Meta contents
+---------------------------------------------------
+}%%TMPL:DEF{"meta:contents"}%%TMPL:P{"startsection" class="foswikiMeta foswikiColorSecondary"}%
+%TMPL:P{context="TopicInteractionPluginEnabled" then="metadata" else="topic:metadata:base"}%
+%TMPL:P{"endsection"}%%TMPL:END%%{
 ---------------------------------------------------
 	Fallback if TopicInteractionPlugin is not enabled
 ---------------------------------------------------
-}%%TMPL:DEF{"topic:metadata:base"}%%TABPANE{class="simple"}%
+}%%TMPL:DEF{"topic:metadata:base"}%%TABPANE{
+	class="simple"
+}%
 %IF{
 	"%QUERY{"length(attachments[NOT lc(attr)=~'h'])"}% > 0"
 	then="$percntTMPL:P{
@@ -89,11 +68,15 @@ Base Skin topic template
 ---------------------------------------------------
 	Form tab
 ---------------------------------------------------
-}%%TMPL:DEF{"form"}%%TAB{"%MAKETEXT{"Data"}%"}%%META{"form"}%%ENDTAB%%TMPL:END%%{
+}%%TMPL:DEF{"form"}%%TAB{
+	"%MAKETEXT{"Data"}%"
+}%%META{"form"}%%ENDTAB%%TMPL:END%%{
 ---------------------------------------------------
 	Atachments tab
 ---------------------------------------------------
-}%%TMPL:DEF{"attachments"}%%TAB{"%MAKETEXT{"Attachments [_1]" args="<span>%QUERY{"length(attachments[NOT lc(attr)=~'h']"}%</span>"}%"}%%META{"attachments"}%%ENDTAB% %TMPL:END%%{
+}%%TMPL:DEF{"attachments"}%%TAB{
+	"%MAKETEXT{"Attachments [_1]" args="<span>%QUERY{"length(attachments[NOT lc(attr)=~'h']"}%</span>"}%"
+}%%META{"attachments"}%%ENDTAB% %TMPL:END%%{
 ---------------------------------------------------
 }%%TMPL:DEF{"attachments:top"}%%TMPL:END%%{
 ---------------------------------------------------

@@ -2,70 +2,119 @@
 MEDIA QUERIES FOR DIFFERENT SCREEN SIZES
 */
 
-@media screen and (max-width: 1024px) {
-	.foswikiContainer {
-		max-width: 1024px;
-		padding: 0 39px;
-	}
-	.foswikiBar .foswikiLogo {
-		display: none;
-	}
-	input[type='text'],
-	input[type='password'],
-	textarea,
-	select,
-	.uneditable-input {
-		width: 0px + @fw_strand1_ratio_up_10;
-	}
-}
-
-@media screen and (max-width: 960px) {
-	.foswikiContainer {
-		max-width: 960px;
-		padding: 0 39px;
-	}
-	.foswikiBar .foswikiLogo {
-		display: none;
-	}
-	input[type='text'],
-	input[type='password'],
-	textarea,
-	select,
-	.uneditable-input {
-		width: 0px + @fw_strand1_ratio_up_8;
-	}
-}
-
-@media screen and (max-width: 480px) {
+// Landscape phones and down
+@media (max-width: 480px) {
 	.foswikiContainer {
 		max-width: 480px;
 		padding: 0 10px;
 	}
-	.foswikiBar .foswikiLogo {
-		display: none;
-	}
 	input[type='text'],
 	input[type='password'],
 	textarea,
 	select,
 	.uneditable-input {
-		width: 0px + @fw_strand1_ratio_up_6;
+		.span1();
 	}
 	
 	.foswikiTopicActions {
 		
+		padding-left: 0;
+		padding-right: 0;
+		
 		div > ul,
-		.nav {
+		.foswikiNavigation {
 			float: none;
 		}
 		.foswikiTopicActionButtons {
 			
 			float: none;	
-			ul.secondary-nav {
+			.foswikiNavigationSecondary {
 				float: none;
 			}
 		}
 	}
 }
 
+// Landscape phone to portrait tablet
+@media (min-width: 480px) and (max-width: 768px) {
+	.foswikiContainer {
+		max-width: 960px;
+		padding: 0 39px;
+	}
+	input[type='text'],
+	input[type='password'],
+	textarea,
+	select,
+	.uneditable-input {
+		.span3();
+	}
+	
+	.foswikiTopicActions {
+		padding-left: 0;
+		padding-right: 0;
+	}
+}
 
+// Portrait tablet to landscape and desktop
+@media (min-width: 768px) and (max-width: 940px) {
+	.foswikiContainer {
+		max-width: 940px;
+		padding: 0 39px;
+	}
+	input[type='text'],
+	input[type='password'],
+	textarea,
+	select,
+	.uneditable-input {
+		.span4();
+	}
+	
+	.foswikiTopicActions {
+		padding-left: 0;
+		padding-right: 0;
+	}
+}
+
+@media (min-width: 940px) and (max-width: 1024px) {
+	.foswikiContainer {
+		max-width: 1080px;
+		padding: 0 39px;
+	}
+	input[type='text'],
+	input[type='password'],
+	textarea,
+	select,
+	.uneditable-input {
+		.span4();
+	}
+}
+
+// Large desktop
+@media (min-width: 1080px) {
+	.foswikiContainer {
+		max-width: 0px + @fw_strand1_ratio_up_14;
+		padding-right: 0px + @fw_strand1_ratio_up_4;
+		padding-left: 0px + @fw_strand1_ratio_up_4;
+	}
+	.foswikiDisplaySpatious {
+		.foswikiContainer {
+			max-width: 0px + @fw_strand1_ratio_up_13;
+			padding-right: 0px + @fw_strand1_ratio_up_3;
+			padding-left: 0px + @fw_strand1_ratio_up_3;
+		}
+	}
+	.foswikiDisplayAverage {
+		.foswikiContainer {
+			max-width: 0px + @fw_strand1_ratio_up_14;
+			padding-right: 0px + @fw_strand1_ratio_up_4;
+			padding-left: 0px + @fw_strand1_ratio_up_4;
+		}
+	}
+	.foswikiDisplayMaxscreen {
+		.foswikiContainer {
+			max-width: auto;
+			padding-right: 20px;
+			padding-left: 20px;
+		}
+	}
+}

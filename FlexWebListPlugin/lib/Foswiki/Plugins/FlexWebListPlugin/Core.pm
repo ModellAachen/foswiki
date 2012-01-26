@@ -1,6 +1,6 @@
 # Plugin for Foswiki - The Free and Open Source Wiki, http://foswiki.org/
 #
-# Copyright (C) 2006-2011 Michael Daum http://michaeldaumconsulting.com
+# Copyright (C) 2006-2012 Michael Daum http://michaeldaumconsulting.com
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -50,20 +50,31 @@ sub handler {
   #writeDebug("*** called %FLEXWEBLIST{".$params->stringify."}%");
 
   # extract parameters
-  $this->{format} = $params->{_DEFAULT} || $params->{format} || '$web ';
+  $this->{format} = $params->{_DEFAULT};
+  $this->{format} = $params->{format} unless defined $this->{format};
+  $this->{format} = '$web ' unless defined $this->{format};
   $this->{webs} = $params->{webs} || 'public';
   $this->{header} = $params->{header} || '';
   $this->{footer} = $params->{footer} || '';
   $this->{separator} = $params->{separator} || '';
   $this->{separator} = '' if $this->{separator} eq 'none';
 
-  $this->{subHeader} = $params->{subheader} || $this->{header};
-  $this->{subFormat} = $params->{subformat} || $this->{format};
-  $this->{subFooter} = $params->{subfooter} || $this->{footer};
-  $this->{subSeparator} = $params->{subseparator} || $this->{separator};
+  $this->{subHeader} = $params->{subheader};
+  $this->{subHeader} = $this->{header} unless defined $this->{subHeader};
+
+  $this->{subFormat} = $params->{subformat};
+  $this->{subFormat} = $this->{format} unless defined $this->{subFormat};
+
+  $this->{subFooter} = $params->{subfooter};
+  $this->{subFooter} = $this->{footer} unless defined $this->{subFooter};
+
+  $this->{subSeparator} = $params->{subseparator};
+  $this->{subSeparator} = $this->{separator} unless defined $this->{subSeparator};
   $this->{subSeparator} = '' if $this->{subSeparator} eq 'none';
 
-  $this->{markerFormat} = $params->{markerformat} || $this->{format};
+  $this->{markerFormat} = $params->{markerformat};
+  $this->{markerFormat} = $this->{format} unless defined $this->{markerFormat};
+
   $this->{selection} = $params->{selection} || '';
   $this->{marker} = $params->{marker} || '';
   $this->{exclude} = $params->{exclude} || '';

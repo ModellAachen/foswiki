@@ -1,0 +1,56 @@
+/***
+By default we include all the CSS for the Superfish menu. We customize below
+Remember if you copy this file remember to update the following relative path
+***/
+@import "../JQueryPlugin/plugins/superfish/jquery.superfish.css";
+
+/*** JQueryMenuSkin Customizations ***/
+
+.sf-menu {
+	float:			left;
+	margin-bottom:	.1em;
+	margin:	0em;
+	padding:	0em;
+}
+.sf-menu a, .sf-menu a:visited  { /* visited pseudo selector so IE6 applies text colour*/
+	color:			#fff;
+    border:     0px;
+}
+.sf-menu li {
+	background:		#48708B;
+	margin:	0em;
+	padding:	0em;
+}
+.sf-menu li li {
+    border:     1px solid #CFDEFF;
+	background:		#48708B;
+	margin:	0em;
+	padding:	0em;
+}
+.sf-menu li li li {
+	background:		#48708B;
+}
+.sf-menu li:hover, .sf-menu li.sfHover,
+.sf-menu a:focus, .sf-menu a:hover, .sf-menu a:active {
+	background:		#292929;
+	outline:		0;
+}
+
+/*** Container that extends the menu bar the full width of the page ***/
+#menu_container {
+    border:     1px solid #CFDEFF;
+	background-color: #48708B;
+	background-repeat: repeat-x;
+	float: left;
+	width: 100%;
+    margin-bottom:  1em;
+} 
+/*** Optional customization of the height of the WebTopBar ***/
+#patternTopBar, 
+#patternClearHeaderCenter, 
+#patternClearHeaderLeft, 
+#patternClearHeaderRight, 
+#patternTopBarContents { 
+   height:65px; /* top bar height; make room for header columns */ 
+   overflow:hidden; 
+} 

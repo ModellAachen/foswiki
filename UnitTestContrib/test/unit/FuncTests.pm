@@ -3,17 +3,17 @@
 #
 package FuncTests;
 
-use utf8;    # For test_unicode_attachment
 use strict;
 use warnings;
+use utf8;    # For test_unicode_attachment
 
-use FoswikiFnTestCase;
-our @ISA = qw( FoswikiFnTestCase );
-use Foswiki;
-use Foswiki::Func;
 use Assert;
+use FoswikiFnTestCase();
+our @ISA = qw( FoswikiFnTestCase );
+use Foswiki();
+use Foswiki::Func();
 
-sub TRACE { 0 }
+sub TRACE { return 0 }
 
 my $MrWhite;
 
@@ -82,12 +82,10 @@ sub set_up {
     my $this = shift;
     $this->SUPER::set_up();
 
-    my $topicObject = Foswiki::Meta->new(
-        $this->{session},
-        $Foswiki::cfg{UsersWebName},
-        $Foswiki::cfg{DefaultUserWikiName}, ''
-    );
+    my ($topicObject) = Foswiki::Func::readTopic( $Foswiki::cfg{UsersWebName},
+        $Foswiki::cfg{DefaultUserWikiName} );
     $topicObject->save();
+    $topicObject->finish();
     $this->registerUser( 'white', 'Mr', "White", 'white@example.com' );
     $MrWhite = $this->{session}->{users}->getCanonicalUserID('white');
 
@@ -96,6 +94,7 @@ sub set_up {
     $this->{test_web2}    = $this->{test_web} . 'Extra';
     my $webObject = Foswiki::Meta->new( $this->{session}, $this->{test_web2} );
     $webObject->populateNewWeb();
+    $webObject->finish();
 
     return;
 }
@@ -144,16 +143,14 @@ sub test_createWeb_permissions {
     use Foswiki::AccessControlException;
     $Foswiki::cfg{EnableHierarchicalWebs} = 1;
 
-    $this->{session}->finish();
-    $this->{session} = Foswiki->new( $Foswiki::cfg{AdminUserLogin} );
+    $this->createNewFoswikiSession( $Foswiki::cfg{AdminUserLogin} );
 
     Foswiki::Func::saveTopicText( $this->{test_web},
         $Foswiki::cfg{WebPrefsTopicName}, <<"HERE");
 \t* Set DENYWEBCHANGE = $Foswiki::cfg{DefaultUserWikiName}
 HERE
 
-    $this->{session}->finish();
-    $this->{session} = Foswiki->new();
+    $this->createNewFoswikiSession();
 
     # Verify that create of a root web is denied by default user.
     try {
@@ -184,8 +181,7 @@ qr/Access to CHANGE TemporaryFuncTestWebFunc\/Blahsub. for BaseUserMapping_666 i
     $this->assert( !Foswiki::Func::webExists("$this->{test_web}/Blahsub"),
         "Test should not have created the web" );
 
-    $this->{session}->finish();
-    $this->{session} = Foswiki->new( $Foswiki::cfg{AdminUserLogin} );
+    $this->createNewFoswikiSession( $Foswiki::cfg{AdminUserLogin} );
 
     Foswiki::Func::saveTopicText(
         $this->{test_web}, 'WebPreferences', <<"END",
@@ -193,8 +189,7 @@ qr/Access to CHANGE TemporaryFuncTestWebFunc\/Blahsub. for BaseUserMapping_666 i
 END
     );
 
-    $this->{session}->finish();
-    $this->{session} = Foswiki->new();
+    $this->createNewFoswikiSession();
 
 # Verify that create of a sub web is allowed by default user if allowed in webPreferences.
     try {
@@ -216,8 +211,7 @@ sub test_Item9021 {
     use Foswiki::AccessControlException;
     $Foswiki::cfg{EnableHierarchicalWebs} = 1;
 
-    $this->{session}->finish();
-    $this->{session} = Foswiki->new( $Foswiki::cfg{AdminUserLogin} );
+    $this->createNewFoswikiSession( $Foswiki::cfg{AdminUserLogin} );
 
     try {
         Foswiki::Func::createWeb( $this->{test_web} . "Missing/Blah" );
@@ -243,8 +237,7 @@ sub test_createWeb_InvalidBase {
     use Foswiki::AccessControlException;
     $Foswiki::cfg{EnableHierarchicalWebs} = 1;
 
-    $this->{session}->finish();
-    $this->{session} = Foswiki->new( $Foswiki::cfg{AdminUserLogin} );
+    $this->createNewFoswikiSession( $Foswiki::cfg{AdminUserLogin} );
 
     try {
         Foswiki::Func::createWeb( $this->{test_web} . "InvaliBase",
@@ -267,8 +260,7 @@ sub test_createWeb_hierarchyDisabled {
     use Foswiki::AccessControlException;
     $Foswiki::cfg{EnableHierarchicalWebs} = 0;
 
-    $this->{session}->finish();
-    $this->{session} = Foswiki->new( $Foswiki::cfg{AdminUserLogin} );
+    $this->createNewFoswikiSession( $Foswiki::cfg{AdminUserLogin} );
 
     try {
         Foswiki::Func::createWeb( $this->{test_web} . "/Subweb" );
@@ -291,10 +283,11 @@ sub test_moveWeb {
     my $webObject =
       Foswiki::Meta->new( $this->{session}, $this->{test_web} . "Blah" );
     $webObject->populateNewWeb();
-    undef $webObject;
+    $webObject->finish();
     $webObject =
       Foswiki::Meta->new( $this->{session}, $this->{test_web} . "Blah/SubWeb" );
     $webObject->populateNewWeb();
+    $webObject->finish();
 
     $this->assert( Foswiki::Func::webExists( $this->{test_web} . 'Blah' ) );
     $this->assert(
@@ -331,8 +324,7 @@ sub test_getViewUrl {
     $result = Foswiki::Func::getViewUrl( "", "WebHome" );
     $this->assert_matches( qr!$ss/$this->{test_web}/WebHome!, $result );
 
-    $Foswiki::Plugins::SESSION =
-      Foswiki->new( undef,
+    $this->createNewFoswikiSession( undef,
         Unit::Request->new( { topic => "Sausages.AndMash" } ) );
 
     $result = Foswiki::Func::getViewUrl( "Sausages", "AndMash" );
@@ -340,7 +332,6 @@ sub test_getViewUrl {
 
     $result = Foswiki::Func::getViewUrl( "", "AndMash" );
     $this->assert_matches( qr!${ss}/Sausages/AndMash!, $result );
-    $Foswiki::Plugins::SESSION->finish();
 
     return;
 }
@@ -358,7 +349,7 @@ sub test_getScriptUrl {
 
     my $q = Unit::Request->new( {} );
     $q->path_info('/Sausages/AndMash');
-    $Foswiki::Plugins::SESSION = Foswiki->new( undef, $q );
+    $this->createNewFoswikiSession( undef, $q );
 
     $result = Foswiki::Func::getScriptUrl( "Sausages", "AndMash", 'wibble' );
     $this->assert_matches( qr!/$ss/Sausages/AndMash!, $result );
@@ -383,8 +374,6 @@ sub test_getScriptUrl {
     $this->assert_matches( qr!wimple=2!, $result );
     $this->assert_matches(
         qr!/$ss/$this->{users_web}/WebHome\?w\w+=\d[;&]w\w+=\d$!, $result );
-
-    $Foswiki::Plugins::SESSION->finish();
 
     return;
 }
@@ -501,6 +490,7 @@ NONNY
     my ( $meta, $text ) = Foswiki::Func::readTopic( $this->{test_web}, $topic );
     Foswiki::Func::saveTopic( $this->{test_web}, $topic, $meta, $text,
         { comment => 'atp save' } );
+    $meta->finish();
     my $text2 = Foswiki::Func::readTopicText( $this->{test_web}, $topic );
 
     my $matchText =
@@ -531,6 +521,7 @@ NONNY
     # Make sure the meta got into the topic
     my ( $m, $t ) = Foswiki::Func::readTopic( $this->{test_web}, $topic );
     my $el = $m->get( 'PREFERENCE', 'Bird' );
+    $m->finish();
     $this->assert_equals( 'Kakapo', $el->{value} );
 
     # This should succeed
@@ -628,8 +619,10 @@ sub test_attachments {
     );
     $this->assert( !$e, $e );
 
+    $meta->finish();
     ( $meta, $text ) = Foswiki::Func::readTopic( $this->{test_web}, $topic );
     @attachments = $meta->find('FILEATTACHMENT');
+    $meta->finish();
     $this->assert_str_equals( $name1, $attachments[0]->{name} );
     $this->assert_str_equals( $name2, $attachments[1]->{name} );
 
@@ -798,7 +791,7 @@ sub test_noauth_saveTopic {
 " APPLE \n   * Set ALLOWTOPICVIEW = SomeUser \n   * Set DENYTOPICCHANGE = BaseUserMapping_666,MrWhite \n ";
 
     my $query = Unit::Request->new();
-    $this->{session} = Foswiki->new( $userLogin, $query );
+    $this->createNewFoswikiSession( $userLogin, $query );
     Foswiki::Func::saveTopicText( $this->{test_web}, $topic, $ttext );
 
     $this->assert( Foswiki::Func::topicExists( $this->{test_web}, $topic ) );
@@ -844,6 +837,7 @@ qr/^AccessControlException: Access to CHANGE TemporaryFuncTestWebFunc.BlahBlahcw
             "Unexpected error $e"
         );
     };
+    $meta->finish();
 
     return;
 }
@@ -886,6 +880,7 @@ sub test_subweb_attachments {
     #
     my $webObject = Foswiki::Meta->new( $this->{session}, $web );
     $webObject->populateNewWeb();
+    $webObject->finish();
 
     my $stream =
       $this->write_file( $this->{tmpdatafile}, $data,
@@ -950,8 +945,10 @@ sub test_subweb_attachments {
     $this->assert( ( -e $ft . "/$name2" ),
         "Attachment file $ft/$name2  was not written to disk?" );
 
+    $meta->finish();
     ( $meta, $text ) = Foswiki::Func::readTopic( $web, $topic );
     @attachments = $meta->find('FILEATTACHMENT');
+    $meta->finish();
     $this->assert_str_equals( $name1, $attachments[0]->{name} );
 
     # Make sure it has a non-0 date
@@ -1007,6 +1004,7 @@ sub test_getrevinfo {
     my $webObject =
       Foswiki::Meta->new( $this->{session}, $this->{test_web} . "/Blah" );
     $webObject->populateNewWeb();
+    $webObject->finish();
 
     Foswiki::Func::saveTopicText( $this->{test_web},        $topic, 'blah' );
     Foswiki::Func::saveTopicText( "$this->{test_web}/Blah", $topic, 'blah' );
@@ -1048,6 +1046,7 @@ sub _checkMoveTopic {
         next if ( $_->{from} ne "$oldWeb.$oldTopic" );
         return 1;
     }
+    $meta->finish();
 
     return 0;
 }
@@ -1232,6 +1231,7 @@ sub test_moveAttachment {
     );
 
 # Verify that the source topic still contains the string "Wibble" following attachment move
+    $meta->finish();
     ( $meta, $text ) =
       Foswiki::Func::readTopic( $this->{test_web}, "SourceTopic" );
     $this->assert( $text =~ m/Wibble/o );
@@ -1254,6 +1254,7 @@ sub test_moveAttachment {
     );
 
     # Verify that the target topic contains the string "Wibble"
+    $meta->finish();
     ( $meta, $text ) =
       Foswiki::Func::readTopic( $this->{test_web}, "TargetTopic" );
     $this->assert( $text =~ m/Wibble/o );
@@ -1276,9 +1277,11 @@ sub test_moveAttachment {
     );
 
 # Verify that the target topic still contains the string "Wibble" following attachment move
+    $meta->finish();
     ( $meta, $text ) =
       Foswiki::Func::readTopic( $this->{test_web}, "TargetTopic" );
     $this->assert( $text =~ m/Wibble/o );
+    $meta->finish();
 
     return;
 }
@@ -1336,6 +1339,7 @@ sub test_copyAttachment {
 
     # Verify that the source topic still contains the string "Wibble"
     # following attachment copy
+    $meta->finish();
     ( $meta, $text ) =
       Foswiki::Func::readTopic( $this->{test_web}, "SourceTopic" );
     $this->assert( $text =~ m/Wibble/o );
@@ -1359,6 +1363,7 @@ sub test_copyAttachment {
     );
 
     # Verify that the target topic contains the string "Wibble"
+    $meta->finish();
     ( $meta, $text ) =
       Foswiki::Func::readTopic( $this->{test_web}, "TargetTopic" );
     $this->assert( $text =~ m/Wibble/o );
@@ -1383,9 +1388,11 @@ sub test_copyAttachment {
 
     # Verify that the target topic still contains the string "Wibble"
     # following attachment copy
+    $meta->finish();
     ( $meta, $text ) =
       Foswiki::Func::readTopic( $this->{test_web}, "TargetTopic" );
     $this->assert( $text =~ m/Wibble/o );
+    $meta->finish();
 
     return;
 }
@@ -1571,8 +1578,7 @@ sub test_normalizeWebTopicName {
 sub test_checkWebAccessPermission {
     my $this = shift;
 
-    $this->{session}->finish();
-    $this->{session} = Foswiki->new( $Foswiki::cfg{AdminUserLogin} );
+    $this->createNewFoswikiSession( $Foswiki::cfg{AdminUserLogin} );
 
     Foswiki::Func::saveTopicText( $this->{test_web},
         $Foswiki::cfg{WebPrefsTopicName}, <<"HERE");
@@ -1583,10 +1589,7 @@ HERE
 \t* Set ALLOWTOPICCHANGE = $Foswiki::cfg{DefaultUserWikiName}
 HERE
 
-    $this->{session}->finish();
-    $this->{session} = Foswiki->new();
-
-    $Foswiki::Plugins::SESSION = $this->{session};
+    $this->createNewFoswikiSession();
 
     # Test with undefined topic - web permissions tested
     my $access =
@@ -1685,9 +1688,7 @@ sub test_checkAccessPermission {
 \t* Set DENYTOPICVIEW = $Foswiki::cfg{DefaultUserWikiName}
 END
     );
-    $this->{session}->finish() if ref( $this->{session} );
-    $this->{session} = Foswiki->new();
-    $Foswiki::Plugins::SESSION = $this->{session};
+    $this->createNewFoswikiSession();
     my $access =
       Foswiki::Func::checkAccessPermission( 'VIEW',
         $Foswiki::cfg{DefaultUserWikiName},
@@ -1714,8 +1715,7 @@ END
     $this->assert($access);
 
     # make sure meta overrides text, as documented - Item2953
-    my $meta =
-      Foswiki::Meta->new( $this->{session}, $this->{test_web}, $topic );
+    my ($meta) = Foswiki::Func::readTopic( $this->{test_web}, $topic );
     $meta->putKeyed(
         'PREFERENCE',
         {
@@ -1732,7 +1732,8 @@ END
         $topic, $this->{test_web}, $meta
     );
     $this->assert( !$access );
-    $meta = Foswiki::Meta->new( $this->{session}, $this->{test_web}, $topic );
+    $meta->finish();
+    ($meta) = Foswiki::Func::readTopic( $this->{test_web}, $topic );
     $meta->putKeyed(
         'PREFERENCE',
         {
@@ -1750,6 +1751,7 @@ END
         $this->{test_web},
         $meta
     );
+    $meta->finish();
     $this->assert( !$access );
 
     #I'm not clear from the docco so...
@@ -1848,9 +1850,7 @@ sub test_checkAccessPermission_login_name {
 \t* Set DENYTOPICVIEW = $Foswiki::cfg{DefaultUserWikiName}
 END
     );
-    eval { $this->{session}->finish() };
-    $this->{session} = Foswiki->new();
-    $Foswiki::Plugins::SESSION = $this->{session};
+    $this->createNewFoswikiSession();
     my $access =
       Foswiki::Func::checkAccessPermission( 'VIEW',
         $Foswiki::cfg{DefaultUserLogin},
@@ -1875,8 +1875,7 @@ END
     $this->assert($access);
 
     # make sure meta overrides text, as documented - Item2953
-    my $meta =
-      Foswiki::Meta->new( $this->{session}, $this->{test_web}, $topic );
+    my ($meta) = Foswiki::Func::readTopic( $this->{test_web}, $topic );
     $meta->putKeyed(
         'PREFERENCE',
         {
@@ -1893,7 +1892,8 @@ END
         $topic, $this->{test_web}, $meta
     );
     $this->assert( !$access );
-    $meta = Foswiki::Meta->new( $this->{session}, $this->{test_web}, $topic );
+    $meta->finish();
+    ($meta) = Foswiki::Func::readTopic( $this->{test_web}, $topic );
     $meta->putKeyed(
         'PREFERENCE',
         {
@@ -1912,6 +1912,7 @@ END
         $meta
     );
     $this->assert( !$access );
+    $meta->finish();
 
     return;
 }
@@ -2051,37 +2052,33 @@ sub test_eachChangeSince {
     sleep(1);    # to move into a new time step
     my $start = time();
 
-    $this->{session}->finish();
-    $this->{session} = Foswiki->new($user1);
-    my $meta =
-      Foswiki::Meta->new( $this->{session}, $this->{test_web}, "ClutterBuck",
-        "One" );
+    $this->createNewFoswikiSession($user1);
+    my ($meta) = Foswiki::Func::readTopic( $this->{test_web}, "ClutterBuck" );
+    $meta->text("One");
     $meta->save();
 
-    $this->{session}->finish();
-    $this->{session} = Foswiki->new($user2);
-    $meta =
-      Foswiki::Meta->new( $this->{session}, $this->{test_web}, "PiggleNut",
-        "One" );
+    $this->createNewFoswikiSession($user2);
+    $meta->finish();
+    ($meta) = Foswiki::Func::readTopic( $this->{test_web}, "PiggleNut" );
+    $meta->text("One");
     $meta->save();
 
     # Wait a second
     sleep(1);
     my $mid = time();
 
-    $this->{session}->finish();
-    $this->{session} = Foswiki->new($user2);
-    $meta =
-      Foswiki::Meta->new( $this->{session}, $this->{test_web}, "ClutterBuck",
-        "One" );
+    $this->createNewFoswikiSession($user2);
+    $meta->finish();
+    ($meta) = Foswiki::Func::readTopic( $this->{test_web}, "ClutterBuck" );
+    $meta->text("One");
     $meta->save();
 
-    $this->{session}->finish();
-    $this->{session} = Foswiki->new($user1);
-    $meta =
-      Foswiki::Meta->new( $this->{session}, $this->{test_web}, "PiggleNut",
-        "Two" );
+    $this->createNewFoswikiSession($user1);
+    $meta->finish();
+    ($meta) = Foswiki::Func::readTopic( $this->{test_web}, "PiggleNut" );
+    $meta->text("Two");
     $meta->save();
+    $meta->finish();
 
     my $change;
     my $it = Foswiki::Func::eachChangeSince( $this->{test_web}, $start );
@@ -2154,8 +2151,7 @@ sub test_4308 {
 sub test_4411 {
     my $this = shift;
     $this->assert( Foswiki::Func::isGuest(), $this->{session}->{user} );
-    $this->{session}->finish();
-    $this->{session} = Foswiki->new( $Foswiki::cfg{AdminUserLogin} );
+    $this->createNewFoswikiSession( $Foswiki::cfg{AdminUserLogin} );
     $this->assert( !Foswiki::Func::isGuest(), $this->{session}->{user} );
 
     return;
@@ -2175,8 +2171,7 @@ sub test_setPreferences {
    * Set PSIBG = naff
    * Set FINALPREFERENCES = PSIBG
 HERE
-    $this->{session}->finish();
-    $this->{session} = Foswiki->new( $Foswiki::cfg{GuestUserLogin}, $q );
+    $this->createNewFoswikiSession( $Foswiki::cfg{GuestUserLogin}, $q );
     $this->assert_str_equals( "naff",
         Foswiki::Func::getPreferencesValue("PSIBG") );
     Foswiki::Func::setPreferencesValue( "PSIBG", "KJHD" );
@@ -2187,8 +2182,7 @@ HERE
         $Foswiki::cfg{WebPrefsTopicName}, <<'HERE');
    * Set PSIBG = naff
 HERE
-    $this->{session}->finish();
-    $this->{session} = Foswiki->new( $Foswiki::cfg{GuestUserLogin}, $q );
+    $this->createNewFoswikiSession( $Foswiki::cfg{GuestUserLogin}, $q );
     $this->assert_str_equals( "naff",
         Foswiki::Func::getPreferencesValue("PSIBG") );
     Foswiki::Func::setPreferencesValue( "PSIBG", "KJHD" );
@@ -2273,15 +2267,16 @@ sub test_getAttachmentList {
     my $shortname = "testfile.gif";
     my $filename  = "$Foswiki::cfg{TempfileDir}/$shortname";
     $this->write_file( $filename, "Naff\n" );
-    my $meta =
-      Foswiki::Meta->new( $this->{session}, $this->{test_web},
-        $this->{test_topic}, "One" );
+    my ($meta) =
+      Foswiki::Func::readTopic( $this->{test_web}, $this->{test_topic} );
+    $meta->text("One");
     $meta->attach(
         name    => $shortname,
         file    => $filename,
         comment => "a comment"
     );
     $meta->save();
+    $meta->finish();
     unlink $filename;
     my @list =
       Foswiki::Func::getAttachmentList( $this->{test_web},
@@ -2339,8 +2334,7 @@ sub test_pushPopContext {
 SETS
 
     # Force re-read of prefs
-    $Foswiki::Plugins::SESSION = $this->{session} =
-      Foswiki->new( undef,
+    $this->createNewFoswikiSession( undef,
         Unit::Request->new( { topic => "$this->{test_web}.$topic1" } ) );
 
     Foswiki::Func::saveTopicText( $this->{test_web}, $topic2, <<'SETS' );
@@ -2449,6 +2443,8 @@ sub DISABLEDtest_unicode_attachment {
     $this->assert( utf8::is_utf8($uniname),
         "Our attachment comment '$unicomment' doesn\'t have utf8 flag set" );
     $this->do_attachment( $uniname, $unicomment );
+
+    return;
 }
 
 # Test that we can attach a file named with unicode chars.
@@ -2468,6 +2464,8 @@ sub test_unicode_attachment_utf8_encoded {
         "Our utf-8 encoded attachment comment '$utfcomment' has utf8 flag set"
     );
     $this->do_attachment( $utfname, $utfcomment );
+
+    return;
 }
 
 sub do_attachment {
@@ -2481,9 +2479,10 @@ sub do_attachment {
     require Unit::Request;
     $query = Unit::Request->new("");
     $query->path_info("/$this->{test_web}/$this->{test_topic}");
-    $this->{session}  = Foswiki->new( undef, $query );
+    $this->createNewFoswikiSession( undef, $query );
     $this->{request}  = $query;
     $this->{response} = Unit::Response->new();
+    $this->{test_topicObject}->finish() if $this->{test_topicObject};
     ( $this->{test_topicObject} ) =
       Foswiki::Func::readTopic( $this->{test_web}, $this->{test_topic} );
     $this->{test_topicObject}->text("BLEEGLE\n");
@@ -2527,6 +2526,7 @@ sub do_attachment {
     my ( $meta, $text ) =
       Foswiki::Func::readTopic( $this->{test_web}, $this->{test_topic} );
     my @attachments = $meta->find('FILEATTACHMENT');
+    $meta->finish();
 
     $this->assert( $name eq $attachments[0]->{name},
         "Got $attachments[0]->{name}  but expected $name " );
@@ -2611,7 +2611,7 @@ sub _test_path_func {
     return;
 }
 
-sub test_getScriptUrl {
+sub test_getScriptUrl_spec {
     my ($this) = @_;
 
     $this->_test_path_func( \&Foswiki::Func::getScriptUrl,
@@ -2620,7 +2620,7 @@ sub test_getScriptUrl {
     return;
 }
 
-sub test_getScriptUrlPath {
+sub test_getScriptUrlPath_spec {
     my ($this) = @_;
 
     $this->_test_path_func( \&Foswiki::Func::getScriptUrlPath );

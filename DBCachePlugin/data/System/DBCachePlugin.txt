@@ -114,7 +114,7 @@ tool or (b) as a tool to extract properties of (a set of) known topics.
   defaults to "$n"; the special separator "none" disables separation |
 | =include="..."= | pattern each found topic name must match to be considered a hit |
 | =exclude="..."= | pattern each found topic name must not match to be considered a hit |
-| =sort="..."= | specifies the sorting of hits; defaults to "name" |
+| =sort="..."= | specifies the sorting of hits; this can be a comma separted list of attributes to specify more complicated sortings; defaults to "name" |
 | =reverse="..."= | specify if hits should be sorted in reverse order; defaults to "off" |
 | =limit="..."= | maximum number of topics to include in the hit set |
 | =skip="..."= | number of topics to skip while constructing the hit set; defaults to "0" |
@@ -291,6 +291,42 @@ derive the title of a topic from a couple of properties:
    * from a "TopicTitle" formfield attribute, or
    * defaults to the topic name
 
+---+++ DBPREV, DBNEXT
+reference the "neigbour" documetns of an item found in a search query
+
+*Syntax:*
+| *%<nop>DBPREV{"&lt;search>" ... "}%*, %<nop>DBNEXT{"&lt;search>" ... "}%* ||
+| ="&lt;search>"= | query string that defines a search, see DBCacheContrib |
+| =web="..."= | the web where to search in (default: current web) |
+| =topic="..."= | the topic from where to search for neighbours (default: current topic) |
+| =format="..."= | format string to render the results (default: "$web.$topic") |
+| =order= | define a sorting on the hit set; see above |
+| =reverse="on,off"= | sort keys descending or ascending |
+
+Results are rendered using the =format= parameter which understands the normal format tokens
+like =$dollar=, =$percnt=, =$nop= and =$n= as well as =$web= and =$topic= which refer to
+the previous or next topic in DBPREV or DBNEXT respectively.
+
+These two macros come in handy rendering a navigation among search results found by a DBQUERY. For
+example, the following code will render a navigation as found in blog applications linking to the 
+previous and next blog entry in a list of postings ordered by created date:
+
+<verbatim class="tml">
+%DBPREV{
+  search="TopicType=~'\bBlogEntry\b' AND State != 'unpublished' AND topic != 'WebTopicEditTemplate'" 
+  order="created"
+  format="[[$web.$topic]]"
+}%
+%DBNEXT{
+  search="TopicType=~'\bBlogEntry\b' AND State != 'unpublished' AND topic != 'WebTopicEditTemplate'" 
+  order="created"
+  format="[[$web.$topic]]"
+}%
+</verbatim>
+
+(from Foswiki:Extensions/BlogPlugin)
+
+
 ---++ Syntax of search queries
 A search query is a boolean expression on fields of a topic. (Tip: use %DBDUMP to explore the available fields).
 
@@ -377,6 +413,10 @@ If =$Foswiki::cfg{DBCache}{MemoryCache}= is set to FALSE (defaults to TRUE)
 the dbcache once loaded into memory will stay there among multiple requests.
 This option only has an effect using speedy/perperl or fastcgi setups.
 
+---+++ <nop>SecureTopicTitles
+When enabling =$$Foswiki::cfg{SecureTopicTitles}=, !TopicTitles will only be used as a link text in !WikiWords
+when the user has got view access to the target topic.
+
 ---++ Plugin Installation Instructions
 %$INSTALL_INSTRUCTIONS%
 
@@ -385,11 +425,16 @@ This option only has an effect using speedy/perperl or fastcgi setups.
    * Set SHORTDESCRIPTION = Lightweight frontend to the <nop>DBCacheContrib
 -->
 |  Author: | Michael Daum |
-|  Copyright &copy;: | 2005-2011, Michael Daum http://michaeldaumconsulting.com |
+|  Copyright &copy;: | 2005-2012, Michael Daum http://michaeldaumconsulting.com |
 |  License: | GPL ([[http://www.gnu.org/copyleft/gpl.html][GNU General Public License]]) |
 |  Release: | %$RELEASE% |
 |  Version: | %$VERSION% |
 |  Change History: | <!-- versions below in reverse order -->&nbsp; |
+|  11 Jan 2012: | implemented !TopicTitles protected by access control rights |
+|  10 Jan 2012: | implemented DBPREV and DBNEXT; \
+                  rationalized rendering !TopicTitles instead of the normal !WikiWord linktext; \
+                  improved =$flatten()= to look nicer; \
+                  fixed sorting search results by multiple keys |
 |  25 Aug 2011: | fixed dbcache index not build properly when creating a new web; \
                   improved flatten() to weed out more; \
                   fixed indexing of non-existing webs due to mal-formed urls |

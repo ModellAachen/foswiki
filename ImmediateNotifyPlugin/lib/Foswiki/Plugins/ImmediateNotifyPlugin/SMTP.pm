@@ -42,11 +42,9 @@ sub notify {
     my ($skin) = Foswiki::Func::getPreferencesValue("SKIN");
     my ($template) = Foswiki::Func::readTemplate( 'smtp', 'immediatenotify' );
 
-    # &$debug("- SMTP:  template read $template");
+    # Expand legacy macros
     my ($from) = Foswiki::Func::getPreferencesValue("WIKIWEBMASTER");
-
     $template =~ s/%EMAILFROM%/$from/go;
-    $template =~ s/%WEB%/$info->{web}/go;
     $template =~ s/%TOPICNAME%/$info->{topic}/go;
     $template =~ s/%USER%/$info->{user}/go;
     $template =~ s/%REV%/$info->{version}/go;

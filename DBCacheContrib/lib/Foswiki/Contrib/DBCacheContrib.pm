@@ -41,7 +41,7 @@ FormQueryPlugin for an example of this.
 =cut
 
 our $VERSION = '$Rev$';
-our $RELEASE = '25 Aug 2011';
+our $RELEASE = '10 Jan 2012';
 our $SHORTDESCRIPTION = 'Reusable code that treats forms as if they were table rows in a database';
 
 =begin TML
@@ -89,6 +89,11 @@ sub new {
       $Foswiki::cfg{DBCacheContrib}{Archivist}->new($web.'.'.$cacheName);
 
     return $this;
+}
+
+sub getArchivist {
+    my $this = shift;
+    return $this->{archivist};
 }
 
 sub cache {
@@ -499,6 +504,7 @@ sub load {
 sub loadTopic {
     my ( $this, $web, $topic ) = @_;
 
+    #print STDERR "loadTopic($web, $topic)\n";
     my $found = 0;
 
     eval { 

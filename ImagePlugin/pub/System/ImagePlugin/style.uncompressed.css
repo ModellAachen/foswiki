@@ -16,7 +16,7 @@
 }
 a.imageHref {
   border:0px;
-  background-image:transparent !important;
+  background-image:none !important;
   text-decoration:none !important;
 }
 a:hover.imageHref {
@@ -33,6 +33,7 @@ a:hover.imageHref {
 }
 .imageSimple {
   overflow:visible;
+  display:inline-block;
 }
 .imageFloat_right,
 .imageSimple_right,

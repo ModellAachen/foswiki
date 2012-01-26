@@ -1,17 +1,17 @@
 <!-- template: renamesidebar.nat.tmpl -->
 %TMPL:DEF{"sidebar"}%<!-- sidebar -->
 <h2 ><a name="Help">%MAKETEXT{"Help"}%</a></h2>
-   * <a href="%SCRIPTURLPATH{"view"}%/%SYSTEMWEB%/TopicsAndWebs" target="_blank">%MAKETEXT{"About Topics and Webs"}%</a> </li>
-   * <a href="%SCRIPTURLPATH{"view"}%/%SYSTEMWEB%/ManagingTopics" target="_blank">%MAKETEXT{"Managing Topics"}%</a> </li>
-   * <a href="%SCRIPTURLPATH{"view"}%/%SYSTEMWEB%/DeleteOrRenameATopic" target="_blank">%MAKETEXT{"Deleting Topics"}%</a> </li>
+   * <a href="%SCRIPTURLPATH{"view"}%/%SYSTEMWEB%/TopicsAndWebs" target="_blank">%MAKETEXT{"About topics and webs"}%</a> </li>
+   * <a href="%SCRIPTURLPATH{"view"}%/%SYSTEMWEB%/ManagingTopics" target="_blank">%MAKETEXT{"Managing topics"}%</a> </li>
+   * <a href="%SCRIPTURLPATH{"view"}%/%SYSTEMWEB%/DeleteOrRenameATopic" target="_blank">%MAKETEXT{"Deleting topics"}%</a> </li>
    * <a href="%SCRIPTURLPATH{"view"}%/%SYSTEMWEB%/WikiWord" target="_blank">%MAKETEXT{"WikiWord"}%</a> </li>
 <h2 ><a name="Notes">%MAKETEXT{"Notes"}%</a></h2>
 <div class="natNotes">
-<p> %MAKETEXT{"Get help on <a href=\"[_1]\" target=\"_blank\">Renaming and moving topics</a>." args="%SCRIPTURLPATH{\"view\"}%/%SYSTEMWEB%/ManagingTopics"}%</p>
+<p> %MAKETEXT{"Get help on <a href='[_1]' target='_blank'>Renaming and moving topics</a>." args="%SCRIPTURLPATH{"view"}%/%SYSTEMWEB%/ManagingTopics"}%</p>
 <p> %MAKETEXT{"It's usually best to chose a <a href='[_1]' target='_blank'>WikiWord</a>
      for the new topic name, otherwise automatic linking may not work.  Characters not 
-     allowed in topic names, such as spaces will automatically be removed." args="%SCRIPTURLPATH{\"view\"}%/%SYSTEMWEB%/WikiWord"}% </p>
-<p> %MAKETEXT{"Select the [[Trash.WebHome][Trash]] web to delete the topic."}% </p>
+     allowed in topic names, such as spaces will automatically be removed." args="%SCRIPTURLPATH{"view"}%/%SYSTEMWEB%/WikiWord"}% </p>
+<p> %MAKETEXT{"Select the [[[_1].WebHome][[_1]]] web to delete the topic." args="%TRASHWEB%"}% </p>
 <p> %MAKETEXT{"The checkmarked topics will be updated (another form will appear which
      will _eventually_ allow you to rename any topics that were locked)"}% </p>
 </div>

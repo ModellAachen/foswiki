@@ -7,8 +7,9 @@ Default bottombar component
 %STARTINCLUDE%<!-- sitebottombar -->
 <div class="natBottomActions foswikiGrid">
 <div class="foswikiCol3">
----++++ %MAKETEXT{"Edit"}%
-%USERACTIONS{"
+%USERACTIONS{
+  header="<h4>%MAKETEXT{"Edit"}%</h4>"
+  format="
    * $action(edit)
    * $action(editraw)
    * $action(editsettings)
@@ -17,22 +18,22 @@ Default bottombar component
    * $action(editform)
    * $action(move)
    * $action(delete)
-"}%
-<!--
-   * <a href="#">%MAKETEXT{"Edit tags"}%</a>
-   * <a href="#">%MAKETEXT{"Set new parent"}%</a>
-   * <a href="#">%MAKETEXT{"Change name identifier"}%</a>
--->
+"
+  guest=""
+}%<!-- -->
 </div>
 <div class="foswikiCol3">
----++++ %MAKETEXT{"Create"}%
-%USERACTIONS{"
+%USERACTIONS{
+  header="<h4>%MAKETEXT{"Create"}%</h4>"
+  format="
    * $action(new)
-"}%%DBQUERY{
+"
+  guest=""
+}%%DBQUERY{
   "TopicType=~'\bTopicType\b'"
   exclude="TopicType|TopicStub"
   format="   * [[$web.$topic][New $topic]]"
-}%
+}%<!-- -->
 </div>
 <div class="foswikiCol3">
 %USERACTIONS{
@@ -41,17 +42,22 @@ Default bottombar component
    * $action(diff)
    * $action(history)
    * $action(restore)
-"}%
+"
+  guest=""
+}%<!-- -->
 </div>
 <div class="foswikiCol3 last">
----++++ %MAKETEXT{"View"}%
-%USERACTIONS{"<!-- -->
+%USERACTIONS{
+  header="<h4>%MAKETEXT{"View"}%</h4>"
+  format="
    * $raw
    * $print
    * $pdf
    * $action(backlinks)
    * $action(childtopics)
-<!-- -->"}%
+"
+  guest=""
+}%<!-- -->
 </div>
 </div>
 <div class="natCopyRight">%WEBCOPYRIGHT%</div>
@@ -61,3 +67,9 @@ Default bottombar component
   <a class='natFeedIcon' href='%SCRIPTURL{"view"}%/%WEB%/WebAtom'>ATOM</a>
 </div>
 <!-- //sitebottombar -->%STOPINCLUDE%
+
+<!--
+   * <a href="#">%MAKETEXT{"Edit tags"}%</a>
+   * <a href="#">%MAKETEXT{"Set new parent"}%</a>
+   * <a href="#">%MAKETEXT{"Change name identifier"}%</a>
+-->
