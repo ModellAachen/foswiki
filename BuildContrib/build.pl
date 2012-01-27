@@ -29,9 +29,9 @@ if ( $extension =~ /Plugin$/ ) {
     $extdir = "Plugins";
 }
 
-my $scriptDir = "$extension/lib/Foswiki/$extdir/$extension";
+my $scriptDir = "../$extension/lib/Foswiki/$extdir/$extension";
 unless ( -e "$scriptDir/build.pl" ) {
-    $scriptDir = "$extension/lib/TWiki/$extdir/$extension";
+    $scriptDir = "../$extension/lib/TWiki/$extdir/$extension";
     unless ( -e "$scriptDir/build.pl" ) {
         die "build.pl not found";
     }
@@ -48,6 +48,7 @@ my $call = './build.pl '.$arg.' '.$target;
 print "calling '$call' in $scriptDir\n" if ($arg eq '-v');
 
 chdir($scriptDir);
+print "Test"
 print `$call`;
 
 

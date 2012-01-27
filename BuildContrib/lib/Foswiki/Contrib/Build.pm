@@ -13,6 +13,11 @@
 # GNU General Public License for more details, published at
 # http://www.gnu.org/copyleft/gpl.html
 #
+
+BEGIN {
+    unshift @INC, 'C:\Benutzer\Alexander\git\foswiki\core\lib\CPAN\lib';
+}
+
 package Foswiki::Contrib::Build;
 
 use Foswiki::Contrib::BuildContrib::BaseBuild;

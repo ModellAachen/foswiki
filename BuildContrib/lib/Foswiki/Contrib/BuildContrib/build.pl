@@ -17,7 +17,9 @@
 # -v Be verbose
 # Standard preamble
 BEGIN {
-    unshift @INC, split( /:/, $ENV{FOSWIKI_LIBS} );
+	#Alex: Sonst klappt´s nicht
+	$ENV{FOSWIKI_LIBS} = 'C:/Benutzer/Alexander/git/foswiki/core/lib';
+    unshift @INC, split( /;/, $ENV{FOSWIKI_LIBS} );
 }
 
 use Foswiki::Contrib::Build;
