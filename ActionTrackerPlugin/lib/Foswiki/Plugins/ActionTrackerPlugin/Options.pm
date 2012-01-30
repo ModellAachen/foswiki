@@ -16,6 +16,7 @@ my %defaults = (
     EDITBOXWIDTH  => '%EDITBOXWIDTH%',
     EDITFORMAT    => '| $who | $due | $state | $notify |',
     EDITHEADER          => '| Assigned to | Due date | State | Notify |',
+    EDITFOOTER			=> '',
     EDITORIENT          => 'rows',
     ENABLESTATESHORTCUT => '1',
     EXTRAS              => '',
@@ -23,6 +24,7 @@ my %defaults = (
     NOTIFYCHANGES       => '$who,$due,$state,$text',
     TABLEFORMAT => '| $who | $due | $text $link | $state | $notify | $edit |',
     TABLEHEADER => '| Assigned to | Due date | Description | State | Notify ||',
+    TABLEFOOTER => '',
     TABLEORIENT => 'cols',
     TEXTFORMAT  => 'Action for $who, due $due, $state$n$text$n$link$n'
 );

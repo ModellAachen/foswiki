@@ -29,7 +29,7 @@ use Foswiki::Func ();
 # $orient is the orientation of generated tables; "rows" gives
 # data in rows, anything else gives data in columns.
 sub new {
-    my ( $class, $header, $fields, $orient, $textform, $changeFields ) = @_;
+    my ( $class, $header, $fields, $footer, $orient, $textform, $changeFields ) = @_;
 
     my $this = {};
     $header ||= '';
@@ -41,6 +41,11 @@ sub new {
     $fields =~ s/^\s*\|//so;
     $fields =~ s/\|\s*$//so;
     my @bodies = split( /\|/, $fields );
+    
+    $footer ||= '';
+    $footer =~ s/^\s*\|//so;
+    $footer =~ s/\|\s*$//so;
+    my @foots = split( /\|/, $footer );
 
     while ( $#bodies < $#heads ) {
         push( @bodies, "&nbsp;" );
@@ -49,9 +54,14 @@ sub new {
     while ( $#heads < $#bodies ) {
         push( @heads, "&nbsp;" );
     }
+    
+   # while ( $#foots < $#bodies ) {
+   #     push( @heads, "&nbsp;" );
+   # }
 
     @{ $this->{HEADINGS} } = @heads;
     @{ $this->{FIELDS} }   = @bodies;
+    @{ $this->{FOOTERS} }   = @foots;
 
     $this->{TEXTFORM} = $textform;
 
@@ -76,6 +86,13 @@ sub new {
 sub getHeaders {
     my $this = shift;
     return "|" . join( "|", @{ $this->{HEADINGS} } ) . "|";
+}
+
+# PUBLIC return the footers in a format suitable for feeding
+# back to new.
+sub getFooters {
+    my $this = shift;
+    return "|" . join( "|", @{ $this->{FOOTERS} } ) . "|";
 }
 
 # PUBLIC return the fields in a format suitable for feeding

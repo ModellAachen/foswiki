@@ -212,6 +212,7 @@ sub _beforeActionEdit {
     my $fmt = new Foswiki::Plugins::ActionTrackerPlugin::Format(
         $options->{EDITHEADER},
         $options->{EDITFORMAT},
+        $options->{EDITFOOTER},
         $options->{EDITORIENT},
         "", ""
 	);
@@ -423,12 +424,13 @@ sub _handleActionSearch {
     my $orient  = $attrs->remove('orient');
     my $sort    = $attrs->remove('sort');
     my $reverse = $attrs->remove('reverse');
-    if ( defined($fmts) || defined($hdrs) || defined($orient) ) {
+    if ( defined($fmts) || defined($hdrs) || defined($orient) || defined($foot) ) {
         $fmts   = $defaultFormat->getFields()      unless ( defined($fmts) );
         $hdrs   = $defaultFormat->getHeaders()     unless ( defined($hdrs) );
+        $foot   = $defaultFormat->getFooters()     unless ( defined($foot) );
         $orient = $defaultFormat->getOrientation() unless ( defined($orient) );
         $fmt = new Foswiki::Plugins::ActionTrackerPlugin::Format(
-	    $hdrs, $fmts, $orient, $fmts, '' );
+	    $hdrs, $fmts, $foot, $orient, $fmts, '' );
     }
     else {
         $fmt = $defaultFormat;
@@ -476,7 +478,7 @@ sub lazyInit {
 HERE
 
     $defaultFormat = new Foswiki::Plugins::ActionTrackerPlugin::Format(
-        $options->{TABLEHEADER}, $options->{TABLEFORMAT},
+        $options->{TABLEHEADER}, $options->{TABLEFORMAT}, $options->{TABLEFOOTER},
         $options->{TABLEORIENT}, $options->{TEXTFORMAT},
         $options->{NOTIFYCHANGES}
 	);
