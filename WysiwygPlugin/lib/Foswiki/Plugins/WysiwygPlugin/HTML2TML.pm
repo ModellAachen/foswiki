@@ -146,6 +146,7 @@ sub convert {
     $text =~ s/\&\#x27;/\&apos;/goi;
     $text =~ s/\&\#34;/\&quot;/go;
     $text =~ s/\&\#x22;/\&quot;/goi;
+    # Modac: Hinzugekommen
     $text =~ s/\&\#160;/\&nbsp;/goi;
 
     require HTML::Entities;

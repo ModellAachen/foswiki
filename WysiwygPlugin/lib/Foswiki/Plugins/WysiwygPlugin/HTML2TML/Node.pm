@@ -622,6 +622,8 @@ sub _htmlParams {
   ATTR: for my $k ( sort keys %$attrs ) {
         next ATTR unless $k;
         my $v = $attrs->{$k};
+        #Modac: Hier muss die Klasse übergeben werden
+        #Modac: class
         if ( $k eq 'class' ) {
             my @classes;
             $v =~ s/^\s*(.*?)\s*$/$1/;
@@ -631,9 +633,9 @@ sub _htmlParams {
 
                 # if cleaning aggressively, remove class attributes
                 # except for the JQuery "Chili" classes
-                next CLASS
-                  if ( $options & $WC::VERY_CLEAN
-                    and not $jqueryChiliClass{$class} );
+                # Modac Change:
+                # next CLASS if ( $options & $WC::VERY_CLEAN
+                #    and not $jqueryChiliClass{$class} );
 
                 push @classes, $class;
             }
@@ -1392,10 +1394,10 @@ sub _handleA {
                       . $WC::CHECK2 );
             }
         }
-
-        if ( $href =~ /${WC::PROTOCOL}[^?]*$/ && $text eq $href ) {
-            return ( 0, $WC::CHECK1 . $nop . $text . $WC::CHECK2 );
-        }
+		#Modac: Do not allow Web.Topic Links
+        #if ( $href =~ /${WC::PROTOCOL}[^?]*$/ && $text eq $href ) {
+        #    return ( 0, $WC::CHECK1 . $nop . $text . $WC::CHECK2 );
+        #}
         if ( $text eq $href ) {
             return ( 0, $WC::CHECKw . '[' . $nop . '[' . $href . ']]' );
         }

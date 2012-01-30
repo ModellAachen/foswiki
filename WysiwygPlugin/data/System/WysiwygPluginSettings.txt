@@ -86,7 +86,7 @@ in the plugin:
         PARAM=name,type,value,valuetype;
         PRE=width;
         Q=cite;
-        TABLE=align,bgcolor,frame,rules,summary,width;
+        TABLE=class,align,bgcolor,frame,rules,summary,width;
         TBODY=align,char,charoff,valign;
         TD=abbr,align,axis,bgcolor,char,charoff,headers,height,nowrap,rowspan,scope,valign,width;
         TFOOT=align,char,charoff,valign;

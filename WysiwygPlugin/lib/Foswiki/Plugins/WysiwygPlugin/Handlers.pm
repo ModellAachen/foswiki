@@ -556,7 +556,7 @@ p=align;
 param=name,type,value,valuetype;
 pre=width;
 q=cite;
-table=align,bgcolor,frame,rules,summary,width;
+table=style,class,align,bgcolor,frame,rules,summary,width;
 tbody=align,char,charoff,valign;
 td=abbr,align,axis,bgcolor,char,charoff,headers,height,nowrap,rowspan,scope,valign,width;
 tfoot=align,char,charoff,valign;
@@ -790,6 +790,7 @@ sub _restUpload {
     my $doPropsOnly = $query->param('changeproperties');
     my $filePath    = $query->param('filepath')    || '';
     my $fileName    = $query->param('filename')    || '';
+    my $funcNum  = $query->param('CKEditorFuncNum')    || '';
     if ( $filePath && !$fileName ) {
         $filePath =~ m|([^/\\]*$)|;
         $fileName = $1;
@@ -876,8 +877,42 @@ sub _restUpload {
         returnRESTResult( $response, 500, $error );
         return;    # to prevent further processing
     }
+    
+    # Dateipfad auslesen und zur weiteren Bearbeitung zurückgeben
+    # Dateipfad auslesen und zur weiteren Bearbeitung zurückgeben
+    my $url = '';
+    $url .= Foswiki::Func::getPubUrlPath();
+    if ( $url !~ /^[a-z]+:/ ) {
+
+        # See http://www.ietf.org/rfc/rfc2396.txt for the definition of
+        # "absolute URI". Foswiki bastardises this definition by assuming
+        # that all relative URLs lack the <authority> component as well.
+        # $url = Foswiki::Func::getUrlHost() . $url;
+    }
+    if ( $web || $topic || $fileName ) {
+        my $path = '/' . $web . '/' . $topic;
+        if ($fileName) {
+            $path .= '/' . $fileName;
+
+            # Attachments are served directly by web server, need to handle
+            # URL encoding specially
+            #$url .= Foswiki::Func::urlEncodeAttachment($path);
+        }
+        else {
+            #$url .= Foswiki::Func::urlEncode($path);
+        }
+        $url .= $path;
+    }
 
     # Otherwise allow the rest dispatcher to write a 200
+    #TODO: Alex, hier muss was getan werden!
+    my $answer = '<script type="text/javascript">window.parent.CKEDITOR.tools.callFunction(' . $funcNum . ', "' . $url . '" , "");</script>';
+    # Otherwise allow the rest dispatcher to write a 200
+    # returnRESTResult( $response, 200, $answer );
+    return $answer;    # to prevent further processing
+    
+    
+    
     return "$origName attached to $web.$topic"
       . ( $origName ne $fileName ? " as $fileName" : '' );
 }

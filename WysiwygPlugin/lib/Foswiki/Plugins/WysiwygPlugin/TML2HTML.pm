@@ -38,8 +38,10 @@ my $TT2 = chr(2);
 # them up. Note that A is specifically excluded from this list because it
 # is common for href attributes to contain macros. Users should
 # be encouraged to use square bracket formulations for links instead.
+
+# Modac: A ist wieder hinzugefügt.
 my @PALATABLE_TAGS = qw(
-  ABBR ACRONYM ADDRESS B BDO BIG BLOCKQUOTE BR CAPTION CITE CODE COL
+  A ABBR ACRONYM ADDRESS B BDO BIG BLOCKQUOTE BR CAPTION CITE CODE COL
   COLGROUP DD DEL DFN DIR DIV DL DT EM FONT H1 H2 H3 H4 H5 H6 HR HTML I IMG INS
   ISINDEX KBD LABEL LEGEND LI OL P PRE Q S SAMP SMALL SPAN STRONG SUB SUP TABLE
   TBODY TD TFOOT TH THEAD TITLE TR TT U UL STICKY
@@ -164,12 +166,24 @@ WARNING
     return $content;
 }
 
+#Modac: Anpassung an CKEditor
 sub _liftOut {
-    my ( $this, $text, $type ) = @_;
+    my ( $this, $text, $type, $encoding, $href ) = @_;
     my %options;
     if ( $type and $type =~ /^(?:PROTECTED|STICKY|VERBATIM)$/ ) {
         $options{protect} = 1;
     }
+    if ( $encoding ) {
+    	$options{encoding} = $encoding;
+    }
+    if ( $href ) {
+    	#Modac: Why?
+    	$text = $this->_unLift($text);
+    	$href = $this->_unLift($href);
+    	
+    	$text = $text = '<a href="' . $href . '">' . $text . '</a>';
+    }
+    
     $options{class} = 'WYSIWYG_' . $type;
     return $this->_liftOutGeneral( $text, \%options );
 }
@@ -744,7 +758,23 @@ s/((^|(?<=[-*\s(]))$Foswiki::regex{linkProtocolPattern}:[^\s<>"]+[^\s*.,!?;:)<])
     # We do _not_ support [[http://link text]] syntax
 
     # [[][]]
-    $text =~ s/(\[\[[^\]]*\](\[[^\]]*\])?\])/$this->_liftOut($1, 'LINK')/ge;
+    # $text =~ s/(\[\[[^\]]*\](\[[^\]]*\])?\])/$this->_liftOut($1, 'LINK')/ge;
+    
+    my $linktype = Foswiki::Func::getContext()->{'CKEditorPluginEnabled'};
+    
+    if($linktype){
+	    # Modac Changes for CK Editor:
+	    
+	    # Handle [[]]
+	    $text =~ s/(\[\[([^\]]*)\]\])/$this->_liftOut($2, 'LINK', 'span', $2)/ge;
+	    
+	    # Handle [[][]]
+	    $text =~ s/(\[\[([^\]]*)\](\[([^\]]*)\])?\])/$this->_liftOut($4, 'LINK', 'span', $2)/ge;
+    }
+    else
+    {
+    	$text =~ s/(\[\[[^\]]*\](\[[^\]]*\])?\])/$this->_liftOut($1, 'LINK')/ge;
+    }
 
     $text =~
 s/$WC::STARTWW(($Foswiki::regex{webNameRegex}\.)?$Foswiki::regex{wikiWordRegex}($Foswiki::regex{anchorRegex})?)/$this->_liftOut($1, 'LINK')/geom;
@@ -1044,7 +1074,8 @@ sub _protectVerbatimChars {
     # They are handled specially, elsewhere
     $text =~ s/([\003-\011\013-\037<&>'"])/'&#'.ord($1).';'/ges;
     $text =~ s/ /&nbsp;/g;
-    $text =~ s/\n/<br \/>/gs;
+    # Modac, Alex: Dieser Br macht im CKEditor einiges kaputt.
+    #$text =~ s/\n/<br \/>/gs;
     return $text;
 }
 
