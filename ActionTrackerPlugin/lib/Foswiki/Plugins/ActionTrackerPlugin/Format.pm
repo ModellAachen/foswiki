@@ -223,6 +223,7 @@ sub _generateHTMLTable {
     my $text = CGI::start_table( { class => $class } );
     my $i;
 
+	# TODO : Implement footer in row orientation
     if ( $this->{ORIENTATION} eq 'rows' ) {
         for ( $i = 0 ; $i <= $#{ $this->{HEADINGS} } ; $i++ ) {
             my $head = ${ $this->{HEADINGS} }[$i];
@@ -243,6 +244,11 @@ sub _generateHTMLTable {
         foreach my $r (@$rows) {
             $text .= CGI::Tr( join( '', @$r ) );
         }
+        $row = '';
+        foreach $i ( @{ $this->{FOOTERS} } ) {
+            $row .= CGI::th($i);
+        }
+        $text .= CGI::Tr($row);
     }
     $text .= CGI::end_table();
 
