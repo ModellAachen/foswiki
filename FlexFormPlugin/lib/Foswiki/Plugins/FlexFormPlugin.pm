@@ -31,6 +31,7 @@ sub initPlugin {
 
   Foswiki::Func::registerTagHandler('RENDERFOREDIT', \&handleRENDERFOREDIT);
   Foswiki::Func::registerTagHandler('RENDERFORDISPLAY', \&handleRENDERFORDISPLAY);
+  Foswiki::Func::registerTagHandler('RENDERFIELD', \&handleRENDERFIELD);
 
   $doneInit = 0;
   return 1;
@@ -54,6 +55,24 @@ sub handleRENDERFOREDIT {
 sub handleRENDERFORDISPLAY {
   init();
   Foswiki::Plugins::FlexFormPlugin::Core::handleRENDERFORDISPLAY(@_);
+}
+
+##############################################################################
+sub handleRENDERFIELD {
+	my ($session, $params, $theTopic, $theWeb) = @_;
+	
+	init();
+	
+	my $theMode = $params->{mode} || 'edit';
+	if ( $theMode == 'edit')
+	{
+		Foswiki::Plugins::FlexFormPlugin::Core::handleRENDERFOREDIT(@_);
+	}
+	else
+	{
+		Foswiki::Plugins::FlexFormPlugin::Core::handleRENDERFORDISPLAY(@_);
+	}
+	
 }
 
 
