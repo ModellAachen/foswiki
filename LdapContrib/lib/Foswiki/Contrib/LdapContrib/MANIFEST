@@ -1,8 +1,8 @@
-data/System/LdapContrib.txt 0644
-lib/Foswiki/Contrib/LdapContrib/Config.spec 0644
-lib/Foswiki/Contrib/LdapContrib.pm 0644
-lib/Foswiki/LoginManager/LdapApacheLogin.pm 0644
-lib/Foswiki/Users/LdapPasswdUser.pm 0644
-lib/Foswiki/Users/LdapUserMapping.pm 0644
-pub/System/LdapContrib/wikiringlogo40x40.png 0644
-tools/ldaptest 0755
+lib/Foswiki/Contrib/LdapContrib.pm 0666
+lib/Foswiki/Contrib/LdapContrib/Config.spec 0666
+lib/Foswiki/LoginManager/LdapApacheLogin.pm 0666
+lib/Foswiki/LoginManager/LdapTemplateLogin.pm 0666
+lib/Foswiki/Users/LdapPasswdUser.pm 0666
+lib/Foswiki/Users/LdapUserMapping.pm 0666
+pub/System/LdapContrib/wikiringlogo40x40.png 0666
+tools/ldaptest 0666
