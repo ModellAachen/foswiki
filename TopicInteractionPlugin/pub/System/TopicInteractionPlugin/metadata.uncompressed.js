@@ -544,6 +544,92 @@ jQuery(function($) {
       }); /** end of openDialog **/
       return false;
     }); /** end of edit button **/
+    
+    // TODO : ModAc : File Update
+	// add update behaviour 
+    $this.find(".foswikiAttachmentUpdateButton").click(function() {
+      var $button = $(this),
+          $attachment = $button.parents(".foswikiAttachment:first"),
+          attachmentOpts = $.extend({}, $attachment.metadata()),
+          thumbnail = $attachment.find(".foswikiThumbnail").clone(true);
+
+      $.log("METADATA: clicked update attachment");
+
+      $attachment.find(".foswikiErrorMessage").remove();
+      loadDialog("#foswikiAttachmentUpdate", "attachments::update");
+      foswiki.openDialog('#foswikiAttachmentUpdate', {
+        persist:false,
+        containerCss: { width:485 },
+        onShow: function(dialog) { 
+          var $container = dialog.container,
+              $hideFile = $container.find("input[name=hidefile]");
+          
+          alert("alllesandro");
+
+          $.log("METADATA: show attachment editor");
+          $container.find("input[name=origfilename]").val(unescape(attachmentOpts.filename));
+          $container.find("input[name=filename]").val(unescape(attachmentOpts.filename));
+          $container.find("input[name=filecomment]").val(unescape(attachmentOpts.filecomment));
+          $container.find(".foswikiThumbnailContainer").empty();
+
+          $container.find(".foswikiThumbnailContainer").append(thumbnail);
+
+          if (attachmentOpts.fileattr == 'h') {
+            $hideFile.attr("checked", "checked");
+          } else {
+            $hideFile.removeAttr("checked");
+          }
+          // forward return key press to submit click event
+          $container.find("input[type=text]").keypress(function(event) {
+            if (event.keyCode == '13') {
+              $container.find(".jqSimpleModalOK").click();
+              event.preventDefault();
+            }
+          });
+        },
+        onSubmit: function(dialog) {
+
+          var $container = dialog.data,
+              $form = $container.find("form"), 
+              params = [];
+          
+          alert("alex");
+
+          $form.find("input").each(function() {
+            var $this = $(this), key = $this.attr('name'), val;
+            if ($this.is("[type=checkbox]")) {
+              val = $this.is(":checked")?'on':'off';
+            } else {
+              val = $this.val();
+            }
+            params.push(key+"="+escape(val));
+          });
+          params.push("id=save");
+
+          var saveUrl = $form.attr("action") + "?" + params.join("&");
+          $.blockUI({
+            message:"<h1>Saving changes ...</h1>",
+            fadeIn: 0,
+            fadeOut: 0
+          });
+          $.ajax({
+            url: saveUrl,
+            type: "POST",
+            dataType: "json",
+            error: function(xhr, msg, error) {
+              var data = $.parseJSON(xhr.responseText);
+              $.unblockUI();
+              $attachment.find(".foswikiAttachmentContainer").append("<div class='foswikiErrorMessage'>Error: "+data.error.message+"</div>");
+            },
+            success: function(data, msg, xhr) {
+              $.unblockUI();
+              loadAttachments();
+            }
+          });
+        } /** end of onSubmit **/
+      }); /** end of openDialog **/
+      return false;
+    }); /** end of update button **/
 
 
     // add delete button behaviour
