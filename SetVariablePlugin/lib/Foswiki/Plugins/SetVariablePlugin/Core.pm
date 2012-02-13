@@ -76,6 +76,11 @@ sub applyRules {
         my $name = $field->{name} || '';
         my $value = $field->{value} || '';
         if ($name eq $record->{field} && $value =~ /^($record->{regex})$/) {
+          # MODAC : If the value isn´t set take the value of the formfield
+          if (!$record->{value}){
+          	$record->{value} = $field->{value};
+          }
+          
           $found = 1;
           last;
         }
