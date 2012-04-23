@@ -1,4 +1,4 @@
-#! C:\Perl64\bin\perl.exe
+#!/usr/bin/perl
 use strict;
 
 # Benchmark script for TWiki

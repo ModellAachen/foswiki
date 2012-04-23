@@ -1,4 +1,4 @@
-#! C:\Perl64\bin\perl.exe
+#!/usr/bin/perl
 #
 # Copyright (C) 2008-2009 Foswiki Contributors. Foswiki Contributors
 # are listed in the AUTHORS file in the root of this distribution.

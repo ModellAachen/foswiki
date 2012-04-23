@@ -1,4 +1,4 @@
-#! C:\Perl64\bin\perl.exe -w
+#!/usr/bin/perl -w
 
 # Copyright (C) 2004 C-Dot Consultants - All rights reserved
 # Portions (C) 2004 Martin Cleaver

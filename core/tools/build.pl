@@ -1,4 +1,4 @@
-#! C:\Perl64\bin\perl.exe -w
+#!/usr/bin/perl -w
 #
 # Build for Foswiki
 # Crawford Currie & Sven Dowideit
