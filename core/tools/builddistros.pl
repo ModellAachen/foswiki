@@ -1,4 +1,4 @@
-#! /usr/bin/perl -w
+#! C:\Perl64\bin\perl.exe -w
 # Copyright 2004 Sven Dowideit.  All Rights Reserved.
 # License: GPL
 

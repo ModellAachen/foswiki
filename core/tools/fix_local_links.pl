@@ -1,4 +1,4 @@
-#! /usr/bin/perl -w
+#! C:\Perl64\bin\perl.exe -w
 
 # This script is used by the build script when building a TWiki release.
 # It is used to create the documents in the TWiki root.

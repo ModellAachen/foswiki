@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#! C:\Perl64\bin\perl.exe -w
 # See bottom of file for license and copyright information
 #
 # Simple utility to fetch an HTML page from a server

@@ -1,4 +1,4 @@
-#! /usr/bin/perl
+#! C:\Perl64\bin\perl.exe
 # One day this will be twikishell config command script
 # This script will install any topics from _default into the named web
 # You need this because some of the Web* topics have changed from Cairo

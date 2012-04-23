@@ -1,0 +1,896 @@
+﻿/*
+Copyright (c) 2003-2010, CKSource - Frederico Knabben. All rights reserved.
+For licensing, see LICENSE.html or http://ckeditor.com/license
+*/
+
+/**
+ * @fileOverview The "sourcearea" plugin. It registers the "source" editing
+ *		mode, which displays the raw data being edited in the editor.
+ */
+
+
+/* Hier wird der Modus der Commands gesetzt (Buttons ausgegraut) */
+var updateCommandsMode = function( editor, namensraum, ein )
+{
+		var command,
+			commands = editor._.commands;
+
+		for ( var name in commands )
+		{
+			if (ein)
+			{
+				if (name.indexOf(namensraum) != 0)
+				{
+					command = commands[ name ];
+					command[ 'disable' ]();
+				}
+			}
+			else
+			{
+				command = commands[ name ];
+				command[ 'enable' ]();
+			}
+		}
+};
+
+
+CKEDITOR.plugins.add( 'qwikiprovisarea',
+{
+	requires : [ 'editingblock', 'richcombo', 'styles' ],
+
+	init : function( editor )
+	{
+	var provisarea = CKEDITOR.plugins.provisarea,
+			win = CKEDITOR.document.getWindow(),
+			iframe,
+			provisframe,
+			config = editor.config;
+		
+		config.provis_maxWidth = "800";
+		config.provis_minWidth = "300";
+		
+		var container = null,
+		textcontainer = null,
+		proviscontainer = null,
+		origin,
+		startSize,
+		provisSize,
+		textSize,
+		resizeHorizontal = 1,
+		resizeVertical = 0;
+		
+		var flowchart;
+		var saveflag;
+		
+		/*
+		 * Watch auch für Internet Explorer etc
+		 * 
+		 */
+		function watchIt(o, p,f) {
+		    if(!o.watchNEU) {canDo(o, p, f);} 
+		    else {o.watch(p,f);}
+		};
+
+		function unwatchIt(o, p) {
+		    if(!o.unwatchNEU) {unDo(o, p);} 
+		    else {o.unwatch(p);}
+		};
+
+		function unDo(o, p) {
+		    eval('clearInterval(o.'+p+'timerID);'); 
+		};
+
+		function canDo(o, p, f){
+			this.obj = o; this.prop = p; this.func = f;
+		    var state=this.obj[this.prop]; 
+			var control=function(){
+				if(o[p]!=state)
+				{
+					state=f(p,state,o[p]);
+				}
+				};
+		    eval('o.'+p+'timerID = setInterval(' + control + ', 100);');
+		};
+		
+		function setDynRunvar(eventname, variable)
+		{
+			editor.fire( eventname, variable );
+		};
+		
+		function saveMapper(saveStyle)
+		{
+			switch (saveStyle)
+			{
+			case "line": 	
+				return "Einfache Trennlinien";
+				break;
+			case "frame": 	
+				return "Rahmen";
+				break;
+			case "noframe": 		
+				return "Ohne Rahmen";
+				break;
+			default:			
+				return "Rahmen";
+				break;
+			}
+		};
+		
+		function addComboSize( editor, comboName, styleType, lang, entries, defaultLabel, styleDefinition )
+		{
+			var config = editor.config;
+
+			// Gets the list of fonts from the settings.
+			var names = entries.split( ';' ),
+				values = [];
+
+			// Create style objects for all ProViiis.
+			var styles = {};
+			for ( var i = 0 ; i < names.length ; i++ )
+			{
+				var parts = names[ i ];
+
+				if ( parts )
+				{
+					parts = parts.split( '/' );
+
+					var vars = {},
+						name = names[ i ] = parts[ 0 ];
+
+					vars[ styleType ] = values[ i ] = name || name;
+
+					styles[ name ] = new CKEDITOR.style( styleDefinition, vars );
+					styles[ name ]._.definition.name = name;
+				}
+				else
+					names.splice( i--, 1 );
+			}
+
+			editor.ui.addRichCombo( comboName,
+				{
+					label : editor.lang.flowchart.resize,
+					title : editor.lang.flowchart.resize,
+					className : 'cke_provis_size',
+					panel :
+					{
+						css : editor.skin.editor.css.concat( config.contentsCss ),
+						multiSelect : false,
+						attributes : { 'aria-label' : lang.panelTitle }
+					},
+
+					init : function()
+					{
+						//this.startGroup( editor.lang.flowchart.resize );
+						for ( var i = 0 ; i < names.length ; i++ )
+						{
+							var name = names[ i ];
+
+							// Add the tag entry to the panel list.
+							this.add( name , styles[ name ].buildPreview(), name );
+						}
+						
+					},
+
+					onClick : function( value )
+					{
+						editor.execCommand( 'provisresize', value );
+					},
+
+					onRender : function()
+					{
+						editor.on( 'selectionChange', function( ev )
+								{
+									var currentValue = this.getValue();
+
+									var elementPath = ev.data.path,
+										elements = elementPath.elements;
+
+									// For each element into the elements path.
+									for ( var i = 0, element ; i < elements.length ; i++ )
+									{
+										element = elements[i];
+
+										// Check if the element is removable by any of
+										// the styles.
+										for ( var value in styles )
+										{
+											if ( styles[ value ].checkElementRemovable( element, true ) )
+											{
+												if ( value != currentValue )
+													this.setValue( value );
+												return;
+											}
+										}
+									}
+
+									// If no styles match, just empty it.
+									this.setValue( '', defaultLabel );
+								},
+								this);
+					}
+				});
+		}
+		
+		function addCombo( editor, comboName, styleType, lang, entries, defaultLabel, styleDefinition )
+		{
+			var config = editor.config;
+			
+			// Gets the list of fonts from the settings.
+			var names = entries.split( ';' ),
+				values = [];
+
+			// Create style objects for all ProViiis.
+			var styles = {};
+			for ( var i = 0 ; i < names.length ; i++ )
+			{
+				var parts = names[ i ];
+
+				if ( parts )
+				{
+					parts = parts.split( '/' );
+					
+					var url =  CKEDITOR.plugins.getPath( 'provisarea' ) + 'images/' + parts[1];
+
+					var vars = {},
+						name = names[ i ] = parts[ 0 ];
+
+					vars[ styleType ] = values[ i ] = parts[1] || name;
+
+					styles[ name ] = new CKEDITOR.style( styleDefinition, vars );
+					styles[ name ]._.definition.name = name;
+				}
+				else
+					names.splice( i--, 1 );
+			}
+
+			editor.ui.addRichCombo( comboName,
+				{
+					label : editor.lang.flowchart.nodes,
+					title : editor.lang.flowchart.nodes,
+					className : 'cke_provis',
+					panel :
+					{
+						css : editor.skin.editor.css.concat( config.contentsCss ),
+						multiSelect : false,
+						attributes : { 'aria-label' : lang.panelTitle }
+					},
+
+					init : function()
+					{						
+						this.startGroup( "Prozesstypen" );
+
+						for ( var i = 0 ; i < names.length ; i++ )
+						{
+							var name = names[ i ];
+
+							// Add the tag entry to the panel list.
+							this.add( name , styles[ name ].buildPreview(), name );
+						}
+						
+					},
+
+					onClick : function( value )
+					{
+						document.getElementById("iframe_provis").contentWindow.setShape(value);
+						//alert(document.getElementById("iframe_provis").contentWindow.DynRunVar.activeShape);
+					},
+
+					onRender : function()
+					{
+						//TODO: Checken ob Wert vorhanden!
+						editor.on( 'provis_shape', function( ev )
+								{
+									var currentValue = this.getValue();
+									var wert = ev.data;
+									this.setValue( wert );
+								},
+								this);
+					}
+				});
+		}
+		
+		function addComboSave( editor, comboName, styleType, lang, entries, defaultLabel, styleDefinition )
+		{
+			var config = editor.config;
+			
+			// Gets the list of fonts from the settings.
+			var names = entries.split( ';' ),
+				values = [];
+
+			// Create style objects for all ProViiis.
+			var styles = {};
+			for ( var i = 0 ; i < names.length ; i++ )
+			{
+				var parts = names[ i ];
+
+				if ( parts )
+				{
+					parts = parts.split( '/' );
+					
+					var url =  CKEDITOR.plugins.getPath( 'provisarea' ) + 'images/' + parts[1];
+
+					var vars = {},
+						name = names[ i ] = parts[ 0 ];
+
+					vars[ styleType ] = values[ i ] = parts[1] || name;
+
+					styles[ name ] = new CKEDITOR.style( styleDefinition, vars );
+					styles[ name ]._.definition.name = name;
+				}
+				else
+					names.splice( i--, 1 );
+			}
+
+			editor.ui.addRichCombo( comboName,
+				{
+					label : editor.lang.flowchart.saveoptions,
+					title : editor.lang.flowchart.saveoptions,
+					className : 'cke_provis',
+					panel :
+					{
+						css : editor.skin.editor.css.concat( config.contentsCss ),
+						multiSelect : false,
+						attributes : { 'aria-label' : lang.panelTitle }
+					},
+
+					init : function()
+					{
+						
+						this.startGroup( "Speicheroptionen" );
+
+						for ( var i = 0 ; i < names.length ; i++ )
+						{
+							var name = names[ i ];
+
+							// Add the tag entry to the panel list.
+							this.add( name , styles[ name ].buildPreview(), name );
+						}
+						
+					},
+
+					onClick : function( value )
+					{
+						document.getElementById("iframe_provis").contentWindow.setSaveStyleMapper(value);
+						//alert(document.getElementById("iframe_provis").contentWindow.DynRunVar.saveStyle);
+					},
+
+					onRender : function()
+					{
+						//TODO: Checken ob Wert vorhanden!
+						editor.on( 'provis_save', function( ev )
+								{
+									var currentValue = this.getValue();
+									var wert = saveMapper(ev.data);
+									this.setValue( wert );
+								},
+								this);
+					}
+				});
+		}
+		
+		editor.on( 'saveprovis', function(event)
+				{
+					//TODO: Alex muss das tun!
+					//Alex: Saveprovis: ProVis Tag muss auch geupdated werden!
+					editor = event.editor;
+					this.saveflag = true;
+				});
+		
+		editor.on( 'closeprovis', function(event)
+				{
+					//Alex: Saveprovis: ProVis Tag muss auch geupdated werden!
+					editor = event.editor;
+					
+					//Provis Attribute auslesen
+					var name = flowchart.getAttribute( '_cke_provis_name' );
+					var type = flowchart.getAttribute( '_cke_provis_type' ) || Swimlane;
+					//Richtig so? Dann muss am Anfang 0 gesetzt sein!
+					var rev = flowchart.getAttribute( '_cke_provis_rev' ) || 1;
+					
+					if (this.saveflag == true)
+					{
+						/*FoswikiCKE.ajaxRequest(url, request, function(){
+							sucess();
+						}, function(){
+							error();
+						});
+						*/
+						
+						//TODO: AjaxRequest oder ähnliches
+						rev++;
+					}
+					
+					// Neues Element kreiieren und ersetzen
+					var element = CKEDITOR.dom.element.createFromHtml('<span class="WYSIWYG_PROTECTED">%PROCESS{name=&quot;' + name + '&quot; type=&quot;' + type + '&quot; rev=&quot;' + rev + '&quot;}%</span>' );
+					element.replace(flowchart);
+					
+					var holderElement = editor.getThemeSpace("contents");
+					holderElement.getChild(2).remove();
+					holderElement.getChild(1).remove();
+					holderElement.getChild(0).setStyle('width', '100%');
+					
+					var data = editor.getData();
+					editor.setData(data);
+					editor.fire( 'close_provistoolbar' );
+					//Tristate wieder rausnehmen
+					updateCommandsMode(editor, "provis", false);
+					this.saveflag = false;
+					
+					//TODO: Was ist wenn die Var nicht gesetzt ist?
+					try {
+						//TODO: Dynamische Runtime Variable setzen
+						var frame = document.getElementById("iframe_provis")
+						var dynrunvar = frame.contentWindow.DynRunVar;
+										
+						unwatchIt(dynrunvar, "activeShape");
+						unwatchIt(dynrunvar, "saveStyle");
+					}
+					catch (e){
+						
+					}
+					
+				});
+		
+		editor.on( 'openprovis', function(event)
+				{
+					this.saveflag = false;
+					
+					var selection = editor.getSelection();
+					
+					var element = selection.getSelectedElement();
+					flowchart = element;
+					
+					if ( element && element.getAttribute( '_cke_real_element_type' ) && element.getAttribute( '_cke_real_element_type' ) == 'provis' )
+					{
+						//Alex: Topic??
+						
+						topic = element.getAttribute( '_cke_provis_topic' ) || FoswikiCKE.getFoswikiVar("WEB") + "." + FoswikiCKE.getFoswikiVar("TOPIC");
+						name = element.getAttribute( '_cke_provis_name' );
+						type = element.getAttribute( '_cke_provis_type' ) || swimlane;
+						rev = element.getAttribute( '_cke_provis_rev' ) || 1;
+					}
+					else
+						return false;
+					
+					//Alex: Standard Verteilung ProVis / Text
+					var share = 0.7;
+					//Alex: Was passiert, wenn der Themespace während der Bearbeitung größer / kleiner wird?
+				
+					editor = event.editor;
+					var holderElement = editor.getThemeSpace("contents");
+					
+					startSize = { width : holderElement.$.offsetWidth || 0, height : holderElement.$.offsetHeight || 0 };
+					provisSize = { width : (startSize.width * share) || "70%", height : holderElement.$.offsetHeight || "100%" };
+					textSize = { width : startSize.width * (1 - share) || "30%", height : holderElement.$.offsetHeight || "100%" };
+					
+					config.provis_maxWidth = startSize.width;
+					
+					//Bestehendes Textfeld auf 30% reduzieren
+					holderElement.getChild(0).setStyle( 'width', textSize.width + "px" );
+					holderElement.getChild(0).setAttribute( 'id', 'iframe_text' );
+					
+					//Rest URL
+					var srcScript = FoswikiCKE.getFoswikiVar('SCRIPTURL') + "/rest/ProVisPlugin/edit?topic=" + topic + 
+					";drawingName=" + name +
+					";drawingRevision=" + rev +
+					";drawingType=" + type + ";";
+					
+					//Sizer					
+					var div = CKEDITOR.dom.element.createFromHtml( '<div class="cke_provis_resizer"' +
+						' style="position: absolute; display: inline; height: ' + startSize.height + 'px; width: 15px; background-color: #d3d3d3;"' +
+						'></div>');
+					
+					//ProVis IFrame
+					iframe = CKEDITOR.dom.element.createFromHtml( '<iframe' +
+							' style="width:' + provisSize.width + 'px; height:100%; display:inline;"' +
+							' frameBorder="0"' +
+							' id="iframe_provis"' +
+							' src="' + srcScript + '"' +
+							' tabIndex="' + editor.tabIndex + '"' +
+							' allowTransparency="true"' +
+							'></iframe>' );
+					
+					//Append both divs
+					holderElement.append(div);
+					holderElement.append(iframe);
+
+					editor.fire( 'load_provistoolbar' );
+					updateCommandsMode(editor, "provis", true);
+					
+					iframe.on( 'load', function( ev )
+						{
+								//TODO: Dynamische Runtime Variable setzen
+								var frame = document.getElementById("iframe_provis")
+								var dynrunvar = frame.contentWindow.DynRunVar;
+								
+								watchIt(dynrunvar, "activeShape",
+										function (id,oldvalue,newvalue) {
+											if( newvalue ){
+												setDynRunvar("provis_shape", newvalue );
+												return newvalue;
+											}
+										});
+										
+								editor.fire("provis_shape", dynrunvar.activeShape );
+								
+								watchIt(dynrunvar, "saveStyle",
+										function (id,oldvalue,newvalue) {
+											if( newvalue ){
+												setDynRunvar("provis_save", newvalue );
+												return newvalue;
+											}
+										});
+								editor.fire("provis_save", dynrunvar.saveStyle );
+						});
+				});
+		
+		editor.on( 'mode', function()
+				{
+					editor.getCommand( 'provisarea' ).setState(
+						editor.mode == 'provisarea' ?
+								CKEDITOR.TRISTATE_ON :
+								CKEDITOR.TRISTATE_OFF );
+								
+				});
+	
+		//Alex: Hier neue Commands hinzufügen
+		editor.addCommand( 'provisarea', provisarea.commands.provisarea );
+		editor.addCommand( 'provisnewdiagram', provisarea.commands.provisnewdiagram );
+		editor.addCommand( 'provisnewswimlane', provisarea.commands.provisnewswimlane );
+		editor.addCommand( 'provissave', provisarea.commands.provissave );
+		editor.addCommand( 'provisundo', provisarea.commands.provisundo );
+		editor.addCommand( 'provisredo', provisarea.commands.provisredo );
+		editor.addCommand( 'provisabort', provisarea.commands.provisabort );
+		editor.addCommand( 'provisresize', provisarea.commands.provisresize );
+		
+		//Alex: Hier neue Buttons hinzufügen
+		//Icons: 
+		if ( editor.ui.addButton )
+		{
+			editor.ui.addButton( 'Provis_Save',
+				{
+					label : editor.lang.flowchart.save,
+					command : 'provissave'
+				});
+		}
+		
+		if ( editor.ui.addButton )
+		{
+			editor.ui.addButton( 'Provis_NewDiagram',
+				{
+					label : editor.lang.flowchart.newdiagram,
+					command : 'provisnewdiagram'
+				});
+		}
+		
+		if ( editor.ui.addButton )
+		{
+			editor.ui.addButton( 'Provis_NewSwimlane',
+				{
+					label : editor.lang.flowchart.newswimlane,
+					command : 'provisnewswimlane',
+					icon	: this.path + 'images/swimlane_new.gif'
+				});
+		}
+		
+		if ( editor.ui.addButton )
+		{
+			editor.ui.addButton( 'Provis_Undo',
+				{
+					label : editor.lang.flowchart.undo,
+					command : 'provisundo'
+				});
+		}
+		
+		if ( editor.ui.addButton )
+		{
+			editor.ui.addButton( 'Provis_Redo',
+				{
+					label : editor.lang.flowchart.redo,
+					command : 'provisredo'
+				});
+		}
+		
+		if ( editor.ui.addButton )
+		{
+			editor.ui.addButton( 'Provis_DeleteSwimlane',
+				{
+					label : "Ausgewählte Swimlane löschen",
+					command : 'provisdeleteswimlane',
+					icon	: this.path + 'images/swimlane_new.gif'
+				});
+		}
+		
+		if ( editor.ui.addButton )
+		{
+			editor.ui.addButton( 'Provisarea',
+				{
+					label : editor.lang.flowchart.cancel,
+					command : 'provisabort',
+					icon	: this.path + 'images/icon_close.gif'
+				});
+		}
+		
+		//Combos:
+		//ProVis Nodes
+		addCombo( editor, 'Provis_Nodes', 'imageurl', 'ProVis', config.provis_nodes, config.provis_defaultLabel, config.Prozessschritt_style );
+
+		
+		//Modac: Flowchart Window Size
+		addComboSize( editor, 'Provis_Size', 'imageurl', 'ProVis_Size', config.provis_size, config.provis_sizedefaultLabel, config.Size_style );
+		
+		
+		//Modac: Save Options
+		addComboSave( editor, 'Provis_Saveoptions', 'imageurl', 'ProVis_Saveoptions', config.provis_saveoptions, config.provis_saveoptionsdefaultLabel, config.Saveoptions_style );
+		
+		//TODO: Fürn Alex
+		//Alex: Css for Sizing Combo
+		editor.addCss(
+				'.cke_provis_size' +
+				'{' +
+					'display: inline;' +
+					'float: right;' +
+				'}'
+				);
+		
+		}
+});
+
+/**
+ * Holds the definition of commands an UI elements included with the sourcearea
+ * plugin.
+ * @example
+ * Hier kommen die neuen Befehle für Provis rein.
+ */
+CKEDITOR.plugins.provisarea =
+{
+	commands :
+	{
+		provisarea :
+		{
+			exec : function( editor )
+			{
+				var top = editor.getThemeSpace("top");
+				if ( editor.getCommand( 'provisarea' ).state == 2 )
+				{
+					editor.fire( 'openprovis' );
+					editor.getCommand( 'provisarea' ).setState( CKEDITOR.TRISTATE_ON );
+					editor.config.toolbar = "Basic_Provis";
+					newtoolbox = editor.fire("expandieren", {space:'top',html:''}).html;
+					top.setHtml(newtoolbox);
+				}
+				else if ( editor.getCommand( 'provisarea' ).state == 1 )
+				{
+					editor.fire( 'closeprovis' );
+					editor.getCommand( 'provisarea' ).setState( CKEDITOR.TRISTATE_OFF );
+					editor.config.toolbar = "Basic";
+					newtoolbox = editor.fire("expandieren", {space:'top',html:''}).html;
+					top.setHtml(newtoolbox);
+				}
+			},
+			canUndo : false
+		},
+		provisnewdiagram :
+		{
+			exec : function( editor )
+			{
+				var iframe = document.getElementById("iframe_provis");
+				iframe.contentWindow.setNewDiagram();
+			}
+		},
+		provisnewswimlane :
+		{
+			exec : function( editor )
+			{
+				var iframe = document.getElementById("iframe_provis");
+				iframe.contentWindow.AddSwim();
+			}
+		},
+		provisdeleteswimlane :
+		{
+			exec : function( editor )
+			{
+				var iframe = document.getElementById("iframe_provis");
+				//iframe.contentWindow.AddSwim();
+			}
+		},
+		provisundo :
+		{
+			exec : function( editor )
+			{
+				var iframe = document.getElementById("iframe_provis");
+				iframe.contentWindow.unDone();
+			}
+		},
+		provisredo :
+		{
+			exec : function( editor )
+			{
+				var iframe = document.getElementById("iframe_provis");
+				iframe.contentWindow.reDone();
+			}
+		},
+		provissave :
+		{
+			exec : function( editor )
+			{
+				//Zuerst Editor speichern - dann Provis speichern - dann Editor neu laden
+				
+				var iframe = document.getElementById("iframe_provis");
+				$.blockUI({ 
+		            centerY: 0, 
+		            css: { top: '10px', left: '10px', right: '' } 
+		        });
+				iframe.contentWindow.saveProvis();
+				editor.fire('saveprovis');
+				$.unblockUI();
+				editor.execCommand( 'provisarea' );
+			}
+		},
+		provisabort :
+		{
+			exec : function( editor )
+			{
+				if (confirm(editor.lang.flowchart.cancelmsg))
+					editor.execCommand( 'provisarea' );
+			}
+		},
+		provisresize :
+		{
+			exec : function( editor, data )
+			{
+				var holderElement = editor.getThemeSpace("contents");
+				data = data.substr(0,data.indexOf("%")) || 50;
+				data = parseFloat(data);
+				
+				var provisSize = data;
+				var textSize = (100 - data);
+				//alert(textSize);
+				
+				//Bestehendes Textfeld auf 30% reduzieren
+				holderElement.getChild(0).setStyle( 'width', textSize + "%");
+				holderElement.getChild(2).setStyle( 'width', provisSize + "%")
+			}
+		}
+	}
+};
+
+
+
+/**
+ * TODO: Neu schreiben und kommentieren
+ * The list of fonts names to be displayed in the Font combo in the toolbar.
+ * Entries are separated by semi-colons (;), while it's possible to have more
+ * than one font for each entry, in the HTML way (separated by comma).
+ *
+ * A display name may be optionally defined by prefixing the entries with the
+ * name and the slash character. For example, "Arial/Arial, Helvetica, sans-serif"
+ * will be displayed as "Arial" in the list, but will be outputted as
+ * "Arial, Helvetica, sans-serif".
+ * @type String
+ * @example
+ * config.font_names =
+ *     'Arial/Arial, Helvetica, sans-serif;' +
+ *     'Times New Roman/Times New Roman, Times, serif;' +
+ *     'Verdana';
+ * @example
+ * config.font_names = 'Arial;Times New Roman;Verdana';
+ */
+CKEDITOR.config.provis_nodes =
+	'Start/prozesse_start.gif;' +
+	'Prozessschritt/prozesse_prozess.gif;' +
+	'Entscheidung/prozesse_entscheidung.gif;' +
+	'Kommentar/prozesse_prozess.gif;' +
+	'Knotenpunkt/prozesse_prozess.gif;' +
+	'Datenbank/prozesse_datenbank.gif;' +	
+	'Dokument/prozesse_dokument.gif;' +	
+	'Ende/prozesse_ende.gif;';
+
+
+/**
+ * The text to be displayed in the Font combo is none of the available values
+ * matches the current cursor position or text selection.
+ * @type String
+ * @example
+ * // If the default site font is Arial, we may making it more explicit to the end user.
+ * config.font_defaultLabel = 'Arial';
+ */
+CKEDITOR.config.provis_defaultLabel = 'Prozessschritt';
+
+/**
+ * The style definition to be used to apply the font in the text.
+ * @type Object
+ * @example
+ * // This is actually the default value for it.
+ * CKEDITOR.config.Prozessschritt_style =
+ *     {
+		element		: 'span',
+		styles		: { 'padding-left' : '28px', 'background-repeat' : 'no-repeat', 'background-image' : 'url(#imageurl)', 'padding-right' : '28px' }
+		};
+ */
+CKEDITOR.config.Prozessschritt_style =
+	{
+		element		: 'span',
+		styles		: { 'background-repeat' : 'no-repeat'}
+	};
+
+/**
+ * TODO: Beschreibung
+ * 
+ */
+
+CKEDITOR.config.provis_size =
+	'25%;' +
+	'33%;' +
+	'50%;' +
+	'66%;' +
+	'100%;';
+
+
+/**
+ * The text to be displayed in the Font combo is none of the available values
+ * matches the current cursor position or text selection.
+ * @type String
+ * @example
+ * // If the default site font is Arial, we may making it more explicit to the end user.
+ * config.font_defaultLabel = 'Arial';
+ */
+CKEDITOR.config.provis_sizedefaultLabel = '66%';
+
+/**
+ * The style definition to be used to apply the font in the text.
+ * @type Object
+ * @example
+ * // This is actually the default value for it.
+ * config.font_style =
+ *     {
+ *         element		: 'span',
+ *         styles		: { 'font-family' : '#(family)' },
+ *         overrides	: [ { element : 'font', attributes : { 'face' : null } } ]
+ *     };
+ */
+CKEDITOR.config.Size_style =
+	{
+		element		: 'span',
+		styles		: { 'padding-left' : '2px' }
+	};
+
+
+
+CKEDITOR.config.provis_saveoptions =
+	'Rahmen;' +
+	'Einfache Trennlinien;' +
+	'Ohne Rahmen;';
+
+
+/**
+ * The text to be displayed in the Font combo is none of the available values
+ * matches the current cursor position or text selection.
+ * @type String
+ * @example
+ * // If the default site font is Arial, we may making it more explicit to the end user.
+ * config.font_defaultLabel = 'Arial';
+ */
+CKEDITOR.config.provis_saveoptionsdefaultLabel = 'Rahmen';
+
+/**
+ * The style definition to be used to apply the font in the text.
+ * @type Object
+ * @example
+ * // This is actually the default value for it.
+ * config.font_style =
+ *     {
+ *         element		: 'span',
+ *         styles		: { 'font-family' : '#(family)' },
+ *         overrides	: [ { element : 'font', attributes : { 'face' : null } } ]
+ *     };
+ */
+CKEDITOR.config.Saveoptions_style =
+	{
+		element		: 'span',
+		styles		: { 'padding-left' : '2px' }
+	};
+
+
+
+

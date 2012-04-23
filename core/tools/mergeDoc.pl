@@ -1,4 +1,4 @@
-#!/usr/bin/perl;
+#! C:\Perl64\bin\perl.exe
 #
 # Foswiki - The Free and Open Source Wiki, http://foswiki.org/
 #

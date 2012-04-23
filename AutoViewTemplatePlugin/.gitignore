@@ -1,0 +1,7 @@
+*.gz
+lib/Foswiki/Plugins/AutoViewTemplatePlugin/Config.spec
+data/System/
+data/System/AutoViewTemplatePlugin.txt
+lib/Foswiki/Plugins/AutoViewTemplatePlugin/
+lib/Foswiki/Plugins/AutoViewTemplatePlugin.pm
+lib/Foswiki/Plugins/

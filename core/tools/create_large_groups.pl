@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#! C:\Perl64\bin\perl.exe
 # Create a large set of users and populate groups with them
 # (group size 10000/5000/2500/..)
 

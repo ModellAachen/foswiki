@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#! C:\Perl64\bin\perl.exe
 
 use strict;
 use File::Basename;

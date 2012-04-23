@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#! C:\Perl64\bin\perl.exe
 # Build and upload all the extensions, zipping those that don't have
 # proper build scripts
 use strict;

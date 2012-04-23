@@ -1,4 +1,4 @@
-#!/usr/bin/perl -wT
+#! C:\Perl64\bin\perl.exe -wT
 
 use strict;
 

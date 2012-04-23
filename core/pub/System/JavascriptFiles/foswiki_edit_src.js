@@ -136,6 +136,11 @@ var EDITBOX_FONTSTYLE_PROPORTIONAL_STYLE = "foswikiEditboxStyleProportional";
 		});
 
         if (alerts.length > 0) {
+            try {
+            	$.unblockUI();
+            }
+        	catch (e) {
+        	}
             alert(alerts.join("\n"));
             return false;
         } else {
