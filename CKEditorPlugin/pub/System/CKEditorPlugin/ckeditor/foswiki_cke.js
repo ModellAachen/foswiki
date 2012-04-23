@@ -423,11 +423,8 @@ var FoswikiCKE = {
         	// TODO: JQuery Implementation Überprüfen
         	if (typeof jQuery == "function")
         	{
-        		
-        		$('textarea#topic').ckeditor(function() {
-        				FoswikiCKE.hideSaveButtons();
-        				FoswikiCKE.setUpContent(this);
-        				this.resetDirty();}, FoswikiCKE.init);
+        		alert("test");
+        		$('textarea#topic').ckeditor();
         		//Inhalte von TML nach Html Parsen (Nach dem Laden des Editors
         		
         		editor = $('.jquery_ckeditor').ckeditorGet();
