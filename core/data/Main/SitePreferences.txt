@@ -1,65 +1,49 @@
-%META:TOPICINFO{author="BaseUserMapping_333" comment="reprev" date="1327941065" format="1.1" reprev="2" version="2"}%
-%META:TOPICINFO{author="maslim" comment="save topic" date="1325669514" format="1.1" reprev="9" version="12"}%
+%META:TOPICINFO{author="ProjectContributor" date="1282166602" format="1.1" version="1"}%
 ---+!! %TOPIC%
 
-%ICON{"help"}% %MAKETEXT{    "Foswiki's default preferences are located in [_1], however settings defined here have override priority and should be used for local customisations."    args="[[%SYSTEMWEB%.DefaultPreferences]]" }%
+%ICON{"help"}% 
+%MAKETEXT{
+   "Foswiki's default preferences are located in [_1], however settings defined here have override priority and should be used for local customisations."
+   args="[[%SYSTEMWEB%.DefaultPreferences]]"
+}%
 
 %TOC%
 
-<sticky class="WYSIWYG_STICKY WYSIWYG_STICKY WYSIWYG_STICKY">
-	<div class="%IF{"not context PreferencesPluginEnabled" then="foswikiHidden"}%"> %EDITPREFERENCES{"%SYSTEMWEB%.DefaultPreferencesForm"}% </div></sticky>
----++ Modell Aachen Settings
-
-Bereiche:
-   * Set Entwicklung = Entwicklungsbereich
-   * Set Main = Allgemeiner Bereich
-   * Set WorkflowManagement = Interaktive Workflows
-Templates:
-   * Set ArbeitsanweisungTemplate = Arbeitsanweisung
-   * Set ChecklisteTemplate = Checkliste
-   * Set InfoseiteTemplate = Infoseite
-   * Set ProzessbeschreibungTemplate = Prozessbeschreibung
-Workflow:
-   * Set WORKFLOW = 
+<sticky>
+<div class="%IF{"not context PreferencesPluginEnabled" then="foswikiHidden"}%">
+%EDITPREFERENCES{"%SYSTEMWEB%.DefaultPreferencesForm"}%
+</div>
+</sticky>
 
 ---++ Appearance
 
 Customize logo and tooltip texts:
-   * Set NOAUTOLINK = on
-   * Set SKIN = project,handbuch,modac
-   * Set WIKILOGOIMG = %PUBURL%/%SYSTEMWEB%/ModacSkinTheme/ModacSkinLogos/qwiki-logo_small.png
+
+   * Set WIKILOGOIMG = %PUBURL%/%SYSTEMWEB%/ProjectLogos/foswiki-logo.gif
    * Set WIKILOGOALT = Powered by Foswiki, The Free and Open Source Wiki
    * Set WIKILOGOURL = %SCRIPTURL{"view"}%/%USERSWEB%/%HOMETOPIC%
-Give your site a specific name:
-   * Set FOSWIKI_LAYOUT_URL = %PUBURL%/%SYSTEMWEB%/ModacSkinTheme/layout.css
-   * Set FOSWIKI_STYLE_URL = %PUBURL%/%SYSTEMWEB%/ModacSkinTheme/style.css
-   * Set FOSWIKI_COLORS_URL = %PUBURL%/%SYSTEMWEB%/ModacSkinTheme/colors.css
-   * Set WIKITOOLNAME = Q.Wiki
 
-
-Project-specific settings:
-   * Set USERSTYLEURL = /pub/System/ModacSkinTheme/handbuch.css
-   * Set TOC_TITLE = Inhaltsverzeichnis
-
-Format of new links
-
-   * Set NEWLINKFORMAT = <a class="foswikiNewLink" href="%SCRIPTURLPATH{"view"}%/$web/WebCreateNewTopic?parenttopic=%WEB%.%TOPIC%;newtopic=$topic" rel="nofollow" title="%MAKETEXT{"Create this topic"}%">$text</a>
 Give your site a specific name:
 
-   * Set WIKITOOLNAME = Q.Wiki
+   * Set WIKITOOLNAME = Foswiki
+      
 Customize your [[http://en.wikipedia.org/wiki/Favicon][favicon]]:
 
-   * Set FAVICON = %PUBURL%/%SYSTEMWEB%/ModacSkinTheme/ModacSkinLogos/favicon.ico
+   * Set FAVICON = %PUBURLPATH%/%SYSTEMWEB%/ProjectLogos/favicon.ico
+
 Customize your top bar background image and color
    * Set WEBHEADERART = %PUBURLPATH%/%SYSTEMWEB%/PatternSkin/header5.gif
    * Set WEBHEADERBGCOLOR = #ffffff
-
+      
+      
 ---++ Finalisation
-
 =FINALPREFERENCES= locks site-level preferences that are *not* allowed to be overridden by [[%WEBPREFSTOPIC%]] or user preferences:
 
    * Set FINALPREFERENCES = ATTACHFILESIZELIMIT, PREVIEWBGIMAGE, WIKITOOLNAME, WIKIHOMEURL, ALLOWROOTCHANGE, DENYROOTCHANGE, USERSWEB, SYSTEMWEB, DOCWEB
-<!-- Keep this as a security measure:    * Set ALLOWTOPICCHANGE = AdminGroup    * Set ALLOWTOPICRENAME = AdminGroup -->
 
-%META:FILEATTACHMENT{name="tesetlogo.png" attachment="tesetlogo.png" attr="" comment="" date="1325669307" path="tesetlogo.png" size="11988" user="maslim" version="1"}%
-%META:WORKFLOWHISTORY{value="<br>Forked to [[Main.Main.SitePreferencesTalk]] by Main.AdminUser at 27 Jan 2011 - 12:53"}%
+   
+<!-- Keep this as a security measure:
+
+   * Set ALLOWTOPICCHANGE = AdminGroup
+   * Set ALLOWTOPICRENAME = AdminGroup
+-->

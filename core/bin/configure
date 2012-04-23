@@ -1,4 +1,4 @@
-#! C:\Perl64\bin\perl.exe -wT
+#!/usr/bin/perl -wT
 # See bottom of file for license and copyright information
 
 =begin TML

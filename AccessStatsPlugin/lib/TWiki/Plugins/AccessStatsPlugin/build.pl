@@ -3,7 +3,7 @@
 # Build for AccessStatsPlugin
 #
 BEGIN {
-  foreach my $pc (split(/;/, $ENV{FOSWIKI_LIBS})) {
+  foreach my $pc (split(/:/, $ENV{FOSWIKI_LIBS})) {
     unshift @INC, $pc;
   }
 }

@@ -1,4 +1,4 @@
-#! C:\Perl64\bin\perl.exe -w
+#!/usr/bin/perl -w
 
 # addpod.pl - tool to add TWiki-style POD function doc headers
 #

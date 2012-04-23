@@ -1,4 +1,4 @@
-#! C:\Perl64\bin\perl.exe -w
+#!/usr/bin/perl -w
 #
 # Build a Foswiki Release from branches in the Foswiki  svn repository - see http://foswiki.org/Development/BuildingARelease
 # checkout Foswiki Branch

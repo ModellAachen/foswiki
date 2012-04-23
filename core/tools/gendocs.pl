@@ -1,4 +1,4 @@
-#! C:\Perl64\bin\perl.exe -w
+#!/usr/bin/perl -w
 # Copyright (C) 2005 Crawford Currie - all rights reserved
 # Generate TWiki code documentation topics in the current
 # checkout area
