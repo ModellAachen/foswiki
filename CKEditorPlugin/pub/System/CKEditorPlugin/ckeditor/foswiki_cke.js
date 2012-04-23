@@ -1,7 +1,4 @@
 /*
-  Copyright (C) 2010 Modell Aachen UG http://www.modell-aachen.de Alexander Stoffers
-  All Rights Reserved.
-
   Copyright (C) 2007 Crawford Currie http://wikiring.com and Arthur Clemens
   All Rights Reserved.iny
 
@@ -73,6 +70,8 @@ var FoswikiCKE = {
     
     hideSaveButtons: function() {
     	//Alex: Aktuell doppelt gemoppelt
+    	return;
+    	
     	var elm = document.getElementsByClassName("patternActionButtons")[0];
         if (elm) {
             elm.style.display = 'none';
@@ -115,6 +114,8 @@ var FoswikiCKE = {
         var a = CKEDITOR.ajax.createXMLHttpRequest();
         
         a.open("POST", url, true);
+        // Modac : Alles ausgrauen
+        $.blockUI();
 
         a.setRequestHeader('Content-type', "application/x-www-form-urlencoded");
         a.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
@@ -128,9 +129,13 @@ var FoswikiCKE = {
             if (a.readyState == 4) {
             	if ( a.status == 200 ) { 
             		onSuccess('' + a.responseText);
+            		// Modac : Eingaben erlauben
+            		$.unblockUI();
             	} 
             	else { 
             	    onError('' + a.status); 
+            	    // Modac : Eingaben erlauben
+            	    $.unblockUI();
             	} 
             }
         };
@@ -326,23 +331,15 @@ var FoswikiCKE = {
     },
 
     // Callback on save. Make sure the WYSIWYG flag ID is there.
-    saveCallback : function(editor_id, html, body) {
-    	
-    	//alert("Alex");
-    	//Alex: Gibt´s hier eine möglichkeit immer den aktiven Editor zu nutzen?
+    saveCallback: function(editor, html) {
         // Evaluate any registered post-processors
-        var editor = CKEDITOR.instances.topic;
-        for (var i = 0; i < FoswikiCKE.html2tml.length; i++) {
-            var cb = FoswikiCKE.html2tml[i];
-            html = cb.apply(editor, [ editor, html ]);
-        }
-        var secret_id = "Test";
-        if (secret_id != null && html.indexOf(
-                '<!--' + secret_id + '-->') == -1) {
+    	// Modac: TODO: Hier sollte die richtige Instanz schon immer übergeben werden!
+        var secret_id = editor.config.foswiki_secret_id;
+        if (secret_id != null && 
+                html.indexOf('<!--' + secret_id + '-->') == -1) {
             // Something ate the ID. Probably IE. Add it back.
             html = '<!--' + secret_id + '-->' + html;
         }
-        
         return html;
     },
 
@@ -419,28 +416,48 @@ var FoswikiCKE = {
     
     // Alex: Hier müssen Custom Config Werte übergeben werden - ggf. über eine Config.js Datei...
     install : function() {
-        // find the CKEDITORPLUGIN_INIT META
-        var cke_init = this.getMetaTag('CKEPLUGIN_INIT');
+        var editor = null;
+        cke_init = FoswikiCKE.init;
         if (cke_init != null) {
-        	//Editor initialisieren mit den Config Elementen aus der CKEPlugin.pm
-        	eval("CKEDITOR.replace('text', {" + unescape(cke_init) + "});");
- 
-        	//CKEDITOR.saveCallback = FoswikiCKE.saveCallback;
-        	var editor = null;
         	
-        	//Inhalte von TML nach Html Parsen (Nach dem Laden des Editors
-        	CKEDITOR.on("instanceReady", function(event)
-        			{
+        	// TODO: JQuery Implementation Überprüfen
+        	if (typeof jQuery == "function")
+        	{
+        		
+        		$('textarea#topic').ckeditor(function() {
         				FoswikiCKE.hideSaveButtons();
-        				editor = event.editor;
-        				
-        				setTimeout(function(){
-        					FoswikiCKE.setUpContent(editor);
-						});
-        				CKEDITOR.instances.topic.resetDirty();
-
-        			});
-        	
+        				FoswikiCKE.setUpContent(this);
+        				this.resetDirty();}, FoswikiCKE.init);
+        		//Inhalte von TML nach Html Parsen (Nach dem Laden des Editors
+        		
+        		editor = $('.jquery_ckeditor').ckeditorGet();
+            	editor.on("instanceReady", function(event)
+            			{
+            				FoswikiCKE.hideSaveButtons();
+            				setTimeout(function(){
+            					FoswikiCKE.setUpContent(editor);
+    						});
+            				editor.resetDirty();
+            			});
+            	return;
+        	}
+        	else
+        	{
+	        	// Editor initialisieren mit den Config Elementen aus der CKEPlugin.pm
+	        	eval("CKEDITOR.replace('text', {" + unescape(cke_init) + "});");
+	        	
+	        	//Inhalte von TML nach Html Parsen (Nach dem Laden des Editors
+	        	CKEDITOR.on("instanceReady", function(event)
+	        			{
+	        				FoswikiCKE.hideSaveButtons();
+	        				editor = event.editor;
+	        				
+	        				setTimeout(function(){
+	        					FoswikiCKE.setUpContent(editor);
+							});
+	        				CKEDITOR.instances.topic.resetDirty();
+	        			});
+        	}
         	
         	return;
         }
@@ -507,5 +524,43 @@ var FoswikiCKE = {
         }
         
         a.close;
+    },
+    
+    ajaxRequest: function(url, request, onSuccess, onError) {
+        
+    	var moreparams = request || '';
+    	var params = "nocache=" + encodeURIComponent((new Date()).getTime()) + moreparams;
+        
+        var a = CKEDITOR.ajax.createXMLHttpRequest();
+        var loaded = false;
+        
+        a.open("POST", url + "?" + params, true);
+        a.onreadystatechange = function () {
+        	if (a.readyState == 4) {
+            	if ( a.status == 200 ) { 
+            		onSuccess('' + a.responseText); 
+            		loaded = true;
+            	} 
+            	else { 
+            	    onError(a, a.status); 
+            	} 
+            }
+        };
+        
+        a.setRequestHeader('Content-type', "application/x-www-form-urlencoded");
+        a.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+        
+        var data = params;
+        a.send(data);
+        
+        var i = 1;
+        //Alex: Schleife um auf das Ajax Ergebnis zu warten
+        while (loaded == false && i<25)
+        {
+        	setTimeout(function(){i++;}, 100);
+        }
+        
+        a.close;
     }
+    
 };

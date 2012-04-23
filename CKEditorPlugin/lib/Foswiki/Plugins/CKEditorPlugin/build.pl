@@ -1,7 +1,8 @@
-#!C:\Perl\bin\perl.exe -w
-BEGIN { 
-	$ENV{FOSWIKI_LIBS} = 'C:/EclipseWorkbench/super/foswiki1/trunk/core/lib';
-	unshift @INC, split( /;/, "C:/EclipseWorkbench/super/foswiki1/trunk/core/lib" ) 
+#!/usr/bin/perl -w
+BEGIN {
+  foreach my $pc (split(/;/, $ENV{FOSWIKI_LIBS})) {
+    unshift @INC, $pc;
+  }
 }
 use Foswiki::Contrib::Build;
 
@@ -16,9 +17,9 @@ $build = new Foswiki::Contrib::Build('CKEditorPlugin');
 # name of web to upload to
 $build->{UPLOADTARGETWEB} = 'Extensions';
 # Full URL of pub directory
-$build->{UPLOADTARGETPUB} = 'http://handbuch.open-quality.com/pub';
+$build->{UPLOADTARGETPUB} = 'http://extensions.open-quality.com/pub';
 # Full URL of bin directory
-$build->{UPLOADTARGETSCRIPT} = 'http://handbuch.open-quality.com/bin';
+$build->{UPLOADTARGETSCRIPT} = 'http://extensions.open-quality.com/bin';
 # Script extension
 $build->{UPLOADTARGETSUFFIX} = '';
 

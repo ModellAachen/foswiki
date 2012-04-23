@@ -1,7 +1,4 @@
 /*
-  Copyright (C) 2010 Modell Aachen UG http://www.modell-aachen.de Alexander Stoffers
-  All Rights Reserved	
-
   Copyright (C) 2007 Crawford Currie http://wikiring.com and Arthur Clemens
   All Rights Reserved.
 
@@ -20,7 +17,7 @@
 
 // Top level setup for tiny MCE editor. Requires tiny_mce.js and foswiki_tiny.js
 
-FoswikiCKE.install();
+ FoswikiCKE.install();
 
 // Setup the standard edit screen for use with TMCE
 var IFRAME_ID = 'mce_editor_0';
@@ -126,13 +123,16 @@ function suppressSaveValidation() {
 
 
 //Alex: Das könnte noch gepimpt werden. Ggf. als Plugin bereitstellen?
-window.onbeforeunload= function() {
-	var is = CKEDITOR.instances[1];
+function beforeUnload( e )
+{
+    if ( CKEDITOR.instances.topic.checkDirty() )
+	        return e.returnValue = "You'll loose the changes made in the editor.";
+}
 
-    if (CKEDITOR.instances.topic.checkDirty() == true) {
-        return "You have unsaved changes. Click Cancel now, then 'Save' to save them. Click OK now to discard them.";
-    }
-};
+if ( window.addEventListener )
+    window.addEventListener( 'beforeunload', beforeUnload, false );
+else
+    window.attachEvent( 'onbeforeunload', beforeUnload );
 
 
 

@@ -3,42 +3,24 @@
 package Foswiki::Plugins::CKEditorPlugin;
 
 use strict;
+use warnings;
 
 use Assert;
 
-our $VERSION           = '$Rev: 5860 (2009-12-28) $';
-our $RELEASE           = '26 Apr 2010';
+our $VERSION           = '$Rev$';
+our $RELEASE           = '1.1.1';
 our $SHORTDESCRIPTION  = 'Integration of the CK WYSIWYG Editor';
 our $NO_PREFS_IN_TOPIC = 1;
 
-# Defaults for CKEPLUGIN_INIT and INIT_browser. Defined as our vars to
-# allow other extensions to override them.
-# PLEASE ENSURE THE PLUGIN TOPIC EXAMPLES ARE KEPT IN SYNCH!
-
-our $defaultINIT = <<'HERE';
-extraPlugins : "ckefilebrowser,foswiki,toolbars,wikitext,tableresize,qwikisave",
-removePlugins : "toolbar,save",
-enterMode : "1",
-menu_groups : "clipboard,form,tablecell,tablecellproperties,tablerow,tablecolumn,table,anchor,link,image,flash,checkbox,radio,textfield,hiddenfield,imagebutton,button,select,textarea,code",
-ckefilebrowserUploadUrl : "%SCRIPTURL%/rest/WysiwygPlugin/upload",
-foswiki_secret_id : "%WYSIWYG_SECRET_ID%",
-stylesSet : "modellaachen",
-foswiki_vars : { PUBURLPATH : "%PUBURLPATH%", PUBURL : "%PUBURL%", WEB : "%WEB%", TOPIC : "%TOPIC%", ATTACHURL : "%ATTACHURL%", ATTACHURLPATH : "%ATTACHURLPATH%", VIEWSCRIPTURL : "%SCRIPTURL{view}%", SCRIPTSUFFIX: "%SCRIPTSUFFIX%", SCRIPTURL : "%SCRIPTURL%", SYSTEMWEB: "%SYSTEMWEB%", HTTP_HOST: "%HTTP_HOST%" },   	
-toolbar_Full : [['WikiText','-','Source'],['Cut','Copy','Paste','PasteText','PasteFromWord','-','Print','SpellChecker','Scayt'],['Undo','Redo','-','Find','Replace','-','SelectAll','RemoveFormat'],['Maximize','ShowBlocks','-','About'],'/',['Bold','Italic','Underline','Strike','-','Subscript','Superscript'],['NumberedList','BulletedList','-','Outdent','Indent','Blockquote','CreateDiv'],['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],['wbdroplets','wblink','Link','Unlink','Anchor'],['Code','Document','Image','Table','HorizontalRule','Smiley','SpecialChar','PageBreak'],'/',['Styles','Format','Font','FontSize']],
-toolbar_Basic : [['Save', 'Cancel'],['WikiText'],['Undo','Redo','-','Link','Unlink','-','Document','Image','Table'],'/',['Format','-','Bold','Italic','Underline','-','NumberedList','BulletedList','Outdent','Indent','-','Styles']],
-toolbar : "Basic",
-height : "400"
-HERE
+use Foswiki::Func ();
 
 our %defaultINIT_BROWSER = (
     MSIE   => '',
     OPERA  => '',
-    GECKO  => 'gecko_spellcheck : true',
+    GECKO  => '"gecko_spellcheck" : true',
     SAFARI => '',
+    CHROME => '',
 );
-
-use Foswiki::Func ();
-
 my $query;
 
 # Info about browser type
@@ -49,7 +31,13 @@ sub initPlugin {
     return 0 unless $query;
     unless ( $Foswiki::cfg{Plugins}{WysiwygPlugin}{Enabled} ) {
         Foswiki::Func::writeWarning(
-"CKEPlugin is enabled but WysiwygPlugin is not enabled. Both plugins must be installed and enabled for CKE."
+"CKEditorPlugin is enabled but WysiwygPlugin is not. Both must be installed and enabled for CKE."
+        );
+        return 0;
+    }
+    unless ( $Foswiki::cfg{Plugins}{JQueryPlugin}{Enabled} ) {
+        Foswiki::Func::writeWarning(
+"CKEditorPlugin is enabled but JQueryPlugin is not. Both must be installed and enabled for CKE."
         );
         return 0;
     }
@@ -62,9 +50,11 @@ sub initPlugin {
         $browserInfo{isMSIE5_0} = $browserInfo{isMSIE} && ( $ua =~ /MSIE 5.0/ );
         $browserInfo{isMSIE6} = $browserInfo{isMSIE} && $ua =~ /MSIE 6/;
         $browserInfo{isMSIE7} = $browserInfo{isMSIE} && $ua =~ /MSIE 7/;
+        $browserInfo{isMSIE8} = $browserInfo{isMSIE} && $ua =~ /MSIE 8/;
         $browserInfo{isGecko}  = $ua =~ /Gecko/;   # Will also be true on Safari
-        $browserInfo{isSafari} = $ua =~ /Safari/;
+        $browserInfo{isSafari} = $ua =~ /Safari/;  # Will also be true on Chrome
         $browserInfo{isOpera}  = $ua =~ /Opera/;
+        $browserInfo{isChrome} = $ua =~ /Chrome/;
         $browserInfo{isMac}    = $ua =~ /Mac/;
         $browserInfo{isNS7}  = $ua =~ /Netscape\/7/;
         $browserInfo{isNS71} = $ua =~ /Netscape\/7.1/;
@@ -74,7 +64,7 @@ sub initPlugin {
 }
 
 sub _notAvailable {
-    for my $c (qw(CKEPLUGIN_DISABLE NOWYSIWYG)) {
+    for my $c (qw(CKEditorPlugin_DISABLE NOWYSIWYG)) {
         return "Disabled by * Set $c = "
           . Foswiki::Func::getPreferencesValue($c)
           if Foswiki::Func::getPreferencesFlag($c);
@@ -90,16 +80,19 @@ sub _notAvailable {
     return "Disabled by URL parameter" if $query->param('nowysiwyg');
 
     # Check the client browser to see if it is blacklisted
-    my $ua = Foswiki::Func::getPreferencesValue('CKEPLUGIN_BAD_BROWSERS')
+    my $ua = Foswiki::Func::getPreferencesValue('CKEditorPlugin_BAD_BROWSERS')
       || '(?i-xsm:Konqueror)';
     return 'Unsupported browser: ' . $query->user_agent()
       if $ua && $query->user_agent() && $query->user_agent() =~ /$ua/;
+
+    # This should only ever happen on Foswiki 1.0.9 and earlier
+    return 'CKEditorPlugin requires ZonePlugin to be installed and enabled'
+      unless ( defined &Foswiki::Func::addToZone );
 
     return 0;
 }
 
 sub beforeEditHandler {
-
     my ( $text, $topic, $web ) = @_;
 
     my $mess = _notAvailable();
@@ -116,106 +109,106 @@ sub beforeEditHandler {
         Foswiki::Func::setPreferencesValue( 'EDITOR_HELP', 'CKEQuickHelp' );
     }
 
+    my $initTopic =
+      Foswiki::Func::getPreferencesValue('CKEPLUGIN_INIT_TOPIC')
+      || $Foswiki::cfg{SystemWebName} . '.CKEditorPlugin';
     my $init = Foswiki::Func::getPreferencesValue('CKEPLUGIN_INIT')
-      || $defaultINIT;
-    my $extras = '';
+      || Foswiki::Func::expandCommonVariables(
+        '%INCLUDE{"'
+          . $initTopic
+          . '" section="CKEPLUGIN_INIT" warn="off"}%',
+        $topic, $web
+      );
+    my $browser = '';
 
     # The order of these conditions is important, because browsers
     # spoof eachother
-    if ( $browserInfo{isSafari} ) {
-        $extras = 'SAFARI';
+    if ( $browserInfo{isChrome} ) {
+        $browser = 'CHROME';
+    }
+    elsif ( $browserInfo{isSafari} ) {
+        $browser = 'SAFARI';
     }
     elsif ( $browserInfo{isOpera} ) {
-        $extras = 'OPERA';
+        $browser = 'OPERA';
     }
     elsif ( $browserInfo{isGecko} ) {
-        $extras = 'GECKO';
+        $browser = 'GECKO';
     }
     elsif ( $browserInfo{isMSIE} ) {
-        $extras = 'MSIE';
+        $browser = 'MSIE';
     }
-    if ( !$extras ) {
-        $extras =
-          Foswiki::Func::getPreferencesValue( 'CKEPLUGIN_INIT_' . $extras )
-          || $defaultINIT_BROWSER{$extras};
-        if ( defined $extras ) {
-            $init = join( ',', ( split( ',', $init ), split( ',', $extras ) ) );
+    if ($browser) {
+        my $settings =
+          Foswiki::Func::getPreferencesValue( 'CKEditorPlugin_INIT_' . $browser )
+          || $defaultINIT_BROWSER{$browser};
+        if ($settings) {
+            $init =
+              join( ',', ( split( ',', $init ), split( ',', $settings ) ) );
         }
     }
 
     require Foswiki::Plugins::WysiwygPlugin;
 
-    $mess = Foswiki::Plugins::WysiwygPlugin::notWysiwygEditable( $_[0] );
+    $mess = Foswiki::Plugins::WysiwygPlugin::notWysiwygEditable($text);
     if ($mess) {
         if ( defined &Foswiki::Func::setPreferencesValue ) {
             Foswiki::Func::setPreferencesValue( 'EDITOR_MESSAGE',
                 'WYSIWYG could not be started: ' . $mess );
+            Foswiki::Func::setPreferencesValue( 'EDITOR_HELP', undef );
         }
         return;
     }
 
     my $USE_SRC = '';
-    if ( Foswiki::Func::getPreferencesValue('CKEPLUGIN_DEBUG') ) {
-        $USE_SRC = '_src';
+    if ( Foswiki::Func::getPreferencesValue('CKEditorPlugin_DEBUG') ) {
+        $USE_SRC = '_source';
     }
 
     # Add the Javascript for the editor. When it starts up the editor will
     # use a REST call to the WysiwygPlugin tml2html REST handler to convert
     # the textarea content from TML to HTML.
-    my $pluginURL = '%PUBURL%/%SYSTEMWEB%/CKEditorPlugin';
-    my $tmceURL   = $pluginURL . '/ckeditor';
+    my $pluginURL = '%PUBURLPATH%/%SYSTEMWEB%/CKEditorPlugin';
+    my $ckeURL   = $pluginURL . '/ckeditor';
 
-    # expand and URL-encode the init string
-    my $metainit = Foswiki::Func::expandCommonVariables($init);
-    $metainit =~ s/([^0-9a-zA-Z-_.:~!*'\/%])/'%'.sprintf('%02x',ord($1))/ge;
-    my $behaving;
-    eval {
-        require Foswiki::Contrib::BehaviourContrib;
-        if ( defined(&Foswiki::Contrib::BehaviourContrib::addHEAD) ) {
-            Foswiki::Contrib::BehaviourContrib::addHEAD();
-            $behaving = 1;
-        }
-    };
-    unless ($behaving) {
-        Foswiki::Func::addToHEAD( 'BEHAVIOURCONTRIB',
-'<script type="text/javascript" src="%PUBURLPATH%/%SYSTEMWEB%/BehaviourContrib/behaviour.js"></script>'
-        );
-    }
-
-# URL-encode the version number to include in the .js URLs, so that the browser re-fetches the .js
-# when this plugin is upgraded.
+    # URL-encode the version number to include in the .js URLs, so that
+    # the browser re-fetches the .js when this plugin is upgraded.
     my $encodedVersion = $VERSION;
 
-# SMELL: This regex (and the one applied to $metainit, above) duplicates Foswiki::urlEncode(),
-#        but Foswiki::Func.pm does not expose that function, so plugins may not use it
+    # SMELL: This regex (and the one applied to $metainit, above)
+    # duplicates Foswiki::urlEncode(), but Foswiki::Func.pm does not
+    # expose that function, so plugins may not use it
     $encodedVersion =~
       s/([^0-9a-zA-Z-_.:~!*'\/%])/'%'.sprintf('%02x',ord($1))/ge;
 
-    #Alex: Hier war der addToHead abschnitt - ggf. wieder zurück schreiben
-    #my $zufall = time();
-
-    Foswiki::Func::addToZone( 'head', 'tiny', <<"META" );
-	<meta name="CKEPLUGIN_INIT" content="$metainit" />
-META
-
-    Foswiki::Func::addToZone( 'script', 'tiny', <<"SCRIPT" );
-<script language="javascript" type="text/javascript" src="%PUBURLPATH%/%SYSTEMWEB%/CKEditorPlugin/ckeditor/ckeditor.js"></script>
-<script language="javascript" type="text/javascript" src="%PUBURLPATH%/%SYSTEMWEB%/CKEditorPlugin/ckeditor/_source/core/ajax.js"></script>
-<script language="javascript" type="text/javascript" src="%PUBURLPATH%/%SYSTEMWEB%/CKEditorPlugin/ckeditor/foswiki_cke.js"></script>
-<script language="javascript" type="text/javascript" src="%PUBURLPATH%/%SYSTEMWEB%/CKEditorPlugin/ckeditor/plugins/autosuggest/js/bsn.AutoSuggest_2.1.3.js"></script>
-<link rel="stylesheet" href="%PUBURLPATH%/%SYSTEMWEB%/CKEditorPlugin/ckeditor/plugins/autosuggest/css/autosuggest_inquisitor.css" type="text/css" media="screen" charset="utf-8" />
+    # Inline JS to set config? Heresy! Well, we were encoding into <meta tags
+    # but this caused problems with non-8bit encodings (See Item9973). Given
+    # that we blindly eval'd the unescaped CKEditorPlugin_INIT anyway, PaulHarvey
+    # doesn't think it was any more secure anyway. Alternative is to use
+    # https://github.com/douglascrockford/JSON-js lib
+    my $scripts = <<"SCRIPT";
+<script type="text/javascript" src="$ckeURL/ckeditor$USE_SRC.js?v=$encodedVersion"></script>
+<script type="text/javascript" src="$ckeURL/foswiki_cke$USE_SRC.js?v=$encodedVersion"></script>
+<script type="text/javascript" src="$ckeURL/adapters/jquery.js?v=$encodedVersion"></script>
+<script type="text/javascript">
+alert( { $init } );
+FoswikiCKE.init = { $init } ;
+</script>
+<script type="text/javascript" src="$ckeURL/foswiki$USE_SRC.js?v=$encodedVersion"></script>
 SCRIPT
 
-    Foswiki::Func::addToZone( 'ckscript', 'tiny', <<"SCRIPT" );
-<script language="javascript" type="text/javascript" src="%PUBURLPATH%/%SYSTEMWEB%/CKEditorPlugin/ckeditor/foswiki.js"></script>
-SCRIPT
+    Foswiki::Func::addToZone( 'script', 'CKEditorPlugin', $scripts,
+        'JQUERYPLUGIN::FOSWIKI' );
 
     # See %SYSTEMWEB%.IfStatements for a description of this context id.
     Foswiki::Func::getContext()->{textareas_hijacked} = 1;
+
+    return;
 }
 
 1;
-__DATA__
+
+__END__
 Foswiki - The Free and Open Source Wiki, http://foswiki.org/
 
 Copyright (C) 2008-2010 Foswiki Contributors. Foswiki Contributors
@@ -238,4 +231,3 @@ but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 As per the GPL, removal of this notice is prohibited.
-
