@@ -20,7 +20,7 @@ CKEDITOR.dialog.add( 'provis', function( editor )
 		var ausdruck4 = /type="([^"]*)"/g;
 		var name = '';
 		var rev, type;
-		
+
 		if (ausdruck1.test(attributeValue))
 		{
 			ausdruck1.exec(attributeValue);
@@ -30,8 +30,8 @@ CKEDITOR.dialog.add( 'provis', function( editor )
 		{
 			ausdruck2.exec(attributeValue);
 			name = RegExp.$1;
-		}	
-		
+		}
+
 		if (ausdruck3.test(attributeValue))
 		{
 			ausdruck3.exec(attributeValue);
@@ -45,20 +45,20 @@ CKEDITOR.dialog.add( 'provis', function( editor )
 		}
 
 		var retval = {};
-		
+
 		retval.name = name;
 		retval.rev = rev;
 		retval.type = type;
-		
-		
+
+
 		if ( name )
 			this.setValueOf( 'info','name', name );
 		else
 			this.setValueOf( 'info','name', '' );
-		
+
 		return retval;
 	};
-	
+
 	// Modac : Was geht hier?
 	var parseProvis = function( editor,  element )
 	{
@@ -73,7 +73,7 @@ CKEDITOR.dialog.add( 'provis', function( editor )
 			var ausdruck4 = /type="([^"]*)"/g;
 			var name = '';
 			var rev, type;
-			
+
 			if (ausdruck1.test(attributeValue))
 			{
 				ausdruck1.exec(attributeValue);
@@ -83,14 +83,14 @@ CKEDITOR.dialog.add( 'provis', function( editor )
 			{
 				ausdruck2.exec(attributeValue);
 				name = RegExp.$1;
-			}	
-			
+			}
+
 			if (ausdruck3.test(attributeValue))
 			{
 				ausdruck3.exec(attributeValue);
 				rev = RegExp.$1 || 0;
 			}
-	
+
 			if (ausdruck4.test(attributeValue))
 			{
 				ausdruck4.exec(attributeValue);
@@ -99,14 +99,14 @@ CKEDITOR.dialog.add( 'provis', function( editor )
 		}
 
 		var retval = {};
-		
+
 		retval.name = name || "Process1";
 		retval.rev = rev || 1;
 		retval.type = type || "swimlane";
-		
+
 		return retval;
 	};
-	
+
 	// Modac : Fake Element im CKEditor erstellen
 	var createFakeElement = function( editor, realElement )
 	{
@@ -121,7 +121,7 @@ CKEDITOR.dialog.add( 'provis', function( editor )
 
 		if ( typeof height != 'undefined' )
 			fakeStyle = fakeElement.attributes.style = fakeStyle + 'height:' + cssifyLength( height ) + ';';
-		
+
 		return fakeElement;
 	};
 
@@ -169,7 +169,7 @@ CKEDITOR.dialog.add( 'provis', function( editor )
 	{
 		return str.replace( /'/g, '\\$&' );
 	};
-	
+
 	var removeSpace = function( str )
 	{
 		return str.replace( /[\s]/g, '' );
@@ -202,6 +202,7 @@ CKEDITOR.dialog.add( 'provis', function( editor )
 										type : 'select',
 										label : editor.lang.qwikiflowchart.type,
 										'default' : 'swimlanes',
+										hidden : 'true',
 										items :
 										[
 											[ editor.lang.qwikiflowchart.swimlane, 'Swimlane' ],
@@ -217,7 +218,7 @@ CKEDITOR.dialog.add( 'provis', function( editor )
 										{
 											var wert = this.getValue();
 											var previewImage = document.getElementById("previewImage2");
-											
+
 											switch (wert) {
 											  case "Swimlane":
 												previewImage.setAttribute( 'src', CKEDITOR.plugins.getPath( 'qwiki' ) + 'images/03_schwimmbahn.gif' );
@@ -254,8 +255,8 @@ CKEDITOR.dialog.add( 'provis', function( editor )
 										onKeyUp : function()
 										{
 											this.allowOnChange = false;
-											
-											//TODO: Validation ob Name schon vorhandne ist 
+
+											//TODO: Validation ob Name schon vorhandne ist
 
 											this.allowOnChange = true;
 
@@ -295,7 +296,7 @@ CKEDITOR.dialog.add( 'provis', function( editor )
 											this.onChange();
 
 											var name = this.getValue();
-											
+
 											// Modac : TODO: Alles entfernen, was nicht gespeichert werden kann
 											name = removeSpace(this.getValue());
 											this.setValue(name);
@@ -346,7 +347,7 @@ CKEDITOR.dialog.add( 'provis', function( editor )
 			this.editMode = false;
 
 			var selection = editor.getSelection();
-			
+
 			var element = selection.getSelectedElement();
 			if ( element && element.getAttribute( 'data-cke-real-element-type' ) && element.getAttribute( 'data-cke-real-element-type' ) == 'provis' )
 			{
@@ -358,7 +359,7 @@ CKEDITOR.dialog.add( 'provis', function( editor )
 				selection.selectElement( this.fakeObj );
 				this.getContentElement( 'info', 'name' ).focus();
 				return;
-				
+
 			}
 			this.setupContent( parseProvis.apply( this, [ editor, element ] ) );
 			this.getContentElement( 'info', 'name' ).focus();
@@ -366,33 +367,33 @@ CKEDITOR.dialog.add( 'provis', function( editor )
 		onOk : function()
 		{
 			var data = {};
-			
+
 			// Alex : Hier müssen rein
 			// Validierung ob Zeichen passen
 			// Test, ob Name schon vorhanden ist
 			// Ggf. Möglichkeit das Dokument zu Überschreiben
-			// 
-			
+			//
+
 			this.commitContent( data );
-			
+
 				{
 					//kann ich hier auch direkt auf data zugreifen?
 					var name = data.name || "Provis_Platzhalter";
 					var type = data.type || "Swimlane";
 					var rev = data.rev || 1;
-					
+
 					//name = this.removeSpace(name);
 					//alert(name);
 
 					var element = CKEDITOR.dom.element.createFromHtml( '<span class="WYSIWYG_PROTECTED">%PROCESS{name=&quot;' + name + '&quot; type=&quot;' + type + '&quot; rev=&quot;' + rev + '&quot;}%</span>' );
-					
+
 					if ( this.editMode )
 					{
 						//alert("jo mann!");
 						//this.editObj.copyAttributes( element, { name : 1 } );
 						//this.editObj.moveChildren( element );
 					}
-					
+
 					// Set name.
 					element.removeAttribute( '_cke_saved_name' );
 					//element.setAttribute( 'name', "ProVis" );
@@ -412,9 +413,9 @@ CKEDITOR.dialog.add( 'provis', function( editor )
 							imgSrc = CKEDITOR.plugins.getPath( 'qwiki' ) + 'images/diagramm_swimlane.png';
 							break;
 					}
-					
+
 					var fakeElement = editor.createFakeElement( element, 'cke_provis', 'provis', false, imgSrc);
-					
+
 					//Alex: Css für das ProVis FakeImage als Style anbinden...
 					var fakeStyle =
 								'background-image: url(' + CKEDITOR.getUrl( CKEDITOR.plugins.getPath( 'qwiki' ) + 'images/diagramm_swimlane.png' ) + ');' +
@@ -422,15 +423,15 @@ CKEDITOR.dialog.add( 'provis', function( editor )
 								'border: 1px solid #a9a9a9;' +
 					            'width: 496px; height: 506px;';
 					fakeElement.setAttribute('style', fakeStyle);
-					
+
 					// Modac : Hier kann angepackt werden
 					fakeElement.setAttribute('_cke_provis_name', name);
 					fakeElement.setAttribute('_cke_provis_type', type);
-					
-					// Modac : 
+
+					// Modac :
 					if ( !fakeElement.getAttribute('_cke_provis_rev'));
 						fakeElement.setAttribute('_cke_provis_rev', rev);
-					
+
 					if ( !this.editMode )
 						editor.insertElement( fakeElement );
 					else
@@ -438,9 +439,9 @@ CKEDITOR.dialog.add( 'provis', function( editor )
 						fakeElement.replace( this.fakeObj );
 						editor.getSelection().selectElement( fakeElement );
 					}
-					
+
 					return true;
-					
+
 				}
 		},
 		onLoad : function()
