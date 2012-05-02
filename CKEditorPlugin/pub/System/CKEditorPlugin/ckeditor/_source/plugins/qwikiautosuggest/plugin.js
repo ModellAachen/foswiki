@@ -3,6 +3,49 @@ Copyright (c) 2012, Modell Aachen, http://modell-aachen.de/
 All rights reserved.
 */
 
+// THIRD-PARTY CODE for HTML autocomplete list {{{
+/*
+ * jQuery UI Autocomplete HTML Extension
+ *
+ * Copyright 2010, Scott González (http://scottgonzalez.com)
+ * Dual licensed under the MIT or GPL Version 2 licenses.
+ *
+ * http://github.com/scottgonzalez/jquery-ui-extensions
+ */
+(function( $ ) {
+
+var proto = $.ui.autocomplete.prototype,
+	initSource = proto._initSource;
+
+function filter( array, term ) {
+	var matcher = new RegExp( $.ui.autocomplete.escapeRegex(term), "i" );
+	return $.grep( array, function(value) {
+		return matcher.test( $( "<div>" ).html( value.label || value.value || value ).text() );
+	});
+}
+
+$.extend( proto, {
+	_initSource: function() {
+		if ( this.options.html && $.isArray(this.options.source) ) {
+			this.source = function( request, response ) {
+				response( filter( this.options.source, request.term ) );
+			};
+		} else {
+			initSource.call( this );
+		}
+	},
+
+	_renderItem: function( ul, item) {
+		return $( "<li></li>" )
+			.data( "item.autocomplete", item )
+			.append( $( "<a></a>" )[ this.options.html ? "html" : "text" ]( item.label ) )
+			.appendTo( ul );
+	}
+});
+
+})( jQuery );
+// }}}
+
 CKEDITOR.plugins.add( 'qwikiautosuggest',
 {
 	requires : ['dialog', 'dialogui'],
@@ -44,6 +87,7 @@ CKEDITOR.plugins.add( 'qwikiautosuggest',
 					// Required so that the list doesn't pop up behind the CKEditor BG overlay -jk
 					jq.css("z-index", $(this.getDialog().getElement().$.firstChild).css("z-index"));
 					jq.css("position", "relative");
+					if (opts.html !== false) opts.html = true;
 					jq.autocomplete(opts);
 					var source;
 					if (opts && typeof(opts.source) == "string")
@@ -55,7 +99,15 @@ CKEDITOR.plugins.add( 'qwikiautosuggest',
 						$.ajax({
 							'url': url.replace("$query", req.term),
 							dataType: 'json',
-							success: resp,
+							success: function(data) {
+								resp($.map(data, function(val) {
+									var o = {};
+									o.label = '<div class="autocomplete_label">'+val.label+'</div>'+
+											'<div class="autocomplete_sublabel">'+val.sublabel+'</div>';
+									o.value = val.value;
+									return o;
+								}));
+							},
 							error: function(){ resp([]); }
 						});
 					});

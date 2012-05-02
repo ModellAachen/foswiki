@@ -1,2 +1,7 @@
 .ui-autocomplete-loading { background: url("img_inquisitor/spinner.gif") no-repeat right center white; }
 .ui-autocomplete a { font: 12px Arial,Helvetica,Tahoma,Verdana,sans-serif; }
+.autocomplete_sublabel {
+	font-size: 75%;
+	color: gray;
+	border-bottom: solid 1px silver;
+}
