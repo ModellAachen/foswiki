@@ -34,7 +34,7 @@ CKEDITOR.lang['de'] =
 	editorTitle : 'WYSIWYG-Editor, %1, drücken Sie ALT 0 für Hilfe.',
 
 	// ARIA descriptions.
-	toolbars	: 'Editor Symbolleisten',
+	toolbars	: 'Editor-Symbolleisten',
 	editor		: 'WYSIWYG-Editor',
 
 	// Toolbar buttons without dialogs.
@@ -419,6 +419,7 @@ CKEDITOR.lang['de'] =
 		upload		: 'Hochladen',
 		alt			: 'Alternativer Text',
 		lockRatio	: 'Größenverhältnis beibehalten',
+		unlockRatio	: 'Größenverhältnis ignorieren',
 		resetSize	: 'Größe zurücksetzen',
 		border		: 'Rahmen',
 		hSpace		: 'Horizontal-Abstand',
@@ -810,6 +811,6 @@ CKEDITOR.lang['de'] =
 		metaDescription : 'Dokument-Beschreibung',
 		metaAuthor : 'Autor',
 		metaCopyright : 'Copyright',
-		previewHtml : '<p>Das ist ein <strong>Beispieltext</strong>. Du schreibst in <a href="javascript:void(0)">CKEditor</a>.</p>'
+		previewHtml : '<p>Das ist ein <strong>Beispieltext</strong>. Sie schreiben in <a href="javascript:void(0)">CKEditor</a>.</p>'
 	}
 };

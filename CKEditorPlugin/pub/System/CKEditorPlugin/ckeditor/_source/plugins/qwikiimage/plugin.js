@@ -9,6 +9,7 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 
 CKEDITOR.plugins.add( 'qwikiimage',
 {
+	requires : [ 'qwiki' ],
 	init : function( editor )
 	{
 		var pluginName = 'qwikiimage';
@@ -20,10 +21,11 @@ CKEDITOR.plugins.add( 'qwikiimage',
 		editor.addCommand( pluginName, new CKEDITOR.dialogCommand( pluginName ) );
 
 		// Register the toolbar button.
-		editor.ui.addButton( 'Image',
+		editor.ui.addButton( 'QWikiImage',
 			{
 				label : editor.lang.common.image,
-				command : pluginName
+				command : pluginName,
+				className : 'cke_button_image'
 			});
 
 		editor.on( 'doubleclick', function( evt )

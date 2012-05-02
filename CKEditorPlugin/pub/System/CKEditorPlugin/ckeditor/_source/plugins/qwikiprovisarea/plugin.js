@@ -8,7 +8,6 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
  *		mode, which displays the raw data being edited in the editor.
  */
 
-
 /* Hier wird der Modus der Commands gesetzt (Buttons ausgegraut) */
 var updateCommandsMode = function( editor, namensraum, ein )
 {
@@ -33,14 +32,14 @@ var updateCommandsMode = function( editor, namensraum, ein )
 		}
 };
 
-
 CKEDITOR.plugins.add( 'qwikiprovisarea',
 {
 	requires : [ 'editingblock', 'richcombo', 'styles' ],
+	lang : [ 'de', 'en' ],
 
 	init : function( editor )
 	{
-	var provisarea = CKEDITOR.plugins.provisarea,
+		var provisarea = CKEDITOR.plugins.provisarea,
 			win = CKEDITOR.document.getWindow(),
 			iframe,
 			provisframe,
@@ -148,8 +147,8 @@ CKEDITOR.plugins.add( 'qwikiprovisarea',
 
 			editor.ui.addRichCombo( comboName,
 				{
-					label : editor.lang.flowchart.resize,
-					title : editor.lang.flowchart.resize,
+					label : editor.lang.qwikiflowchart.resize,
+					title : editor.lang.qwikiflowchart.resize,
 					className : 'cke_provis_size',
 					panel :
 					{
@@ -160,7 +159,7 @@ CKEDITOR.plugins.add( 'qwikiprovisarea',
 
 					init : function()
 					{
-						//this.startGroup( editor.lang.flowchart.resize );
+						this.startGroup( editor.lang.qwikiflowchart.resize );
 						for ( var i = 0 ; i < names.length ; i++ )
 						{
 							var name = names[ i ];
@@ -245,8 +244,8 @@ CKEDITOR.plugins.add( 'qwikiprovisarea',
 
 			editor.ui.addRichCombo( comboName,
 				{
-					label : editor.lang.flowchart.nodes,
-					title : editor.lang.flowchart.nodes,
+					label : editor.lang.qwikiflowchart.nodes,
+					title : editor.lang.qwikiflowchart.nodes,
 					className : 'cke_provis',
 					panel :
 					{
@@ -257,7 +256,7 @@ CKEDITOR.plugins.add( 'qwikiprovisarea',
 
 					init : function()
 					{						
-						this.startGroup( "Prozesstypen" );
+						this.startGroup(editor.lang.qwikiflowchart.nodes);
 
 						for ( var i = 0 ; i < names.length ; i++ )
 						{
@@ -323,8 +322,8 @@ CKEDITOR.plugins.add( 'qwikiprovisarea',
 
 			editor.ui.addRichCombo( comboName,
 				{
-					label : editor.lang.flowchart.saveoptions,
-					title : editor.lang.flowchart.saveoptions,
+					label : editor.lang.qwikiflowchart.saveoptions,
+					title : editor.lang.qwikiflowchart.saveoptions,
 					className : 'cke_provis',
 					panel :
 					{
@@ -389,17 +388,16 @@ CKEDITOR.plugins.add( 'qwikiprovisarea',
 					
 					if (this.saveflag == true)
 					{
-						/*FoswikiCKE.ajaxRequest(url, request, function(){
-							sucess();
-						}, function(){
-							error();
-						});
-						*/
-						
 						//TODO: AjaxRequest oder ähnliches
 						rev++;
 					}
 					
+					// Unblock editor UI
+					//SMELL: should un-hardcode ID
+					var ibody = $('#cke_contents_topic iframe').first().contents().find('body');
+					ibody.find('#cke_provis_block_overlay').remove();
+					ibody[0].contentEditable = "true";
+
 					// Neues Element kreiieren und ersetzen
 					var element = CKEDITOR.dom.element.createFromHtml('<span class="WYSIWYG_PROTECTED">%PROCESS{name=&quot;' + name + '&quot; type=&quot;' + type + '&quot; rev=&quot;' + rev + '&quot;}%</span>' );
 					element.replace(flowchart);
@@ -426,9 +424,7 @@ CKEDITOR.plugins.add( 'qwikiprovisarea',
 						unwatchIt(dynrunvar, "saveStyle");
 					}
 					catch (e){
-						
 					}
-					
 				});
 		
 		editor.on( 'openprovis', function(event)
@@ -440,7 +436,19 @@ CKEDITOR.plugins.add( 'qwikiprovisarea',
 					var element = selection.getSelectedElement();
 					flowchart = element;
 					
-					if ( element && element.getAttribute( '_cke_real_element_type' ) && element.getAttribute( '_cke_real_element_type' ) == 'provis' )
+					// Block editor UI
+					// Must happen after getting selected element because IE is prone to forgetting the selection -jk
+					//SMELL: should un-hardcode ID
+					var iframe = $('#cke_contents_topic iframe').first();
+					var ibody = iframe.contents().find('body');
+					ibody.append('<div id="cke_provis_block_overlay" style="left: 0; top: 0; background: black; -ms-filter:\'progid:DXImageTransform.Microsoft.Alpha(Opacity=50)\'; filter: alpha(opacity=50); opacity: .5; z-index: 15000; position: fixed;"></div>');
+					ibody.find('#cke_provis_block_overlay').height(iframe.innerHeight()).width(iframe.innerWidth());
+					if (ibody[0]) ibody[0].contentEditable = "false";
+					// Make IE7 deselect flowchart element in editor, so that users
+					// cannot accidentally delete it
+					iframe.blur();
+
+					if ( element && element.getAttribute( 'data-cke-real-element-type' ) && element.getAttribute( 'data-cke-real-element-type' ) == 'provis' )
 					{
 						//Alex: Topic??
 						
@@ -482,7 +490,7 @@ CKEDITOR.plugins.add( 'qwikiprovisarea',
 					
 					//ProVis IFrame
 					iframe = CKEDITOR.dom.element.createFromHtml( '<iframe' +
-							' style="width:' + provisSize.width + 'px; height:100%; display:inline;"' +
+							' style="width:' + provisSize.width + 'px; height:100%;"' +
 							' frameBorder="0"' +
 							' id="iframe_provis"' +
 							' src="' + srcScript + '"' +
@@ -496,13 +504,15 @@ CKEDITOR.plugins.add( 'qwikiprovisarea',
 
 					editor.fire( 'load_provistoolbar' );
 					updateCommandsMode(editor, "provis", true);
-					
+
 					iframe.on( 'load', function( ev )
 						{
 								//TODO: Dynamische Runtime Variable setzen
 								var frame = document.getElementById("iframe_provis")
 								var dynrunvar = frame.contentWindow.DynRunVar;
-								
+
+								// Fix applet spacing in IE7
+								$(frame).contents().find('applet').css('padding', '5px');
 								watchIt(dynrunvar, "activeShape",
 										function (id,oldvalue,newvalue) {
 											if( newvalue ){
@@ -549,8 +559,9 @@ CKEDITOR.plugins.add( 'qwikiprovisarea',
 		{
 			editor.ui.addButton( 'Provis_Save',
 				{
-					label : editor.lang.flowchart.save,
-					command : 'provissave'
+					label : editor.lang.qwikiflowchart.save,
+					command : 'provissave',
+					className : 'cke_button_save'
 				});
 		}
 		
@@ -558,8 +569,9 @@ CKEDITOR.plugins.add( 'qwikiprovisarea',
 		{
 			editor.ui.addButton( 'Provis_NewDiagram',
 				{
-					label : editor.lang.flowchart.newdiagram,
-					command : 'provisnewdiagram'
+					label : editor.lang.qwikiflowchart.newdiagram,
+					command : 'provisnewdiagram',
+					className : 'cke_button_newpage'
 				});
 		}
 		
@@ -567,7 +579,7 @@ CKEDITOR.plugins.add( 'qwikiprovisarea',
 		{
 			editor.ui.addButton( 'Provis_NewSwimlane',
 				{
-					label : editor.lang.flowchart.newswimlane,
+					label : editor.lang.qwikiflowchart.newswimlane,
 					command : 'provisnewswimlane',
 					icon	: this.path + 'images/swimlane_new.gif'
 				});
@@ -577,8 +589,9 @@ CKEDITOR.plugins.add( 'qwikiprovisarea',
 		{
 			editor.ui.addButton( 'Provis_Undo',
 				{
-					label : editor.lang.flowchart.undo,
-					command : 'provisundo'
+					label : editor.lang.qwikiflowchart.undo,
+					command : 'provisundo',
+					className : 'cke_button_undo'
 				});
 		}
 		
@@ -586,8 +599,9 @@ CKEDITOR.plugins.add( 'qwikiprovisarea',
 		{
 			editor.ui.addButton( 'Provis_Redo',
 				{
-					label : editor.lang.flowchart.redo,
-					command : 'provisredo'
+					label : editor.lang.qwikiflowchart.redo,
+					command : 'provisredo',
+					className : 'cke_button_redo'
 				});
 		}
 		
@@ -605,7 +619,7 @@ CKEDITOR.plugins.add( 'qwikiprovisarea',
 		{
 			editor.ui.addButton( 'Provisarea',
 				{
-					label : editor.lang.flowchart.cancel,
+					label : editor.lang.qwikiflowchart.cancel,
 					command : 'provisabort',
 					icon	: this.path + 'images/icon_close.gif'
 				});
@@ -623,17 +637,14 @@ CKEDITOR.plugins.add( 'qwikiprovisarea',
 		//Modac: Save Options
 		addComboSave( editor, 'Provis_Saveoptions', 'imageurl', 'ProVis_Saveoptions', config.provis_saveoptions, config.provis_saveoptionsdefaultLabel, config.Saveoptions_style );
 		
-		//TODO: Fürn Alex
-		//Alex: Css for Sizing Combo
-		editor.addCss(
-				'.cke_provis_size' +
-				'{' +
-					'display: inline;' +
-					'float: right;' +
-				'}'
-				);
-		
-		}
+		// CSS for Sizing Combo
+		// +IE7 hack for combo panel height
+		$(document).find('head').append('<style type="text/css">\n'+
+				'.cke_toolbar_provis_size { float: right !important; }'+
+				'.cke_rcombopanel { min-height: 150px; }'+
+				'</style>'
+		);
+	}
 });
 
 /**
@@ -644,6 +655,8 @@ CKEDITOR.plugins.add( 'qwikiprovisarea',
  */
 CKEDITOR.plugins.provisarea =
 {
+	// "canUndo" must be false for any commands that update the editor,
+	// otherwise IE7 will screw up badly -jk
 	commands :
 	{
 		provisarea :
@@ -676,7 +689,8 @@ CKEDITOR.plugins.provisarea =
 			{
 				var iframe = document.getElementById("iframe_provis");
 				iframe.contentWindow.setNewDiagram();
-			}
+			},
+			canUndo : false
 		},
 		provisnewswimlane :
 		{
@@ -684,7 +698,8 @@ CKEDITOR.plugins.provisarea =
 			{
 				var iframe = document.getElementById("iframe_provis");
 				iframe.contentWindow.AddSwim();
-			}
+			},
+			canUndo : false
 		},
 		provisdeleteswimlane :
 		{
@@ -692,7 +707,8 @@ CKEDITOR.plugins.provisarea =
 			{
 				var iframe = document.getElementById("iframe_provis");
 				//iframe.contentWindow.AddSwim();
-			}
+			},
+			canUndo : false
 		},
 		provisundo :
 		{
@@ -700,7 +716,8 @@ CKEDITOR.plugins.provisarea =
 			{
 				var iframe = document.getElementById("iframe_provis");
 				iframe.contentWindow.unDone();
-			}
+			},
+			canUndo : false
 		},
 		provisredo :
 		{
@@ -708,7 +725,8 @@ CKEDITOR.plugins.provisarea =
 			{
 				var iframe = document.getElementById("iframe_provis");
 				iframe.contentWindow.reDone();
-			}
+			},
+			canUndo : false
 		},
 		provissave :
 		{
@@ -725,15 +743,22 @@ CKEDITOR.plugins.provisarea =
 				editor.fire('saveprovis');
 				$.unblockUI();
 				editor.execCommand( 'provisarea' );
-			}
+			},
+			canUndo : false
 		},
 		provisabort :
 		{
 			exec : function( editor )
 			{
-				if (confirm(editor.lang.flowchart.cancelmsg))
+				if (confirm(editor.lang.qwikiflowchart.cancelmsg))
 					editor.execCommand( 'provisarea' );
-			}
+				else
+					// IE7 somehow selects the flowchart element in the editor here,
+					// thus theoretically allowing the user to accidentally delete it.
+					// Blurring the iframe seems to deselect the element, too.
+					$('#cke_contents_topic iframe').first().blur();
+			},
+			canUndo : false
 		},
 		provisresize :
 		{
@@ -750,7 +775,8 @@ CKEDITOR.plugins.provisarea =
 				//Bestehendes Textfeld auf 30% reduzieren
 				holderElement.getChild(0).setStyle( 'width', textSize + "%");
 				holderElement.getChild(2).setStyle( 'width', provisSize + "%")
-			}
+			},
+			canUndo : false
 		}
 	}
 };

@@ -9,78 +9,37 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 
 (function()
 {
+	var abortingEdit = true;
+
 	var saveCmd =
 	{
-		modes : { wysiwyg:1, source:1 },
+		modes : { wysiwyg:1,source:1 },
 
 		exec : function( editor )
 		{
-			var $form = editor.element.$.form;
-			
-			if ( $form )
-			{
-				// TODO: Spinner setzen
-				$.blockUI({ timout: 4000 });
-				
-				// Modac : saveCallback auf die Editor-Daten ausführen
-				var html = FoswikiCKE.saveCallback(editor, editor.getData());
-
-				// Modac : Daten aus dem Callback setzen und Formular abspeichern
-				if (html) 
-				{
-					editor.setData(html, function()		
-				    {
-						try
-						{
-							$form.save.click();
-						}
-						catch( e )
-						{
-							try
-							{
-								$form.submit();
-							}
-							catch(e)
-							{
-								// If there's a button named "submit" then the form.submit
-								// function is masked and can't be called in IE/FF, so we
-								// call the click() method of that button.
-								if ( $form.submit.click )
-									$form.submit.click();
-							}
-						}
-						// TODO: Spinner entsetzen!
-						// $.unblockUI();
-				    });
-				}
-				else
-				{
-					try
-					{
-						$form.save.click();
-					}
-					catch( e )
-					{
-						try
-						{
-							$form.submit();
-						}
-						catch(e)
-						{
-							// If there's a button named "submit" then the form.submit
-							// function is masked and can't be called in IE/FF, so we
-							// call the click() method of that button.
-							if ( $form.submit.click )
-								$form.submit.click();
-						}
-					}	
-					
-					// $.unblockUI();
-				}
-			}			
+			$('#save').click();
 		}
-
 	};
+
+	var saveHandler = function(e) {
+		if (foswiki.Edit.validateSuppressed) return true;
+		if (!foswiki.Edit.validateMandatoryFields()) return false;
+
+		$.blockUI();
+		abortingEdit = false;
+	};
+
+	var unloadHandler = function(e) {
+		//XXX: checkDirty() will pretty much always return true.
+		//     Can we fix that?
+		if (abortingEdit && e.data.checkDirty()) {
+			var warning = e.data.lang.qwikisave.warning;
+			var oe = e.originalEvent || window.event;
+			if (oe) oe.returnValue = warning;
+			return warning;
+		}
+		return;
+	}
 	
 	var cancelCmd =
 	{
@@ -88,28 +47,7 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 
 		exec : function( editor )
 		{
-			var $form = editor.element.$.form;
-
-			if ( $form )
-			{
-				try
-				{
-					// TODO: Mehrsprachigkeit
-					var wert = confirm(editor.lang.qwikisave.cancelquestion);
-					if (wert){
-						// TODO: Ajax mit automatischem entsetzen
-						$.blockUI({ timout: 4000 });
-						$form.cancel.click();
-						// TODO: Spinner setzen
-						//$.blockUI();
-					}
-					
-				}
-				catch( e )
-				{
-					
-				}
-			}
+			$('#cancel').click();
 		}
 	};
 
@@ -118,16 +56,20 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 	// Register a plugin named "save".
 	CKEDITOR.plugins.add( pluginName,
 	{
+		lang : [ 'de', 'en' ],
 		init : function( editor )
 		{
-			// Programm-Status nach dem Speichern abfangen
-		
-			var command = editor.addCommand( pluginName, saveCmd );
-			//command.modes = { wysiwyg : !!( editor.element.$.form ) };
+			var form = editor.element.$.form;
+			if (!form) return;
+
+			$('#save').on('click', null, editor, saveHandler);
+			$(window).on('beforeunload', null, editor, unloadHandler);
+
+			var command = editor.addCommand( 'save', saveCmd );
 			editor.ui.addButton( 'Save',
 				{
 					label : editor.lang.save,
-					command : pluginName
+					command : 'save'
 				});
 			
 			//Abbrechen

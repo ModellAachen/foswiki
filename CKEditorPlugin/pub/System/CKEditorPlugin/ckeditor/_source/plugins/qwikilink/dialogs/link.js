@@ -421,7 +421,8 @@ CKEDITOR.dialog.add( 'link', function( editor )
 	}
 
 	var commonLang = editor.lang.common,
-		linkLang = editor.lang.link;
+		linkLang = editor.lang.link,
+		qlinkLang = editor.lang.qwikilink;
 
 	return {
 		title : linkLang.title,
@@ -441,7 +442,7 @@ CKEDITOR.dialog.add( 'link', function( editor )
 						'default' : 'qwiki',
 						items :
 						[
-							[ linkLang.toQwiki, 'qwiki' ],
+							[ qlinkLang.toQwiki, 'qwiki' ],
 							[ linkLang.toUrl, 'url' ],
 							[ linkLang.toEmail, 'email' ]
 						],
@@ -474,9 +475,9 @@ CKEDITOR.dialog.add( 'link', function( editor )
 										style : 'width : 100%;',
 										items :
 										[
-										 	[ linkLang.typeTopic , 'topicurl' ],
-										 	[ linkLang.typeAnchor , 'anchorOptions' ],
-											[ linkLang.typeFile , 'attachmenturl' ]
+										 	[ qlinkLang.typeTopic , 'topicurl' ],
+										 	[ qlinkLang.typeAnchor , 'anchorOptions' ],
+											[ qlinkLang.typeFile , 'attachmenturl' ]
 										],
 										onChange : function()
 										{
@@ -498,6 +499,16 @@ CKEDITOR.dialog.add( 'link', function( editor )
 												}
 												else
 													htmlelement.hide();
+											}
+
+											var textElem = dialog.getContentElement('info', 'topicurl');
+											textElem.qwikiautosuggest((this.getValue() == 'anchorOptions') ? "disable" : "enable");
+											switch (this.getValue()) {
+											case 'topicurl':
+												textElem.qwikiautosuggest("url", CKEDITOR.qwikiautosuggest.topics);
+												break;
+											case 'attachmenturl':
+												textElem.qwikiautosuggest("url", CKEDITOR.qwikiautosuggest.attachments);
 											}
 										},
 										setup : function( data )
@@ -522,67 +533,9 @@ CKEDITOR.dialog.add( 'link', function( editor )
 										required: true,
 										onLoad : function ()
 										{
-											var dialogElement = this.getDialog().getElement().getFirst();
-											var new_id = "dialog_" + CKEDITOR.tools.getNextId();
-											dialogElement.setAttribute("id", new_id);
-
-											this.allowOnChange = true;
-											this.nummer = new_id;
-										},
-										onKeyUp : function()
-										{
-										},
-										onChange : function()
-										{
-											if ( this.allowOnChange )		// Dont't call on dialog load.
-												this.onKeyUp();
-											
-											//this.as_json = undefined;
-											//Alex: Verbessern - veralgemeinern
-											var dialog = this.getDialog();
-											var as_json;
-											var el_id = dialog.getContentElement('info', 'topicurl').getInputElement().getId();
-											var attach = dialog.getContentElement('info', 'topicurl').getInputElement().getParent().getParent().getAttribute("id");
-											
-											var options_Topic = {
-													script: FoswikiCKE.getFoswikiVar("VIEWSCRIPTURL") + "/Sandbox/AjaxHelper?section=topic;contenttype=text/plain;skin=text;baseweb=all,-Trash*,-System,-TWiki,-Sandbox;format=$topic,$web,$web.$topic;",
-													varname:"input",
-													klasse: this.nummer,
-													link:true,
-													shownoresults:true,
-													maxresults:16,
-													callback: function (obj) { document.getElementById(el_id).value = obj.id; }
-											};
-											
-											
-											var options_Attachment = {
-													script: FoswikiCKE.getFoswikiVar("VIEWSCRIPTURL") + "/Sandbox/AjaxHelper?section=attachment;contenttype=text/plain;skin=text;",
-													varname:"input",
-													klasse: this.nummer,
-													media:true,
-													shownoresults:false,
-													maxresults:16,
-													callback: function (obj) { document.getElementById(el_id).value = obj.id; }
-											};
-											
-											if (dialog.getContentElement('info', 'type').getValue() == 'topicurl')
-											{
-												as_json = undefined;
-												as_json = new bsn.AutoSuggest(el_id, options_Topic);
-												this.label = editor.lang.common.url;
-											}
-											else
-											{
-												as_json = undefined;
-												as_json = new bsn.AutoSuggest(el_id, options_Attachment);
-												this.label = editor.lang.link.toAttachment;
-											}
-										},
-										onShow : function()
-										{
-											this.onChange();
-									
-										},
+											this.qwikiautosuggest("init", {source: CKEDITOR.qwikiautosuggest.topics, minLength: 2});
+												},
+										onChange : function(){},
 										validate : function()
 										{
 											var dialog = this.getDialog();
@@ -880,131 +833,6 @@ CKEDITOR.dialog.add( 'link', function( editor )
 						]
 					},
 					{
-						type : 'vbox',
-						id : 'anchorOptions',
-						width : 260,
-						align : 'center',
-						padding : 0,
-						children :
-						[
-							{
-								type : 'fieldset',
-								id : 'selectAnchorText',
-								label : linkLang.selectAnchor,
-								setup : function( data )
-								{
-									if ( data.anchors.length > 0 )
-										this.getElement().show();
-									else
-										this.getElement().hide();
-								},
-								children :
-								[
-									{
-										type : 'hbox',
-										id : 'selectAnchor',
-										children :
-										[
-											{
-												type : 'select',
-												id : 'anchorName',
-												'default' : '',
-												label : linkLang.anchorName,
-												style : 'width: 100%;',
-												items :
-												[
-													[ '' ]
-												],
-												setup : function( data )
-												{
-													this.clear();
-													this.add( '' );
-													for ( var i = 0 ; i < data.anchors.length ; i++ )
-													{
-														if ( data.anchors[i].name )
-															this.add( data.anchors[i].name );
-													}
-
-													if ( data.anchor )
-														this.setValue( data.anchor.name );
-
-													var linkType = this.getDialog().getContentElement( 'info', 'linkType' );
-													if ( linkType && linkType.getValue() == 'email' )
-														this.focus();
-												},
-												commit : function( data )
-												{
-													if ( !data.anchor )
-														data.anchor = {};
-
-													data.anchor.name = this.getValue();
-												}
-											},
-											{
-												type : 'select',
-												id : 'anchorId',
-												'default' : '',
-												label : linkLang.anchorId,
-												style : 'width: 100%;',
-												items :
-												[
-													[ '' ]
-												],
-												setup : function( data )
-												{
-													this.clear();
-													this.add( '' );
-													for ( var i = 0 ; i < data.anchors.length ; i++ )
-													{
-														if ( data.anchors[i].id )
-															this.add( data.anchors[i].id );
-													}
-
-													if ( data.anchor )
-														this.setValue( data.anchor.id );
-												},
-												commit : function( data )
-												{
-													if ( !data.anchor )
-														data.anchor = {};
-
-													data.anchor.id = this.getValue();
-												}
-											}
-										],
-										setup : function( data )
-										{
-											if ( data.anchors.length > 0 )
-												this.getElement().show();
-											else
-												this.getElement().hide();
-										}
-									}
-								]
-							},
-							{
-								type : 'html',
-								id : 'noAnchors',
-								style : 'text-align: center;',
-								html : '<div role="label" tabIndex="-1">' + CKEDITOR.tools.htmlEncode( linkLang.noAnchors ) + '</div>',
-								// Focus the first element defined in above html.
-								focus : true,
-								setup : function( data )
-								{
-									if ( data.anchors.length < 1 )
-										this.getElement().show();
-									else
-										this.getElement().hide();
-								}
-							}
-						],
-						setup : function( data )
-						{
-							if ( !this.getDialog().getContentElement( 'info', 'linkType' ) )
-								this.getElement().hide();
-						}
-					},
-					{
 						type :  'vbox',
 						id : 'emailOptions',
 						padding : 1,
@@ -1069,14 +897,14 @@ CKEDITOR.dialog.add( 'link', function( editor )
 								setup : function( data )
 								{
 									if ( data.email )
-										this.setValue( data.email.body );
+										this.setValue( decodeURIComponent(data.email.body) );
 								},
 								commit : function( data )
 								{
 									if ( !data.email )
 										data.email = {};
 
-									data.email.body = this.getValue();
+									data.email.body = encodeURIComponent(this.getValue());
 								}
 							}
 						],

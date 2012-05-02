@@ -1,0 +1,8 @@
+ckeditor.js
+ckeditor_basic.js
+foswiki.js
+foswiki_cke.js
+modacContents.css
+prebuild.stamp
+*.swp
+*~

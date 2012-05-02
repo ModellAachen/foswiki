@@ -177,14 +177,14 @@ CKEDITOR.dialog.add( 'provis', function( editor )
 
 	// Modac : Rendern vom Dialog
 	return {
-		title : editor.lang.flowchart.title,
+		title : editor.lang.qwikiflowchart.title,
 		minWidth : 350,
 		minHeight : 230,
 		contents : [
 			{
 				id : 'info',
-				label : editor.lang.flowchart.info,
-				title : editor.lang.flowchart.info,
+				label : editor.lang.qwikiflowchart.info,
+				title : editor.lang.qwikiflowchart.info,
 				elements :
 				[
 					{
@@ -200,13 +200,13 @@ CKEDITOR.dialog.add( 'provis', function( editor )
 									{
 										id : 'flowchartType',
 										type : 'select',
-										label : editor.lang.flowchart.type,
+										label : editor.lang.qwikiflowchart.type,
 										'default' : 'swimlanes',
 										items :
 										[
-											[ editor.lang.flowchart.swimlane, 'Swimlane' ],
-											[ editor.lang.flowchart.process1, 'Flex' ],
-											[ editor.lang.flowchart.organigram, 'Orglane' ]
+											[ editor.lang.qwikiflowchart.swimlane, 'Swimlane' ],
+											[ editor.lang.qwikiflowchart.process1, 'Flex' ],
+											[ editor.lang.qwikiflowchart.organigram, 'Orglane' ]
 										],
 										setup : function( data )
 										{
@@ -220,19 +220,19 @@ CKEDITOR.dialog.add( 'provis', function( editor )
 											
 											switch (wert) {
 											  case "Swimlane":
-												previewImage.setAttribute( 'src', CKEDITOR.plugins.getPath( 'foswiki' ) + 'images/03_schwimmbahn.gif' );
+												previewImage.setAttribute( 'src', CKEDITOR.plugins.getPath( 'qwiki' ) + 'images/03_schwimmbahn.gif' );
 											    //data.type = "swimlane";
 												break;
 											  case "Flex":
-												previewImage.setAttribute( 'src', CKEDITOR.plugins.getPath( 'foswiki' ) + 'images/01_chevron.gif' );
+												previewImage.setAttribute( 'src', CKEDITOR.plugins.getPath( 'qwiki' ) + 'images/01_chevron.gif' );
 												//data.type = "process";
 												break;
 											  case "Orglane":
-												previewImage.setAttribute( 'src', CKEDITOR.plugins.getPath( 'foswiki' ) + 'images/02_organigramm.gif' );
+												previewImage.setAttribute( 'src', CKEDITOR.plugins.getPath( 'qwiki' ) + 'images/02_organigramm.gif' );
 											    //data.type = "organigram";
 												break;
 											  default:
-												previewImage.setAttribute( 'src', CKEDITOR.plugins.getPath( 'foswiki' ) + 'images/03_schwimmbahn.gif' );
+												previewImage.setAttribute( 'src', CKEDITOR.plugins.getPath( 'qwiki' ) + 'images/03_schwimmbahn.gif' );
 											    //data.type = "swimlane";
 											  	break;
 											}
@@ -245,7 +245,7 @@ CKEDITOR.dialog.add( 'provis', function( editor )
 									{
 										type : 'text',
 										id : 'name',
-										label : editor.lang.flowchart.name,
+										label : editor.lang.qwikiflowchart.name,
 										required: true,
 										onLoad : function ()
 										{
@@ -276,7 +276,7 @@ CKEDITOR.dialog.add( 'provis', function( editor )
 
 											return true;
 
-											var func = CKEDITOR.dialog.validate.notEmpty( editor.lang.flowchart.noUrl );
+											var func = CKEDITOR.dialog.validate.notEmpty( editor.lang.qwikiflowchart.noUrl );
 											return func.apply( this );
 										},
 										setup : function( data )
@@ -327,7 +327,7 @@ CKEDITOR.dialog.add( 'provis', function( editor )
 										type : 'html',
 										//style : 'width:30%;',
 										//Alex: Hier werden die Vorschaubilder genutzt
-										html : '<div>' + CKEDITOR.tools.htmlEncode( editor.lang.flowchart.example ) + '<br>' +
+										html : '<div>' + CKEDITOR.tools.htmlEncode( editor.lang.qwikiflowchart.example ) + '<br>' +
 										'<div id="FlowchartPreviewBox">'+
 										'<img id="previewImage2" src="' + CKEDITOR.plugins.getPath( 'foswiki' ) + 'images/03_schwimmbahn.gif" alt="" /></a>' +
 										'</div>'+'</div>'
@@ -348,7 +348,7 @@ CKEDITOR.dialog.add( 'provis', function( editor )
 			var selection = editor.getSelection();
 			
 			var element = selection.getSelectedElement();
-			if ( element && element.getAttribute( '_cke_real_element_type' ) && element.getAttribute( '_cke_real_element_type' ) == 'provis' )
+			if ( element && element.getAttribute( 'data-cke-real-element-type' ) && element.getAttribute( 'data-cke-real-element-type' ) == 'provis' )
 			{
 				this.fakeObj = element;
 				//alert(element.attributes.name);
@@ -400,16 +400,16 @@ CKEDITOR.dialog.add( 'provis', function( editor )
 					var imgSrc;
 					switch (type) {
 						case "Swimlane":
-							imgSrc = CKEDITOR.plugins.getPath( 'foswiki' ) + 'images/diagramm_swimlane.png';
+							imgSrc = CKEDITOR.plugins.getPath( 'qwiki' ) + 'images/diagramm_swimlane.png';
 							break;
 						case "Flex":
-							imgSrc = CKEDITOR.plugins.getPath( 'foswiki' ) + 'images/diagramm_swimlane.png';
+							imgSrc = CKEDITOR.plugins.getPath( 'qwiki' ) + 'images/diagramm_swimlane.png';
 							break;
 						case "Orglane":
-							imgSrc = CKEDITOR.plugins.getPath( 'foswiki' ) + 'images/diagramm_swimlane.png';
+							imgSrc = CKEDITOR.plugins.getPath( 'qwiki' ) + 'images/diagramm_swimlane.png';
 							break;
 						default:
-							imgSrc = CKEDITOR.plugins.getPath( 'foswiki' ) + 'images/diagramm_swimlane.png';
+							imgSrc = CKEDITOR.plugins.getPath( 'qwiki' ) + 'images/diagramm_swimlane.png';
 							break;
 					}
 					
@@ -417,7 +417,7 @@ CKEDITOR.dialog.add( 'provis', function( editor )
 					
 					//Alex: Css für das ProVis FakeImage als Style anbinden...
 					var fakeStyle =
-								'background-image: url(' + CKEDITOR.getUrl( CKEDITOR.plugins.getPath( 'foswiki' ) + 'images/diagramm_swimlane.png' ) + ');' +
+								'background-image: url(' + CKEDITOR.getUrl( CKEDITOR.plugins.getPath( 'qwiki' ) + 'images/diagramm_swimlane.png' ) + ');' +
 								'background-repeat: no-repeat;' +
 								'border: 1px solid #a9a9a9;' +
 					            'width: 496px; height: 506px;';

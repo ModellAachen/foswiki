@@ -8,8 +8,8 @@ use warnings;
 use Assert;
 
 our $VERSION           = '$Rev$';
-our $RELEASE           = '1.1.1';
-our $SHORTDESCRIPTION  = 'Integration of the CK WYSIWYG Editor';
+our $RELEASE           = '1.2';
+our $SHORTDESCRIPTION  = 'Integration of the CKEditor WYSIWYG Editor';
 our $NO_PREFS_IN_TOPIC = 1;
 
 use Foswiki::Func ();
@@ -191,7 +191,6 @@ sub beforeEditHandler {
 <script type="text/javascript" src="$ckeURL/foswiki_cke$USE_SRC.js?v=$encodedVersion"></script>
 <script type="text/javascript" src="$ckeURL/adapters/jquery.js?v=$encodedVersion"></script>
 <script type="text/javascript">
-alert( { $init } );
 FoswikiCKE.init = { $init } ;
 </script>
 <script type="text/javascript" src="$ckeURL/foswiki$USE_SRC.js?v=$encodedVersion"></script>

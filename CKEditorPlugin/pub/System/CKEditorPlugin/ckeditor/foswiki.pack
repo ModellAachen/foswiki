@@ -208,8 +208,6 @@ packages :
 //Foswiki Plugins:
 					'_source/plugins/ajax/plugin.js',
 					'_source/plugins/foswiki/plugin.js',
-					//Autosuggest File
-					'plugins/autosuggest/js/bsn.AutoSuggest_2.1.3.js'
 				]
 		}
 

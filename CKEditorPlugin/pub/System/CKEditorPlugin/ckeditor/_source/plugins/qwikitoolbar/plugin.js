@@ -346,181 +346,172 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 			
 			editor.on( 'expandieren', function( event )
 					{
-						//if ( event.data.space == editor.config.toolbarLocation )
-						alert("teeestomat");
+						editor.toolbox = new toolbox();
+						
+						var labelId = 'cke_' + CKEDITOR.tools.getNextId();
+
+						var output = [ '<div class="cke_toolbox" role="group" aria-labelledby="', labelId, '"' ],
+							expanded =  editor.config.toolbarStartupExpanded !== false,
+							groupStarted;
+
+						output.push( expanded ? '>' : ' style="display:none">' );
+
+						// Sends the ARIA label.
+						output.push( '<span id="', labelId, '" class="cke_voice_label">', editor.lang.toolbar, '</span>' );
+
+						var toolbars = editor.toolbox.toolbars,
+							toolbar =
+									( editor.config.toolbar instanceof Array ) ?
+										editor.config.toolbar
+									:
+										editor.config[ 'toolbar_' + editor.config.toolbar ];
+
+						for ( var r = 0 ; r < toolbar.length ; r++ )
 						{
-							editor.toolbox = new toolbox();
+							var toolbarId,
+								toolbarObj = 0,
+								toolbarName,
+								row = toolbar[ r ],
+								items;
 
-							var labelId = 'cke_' + CKEDITOR.tools.getNextNumber();
+							// It's better to check if the row object is really
+							// available because it's a common mistake to leave
+							// an extra comma in the toolbar definition
+							// settings, which leads on the editor not loading
+							// at all in IE. (#3983)
+							if ( !row )
+								continue;
 
-							var output = [ '<div class="cke_toolbox" role="toolbar" aria-labelledby="', labelId, '"' ],
-								expanded =  editor.config.toolbarStartupExpanded !== false,
-								groupStarted;
-
-							output.push( expanded ? '>' : ' style="display:none">' );
-
-							// Sends the ARIA label.
-							output.push( '<span id="', labelId, '" class="cke_voice_label">', editor.lang.toolbar, '</span>' );
-
-							//editor.config.toolbar = "Basic_Provis";
-							
-							var toolbars = editor.toolbox.toolbars,
-								toolbar =
-										( editor.config.toolbar instanceof Array ) ?
-											editor.config.toolbar
-										:
-											editor.config[ 'toolbar_' + editor.config.toolbar ];
-							
-							//alert(toolbar);
-							
-							for ( var r = 0 ; r < toolbar.length ; r++ )
+							if ( groupStarted )
 							{
-								var row = toolbar[ r ];
-								
-								
-								// It's better to check if the row object is really
-								// available because it's a common mistake to leave
-								// an extra comma in the toolbar definition
-								// settings, which leads on the editor not loading
-								// at all in IE. (#3983)
-								if ( !row )
-									continue;
+								output.push( '</div>' );
+								groupStarted = 0;
+							}
 
-								var toolbarId = 'cke_' + CKEDITOR.tools.getNextNumber(),
-									toolbarObj = { id : toolbarId, items : [] };
+							if ( row === '/' )
+							{
+								output.push( '<div class="cke_break"></div>' );
+								continue;
+							}
 
-								if ( groupStarted )
+							items = row.items || row;
+
+							// Create all items defined for this toolbar.
+							for ( var i = 0 ; i < items.length ; i++ )
+							{
+								var item,
+									itemName = items[ i ],
+									canGroup;
+
+								item = editor.ui.create( itemName );
+
+								if ( item )
 								{
-									output.push( '</div>' );
-									groupStarted = 0;
-								}
+									canGroup = item.canGroup !== false;
 
-								if ( row === '/' )
-								{
-									output.push( '<div class="cke_break"></div>' );
-									continue;
-								}
-
-								output.push( '<span id="', toolbarId, '" class="cke_toolbar" role="presentation"><span class="cke_toolbar_start"></span>' );
-
-								// Add the toolbar to the "editor.toolbox.toolbars"
-								// array.
-								var index = toolbars.push( toolbarObj ) - 1;
-
-								// Create the next/previous reference.
-								if ( index > 0 )
-								{
-									toolbarObj.previous = toolbars[ index - 1 ];
-									toolbarObj.previous.next = toolbarObj;
-								}
-								
-								// Create all items defined for this toolbar.
-								for ( var i = 0 ; i < row.length ; i++ )
-								{
-									
-									var item,
-										itemName = row[ i ];
-
-									if ( itemName == '-' )
-										item = CKEDITOR.ui.separator;
-									else
-									try 
+									// Initialize the toolbar first, if needed.
+									if ( !toolbarObj )
 									{
-										item = editor.ui.create( itemName );
-									}
-									catch (e)
-									{
-									}
-									
+										// Create the basic toolbar object.
+										toolbarId = CKEDITOR.tools.getNextId();
+										toolbarObj = { id : toolbarId, items : [] };
+										toolbarName = row.name && ( editor.lang.toolbarGroups[ row.name ] || row.name );
 
-									if ( item )
-									{
-										
-										
-										if ( item.canGroup )
-										{
-											if ( !groupStarted )
-											{
-												output.push( '<span class="cke_toolgroup" role="presentation">' );
-												groupStarted = 1;
-											}
-										}
-										else if ( groupStarted )
-										{
-											output.push( '</span>' );
-											groupStarted = 0;
-										}
+										// Output the toolbar opener.
+										output.push( '<span id="', toolbarId, '" class="cke_toolbar ',
+											( toolbarName ? 'cke_toolbar_'+toolbarName : '' ), '"',
+											( toolbarName ? ' aria-labelledby="'+ toolbarId +  '_label"' : '' ),
+											' role="toolbar">' );
 
-										var itemObj = item.render( editor, output );
-										index = toolbarObj.items.push( itemObj ) - 1;
+										// If a toolbar name is available, send the voice label.
+										toolbarName && output.push( '<span id="', toolbarId, '_label" class="cke_voice_label">', toolbarName, '</span>' );
 
+										output.push( '<span class="cke_toolbar_start"></span>' );
+
+										// Add the toolbar to the "editor.toolbox.toolbars"
+										// array.
+										var index = toolbars.push( toolbarObj ) - 1;
+
+										// Create the next/previous reference.
 										if ( index > 0 )
 										{
-											itemObj.previous = toolbarObj.items[ index - 1 ];
-											itemObj.previous.next = itemObj;
+											toolbarObj.previous = toolbars[ index - 1 ];
+											toolbarObj.previous.next = toolbarObj;
 										}
-
-										itemObj.toolbar = toolbarObj;
-										itemObj.onkey = itemKeystroke;
-
-										/*
-										 * Fix for #3052:
-										 * Prevent JAWS from focusing the toolbar after document load.
-										 */
-										itemObj.onfocus = function()
-										{
-											if ( !editor.toolbox.focusCommandExecuted )
-												editor.focus();
-										};
 									}
-								}
 
-								if ( groupStarted )
-								{
-									output.push( '</span>' );
-									groupStarted = 0;
-								}
-								
-								output.push( '<span class="cke_toolbar_end"></span></span>' );
-								
-							}
-							
-							output.push( '</div>' );
-							
-							if ( editor.config.toolbarCanCollapse && !(editor.config.toolbar == "Basic_Provis" ))
-							{
-								var collapserId = 'cke_' + CKEDITOR.tools.getNextNumber();
-								
-								var collapserFn = CKEDITOR.tools.addFunction(
-									function()
+									if ( canGroup )
 									{
-										editor.execCommand( 'toolbarCollapse', collapserId );
-									} );
+										if ( !groupStarted )
+										{
+											output.push( '<span class="cke_toolgroup" role="presentation">' );
+											groupStarted = 1;
+										}
+									}
+									else if ( groupStarted )
+									{
+										output.push( '</span>' );
+										groupStarted = 0;
+									}
 
-								output.push( '<span id="' + collapserId + '" class="cke_expertenmodus">' )
-								
-								output.push( '<a title="' + editor.lang.toolbarCollapse
-														  + '" tabIndex="-1"' );
+									var itemObj = item.render( editor, output );
+									index = toolbarObj.items.push( itemObj ) - 1;
 
-								output.push( '" onclick="CKEDITOR.tools.callFunction(' + collapserFn + ')">',
-										'<span class="cke_expertenicon_collapse"></span></a></span>' );
-										
+									if ( index > 0 )
+									{
+										itemObj.previous = toolbarObj.items[ index - 1 ];
+										itemObj.previous.next = itemObj;
+									}
+
+									itemObj.toolbar = toolbarObj;
+									itemObj.onkey = itemKeystroke;
+
+									/*
+									 * Fix for #3052:
+									 * Prevent JAWS from focusing the toolbar after document load.
+									 */
+									itemObj.onfocus = function()
+									{
+										if ( !editor.toolbox.focusCommandExecuted )
+											editor.focus();
+									};
+								}
 							}
-							if (editor.config.toolbar == "Basic_Provis")
+
+							if ( groupStarted )
 							{
-								var item = editor.ui.create("Provis_Size");
-								var itemObj = item.render( editor, output );
-								itemObj.toolbar = toolbarObj;
-								itemObj.onkey = itemKeystroke;
-								
-								// Modac : Warum?
-								var collapserId = 'cke_' + CKEDITOR.tools.getNextNumber();
+								output.push( '</span>' );
+								groupStarted = 0;
 							}
-							
-							
-							
-							event.data.html += output.join( '' );
+
+							if ( toolbarObj )
+								output.push( '<span class="cke_toolbar_end"></span></span>' );
 						}
+
+						output.push( '</div>' );
+
+						if ( editor.config.toolbarCanCollapse && !(editor.config.toolbar == "Basic_Provis" ))
+						{
+							var collapserId = 'cke_' + CKEDITOR.tools.getNextNumber();
+							
+							var collapserFn = CKEDITOR.tools.addFunction(
+								function()
+								{
+									editor.execCommand( 'toolbarCollapse' );
+								});
+
+							output.push( '<span id="' + collapserId + '" class="cke_expertenmodus">' );
+							
+							output.push( '<a title="' + editor.lang.toolbarCollapse
+													  + '" tabIndex="-1"' );
+
+							output.push( '" onclick="CKEDITOR.tools.callFunction(' + collapserFn + ')">',
+									'<span class="cke_expertenicon_collapse"></span></a></span>' );
+									
+						}
+						
+						
+						event.data.html += output.join( '' );
 					});
 
 			editor.addCommand( 'toolbarFocus', commands.toolbarFocus );

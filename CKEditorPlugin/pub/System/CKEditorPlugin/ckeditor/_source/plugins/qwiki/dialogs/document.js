@@ -5,7 +5,6 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 
 CKEDITOR.dialog.add( 'document', function( editor )
 {
-
 	// Handles the event when the "Target" selection box is changed.
 	var targetChanged = function()
 	{
@@ -24,12 +23,12 @@ CKEDITOR.dialog.add( 'document', function( editor )
 		switch ( value )
  		{
 			case 'frame' :
-				targetName.setLabel( editor.lang.document.targetFrameName );
+				targetName.setLabel( editor.lang.qwikidocument.targetFrameName );
 				targetName.getElement().show();
 				break;
 			case 'popup' :
 				popupFeatures.show();
-				targetName.setLabel( editor.lang.document.targetPopupName );
+				targetName.setLabel( editor.lang.qwikidocument.targetPopupName );
 				targetName.getElement().show();
 				break;
 			default :
@@ -364,21 +363,21 @@ CKEDITOR.dialog.add( 'document', function( editor )
 	}
 
 	return {
-		title : editor.lang.document.title,
+		title : editor.lang.qwikidocument.title,
 		minWidth : 350,
 		minHeight : 230,
 		contents : [
 			{
 				id : 'info',
-				label : editor.lang.document.info,
-				title : editor.lang.document.info,
+				label : editor.lang.qwikidocument.info,
+				title : editor.lang.qwikidocument.info,
 				elements :
 				[
 					{
 						id : 'linkType',
 						type : 'select',
 						hidden : true,
-						label : editor.lang.document.type,
+						label : editor.lang.qwikidocument.type,
 						'default' : 'url',
 						items :
 						[
@@ -408,16 +407,15 @@ CKEDITOR.dialog.add( 'document', function( editor )
 									{
 										type : 'text',
 										id : 'url',
-										label : editor.lang.document.toUrl,
+										label : editor.lang.qwikidocument.toUrl,
 										required: true,
 										onLoad : function ()
 										{
 											var dialogElement = this.getDialog().getElement().getFirst();
 											var new_id = "dialog_" + CKEDITOR.tools.getNextId();
 											dialogElement.setAttribute("id", new_id);
-	
+											this.qwikiautosuggest("init", {source: CKEDITOR.qwikiautosuggest.attachments, minLength: 2});
 											this.allowOnChange = true;
-											this.nummer = new_id;
 										},
 										onKeyUp : function()
 										{
@@ -447,25 +445,6 @@ CKEDITOR.dialog.add( 'document', function( editor )
 											if ( this.allowOnChange )	
 												this.onKeyUp();
 										},
-										onShow : function()
-										{
-											//Alex: Verbessern - veralgemeinern
-											dialog = this.getDialog()
-											var el_id = dialog.getContentElement('info', 'url').getInputElement().getId();
-											
-											var options = {
-													script: FoswikiCKE.getFoswikiVar("VIEWSCRIPTURL") + "/Sandbox/AjaxHelper?section=attachment;contenttype=text/plain;skin=text;",
-													varname:"input",
-													klasse: this.nummer,
-													media:true,
-													shownoresults:false,
-													maxresults:16,
-													callback: function (obj) { document.getElementById(el_id).value = obj.id; }
-											};
-											//Alex: Verbessern
-											var as_json = new bsn.AutoSuggest(el_id, options);
-									
-										},
 										validate : function()
 										{
 											this.onKeyUp();
@@ -478,7 +457,7 @@ CKEDITOR.dialog.add( 'document', function( editor )
 											if ( this.getDialog().fakeObj )	// Edit Anchor.
 												return true;
 
-											var func = CKEDITOR.dialog.validate.notEmpty( editor.lang.document.noUrl );
+											var func = CKEDITOR.dialog.validate.notEmpty( editor.lang.qwikidocument.noUrl );
 											return func.apply( this );
 										},
 										setup : function( data )
@@ -529,7 +508,7 @@ CKEDITOR.dialog.add( 'document', function( editor )
 							{
 								type : 'fieldset',
 								id : 'selectAnchorText',
-								label : editor.lang.document.selectAnchor,
+								label : editor.lang.qwikidocument.selectAnchor,
 								setup : function( data )
 								{
 									if ( data.anchors.length > 0 )
@@ -548,7 +527,7 @@ CKEDITOR.dialog.add( 'document', function( editor )
 												type : 'select',
 												id : 'anchorName',
 												'default' : '',
-												label : editor.lang.document.anchorName,
+												label : editor.lang.qwikidocument.anchorName,
 												style : 'width: 100%;',
 												items :
 												[
@@ -583,7 +562,7 @@ CKEDITOR.dialog.add( 'document', function( editor )
 												type : 'select',
 												id : 'anchorId',
 												'default' : '',
-												label : editor.lang.document.anchorId,
+												label : editor.lang.qwikidocument.anchorId,
 												style : 'width: 100%;',
 												items :
 												[
@@ -625,7 +604,7 @@ CKEDITOR.dialog.add( 'document', function( editor )
 								type : 'html',
 								id : 'noAnchors',
 								style : 'text-align: center;',
-								html : '<div role="label" tabIndex="-1">' + CKEDITOR.tools.htmlEncode( editor.lang.document.noAnchors ) + '</div>',
+								html : '<div role="label" tabIndex="-1">' + CKEDITOR.tools.htmlEncode( editor.lang.qwikidocument.noAnchors ) + '</div>',
 								// Focus the first element defined in above html.
 								focus : true,
 								setup : function( data )
@@ -652,7 +631,7 @@ CKEDITOR.dialog.add( 'document', function( editor )
 							{
 								type : 'text',
 								id : 'emailAddress',
-								label : editor.lang.document.emailAddress,
+								label : editor.lang.qwikidocument.emailAddress,
 								required : true,
 								validate : function()
 								{
@@ -662,7 +641,7 @@ CKEDITOR.dialog.add( 'document', function( editor )
 											dialog.getValueOf( 'info', 'linkType' ) != 'email' )
 										return true;
 
-									var func = CKEDITOR.dialog.validate.notEmpty( editor.lang.document.noEmail );
+									var func = CKEDITOR.dialog.validate.notEmpty( editor.lang.qwikidocument.noEmail );
 									return func.apply( this );
 								},
 								setup : function( data )
@@ -685,7 +664,7 @@ CKEDITOR.dialog.add( 'document', function( editor )
 							{
 								type : 'text',
 								id : 'emailSubject',
-								label : editor.lang.document.emailSubject,
+								label : editor.lang.qwikidocument.emailSubject,
 								setup : function( data )
 								{
 									if ( data.email )
@@ -702,7 +681,7 @@ CKEDITOR.dialog.add( 'document', function( editor )
 							{
 								type : 'textarea',
 								id : 'emailBody',
-								label : editor.lang.document.emailBody,
+								label : editor.lang.qwikidocument.emailBody,
 								rows : 3,
 								'default' : '',
 								setup : function( data )
@@ -729,8 +708,8 @@ CKEDITOR.dialog.add( 'document', function( editor )
 			},
 			{
 				id : 'target',
-				label : editor.lang.document.target,
-				title : editor.lang.document.target,
+				label : editor.lang.qwikidocument.target,
+				title : editor.lang.qwikidocument.target,
 				elements :
 				[
 					{
@@ -747,8 +726,8 @@ CKEDITOR.dialog.add( 'document', function( editor )
 								'items' :
 								[
 									[ editor.lang.common.notSet, 'notSet' ],
-									[ editor.lang.document.targetFrame, 'frame' ],
-									[ editor.lang.document.targetPopup, 'popup' ],
+									[ editor.lang.qwikidocument.targetFrame, 'frame' ],
+									[ editor.lang.qwikidocument.targetPopup, 'popup' ],
 									[ editor.lang.common.targetNew, '_blank' ],
 									[ editor.lang.common.targetTop, '_top' ],
 									[ editor.lang.common.targetSelf, '_self' ],
@@ -771,7 +750,7 @@ CKEDITOR.dialog.add( 'document', function( editor )
 							{
 								type : 'text',
 								id : 'linkTargetName',
-								label : editor.lang.document.targetFrameName,
+								label : editor.lang.qwikidocument.targetFrameName,
 								'default' : '',
 								setup : function( data )
 								{
@@ -798,7 +777,7 @@ CKEDITOR.dialog.add( 'document', function( editor )
 						[
 							{
 								type : 'fieldset',
-								label : editor.lang.document.popupFeatures,
+								label : editor.lang.qwikidocument.popupFeatures,
 								children :
 								[
 									{
@@ -808,14 +787,14 @@ CKEDITOR.dialog.add( 'document', function( editor )
 											{
 												type : 'checkbox',
 												id : 'resizable',
-												label : editor.lang.document.popupResizable,
+												label : editor.lang.qwikidocument.popupResizable,
 												setup : setupPopupParams,
 												commit : commitPopupParams
 											},
 											{
 												type : 'checkbox',
 												id : 'status',
-												label : editor.lang.document.popupStatusBar,
+												label : editor.lang.qwikidocument.popupStatusBar,
 												setup : setupPopupParams,
 												commit : commitPopupParams
 
@@ -829,7 +808,7 @@ CKEDITOR.dialog.add( 'document', function( editor )
 											{
 												type : 'checkbox',
 												id : 'location',
-												label : editor.lang.document.popupLocationBar,
+												label : editor.lang.qwikidocument.popupLocationBar,
 												setup : setupPopupParams,
 												commit : commitPopupParams
 
@@ -837,7 +816,7 @@ CKEDITOR.dialog.add( 'document', function( editor )
 											{
 												type : 'checkbox',
 												id : 'toolbar',
-												label : editor.lang.document.popupToolbar,
+												label : editor.lang.qwikidocument.popupToolbar,
 												setup : setupPopupParams,
 												commit : commitPopupParams
 
@@ -851,7 +830,7 @@ CKEDITOR.dialog.add( 'document', function( editor )
 											{
 												type : 'checkbox',
 												id : 'menubar',
-												label : editor.lang.document.popupMenuBar,
+												label : editor.lang.qwikidocument.popupMenuBar,
 												setup : setupPopupParams,
 												commit : commitPopupParams
 
@@ -859,7 +838,7 @@ CKEDITOR.dialog.add( 'document', function( editor )
 											{
 												type : 'checkbox',
 												id : 'fullscreen',
-												label : editor.lang.document.popupFullScreen,
+												label : editor.lang.qwikidocument.popupFullScreen,
 												setup : setupPopupParams,
 												commit : commitPopupParams
 
@@ -873,7 +852,7 @@ CKEDITOR.dialog.add( 'document', function( editor )
 											{
 												type : 'checkbox',
 												id : 'scrollbars',
-												label : editor.lang.document.popupScrollBars,
+												label : editor.lang.qwikidocument.popupScrollBars,
 												setup : setupPopupParams,
 												commit : commitPopupParams
 
@@ -881,7 +860,7 @@ CKEDITOR.dialog.add( 'document', function( editor )
 											{
 												type : 'checkbox',
 												id : 'dependent',
-												label : editor.lang.document.popupDependent,
+												label : editor.lang.qwikidocument.popupDependent,
 												setup : setupPopupParams,
 												commit : commitPopupParams
 
@@ -896,7 +875,7 @@ CKEDITOR.dialog.add( 'document', function( editor )
 												type :  'text',
 												widths : [ '30%', '70%' ],
 												labelLayout : 'horizontal',
-												label : editor.lang.document.popupWidth,
+												label : editor.lang.qwikidocument.popupWidth,
 												id : 'width',
 												setup : setupPopupParams,
 												commit : commitPopupParams
@@ -906,7 +885,7 @@ CKEDITOR.dialog.add( 'document', function( editor )
 												type :  'text',
 												labelLayout : 'horizontal',
 												widths : [ '55%', '45%' ],
-												label : editor.lang.document.popupLeft,
+												label : editor.lang.qwikidocument.popupLeft,
 												id : 'left',
 												setup : setupPopupParams,
 												commit : commitPopupParams
@@ -922,7 +901,7 @@ CKEDITOR.dialog.add( 'document', function( editor )
 												type :  'text',
 												labelLayout : 'horizontal',
 												widths : [ '30%', '70%' ],
-												label : editor.lang.document.popupHeight,
+												label : editor.lang.qwikidocument.popupHeight,
 												id : 'height',
 												setup : setupPopupParams,
 												commit : commitPopupParams
@@ -931,7 +910,7 @@ CKEDITOR.dialog.add( 'document', function( editor )
 											{
 												type :  'text',
 												labelLayout : 'horizontal',
-												label : editor.lang.document.popupTop,
+												label : editor.lang.qwikidocument.popupTop,
 												widths : [ '55%', '45%' ],
 												id : 'top',
 												setup : setupPopupParams,
@@ -956,7 +935,7 @@ CKEDITOR.dialog.add( 'document', function( editor )
 					{
 						type : 'file',
 						id : 'filepath',
-						label : editor.lang.document.fileBrowser || "Lokale Datei",
+						label : editor.lang.qwikidocument.fileBrowser,
 						style: 'height:40px',
 						size : 26,
 						onChange : function()
@@ -967,7 +946,7 @@ CKEDITOR.dialog.add( 'document', function( editor )
 					{
 						type : 'text',
 						id : 'filename',
-						label : editor.lang.document.fileName || "Dateiname im Q.Wiki",
+						label : editor.lang.qwikidocument.fileName,
 						style : 'width: 60%',
 						size : 20,
 						onFocus : function()
@@ -975,8 +954,10 @@ CKEDITOR.dialog.add( 'document', function( editor )
 							if (!this.getValue())
 							{
 								dialog = this.getDialog()
-								var el_id = dialog.getContentElement('upload', 'filepath').getInputElement().getValue();
-								this.setValue(el_id);
+								var fname = dialog.getContentElement('upload', 'filepath').getInputElement().getValue();
+								// IE hates us and does stupid things
+								fname = fname.replace(/^C:\\fakepath\\/, '');
+								this.setValue(fname);
 							}
 						}
 					},
@@ -984,7 +965,7 @@ CKEDITOR.dialog.add( 'document', function( editor )
 						type : 'select',
 						hidden : 'true',
 						id : 'uploadtarget',
-						label : editor.lang.document.uploadTarget || "Upload Optionen",
+						label : editor.lang.qwikidocument.uploadOptions,
 						'default' : 'local',
 						items :
 							[
@@ -1211,6 +1192,16 @@ CKEDITOR.dialog.add( 'document', function( editor )
 			if ( !editor.config.linkShowTargetTab )
 				this.hidePage( 'target' );		//Hide Target tab.
 
+			this.on('selectPage', function(e) {
+				if (e.data.page == 'info') {
+					this.enableButton('ok');
+					$(this.getButton('ok').getElement().$).show();
+				} else {
+					this.disableButton('ok');
+					$(this.getButton('ok').getElement().$).hide();
+				}
+
+			});
 		},
 		// Inital focus on 'url' field if link is of type URL.
 		onFocus : function()

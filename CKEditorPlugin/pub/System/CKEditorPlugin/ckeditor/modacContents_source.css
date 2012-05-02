@@ -1,0 +1,143 @@
+
+/* CSS fuer den CKEditor-Content */
+
+body
+{
+	font-family: Arial, Verdana, sans-serif;
+	font-size: small;
+	color: #000000;
+	background-color: #fff;
+}
+
+
+h1, h2, h3, h4, h5, h6 {
+	font-weight:normal;
+	line-height:1.1em;
+}
+
+h1 {
+	margin-top:.5em;
+	font-size:165%;
+}
+h2 { font-size:145%; }
+h3 { font-size:127%; }
+h4 { font-size:117%; }
+h5 { font-size:107%; }
+h6 { font-size:100%; }
+
+
+h1, h2 {
+	border-width:1px;
+	border-style:none none solid none;
+	border-color: #AAAAAA;
+}
+
+h3 { 
+	border-style: none;
+	font-weight:bold;
+}
+
+
+ul {
+	list-style-image:url("images/bullet.gif");
+	margin-left: 0.1em;	
+}
+
+
+.cke_show_blocks h1,
+.cke_show_blocks h2, 
+.cke_show_blocks h3, 
+.cke_show_blocks h4, 
+.cke_show_blocks h5, 
+.cke_show_blocks h6 {
+	margin-top: 1em!important;
+}
+
+/* Fix spacing of editor combo items in IE8/9 */
+.cke_panel_list {
+	list-style: none;
+}
+
+
+/* -------------------------- Modac Tables ----------------------------*/
+
+/*-------- Modac_Standard = MA_table --------*/
+.Modac_Standard {
+	margin: 1em 0;
+	background: #f9f9f9;
+	border-collapse: collapse;
+	empty-cells:show;
+ }
+.Modac_Standard td {
+	border: 1px #AAA solid;
+	padding-left: 3px;
+	padding-right: 3px;
+}
+.Modac_Standard tr:first-child { 
+	text-align: center; 
+	font-weight: bold; 
+	color: #f9f9f9; 
+	background: #003c89; 
+ }
+/*-------- /Modac_Standard = MA_table --------*/
+
+/*-------- Modac_Standard_Ohne --------*/
+.Modac_Standard_Ohne {
+	margin: 1em 0;
+	background: #f9f9f9;
+	border-collapse: collapse;
+	empty-cells:show;
+ }
+.Modac_Standard_Ohne td {
+	border: 1px #AAA solid;
+	padding-left: 3px;
+	padding-right: 3px;
+}
+/*-------- /Modac_Standard_Ohne --------*/
+
+/*-------- Modac_Standard_Leer --------*/
+.Modac_Standard_Leer {
+	margin: 1em 0;
+	border-width: 0px;
+	border-collapse: collapse;
+	empty-cells:show;
+ }
+.Modac_Standard_Leer td {
+	padding-left: 3px;
+	padding-right: 3px;
+}
+/*-------- /Modac_Standard_Leer --------*/
+
+/*-------- deprecated: MA_table --------*/
+.MA_table {
+  margin: 1em 0;
+  background: #f9f9f9;
+  border: 1px #AAA solid;
+  border-collapse: collapse;
+  empty-cells:show;
+ }
+.MA_table td {
+	border: 1px #AAA solid;
+	padding-left: 3px;
+	padding-right: 3px;
+}
+.MA_table tr:first-child { 
+text-align: center; 
+font-weight: bold; 
+color: #f9f9f9; 
+background: #003c89; 
+ }
+.MA_table_controlling {
+  margin: 1em 1em 1em 0;
+  background: #f9f9f9;
+  border: 1px #AAA solid;
+  border-collapse: collapse;
+  empty-cells:show;
+}
+.MA_table_controlling tr:first-child {
+text-align: center; 
+font-weight: bold; 
+color: #f9f9f9; 
+background: #003c89; 
+ }
+/*-------- /MA_table --------*/

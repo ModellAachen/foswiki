@@ -18,7 +18,7 @@ var cssifyLength = function( length )
 // Modac : RegEx um ProVis Diagramme zu filtern
 var isProVis = function( element )
 	{
-		var provisRegex = new RegExp("%PROCESS\{[^\}]*\}%$", "ig");
+		var provisRegex = new RegExp("%PROCESS\{[^}]*\}%$", "ig");
 		var wert = provisRegex.test( element );
 		//alert(element + "und ist  :" + wert);
 		return wert;
@@ -98,6 +98,7 @@ var isCode = function( element )
 CKEDITOR.plugins.add('qwiki',
 {
 	requires : [ 'dialog', 'fakeobjects', 'qwikiprovisarea' ],
+	lang : [ 'de', 'en' ],
 
 	init : function( editor, pluginPath )
 	{
@@ -106,7 +107,7 @@ CKEDITOR.plugins.add('qwiki',
 		editor.addCommand( 'document', new CKEDITOR.dialogCommand( 'document' ) );
 		editor.ui.addButton( 'Document',
 			{
-				label	: editor.lang.document.toolbar,
+				label	: editor.lang.qwikidocument.toolbar,
 				command : 'document',
 				icon	: this.path + 'images/document.gif'
 			});
@@ -116,7 +117,7 @@ CKEDITOR.plugins.add('qwiki',
 		editor.addCommand( 'provis', new CKEDITOR.dialogCommand( 'provis' ));
 		editor.ui.addButton( 'ProVis',
 			{
-				label : editor.lang.flowchart.toolbar,
+				label : editor.lang.qwikiflowchart.toolbar,
 				command : 'provis',
 				icon	: this.path + 'images/flowchart.gif'
 			});
@@ -127,7 +128,7 @@ CKEDITOR.plugins.add('qwiki',
 				{
 					var element = CKEDITOR.plugins.link.getSelectedLink( editor ) || evt.data.element;
 
-					if ( element.getAttribute( '_cke_real_element_type' ) == 'provis' )
+					if ( element.getAttribute( 'data-cke-real-element-type' ) == 'provis' )
 					{
 						editor.execCommand('provisarea');
 					}
@@ -138,7 +139,7 @@ CKEDITOR.plugins.add('qwiki',
 		editor.addCommand( 'code', new CKEDITOR.dialogCommand( 'code' ) );
 		editor.ui.addButton( 'Code',
 			{
-				label : editor.lang.code.toolbar,
+				label : editor.lang.qwikicode.toolbar,
 				command : 'code',
 				icon	: this.path + 'images/code.png'
 			});
@@ -168,7 +169,7 @@ CKEDITOR.plugins.add('qwiki',
 					// ProVis Kontextmenü - Editieren starten
 					provis :
 					{
-						label : editor.lang.flowchart.contextmenu,
+						label : editor.lang.qwikiflowchart.contextmenu,
 						icon : this.path + "images/flowchart.gif",
 						command : 'provisarea',
 						group : 'provis',
@@ -191,14 +192,14 @@ CKEDITOR.plugins.add('qwiki',
 			// Modac : provis contextmenu
 			editor.contextMenu.addListener( function( element, selection )
 				{
-					if ( element && element.is( 'img' ) && element.getAttribute( '_cke_real_element_type' ) == 'provis' )
+					if ( element && element.is( 'img' ) && element.getAttribute( 'data-cke-real-element-type' ) == 'provis' )
 						return { provis : CKEDITOR.TRISTATE_OFF };
 				});
 			
 			// Modac : code contextmenu
 			editor.contextMenu.addListener( function( element, selection )
 				{
-					if ( element && element.is( 'img' ) && element.getAttribute( '_cke_real_element_type' ) == 'code' )
+					if ( element && element.is( 'img' ) && element.getAttribute( 'data-cke-real-element-type' ) == 'code' )
 						return { code : CKEDITOR.TRISTATE_OFF };
 				});
 			
@@ -321,17 +322,17 @@ var attributes =
 {
 	'class' : className,
 	src : CKEDITOR.getUrl( 'images/spacer.gif' ) ,
-	_cke_realelement : encodeURIComponent( html ),
-		_cke_real_node_type : realElement.type,
+	'data-cke-realelement' : encodeURIComponent( html ),
+		'data-cke-real-node-type' : realElement.type,
 		alt : lang[ realElementType ] || lang.unknown,
 		align : realElement.attributes.align || ''
 };
  
 	if ( realElementType )
-		attributes._cke_real_element_type = realElementType;
+		attributes['data-cke-real-element-type'] = realElementType;
 
 	if ( isResizable )
-		attributes._cke_resizable = isResizable;
+		attributes['data-cke-resizable'] = isResizable;
 	
 	if ( imgSrc )
 	{

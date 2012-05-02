@@ -98,7 +98,7 @@ CKEDITOR.dialog.add( 'code', function( editor )
 	};
 
 	return {
-		title : editor.lang.code.title,
+		title : editor.lang.qwikicode.title,
 		minWidth : 350,
 		minHeight : 230,
 		resizable : CKEDITOR.DIALOG_RESIZE_BOTH,

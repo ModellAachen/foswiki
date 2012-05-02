@@ -21,7 +21,6 @@ CKEDITOR.plugins.add( 'qwikiwikitext',
 				{
 					editor = event.editor;
 					
-					//alert("alex");
 					editor.updateElement()
     				setTimeout(function(){
     					FoswikiCKE.setUpContent(editor);

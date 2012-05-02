@@ -5,6 +5,8 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 
 CKEDITOR.plugins.add( 'qwikilink',
 {
+	requires : [ 'qwikiautosuggest' ],
+	lang : [ 'de', 'en' ],
 	init : function( editor )
 	{
 		// Add the link and unlink buttons.
