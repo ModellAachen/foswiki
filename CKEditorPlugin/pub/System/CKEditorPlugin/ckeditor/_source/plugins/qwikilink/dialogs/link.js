@@ -22,7 +22,7 @@ CKEDITOR.dialog.add( 'link', function( editor )
 		targetName.setValue( '' );
 
 		switch ( value )
- 		{
+		{
 			case 'frame' :
 				targetName.setLabel( editor.lang.link.targetFrameName );
 				targetName.getElement().show();
@@ -36,7 +36,7 @@ CKEDITOR.dialog.add( 'link', function( editor )
 				targetName.setValue( value );
 				targetName.getElement().hide();
 				break;
- 		}
+		}
 
 	};
 
@@ -99,7 +99,7 @@ CKEDITOR.dialog.add( 'link', function( editor )
 	var parseLink = function( editor, element )
 	{
 		var href = ( element  && ( element.data( 'cke-saved-href' ) || element.getAttribute( 'href' ) ) ) || '',
-		 	javascriptMatch,
+			javascriptMatch,
 			emailMatch,
 			anchorMatch,
 			urlMatch,
@@ -176,14 +176,14 @@ CKEDITOR.dialog.add( 'link', function( editor )
 				retval.url.protocol = urlMatch[1];
 				retval.url.url = urlMatch[2];
 			}
-			
+
 			else if (  href && ( urlMatch = href.match( qwikiRegex ) ) )
 			{
 				retval.type = 'qwiki';
 				retval.qwiki = {};
-				
+
 				var eintrag;
-				
+
 				if(urlMatch[1])
 				{
 					retval.qwiki.protocol = 'attachmenturl';
@@ -195,10 +195,10 @@ CKEDITOR.dialog.add( 'link', function( editor )
 					retval.qwiki.topicurl = urlMatch[2];
 				}
 			}
-			
+
 			else
 				retval.type = 'qwiki';
-			
+
 		}
 
 		// Load target and popup settings.
@@ -273,15 +273,15 @@ CKEDITOR.dialog.add( 'link', function( editor )
 		var elements = editor.document.getElementsByTag( 'img' ),
 			realAnchors = new CKEDITOR.dom.nodeList( editor.document.$.anchors ),
 			anchors = retval.anchors = [];
-		
-		
+
+
 		// Handle of all Foswiki Anchors (Headings)
-		
+
 		if (!CKEDITOR.env.ie)
 		{
 			var headingList = editor.document.$.getElementsByClassName ('TML');
 			var headingAnchors = new CKEDITOR.dom.nodeList ( headingList );
-			
+
 			for ( i = 0 ; i < headingAnchors.count() ; i++ )
 			{
 				item = headingAnchors.getItem( i );
@@ -292,7 +292,7 @@ CKEDITOR.dialog.add( 'link', function( editor )
 				anchors.push( item );
 			}
 		}
-		
+
 		for ( var i = 0; i < elements.count() ; i++ )
 		{
 			var item = elements.getItem( i );
@@ -475,8 +475,8 @@ CKEDITOR.dialog.add( 'link', function( editor )
 										style : 'width : 100%;',
 										items :
 										[
-										 	[ qlinkLang.typeTopic , 'topicurl' ],
-										 	[ qlinkLang.typeAnchor , 'anchorOptions' ],
+											[ qlinkLang.typeTopic , 'topicurl' ],
+											[ qlinkLang.typeAnchor , 'anchorOptions' ],
 											[ qlinkLang.typeFile , 'attachmenturl' ]
 										],
 										onChange : function()
@@ -484,13 +484,13 @@ CKEDITOR.dialog.add( 'link', function( editor )
 											var partIds = [ 'topicurl', 'anchorOptions' ];
 											var typeValue = (this.getValue() == "attachmenturl" ) ? "topicurl" : this.getValue();
 											dialog = this.getDialog();
-											
+
 											for ( var i = 0 ; i < partIds.length ; i++ )
 											{
 												var element = dialog.getContentElement( 'info', partIds[i] );
 												if ( !element )
 													continue;
-												
+
 												var htmlelement = element.getElement();
 												if ( partIds[i] == typeValue )
 												{
@@ -515,7 +515,7 @@ CKEDITOR.dialog.add( 'link', function( editor )
 										{
 											if ( data.qwiki )
 												this.setValue( data.qwiki.type || 'topicurl' );
-											
+
 											this.onChange();
 										},
 										commit : function( data )
@@ -539,10 +539,10 @@ CKEDITOR.dialog.add( 'link', function( editor )
 										validate : function()
 										{
 											var dialog = this.getDialog();
-											
+
 											//Alex:
 											return true;
-											
+
 											if ( dialog.getContentElement( 'info', 'type' ) &&
 													dialog.getValueOf( 'info', 'type' ) != 'topicurl' )
 												return true;
@@ -589,7 +589,7 @@ CKEDITOR.dialog.add( 'link', function( editor )
 								{
 								},
 								children :
-								[	 
+								[
 									{
 										type : 'fieldset',
 										id : 'selectAnchorText',
@@ -627,10 +627,10 @@ CKEDITOR.dialog.add( 'link', function( editor )
 																if ( data.anchors[i].name )
 																	this.add( data.anchors[i].name );
 															}
-		
+
 															if ( data.anchor )
 																this.setValue( data.anchor.name );
-		
+
 															var linkType = this.getDialog().getContentElement( 'info', 'linkType' );
 															if ( linkType && linkType.getValue() == 'email' )
 																this.focus();
@@ -639,7 +639,7 @@ CKEDITOR.dialog.add( 'link', function( editor )
 														{
 															if ( !data.anchor )
 																data.anchor = {};
-		
+
 															data.anchor.name = this.getValue();
 														}
 													},
@@ -662,7 +662,7 @@ CKEDITOR.dialog.add( 'link', function( editor )
 																if ( data.anchors[i].id )
 																	this.add( data.anchors[i].id );
 															}
-		
+
 															if ( data.anchor )
 																this.setValue( data.anchor.id );
 														},
@@ -670,7 +670,7 @@ CKEDITOR.dialog.add( 'link', function( editor )
 														{
 															if ( !data.anchor )
 																data.anchor = {};
-		
+
 															data.anchor.id = this.getValue();
 														}
 													}
@@ -1353,28 +1353,28 @@ CKEDITOR.dialog.add( 'link', function( editor )
 						url = ( data.url && CKEDITOR.tools.trim( data.url.url ) ) || '';
 					attributes[ 'data-cke-saved-href' ] = ( url.indexOf( '/' ) === 0 ) ? url : protocol + url;
 					break;
-					
+
 				case 'qwiki':
 					switch ( data.qwiki.type || 'topicurl')
 					{
 						case 'topicurl':
 							var protocol = '',
 									url = ( data.qwiki.topicurl && data.qwiki.topicurl ) || '';
-							attributes._cke_saved_href = ( url.indexOf( '/' ) === 0 ) ? url : protocol + url;
+							attributes['data-cke-saved-href'] = ( url.indexOf( '/' ) === 0 ) ? url : protocol + url;
 							break;
 						case 'anchorOptions':
 							var name = ( data.anchor && data.anchor.name ),
 								id = ( data.anchor && data.anchor.id );
-							attributes._cke_saved_href = '#' + ( name || id || '' );
+							attributes['data-cke-saved-href'] = '#' + ( name || id || '' );
 							break;
 						case 'attachmenturl':
 							var protocol = '',
 								url = ( data.qwiki.topicurl && data.qwiki.topicurl ) || '';
-							attributes._cke_saved_href = ( url.indexOf( '/' ) === 0 ) ? url : protocol + url;
+							attributes['data-cke-saved-href'] = ( url.indexOf( '/' ) === 0 ) ? url : protocol + url;
 							break;
 					}
-					
-					break;	
+
+					break;
 				case 'anchor':
 					var name = ( data.anchor && data.anchor.name ),
 						id = ( data.anchor && data.anchor.id );
@@ -1570,7 +1570,7 @@ CKEDITOR.dialog.add( 'link', function( editor )
 				urlField = this.getContentElement( 'info', 'topicurl' );
 				urlField.select();
 			}
-			
+
 			if ( linkType && linkType.getValue( ) == 'url' )
 			{
 				urlField = this.getContentElement( 'info', 'url' );
