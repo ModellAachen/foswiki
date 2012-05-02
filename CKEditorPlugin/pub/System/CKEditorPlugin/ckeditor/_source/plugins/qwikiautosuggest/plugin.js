@@ -48,7 +48,7 @@ $.extend( proto, {
 
 CKEDITOR.plugins.add( 'qwikiautosuggest',
 {
-	requires : ['dialog', 'dialogui'],
+	requires : ['dialogui'],
 
 	init : function( editor )
 	{
