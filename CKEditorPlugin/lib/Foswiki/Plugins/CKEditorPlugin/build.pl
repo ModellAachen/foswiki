@@ -37,7 +37,7 @@ my %preprocess_files = (
 # Regular expression syntax
 # Only applies to the automatic recursive processing above, obviously
 my @preprocess_ignore = (
-	'\.swp$', '\~$'
+	'\.swp$', '\~$', '\.xcf$'
 );
 
 # Should the unprocessed versions of the files be included, too?
