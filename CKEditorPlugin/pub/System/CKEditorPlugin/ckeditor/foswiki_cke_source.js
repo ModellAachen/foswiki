@@ -31,8 +31,7 @@ var FoswikiCKE = {
         if (FoswikiCKE.foswikiVars == null) {
         	//Alex: Variablen der aktuellen Instanz auslesen. Instanz sollte ggf. bei Installation übergeben werden...
         	var sets = CKEDITOR.instances.topic.config.foswiki_vars;
-            //alert(sets);
-            FoswikiCKE.foswikiVars = eval(sets);
+            FoswikiCKE.foswikiVars = sets;
         }
 
         return FoswikiCKE.foswikiVars[name];
