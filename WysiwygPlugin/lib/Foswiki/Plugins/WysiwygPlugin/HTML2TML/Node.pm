@@ -1399,10 +1399,10 @@ sub _handleA {
         #    return ( 0, $WC::CHECK1 . $nop . $text . $WC::CHECK2 );
         #}
         if ( $text eq $href ) {
-            return ( 0, $WC::CHECKw . '[' . $nop . '[' . $href . ']]' );
+            return ( 0, $WC::CHECKw . '[' . $nop . '[' . $this->{attrs}{href} . ']]' );
         }
         return ( 0,
-            $WC::CHECKw . '[' . $nop . '[' . $href . '][' . $text . ']]' );
+            $WC::CHECKw . '[' . $nop . '[' . $this->{attrs}{href} . '][' . $text . ']]' );
     }
     elsif ( $this->{attrs}->{name} ) {
 

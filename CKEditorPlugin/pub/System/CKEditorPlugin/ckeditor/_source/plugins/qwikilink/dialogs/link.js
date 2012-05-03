@@ -7,9 +7,6 @@ CKEDITOR.dialog.add( 'link', function( editor )
 {
 	var plugin = CKEDITOR.plugins.link;
 
-	var doubleDecode = function(s) { return decodeURIComponent(decodeURIComponent(s)); }
-	var doubleEncode = function(s) { return encodeURIComponent(encodeURIComponent(s)); }
-
 	// Handles the event when the "Target" selection box is changed.
 	var targetChanged = function()
 	{
@@ -140,7 +137,7 @@ CKEDITOR.dialog.add( 'link', function( editor )
 
 						for ( var i = 0; i < paramsMatchLength; i++ )
 						{
-							paramVal = doubleDecode( unescapeSingleQuote( paramsMatch[ i ].replace( paramQuoteRegex, '' ) ) );
+							paramVal = decodeURIComponent( unescapeSingleQuote( paramsMatch[ i ].replace( paramQuoteRegex, '' ) ) );
 							paramName = compiledProtectionFunction.params[ i ].toLowerCase();
 							email[ paramName ] = paramVal;
 						}
@@ -169,8 +166,8 @@ CKEDITOR.dialog.add( 'link', function( editor )
 				retval.type = 'email';
 				var email = ( retval.email = {} );
 				email.address = emailMatch[ 1 ];
-				subjectMatch && ( email.subject = doubleDecode( subjectMatch[ 1 ] ) );
-				bodyMatch && ( email.body = doubleDecode( bodyMatch[ 1 ] ) );
+				subjectMatch && ( email.subject = decodeURIComponent( subjectMatch[ 1 ] ) );
+				bodyMatch && ( email.body = decodeURIComponent( bodyMatch[ 1 ] ) );
 			}
 			// urlRegex matches empty strings, so need to check for href as well.
 			else if (  href && ( urlMatch = href.match( qwikiurlRegex ) ) )
@@ -397,7 +394,7 @@ CKEDITOR.dialog.add( 'link', function( editor )
 			i > 0 && retval.push( ',' );
 			retval.push( '\'',
 						 paramValue ?
-						 escapeSingleQuote( doubleEncode( email[ paramName ] ) )
+						 escapeSingleQuote( encodeURIComponent( email[ paramName ] ) )
 						 : '',
 						 '\'');
 		}
@@ -1395,8 +1392,8 @@ CKEDITOR.dialog.add( 'link', function( editor )
 						case '' :
 						case 'encode' :
 						{
-							var subject = doubleEncode( email.subject || '' ),
-								body = doubleEncode( email.body || '' );
+							var subject = encodeURIComponent( email.subject || '' ),
+								body = encodeURIComponent( email.body || '' );
 
 							// Build the e-mail parameters first.
 							var argList = [];
