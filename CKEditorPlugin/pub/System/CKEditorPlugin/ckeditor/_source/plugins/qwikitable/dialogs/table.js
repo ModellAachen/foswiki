@@ -273,8 +273,12 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 				}
 
 				// Insert the table element if we're creating one.
-				if ( !this._.selectedElement )
+				if ( !this._.selectedElement ) {
 					editor.insertElement( table );
+					// Insert line break after, since otherwise the editor
+					// will make it very hard to edit after the table
+					editor.insertElement( makeElement( 'p' ) );
+				}
 				// Properly restore the selection inside table. (#4822)
 				else
 					selection.selectBookmarks( bms );
