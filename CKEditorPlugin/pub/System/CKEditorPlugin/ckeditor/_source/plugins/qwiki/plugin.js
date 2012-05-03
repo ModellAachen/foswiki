@@ -117,7 +117,7 @@ CKEDITOR.plugins.add('qwiki',
 		editor.addCommand( 'provis', new CKEDITOR.dialogCommand( 'provis' ));
 		editor.ui.addButton( 'ProVis',
 			{
-				label : editor.lang.qwikiflowchart.toolbar,
+				label : editor.lang.qwiki.toolbarFlowchart,
 				command : 'provis',
 				icon	: this.path + 'images/flowchart.gif'
 			});
