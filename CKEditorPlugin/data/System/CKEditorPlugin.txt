@@ -1,3 +1,4 @@
+%META:TOPICINFO{author="BaseUserMapping_999" comment="autosave" date="1335973652" format="1.1" version="7"}%
 %META:TOPICPARENT{name="Plugins"}%
 ---+!! !CKEditorPlugin
 <!--
@@ -82,7 +83,7 @@ stylesSet : "modellaachen",
 templates_files : [ "CKEDITOR.getUrl('plugins/qwiki/templates/modellaachen.js')" ],
 templates : "modellaachen",
 pasteFromWordRemoveFontStyles : true,
-foswiki_vars : { PUBURLPATH : "%PUBURLPATH%", PUBURL : "%PUBURL%", WEB : "%WEB%", TOPIC : "%TOPIC%", ATTACHURL : "%ATTACHURL%", ATTACHURLPATH : "%ATTACHURLPATH%", VIEWSCRIPTURL : "%SCRIPTURL{view}%", SCRIPTSUFFIX: "%SCRIPTSUFFIX%", SCRIPTURL : "%SCRIPTURL%", SYSTEMWEB: "%SYSTEMWEB%", HTTP_HOST: "%HTTP_HOST%" },
+foswiki_vars : { PUBURLPATH : "%PUBURLPATH%", PUBURL : "%PUBURL%", WEB : "%BASEWEB%", TOPIC : "%BASETOPIC%", ATTACHURL : "%PUBURL%/%BASEWEB%/%BASETOPIC%", ATTACHURLPATH : "%PUBURLPATH%/%BASEWEB%/%BASETOPIC%", VIEWSCRIPTURL : "%SCRIPTURL{view}%", SCRIPTSUFFIX: "%SCRIPTSUFFIX%", SCRIPTURL : "%SCRIPTURL%", SYSTEMWEB: "%SYSTEMWEB%", HTTP_HOST: "%HTTP_HOST%" },
 height : "400",
 contentsCss : [
   "%PUBURLPATH%/%SYSTEMWEB%/CKEditorPlugin/ckeditor/contents.css",
