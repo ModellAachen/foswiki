@@ -245,7 +245,7 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 			switchLockRatio( this, false );	// Unlock.
 		};
 		return {
-			title : ( dialogType == 'qwikiimage' ) ? editor.lang.image.title : editor.lang.image.titleButton,
+			title : ( dialogType == 'image' ) ? editor.lang.image.title : editor.lang.image.titleButton,
 			minWidth : 420,
 			minHeight : 310,
 			onShow : function()
@@ -526,7 +526,7 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 											{
 												if ( type == IMAGE )
 												{
-													var url = element.getAttribute( '_cke_saved_src' ) || element.getAttribute( 'src' );
+													var url = element.getAttribute( 'data-cke-saved-src' ) || element.getAttribute( 'src' );
 													var field = this;
 
 													this.getDialog().dontResetSize = true;
@@ -554,7 +554,7 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 											{
 												if ( type == IMAGE && ( this.getValue() || this.isChanged() ) )
 												{
-													element.setAttribute( '_cke_saved_src', decodeURI( this.getValue() ) );
+													element.setAttribute( 'data-cke-saved-src', decodeURI( this.getValue() ) );
 													element.setAttribute( 'src', decodeURI( this.getValue() ) );
 												}
 												else if ( type == CLEANUP )
@@ -1439,11 +1439,11 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 
 	CKEDITOR.dialog.add( 'qwikiimage', function( editor )
 		{
-			return imageDialog( editor, 'qwikiimage' );
+			return imageDialog( editor, 'image' );
 		});
 
 	CKEDITOR.dialog.add( 'qwikiimagebutton', function( editor )
 		{
-			return imageDialog( editor, 'qwikiimagebutton' );
+			return imageDialog( editor, 'imagebutton' );
 		});
 })();
