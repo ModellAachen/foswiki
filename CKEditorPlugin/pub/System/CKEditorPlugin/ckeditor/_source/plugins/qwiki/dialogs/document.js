@@ -958,8 +958,8 @@ CKEDITOR.dialog.add( 'document', function( editor )
 							{
 								dialog = this.getDialog()
 								var fname = dialog.getContentElement('upload', 'filepath').getInputElement().getValue();
-								// IE hates us and does stupid things
-								fname = fname.replace(/^C:\\fakepath\\/, '');
+								// We're not terribly interested in Windows paths
+								fname = fname.replace(/^.:\\(.+)\\/, '');
 								this.setValue(fname);
 							}
 						}
