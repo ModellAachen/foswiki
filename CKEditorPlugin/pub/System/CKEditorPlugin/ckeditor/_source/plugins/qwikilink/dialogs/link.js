@@ -897,8 +897,12 @@ CKEDITOR.dialog.add( 'link', function( editor )
 								'default' : '',
 								setup : function( data )
 								{
-									if ( data.email )
+									if ( data.email ) {
 										this.setValue( data.email.body );
+										// Fix scrollbar in IE7
+										var e = $(this.getElement().$);
+										e.css('height', e.outerHeight());
+									}
 								},
 								commit : function( data )
 								{
