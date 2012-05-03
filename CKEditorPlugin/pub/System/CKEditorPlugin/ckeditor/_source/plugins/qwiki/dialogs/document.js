@@ -411,11 +411,14 @@ CKEDITOR.dialog.add( 'document', function( editor )
 										required: true,
 										onLoad : function ()
 										{
-											var dialogElement = this.getDialog().getElement().getFirst();
-											var new_id = "dialog_" + CKEDITOR.tools.getNextId();
-											dialogElement.setAttribute("id", new_id);
-											this.qwikiautosuggest("init", {source: CKEDITOR.qwikiautosuggest.attachments, minLength: 2});
 											this.allowOnChange = true;
+										},
+										onKeyDown : function()
+										{
+											// IE7 doesn't like doing this during onLoad
+											if (!this.qwikiautosuggest) return;
+											this.qwikiautosuggest("init", {source: CKEDITOR.qwikiautosuggest.attachments, minLength: 2});
+											this.qwikiautosuggest = false;
 										},
 										onKeyUp : function()
 										{
