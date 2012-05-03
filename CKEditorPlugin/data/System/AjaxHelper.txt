@@ -4,7 +4,7 @@
 Der folgende Bereich gibt Topics für den Ajax Client zurück.
 
 %STARTSECTION{"topic"}%
-[%SEARCH{ "^%URLPARAM{"input" default="does not exist"}%.*" type="regex" scope="topic" format="<nop>%URLPARAM{"format" encode="quote" default="{\\"label\\":\\"$topic\\",\\"sublabel\\":\\"$web\\",\\"value\\":\\"$topic.$web\\"}"}%" separator="," limit="%URLPARAM{"limit" default="10"}%" nonoise="on" excludetopic="%URLPARAM{"exclude"}%" web="%URLPARAM{"baseweb" default="%BASEWEB%"}%" }%]
+[%SEARCH{ "^%URLPARAM{"input" default="does not exist"}%.*" type="regex" scope="topic" format="<nop>%URLPARAM{"format" encode="quote" default="{\\"label\\":\\"$topic\\",\\"sublabel\\":\\"$web\\",\\"value\\":\\"$web.$topic\\"}"}%" separator="," limit="%URLPARAM{"limit" default="10"}%" nonoise="on" excludetopic="%URLPARAM{"exclude"}%" web="%URLPARAM{"baseweb" default="%BASEWEB%"}%" }%]
 %ENDSECTION{"topic"}%
 
 ---++ Web Create Helper
