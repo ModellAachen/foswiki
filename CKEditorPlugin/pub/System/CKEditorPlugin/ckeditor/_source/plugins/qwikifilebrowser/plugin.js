@@ -256,7 +256,7 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 		var height = editor.config[ 'ckefilebrowser' + ucFirst( dialog.getName() ) + 'WindowHeight' ]
 				|| editor.config.ckefilebrowserWindowHeight || '70%';
 
-		var params = this.ckefilebrowser.params || {};
+		var params = this.ckefilebrowser.params;
 		params.CKEditor = editor.name;
 		params.CKEditorFuncNum = editor._.ckefilebrowserFn;
 		if ( !params.langCode )
@@ -302,7 +302,7 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 	 */
 	function setupFileElement( editor, fileInput, ckefilebrowser )
 	{
-		var params = ckefilebrowser.params || {};
+		var params = ckefilebrowser.params;
 		params.CKEditor = editor.name;
 		params.CKEditorFuncNum = editor._.ckefilebrowserFn;
 		if ( !params.langCode )
@@ -323,7 +323,7 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 	 */
 	function setupPostFileElement( editor, fileInput, ckefilebrowser )
 	{
-		var params = ckefilebrowser.params || {};
+		var params = ckefilebrowser.params;
 		params.CKEditor = editor.name;
 		params.CKEditorFuncNum = editor._.ckefilebrowserFn;
 		if ( !params.langCode )
@@ -358,6 +358,9 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 
 			if ( !element.ckefilebrowser )
 				continue;
+
+			if ( element.ckefilebrowser.params === undefined )
+				element.ckefilebrowser.params = {};
 
 			if ( typeof element.ckefilebrowser == 'string' )
 			{

@@ -980,9 +980,6 @@ CKEDITOR.dialog.add( 'document', function( editor )
 							{
 						 		action : 'UploadPOST', //required
 						 		target : 'info:url', //required
-						 		params : {
-										platzhalter : 'platz' // Modac : Wofür gibt´s den Schrott?
-								},
 						 		url : FoswikiCKE.getFoswikiVar("SCRIPTURL") + '/rest/WysiwygPlugin/upload'
 						 	},
 						'for' : [ 'upload', 'filepath']

@@ -1227,9 +1227,6 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 								{
 							 		action : 'UploadPOST', //required
 							 		target : 'info:txtUrl', //required
-							 		params : {
-											platzhalter : 'platz'
-									},
 							 		url : FoswikiCKE.getFoswikiVar("SCRIPTURL") + '/rest/WysiwygPlugin/upload'
 							 	},
 							'for' : [ 'upload', 'filepath']
