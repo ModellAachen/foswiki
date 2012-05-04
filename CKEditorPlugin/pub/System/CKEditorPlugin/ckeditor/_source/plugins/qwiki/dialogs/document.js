@@ -124,7 +124,8 @@ CKEDITOR.dialog.add( 'document', function( editor )
 
 			// Compose the URL.
 			var url = data.url || '';
-			attributes['data-cke-saved-href'] = "%ATTACHURL%/" + url;
+			var urlPrefix = (url.match(/\//)) ? '%PUBURL%/' : '%ATTACHURL%/';
+			attributes['data-cke-saved-href'] = urlPrefix + url;
 
 			if ( !this._.selectedElement )
 			{
