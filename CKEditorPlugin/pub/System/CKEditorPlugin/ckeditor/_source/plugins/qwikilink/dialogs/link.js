@@ -431,7 +431,7 @@ CKEDITOR.dialog.add( 'link', function( editor )
 	return {
 		title : linkLang.title,
 		minWidth : 350,
-		minHeight : 230,
+		minHeight : 280,
 		contents : [
 			{
 				id : 'info',
@@ -896,15 +896,19 @@ CKEDITOR.dialog.add( 'link', function( editor )
 								type : 'textarea',
 								id : 'emailBody',
 								label : linkLang.emailBody,
-								rows : 3,
+								rows : 8,
 								'default' : '',
 								setup : function( data )
 								{
 									if ( data.email ) {
 										this.setValue( data.email.body );
-										// Fix scrollbar in IE7
-										var e = $(this.getElement().$);
-										e.css('height', e.outerHeight());
+										if (CKEDITOR.env.ie7Compat) {
+											// IE7 will magically only render
+											// the first line of text if
+											// 'position' is left at default
+											var e = $(this.getElement().$);
+											e.css('position', 'relative');
+										}
 									}
 								},
 								commit : function( data )
