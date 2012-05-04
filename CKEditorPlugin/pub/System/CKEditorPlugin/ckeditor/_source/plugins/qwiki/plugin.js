@@ -102,7 +102,13 @@ CKEDITOR.plugins.add('qwiki',
 
 	init : function( editor, pluginPath )
 	{
-	
+		// General UI fixes that don't fit anywhere else
+		// Make combo boxes wide enough so nothing gets truncated
+		$('head').append('<style type="text/css">\n'+
+			'.cke_panel { min-width: 200px; }\n'+
+			'.cke_rcombo { min-width: 10em; }\n'+
+		'</style>');
+
 		// Dokumente Verlinken
 		editor.addCommand( 'document', new CKEDITOR.dialogCommand( 'document' ) );
 		editor.ui.addButton( 'Document',
