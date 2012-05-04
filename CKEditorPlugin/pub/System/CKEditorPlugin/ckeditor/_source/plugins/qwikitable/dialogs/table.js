@@ -7,6 +7,7 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 {
 	var widthPattern = /^(\d+(?:\.\d+)?)(px|%)$/,
 		heightPattern = /^(\d+(?:\.\d+)?)px$/;
+	var alreadyChangingType = false;
 
 	var commitValue = function( data )
 	{
@@ -43,51 +44,42 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 				var styles = dialog.getContentElement( 'advanced', 'advStyles' );
 				var classes = dialog.getContentElement( 'advanced', 'advCSSClasses' );
 
-				if (dialogadvtab && !getAdvSetting('qwikitable_advancedtab'))
-					dialog.hidePage('advanced');
+				styles.on( 'change', function( evt )
+					{
+						// Synchronize width value.
+						var width = this.getStyle( 'width', '' ),
+							txtWidth = dialog.getContentElement( 'info', 'txtWidth' ),
+							cmbWidthType = dialog.getContentElement( 'info', 'cmbWidthType' ),
+							isPx = 1;
 
-				if ( styles )
-				{
-					styles.on( 'change', function( evt )
+						if ( width )
 						{
-							// Synchronize width value.
-							var width = this.getStyle( 'width', '' ),
-								txtWidth = dialog.getContentElement( 'info', 'txtWidth' ),
-								cmbWidthType = dialog.getContentElement( 'info', 'cmbWidthType' ),
-								isPx = 1;
+							isPx = ( width.length < 3 || width.substr( width.length - 1 ) != '%' );
+							width = parseInt( width, 10 );
+						}
 
-							if ( width )
-							{
-								isPx = ( width.length < 3 || width.substr( width.length - 1 ) != '%' );
-								width = parseInt( width, 10 );
-							}
+						txtWidth && txtWidth.setValue( width, true );
+						cmbWidthType && cmbWidthType.setValue( isPx ? 'pixels' : 'percents', true );
 
-							txtWidth && txtWidth.setValue( width, true );
-							cmbWidthType && cmbWidthType.setValue( isPx ? 'pixels' : 'percents', true );
+						// Synchronize height value.
+						var height = this.getStyle( 'height', '' ),
+							txtHeight = dialog.getContentElement( 'info', 'txtHeight' );
 
-							// Synchronize height value.
-							var height = this.getStyle( 'height', '' ),
-								txtHeight = dialog.getContentElement( 'info', 'txtHeight' );
-
-							height && ( height = parseInt( height, 10 ) );
-							txtHeight && txtHeight.setValue( height, true );
-						});
-				}
-				if ( classes )
-				{
-					classes.on( 'change', function( evt )
-						{
-							var check = this.getValue();
-							check = check.match(/Modac_Standard_Leer|Modac_Standard_Ohne|Modac_Standard/);
-							if(check){
-								dialog.getContentElement('info', 'tableType').setValue(this.getValue());
-							}
-							else {
-								dialog.getContentElement('info', 'tableType').setValue('');
-							}
-
-						});
-				}
+						height && ( height = parseInt( height, 10 ) );
+						txtHeight && txtHeight.setValue( height, true );
+					});
+				classes.on( 'change', function( evt )
+					{
+						var check = this.getValue().match(/Modac_Standard_Leer|Modac_Standard_Ohne|Modac_Standard/);
+						if(check){
+							dialog.getContentElement('info', 'tableType').setValue(this.getValue());
+							dialog.hidePage('advanced');
+						}
+						else {
+							dialog.getContentElement('info', 'tableType').setValue('');
+							dialog.showPage('advanced');
+						}
+					});
 			},
 
 			onShow : function()
@@ -100,7 +92,8 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 				var rowsInput = this.getContentElement( 'info', 'txtRows' ),
 					colsInput = this.getContentElement( 'info', 'txtCols' ),
 					widthInput = this.getContentElement( 'info', 'txtWidth' ),
-					heightInput = this.getContentElement( 'info', 'txtHeight' );
+					heightInput = this.getContentElement( 'info', 'txtHeight' ),
+					classes = this.getContentElement( 'advanced', 'advCSSClasses' );
 
 				if ( command == 'tableProperties' )
 				{
@@ -135,7 +128,10 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 				{
 					rowsInput && rowsInput.enable();
 					colsInput && colsInput.enable();
+					classes.setValue(this.getContentElement('info', 'tableType').getValue());
 				}
+
+				classes.fire('change');
 
 				// Call the onChange method for the widht and height fields so
 				// they get reflected into the Advanced tab.
@@ -308,39 +304,14 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 											[ editor.lang.qwikitable.type_invisible, 'Modac_Standard_Leer' ],
 											[ editor.lang.qwikitable.type_none, '' ]
 										],
-									onLoad : function( selectedTable )
-									{
-										/* Modac : Stylesheet Klassen Übernehmen
-										var cssClass = this.getDialog().getContentElement('advanced', 'advCSSClasses').getValue() || '';
-										var check = cssClass.match(/Modac_Standard/g);
-										if (check){
-											this.setValue(cssClass);
-										}
-										else {
-											this.setValue('');
-										}
-										*/
-									},
 									onChange : function( data, table )
 									{
+										if (alreadyChangingType) return;
 										// Modac : Stylesheet Klassen setzen
-										var styleclass = this.getDialog().getContentElement('advanced', 'advCSSClasses').getValue();
-																				
-										if (this.getValue() != styleclass && this.getValue() != '')
-										{
-											//alert("onchange" + this.getValue());
-											this.getDialog().getContentElement('advanced', 'advCSSClasses').setValue(this.getValue());
-										}
-									},
-									commit : function( data, table )
-									{
-										/* Modac : Stylesheet Klassen setzen
-										if (this.getValue() != '')
-										{
-											alert(this.getValue());
-											this.getDialog().getContentElement('advanced', 'advCSSClasses').setValue(this.getValue());
-										}
-										*/
+										alreadyChangingType = true;
+										var classes = this.getDialog().getContentElement('advanced', 'advCSSClasses');
+										classes.setValue(this.getValue());
+										alreadyChangingType = false;
 									}
 								}
 							]
@@ -753,7 +724,7 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 						}
 					]
 				},
-				dialogadvtab && dialogadvtab.createAdvancedTab( editor )
+				dialogadvtab.createAdvancedTab( editor )
 			]
 		};
 	}

@@ -5,6 +5,7 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 
 CKEDITOR.plugins.add( 'qwikitable',
 {
+	requires : [ 'dialogadvtab' ],
 	lang : ['de','en'],
 	init : function( editor )
 	{
