@@ -117,10 +117,10 @@ CKEDITOR.plugins.add( 'qwikiautosuggest',
 				}
 			}
 		});
+		CKEDITOR.qwikiautosuggest = {
+			topics: FoswikiCKE.getFoswikiVar("VIEWSCRIPTURL") + "/System/AjaxHelper?section=topic;contenttype=text/plain;skin=text;baseweb=all,-Trash*,-System,-TWiki,-Sandbox;input=$query",
+			attachments: FoswikiCKE.getFoswikiVar("VIEWSCRIPTURL") + "/System/AjaxHelper?section=attachment;contenttype=text/plain;skin=text;input=$query"
+		};
 	}
 } );
 
-CKEDITOR.qwikiautosuggest = {
-	topics: FoswikiCKE.getFoswikiVar("VIEWSCRIPTURL") + "/System/AjaxHelper?section=topic;contenttype=text/plain;skin=text;baseweb=all,-Trash*,-System,-TWiki,-Sandbox;input=$query",
-	attachments: FoswikiCKE.getFoswikiVar("VIEWSCRIPTURL") + "/System/AjaxHelper?section=attachment;contenttype=text/plain;skin=text;input=$query"
-};
