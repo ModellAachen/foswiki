@@ -20,5 +20,5 @@ Der folgende Bereich gibt Topics für den Ajax Client zurück.
 Der folgende Bereich gibt Attachments für den Ajax Client zurück
 
 %STARTSECTION{"attachment"}%[
-%ATTACHMENTLIST{web="*" excludeweb="System, Sandbox, Trash, TWiki" topic="*" sort="$fileName" format="{\"label\":\"$fileName\",\"sublabel\":\"<strong>$fileTopic</strong> ($fileWeb)\",\"value\":\"%PUBURLPATH%/$fileWeb/$fileTopic/$fileName\"}" separator="," includefilepattern="(?i)%URLPARAM{"input" default="Keine Suchergebnisse"}%"}%]
+%ATTACHMENTLIST{web="*" excludeweb="System, Sandbox, Trash, TWiki" topic="*" sort="$fileName" format="{\"label\":\"$fileName\",\"sublabel\":\"<strong>$fileTopic</strong> ($fileWeb)\",\"value\":\"$fileWeb/$fileTopic/$fileName\"}" separator="," includefilepattern="(?i)%URLPARAM{"input" default="Keine Suchergebnisse"}%"}%]
 %ENDSECTION{"attachment"}%

@@ -144,16 +144,7 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 	    //Parameter mit den Auswahlelementen erweitern
 	    params.filename = dialog.getContentElement( this[ 'for' ][ 0 ], 'filename' ).getInputElement().$.value;
 	    
-	    //Web und Topic auslesen
-	    if (dialog.getContentElement( this[ 'for' ][ 0 ], 'uploadtarget' ).getInputElement().$.value == 'local')
-	    {
-	    	params.topic = utf8_decode(FoswikiCKE.getTopicPath());
-	    	
-	    }
-	    else
-	    {
-	    	params.topic = "Main.WebAttachments";
-	    }
+		params.topic = utf8_decode(FoswikiCKE.getTopicPath());
 	    
 	    for ( var i in params )
 	    {
