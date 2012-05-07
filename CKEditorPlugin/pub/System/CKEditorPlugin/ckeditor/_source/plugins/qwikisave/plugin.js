@@ -24,7 +24,7 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 	var doFinalSubmit = function(editor, form)
 	{
 		editor.updateElement();
-		if (StrikeOne) StrikeOne.submit(form);
+		if (typeof StrikeOne == 'object') StrikeOne.submit(form);
 		form.submit();
 	}
 
