@@ -21,12 +21,32 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 		}
 	};
 
-	var saveHandler = function(e) {
-		if (foswiki.Edit.validateSuppressed) return true;
-		if (!foswiki.Edit.validateMandatoryFields()) return false;
+	var doFinalSubmit = function(editor, form)
+	{
+		editor.updateElement();
+		StrikeOne.submit(form);
+		form.submit();
+	}
 
+	var saveHandler = function(e) {
+		if (!foswiki.Edit.validateSuppressed &&
+				!foswiki.Edit.validateMandatoryFields())
+			return false;
+
+		// Use saveCallback to restore secret comment if necessary
+		var editor = e.data;
+		var $form = editor.element.$.form;
 		$.blockUI();
 		abortingEdit = false;
+		var html = FoswikiCKE.saveCallback(editor, editor.getData());
+		if (html) {
+			editor.setData(html, function() {
+				doFinalSubmit(editor, $form);
+			});
+		} else {
+			doFinalSubmit(editor, $form);
+		}
+		return false;
 	};
 
 	var unloadHandler = function(e) {
