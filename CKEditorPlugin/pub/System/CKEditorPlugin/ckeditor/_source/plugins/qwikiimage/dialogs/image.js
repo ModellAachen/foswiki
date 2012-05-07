@@ -546,9 +546,8 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 											},
 											onShow : function()
 											{
-												//Alex: Verbessern - veralgemeinern
 												dialog = this.getDialog()
-												dialog.getContentElement('info', 'txtUrl').qwikiautosuggest({source: CKEDITOR.qwikiautosuggest.attachments, minLength: 2});
+												dialog.getContentElement('info', 'txtUrl').qwikiautosuggest('init', {source: CKEDITOR.qwikiautosuggest.attachments, minLength: 2});
 											},
 											commit : function( type, element )
 											{
