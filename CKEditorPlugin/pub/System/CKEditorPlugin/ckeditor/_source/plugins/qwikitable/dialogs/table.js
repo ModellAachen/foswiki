@@ -424,7 +424,7 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 										{
 											type : 'text',
 											id : 'txtBorder',
-											'default' : 1,
+											'default' : 0,
 											hidden : !getAdvSetting('qwikitable_cellproperties'),
 											label : editor.lang.table.border,
 											style : 'width:3em',
