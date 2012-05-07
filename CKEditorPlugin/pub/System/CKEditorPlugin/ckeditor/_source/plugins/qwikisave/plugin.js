@@ -25,6 +25,8 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 	{
 		editor.updateElement();
 		if (typeof StrikeOne == 'object') StrikeOne.submit(form);
+		var action = abortingEdit ? 'cancel' : 'save';
+		$(form).find('input[name=action]').val(action);
 		form.submit();
 	}
 
