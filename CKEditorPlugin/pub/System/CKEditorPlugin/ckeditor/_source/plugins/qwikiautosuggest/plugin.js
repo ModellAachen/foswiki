@@ -84,10 +84,18 @@ CKEDITOR.plugins.add( 'qwikiautosuggest',
 				switch (method) {
 				case "init":
 					var opts = arguments[1];
-					// Required so that the list doesn't pop up behind the CKEditor BG overlay -jk
-					jq.css("z-index", $(this.getDialog().getElement().$.firstChild).css("z-index"));
-					jq.css("position", "relative");
 					if (opts.html !== false) opts.html = true;
+					var orig_open = opts.open;
+					// Required so that the list doesn't pop up behind the
+					// CKEditor BG overlay -jk
+					// We can't use the jQuery method of setting a base
+					// z-index for the input element; IE7 will mess things up
+					// spectacularly if we do. So, set the z-index dynamically
+					// ourselves.
+					opts.open = function(ev, ui) {
+						if (orig_open) orig_open(ev, ui);
+						$('.ui-autocomplete').css('z-index', '10020');
+					};
 					jq.autocomplete(opts);
 					var source;
 					if (opts && typeof(opts.source) == "string")

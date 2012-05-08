@@ -31,12 +31,9 @@ CKEDITOR.dialog.add( 'document', function( editor )
 										id : 'url',
 										label : editor.lang.qwikidocument.toUrl,
 										required: true,
-										onKeyDown : function()
+										onLoad : function()
 										{
-											// IE7 doesn't like doing this during onLoad
-											if (!this.qwikiautosuggest) return;
 											this.qwikiautosuggest("init", {source: CKEDITOR.qwikiautosuggest.attachments, minLength: 2});
-											this.qwikiautosuggest = false;
 										},
 										validate : function()
 										{
