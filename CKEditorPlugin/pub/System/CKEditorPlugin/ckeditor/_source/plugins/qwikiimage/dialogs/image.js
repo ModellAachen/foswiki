@@ -490,7 +490,12 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 											{
 												var dialog = this.getDialog(),
 													newUrl = this.getValue();
-												
+
+												// During autocomplete, selecting an option in the menu
+												// blurs the input and thus triggers this handler.
+												// We don't have the complete URL at this point, though.
+												if ($('.ui-autocomplete:visible').length > 0) return;
+
 												//Update original image
 												if ( newUrl.length > 0 )	//Prevent from load before onShow
 												{
@@ -546,15 +551,25 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 											},
 											onShow : function()
 											{
-												dialog = this.getDialog()
-												dialog.getContentElement('info', 'txtUrl').qwikiautosuggest('init', {source: CKEDITOR.qwikiautosuggest.attachments, minLength: 2});
+												dialog = this.getDialog();
+												dialog.getContentElement('info', 'txtUrl').qwikiautosuggest('init', {
+													source: CKEDITOR.qwikiautosuggest.attachmentURLs,
+													minLength: 2,
+													select: function() {
+														// Need to delay this so that it only runs after the field has been updated
+														setTimeout(function() {
+															// Change of value doesn't trigger this when the field is not focused
+															dialog.getContentElement('info', 'txtUrl').fire('change');
+														});
+													}
+												});
 											},
 											commit : function( type, element )
 											{
 												if ( type == IMAGE && ( this.getValue() || this.isChanged() ) )
 												{
-													element.setAttribute( 'data-cke-saved-src', decodeURI( this.getValue() ) );
-													element.setAttribute( 'src', decodeURI( this.getValue() ) );
+													element.setAttribute( 'data-cke-saved-src', this.getValue() );
+													element.setAttribute( 'src', this.getValue() );
 												}
 												else if ( type == CLEANUP )
 												{

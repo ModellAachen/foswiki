@@ -127,7 +127,8 @@ CKEDITOR.plugins.add( 'qwikiautosuggest',
 		});
 		CKEDITOR.qwikiautosuggest = {
 			topics: FoswikiCKE.getFoswikiVar("VIEWSCRIPTURL") + "/System/AjaxHelper?section=topic;contenttype=text/plain;skin=text;baseweb=all,-Trash*,-System,-TWiki,-Sandbox;input=$query",
-			attachments: FoswikiCKE.getFoswikiVar("VIEWSCRIPTURL") + "/System/AjaxHelper?section=attachment;contenttype=text/plain;skin=text;input=$query"
+			attachments: FoswikiCKE.getFoswikiVar("VIEWSCRIPTURL") + "/System/AjaxHelper?section=attachment;contenttype=text/plain;skin=text;input=$query",
+			attachmentURLs: FoswikiCKE.getFoswikiVar("VIEWSCRIPTURL") + "/System/AjaxHelper?section=attachmenturl;contenttype=text/plain;skin=text;input=$query"
 		};
 	}
 } );
