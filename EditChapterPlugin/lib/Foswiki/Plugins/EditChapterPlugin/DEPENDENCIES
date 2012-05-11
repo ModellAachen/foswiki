@@ -1,5 +1,6 @@
 Foswiki::Plugins::JQueryPlugin,>=4.10,perl,Required.
 Foswiki::Plugins::JsonRpcContrib,>=1.1,perl,Required.
 Foswiki::Plugins::RenderPlugin,>=3.1,perl,Required.
+Foswiki::Plugins::NatEditPlugin,>=5.20,perl,Optional.
 ONLYIF ( $Foswiki::Plugins::VERSION < 2.1)
 Foswiki::Plugins::ZonePlugin,>=1.0,perl,Required. required for Foswiki < 1.1

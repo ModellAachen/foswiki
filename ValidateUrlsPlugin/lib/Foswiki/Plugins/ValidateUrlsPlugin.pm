@@ -33,7 +33,8 @@ $pluginName = 'ValidateUrlsPlugin';
 sub initPlugin {
     my ( $topic, $web, $user, $installWeb ) = @_;
 
-    Foswiki::Func::registerRESTHandler( 'getExternalLinks', \&getExternalLinks );
+    Foswiki::Func::registerRESTHandler( 'getExternalLinks',
+        \&getExternalLinks );
     return 1;
 }
 
@@ -46,6 +47,7 @@ searches through the specified web and lists all the explicitly listed external 
 =cut
 
 sub getExternalLinks {
+
     #my ($session) = @_;
 
 #TODO: make a lease file, and only allow the first request to run..
@@ -55,8 +57,8 @@ sub getExternalLinks {
     my $urls = \%urlHash;
 
     my $query = Foswiki::Func::getRequestObject();
-    my $web = $query->param('web'); 
-    return 'no web specified' if (not defined($web));
+    my $web   = $query->param('web');
+    return 'no web specified' if ( not defined($web) );
     $web =~ /(.*)/;
     $web = $1;
 
@@ -86,13 +88,14 @@ s/($Foswiki::regex{linkProtocolPattern}:([^\s<>'"\]]+[^\s*.,!?;:"')<|\]]))/_exte
     my $return = join(
         "<br /></div>\n",
         map {
-                "<div id='section"
-              . ++$id
+                "<div id='section" 
+              . ++$id 
               . "'><span id='testUrl$id' >$_</span> "
               . (
                 defined( $urls->{$_}->{response} )
                 ? ' (' . $urls->{$_}->{response} . ') '
-                : '' )
+                : ''
+              )
               . ', '
               . $urls->{$_}->{count} . ', '
               . join( ', ', keys( %{ $urls->{$_}->{topics} } ) )
@@ -103,7 +106,9 @@ s/($Foswiki::regex{linkProtocolPattern}:([^\s<>'"\]]+[^\s*.,!?;:"')<|\]]))/_exte
     my @okLinks;
 
     foreach my $key (@sortedKeys) {
-        if ( defined($urls->{$key}->{response}) and $urls->{$key}->{response} eq 200 ) {
+        if ( defined( $urls->{$key}->{response} )
+            and $urls->{$key}->{response} eq 200 )
+        {
             push( @okLinks, $key );
         }
         else {
@@ -111,9 +116,14 @@ s/($Foswiki::regex{linkProtocolPattern}:([^\s<>'"\]]+[^\s*.,!?;:"')<|\]]))/_exte
         }
     }
 
-    my $viewPermission = $Foswiki::cfg{Plugins}{$pluginName}{ReportViewPermission} || 'AdminGroup';
-    if ((!defined($viewPermission)) || ($viewPermission ne '')) {
-        $viewPermission = "\n   * Set ALLOWTOPICVIEW = %USERSWEB%.".Foswiki::Func::normalizeWebTopicName('%USERSWEB%', $viewPermission)."\n";
+    my $viewPermission =
+      $Foswiki::cfg{Plugins}{$pluginName}{ReportViewPermission} || 'AdminGroup';
+    if ( ( !defined($viewPermission) ) || ( $viewPermission ne '' ) ) {
+        $viewPermission =
+          "\n   * Set ALLOWTOPICVIEW = %USERSWEB%."
+          . Foswiki::Func::normalizeWebTopicName( '%USERSWEB%',
+            $viewPermission )
+          . "\n";
     }
     my $generatedTopic =
         "\n---++ External URL's in $web"
@@ -126,7 +136,8 @@ s/($Foswiki::regex{linkProtocolPattern}:([^\s<>'"\]]+[^\s*.,!?;:"')<|\]]))/_exte
               . (
                 defined( $urls->{$_}->{response} )
                 ? ' (' . $urls->{$_}->{response} . ') '
-                : '' )
+                : ''
+              )
               . ', '
               . $urls->{$_}->{count} . ', '
               . join( ', ', keys( %{ $urls->{$_}->{topics} } ) )
@@ -140,7 +151,8 @@ s/($Foswiki::regex{linkProtocolPattern}:([^\s<>'"\]]+[^\s*.,!?;:"')<|\]]))/_exte
               . (
                 defined( $urls->{$_}->{response} )
                 ? ' (' . $urls->{$_}->{response} . ') '
-                : '' )
+                : ''
+              )
               . ', '
               . $urls->{$_}->{count} . ', '
               . join( ', ', keys( %{ $urls->{$_}->{topics} } ) )
@@ -164,7 +176,7 @@ s/($Foswiki::regex{linkProtocolPattern}:([^\s<>'"\]]+[^\s*.,!?;:"')<|\]]))/_exte
       . scalar( keys( %{$urls} ) )
       . " urls: <br />$return\n\n"
       . "see <a href='"
-      . Foswiki::Func::getScriptUrl($web, 'WebExternalURLsReport', 'view')
+      . Foswiki::Func::getScriptUrl( $web, 'WebExternalURLsReport', 'view' )
       . "'>$web 's WebExternalURLsReport</a>";
 }
 

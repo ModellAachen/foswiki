@@ -26,21 +26,21 @@ use strict;
 # Inherit from file backend; we use the local copy as the cache for
 # uploading from
 use Foswiki::Plugins::PublishPlugin::file;
-our @ISA = ( 'Foswiki::Plugins::PublishPlugin::file' );
+our @ISA = ('Foswiki::Plugins::PublishPlugin::file');
 
 use File::Temp qw(:seekable);
 use File::Spec;
 
 sub new {
     my $class = shift;
-    my $this = $class->SUPER::new( @_ );
+    my $this  = $class->SUPER::new(@_);
 
     $this->{params}->{fastupload} ||= 0;
     if ( $this->{params}->{destinationftpserver} ) {
         if ( $this->{params}->{destinationftppath} =~ /^\/?(.*)$/ ) {
             $this->{params}->{destinationftppath} = $1;
         }
-        $this->{logger}->logInfo('', "fastUpload = $this->{fastupload}");
+        $this->{logger}->logInfo( '', "fastUpload = $this->{fastupload}" );
     }
 
     return $this;
@@ -49,20 +49,24 @@ sub new {
 sub param_schema {
     my $class = shift;
     return {
-	destinationftpserver => {
-	    validator => \&Foswiki::Plugins::PublishPlugin::Publisher::validateNonEmpty
-	},
-	destinationftppath => {
-	    validator => \&Foswiki::Plugins::PublishPlugin::Publisher::validateNonEmpty
-	},
-	destinationftpusername => {
-	    validator => \&Foswiki::Plugins::PublishPlugin::Publisher::validateNonEmpty
-	},
-	destinationftppassword => {
-	    validator => \&Foswiki::Plugins::PublishPlugin::Publisher::validateNonEmpty
-	},
-	fastupload => { default => 1 },
-	%{$class->SUPER::param_schema()}
+        destinationftpserver => {
+            validator =>
+              \&Foswiki::Plugins::PublishPlugin::Publisher::validateNonEmpty
+        },
+        destinationftppath => {
+            validator =>
+              \&Foswiki::Plugins::PublishPlugin::Publisher::validateNonEmpty
+        },
+        destinationftpusername => {
+            validator =>
+              \&Foswiki::Plugins::PublishPlugin::Publisher::validateNonEmpty
+        },
+        destinationftppassword => {
+            validator =>
+              \&Foswiki::Plugins::PublishPlugin::Publisher::validateNonEmpty
+        },
+        fastupload => { default => 1 },
+        %{ $class->SUPER::param_schema() }
     };
 }
 
@@ -124,7 +128,9 @@ sub _upload {
                 if ( $localCS eq $remoteCS ) {
 
                     # Unchanged
-                    $this->{logger}->logInfo('', "skipped uploading $to to $this->{destinationftpserver} (no changes)");
+                    $this->{logger}->logInfo( '',
+"skipped uploading $to to $this->{destinationftpserver} (no changes)"
+                    );
                     $attempts = 2;
                     return;
                 }
@@ -143,7 +149,8 @@ sub _upload {
 
             $ftp->put( $localfilePath, $to )
               or die "put failed ", $ftp->message;
-            $this->{logger}->logInfo("FTPed","$to to $this->{params}->{destinationftpserver}");
+            $this->{logger}->logInfo( "FTPed",
+                "$to to $this->{params}->{destinationftpserver}" );
             $attempts = 2;
         };
 
@@ -151,12 +158,12 @@ sub _upload {
 
             # Got an error; try restarting the session a couple of times
             # before giving up
-            $this->{logger}->logError("FTP ERROR: " . $@);
+            $this->{logger}->logError( "FTP ERROR: " . $@ );
             if ( ++$attempts == 2 ) {
                 $this->{logger}->logError("Giving up on $to");
                 return;
             }
-            $this->{logger}->logInfo('', "...retrying in 30s)");
+            $this->{logger}->logInfo( '', "...retrying in 30s)" );
             eval { $ftp->quit(); };
             $this->{ftp_interface} = undef;
             sleep(30);
@@ -174,10 +181,13 @@ sub _ftpConnect {
             Debug   => 1,
             Timeout => 30,
             Passive => 1
-        ) or die "Cannot connect to $this->{params}->{destinationftpserver}: $@";
-        $ftp->login( $this->{params}->{destinationftpusername},
-            $this->{params}->{destinationftppassword} )
-          or die "Cannot login ", $ftp->message;
+          )
+          or die
+          "Cannot connect to $this->{params}->{destinationftpserver}: $@";
+        $ftp->login(
+            $this->{params}->{destinationftpusername},
+            $this->{params}->{destinationftppassword}
+        ) or die "Cannot login ", $ftp->message;
 
         $ftp->binary();
 

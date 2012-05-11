@@ -8,43 +8,49 @@ use Assert;
 
 my $debug = 0;
 
-sub fromFile{
-    my ($class, $web, $topic, $plotName) = @_;
+sub fromFile {
+    my ( $class, $web, $topic, $plotName ) = @_;
     $debug = $Foswiki::Plugins::PloticusPlugin::debug;
-    Foswiki::Func::writeDebug( "PloticusPlugin::PlotSettings::fromFile - Creating new PlotSettings Object from file for $web / $topic / $plotName" );
+    Foswiki::Func::writeDebug(
+"PloticusPlugin::PlotSettings::fromFile - Creating new PlotSettings Object from file for $web / $topic / $plotName"
+    );
     my $self = {};
     $self->{WEB}   = $web;
     $self->{TOPIC} = $topic;
     $self->{NAME}  = $plotName;
     $self->{TEXT}  = undef;
-#    $self->{SETTINGS} = [];
 
-    my $ploticusFile = buildFileName($web, $topic, $plotName);
+    #    $self->{SETTINGS} = [];
+
+    my $ploticusFile = buildFileName( $web, $topic, $plotName );
     $self->{TEXT} = readFile($ploticusFile);
-    
-    bless ($self, $class);
-    return $self;    
+
+    bless( $self, $class );
+    return $self;
 }
 
-sub buildFileName{
-    my ($web, $topic, $plotName) = @_;
+sub buildFileName {
+    my ( $web, $topic, $plotName ) = @_;
     return Foswiki::Func::getPubDir() . "/$web/$topic/$plotName.ploticus";
 }
+
 sub readFile {
     my $ploticusFile = $_[0];
-    Foswiki::Func::writeDebug( "PloticusPlugin::PlotSettings::readFile - Reading settings from $ploticusFile" ) if $debug;
-    open (INFILE, $ploticusFile) or return newFile();
+    Foswiki::Func::writeDebug(
+"PloticusPlugin::PlotSettings::readFile - Reading settings from $ploticusFile"
+    ) if $debug;
+    open( INFILE, $ploticusFile ) or return newFile();
     my $content = '';
-    while (<INFILE>)
-    {
-        if (/^\s*$/ or /^\<p\s*\// )
-        {
+    while (<INFILE>) {
+        if ( /^\s*$/ or /^\<p\s*\// ) {
             $content .= " \n";
-            next; 
+            next;
         }
         $content .= $_;
     }
-    if ( $content =~ /#shell|#endshell|\$shellrow|#sql|#load|#write|#endwrite|#cat/ ) {
+    if ( $content =~
+        /#shell|#endshell|\$shellrow|#sql|#load|#write|#endwrite|#cat/ )
+    {
         $content = "#proc annotate\n";
         $content .= "location: 2 6\n";
         $content .= "ellipse: yes\n";
@@ -66,17 +72,25 @@ sub readFile {
     return $content;
 }
 
-sub writeFile{
-    my ($web, $topic, $plotName, $text) = @_;
+sub writeFile {
+    my ( $web, $topic, $plotName, $text ) = @_;
     my $webDir = Foswiki::Func::getPubDir() . "/$web";
-    unless (-e $webDir) { mkdir $webDir };
-    unless (-e "$webDir/$topic") { mkdir "$webDir/$topic" };
-    my $ploticusFile =  "$webDir/$topic/$plotName.ploticus";
-    Foswiki::Func::writeDebug( "PloticusPlugin::PlotSettings::writeFile - Writing ---=$text=--- to $ploticusFile" );# if $debug;
-    open (OUTFILE, ">", $ploticusFile) or die "Cannot create new Ploticusplot file!";
-    Foswiki::Func::writeDebug( "PloticusPlugin::PlotSettings::writeFile - Writing ---=$text=--- to $ploticusFile" );# if $debug;
-    $text  =~s/<p \/>//g;
-    if ( $text =~ /#shell|#endshell|\$shellrow|#sql|#load|#write|#endwrite|#cat/ ) {
+    unless ( -e $webDir )          { mkdir $webDir }
+    unless ( -e "$webDir/$topic" ) { mkdir "$webDir/$topic" }
+    my $ploticusFile = "$webDir/$topic/$plotName.ploticus";
+    Foswiki::Func::writeDebug(
+"PloticusPlugin::PlotSettings::writeFile - Writing ---=$text=--- to $ploticusFile"
+    );    # if $debug;
+    open( OUTFILE, ">", $ploticusFile )
+      or die "Cannot create new Ploticusplot file!";
+    Foswiki::Func::writeDebug(
+"PloticusPlugin::PlotSettings::writeFile - Writing ---=$text=--- to $ploticusFile"
+    );    # if $debug;
+    $text =~ s/<p \/>//g;
+
+    if ( $text =~
+        /#shell|#endshell|\$shellrow|#sql|#load|#write|#endwrite|#cat/ )
+    {
         $text = "#proc annotate\n";
         $text .= "location: 2 6\n";
         $text .= "ellipse: yes\n";
@@ -99,10 +113,13 @@ sub writeFile{
     close OUTFILE;
 }
 
-sub newFile{
-    Foswiki::Func::writeDebug( "PloticusPlugin::PlotSettings::newFile - Creating new default settings" ) if $debug;
+sub newFile {
+    Foswiki::Func::writeDebug(
+        "PloticusPlugin::PlotSettings::newFile - Creating new default settings")
+      if $debug;
     my $text = '';
-    $text .= "// simple vertical bars example - replace this with your own plot\n";
+    $text .=
+      "// simple vertical bars example - replace this with your own plot\n";
     $text .= "\n";
     $text .= "#proc areadef\n";
     $text .= "rectangle: 1 1 4 2\n";
@@ -135,32 +152,40 @@ sub newFile{
     return $text;
 }
 
-
-sub render{
+sub render {
     my $self = shift;
-#    $self->{WEB}   
-#    $self->{TOPIC}
-#    $self->{NAME} 
-#    $self->{TEXT}  
+
+    #    $self->{WEB}
+    #    $self->{TOPIC}
+    #    $self->{NAME}
+    #    $self->{TEXT}
     my $text = '';
     $text .= "*Edit Settings for !$self->{NAME}*\n";
     $text .= "<a name=\"ploticusplot" . $self->{NAME} . "\"></a>\n";
-    $text .= "<form action=" . Foswiki::Func::getScriptUrl( "$self->{WEB}", "$self->{TOPIC}", "view" ) . "\#ploticusplot$self->{NAME}\" method=\"post\">\n";
+    $text .=
+        "<form action="
+      . Foswiki::Func::getScriptUrl( "$self->{WEB}", "$self->{TOPIC}", "view" )
+      . "\#ploticusplot$self->{NAME}\" method=\"post\">\n";
     $text .= "<table>\n";
     $text .= "  <tr valign=\"middle\">\n";
-    $text .= "    <td><textarea  rows=\"10\" cols=\"90\" name=\"ploticusPlotSettingsText\" >$self->{TEXT}</textarea>\n";
+    $text .=
+"    <td><textarea  rows=\"10\" cols=\"90\" name=\"ploticusPlotSettingsText\" >$self->{TEXT}</textarea>\n";
     $text .= "    </td>\n";
-    $text .= "    <td><input  type=\"submit\" value=\"Save Settings\" class=\"foswikiSubmit\" /><br>\n";
-    $text .= "        <a target=\"PloticusPlugin\" onclick=\"return launchWindow('System','PloticusPlugin')\" href=\"/foswiki/bin/view/System/PloticusPlugin\">PloticusPlugin help</a><br>\n";
-    $text .= "        <a target=\"PloticusHelp\" onclick=\"return launchWindow('System','PloticusHelp')\" href=\"/foswiki/bin/view/System/PloticusHelp\">Ploticus help</a>\n";
+    $text .=
+"    <td><input  type=\"submit\" value=\"Save Settings\" class=\"foswikiSubmit\" /><br>\n";
+    $text .=
+"        <a target=\"PloticusPlugin\" onclick=\"return launchWindow('System','PloticusPlugin')\" href=\"/foswiki/bin/view/System/PloticusPlugin\">PloticusPlugin help</a><br>\n";
+    $text .=
+"        <a target=\"PloticusHelp\" onclick=\"return launchWindow('System','PloticusHelp')\" href=\"/foswiki/bin/view/System/PloticusHelp\">Ploticus help</a>\n";
     $text .= "    </td>\n";
     $text .= "  </tr>\n";
     $text .= "</table>\n";
-    $text .= "<input type=\"hidden\" name=\"ploticusPlotName\" value=\"$self->{NAME}\" />";
-    $text .= "<input type=\"hidden\" name=\"ploticusPlotAction\" value=\"save\" />";
+    $text .=
+"<input type=\"hidden\" name=\"ploticusPlotName\" value=\"$self->{NAME}\" />";
+    $text .=
+      "<input type=\"hidden\" name=\"ploticusPlotAction\" value=\"save\" />";
     $text .= "</form>\n";
     return $text;
 }
-
 
 1;

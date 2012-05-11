@@ -35,29 +35,33 @@ $pluginName = 'StopWikiWordLinkPlugin';
 
 #===========================================================================
 sub initPlugin {
-    my( $topic, $web, $user, $installWeb ) = @_;
+    my ( $topic, $web, $user, $installWeb ) = @_;
 
     # check for Plugins.pm versions
-    if( $TWiki::Plugins::VERSION < 1.026 ) {
-        TWiki::Func::writeWarning( "Version mismatch between $pluginName and Plugins.pm" );
+    if ( $TWiki::Plugins::VERSION < 1.026 ) {
+        TWiki::Func::writeWarning(
+            "Version mismatch between $pluginName and Plugins.pm");
         return 0;
     }
 
     # get debug flag
-    $debug = TWiki::Func::getPreferencesFlag( "\U$pluginName\E_DEBUG" );
+    $debug = TWiki::Func::getPreferencesFlag("\U$pluginName\E_DEBUG");
 
     # Get plugin preferences variable:
-    my $stopWords = TWiki::Func::getPreferencesValue( "STOPWIKIWORDLINK" )
-                 || TWiki::Func::getPreferencesValue( "\U$pluginName\E_STOPWIKIWORDLINK" )
-                 || 'UndefinedStopWikiWordLink';
+    my $stopWords =
+         TWiki::Func::getPreferencesValue("STOPWIKIWORDLINK")
+      || TWiki::Func::getPreferencesValue("\U$pluginName\E_STOPWIKIWORDLINK")
+      || 'UndefinedStopWikiWordLink';
 
     # build regex:
     $stopWords =~ s/\, */\|/go;
     $stopWords =~ s/^ *//o;
     $stopWords =~ s/ *$//o;
     $stopWords =~ s/[^A-Za-z0-9\|]//go;
-    $stopWordsRE = "(^|[\( \n\r\t\|])($stopWords)"; # WikiWord preceeded by space or parens
-    TWiki::Func::writeDebug( "- $pluginName stopWordsRE: $stopWordsRE" ) if $debug;
+    $stopWordsRE =
+      "(^|[\( \n\r\t\|])($stopWords)";   # WikiWord preceeded by space or parens
+    TWiki::Func::writeDebug("- $pluginName stopWordsRE: $stopWordsRE")
+      if $debug;
 
     # Plugin correctly initialized
     return 1;
@@ -65,6 +69,7 @@ sub initPlugin {
 
 #===========================================================================
 sub preRenderingHandler {
+
     # do not uncomment, use $_[0], $_[1]... instead
     #my( $text, $pMap ) = @_;
 

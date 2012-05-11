@@ -38,6 +38,7 @@ sub TOC {
 
     my $tocTopic = $params->{_DEFAULT};
     my $tocWeb   = $params->{web};
+    my $tocId    = $params->{id} || 'foswikiTOC';
 
     if ( $tocTopic || $tocWeb ) {
         $tocWeb   ||= $topicObject->web;
@@ -102,6 +103,7 @@ sub TOC {
         next if ( $name eq 'validation_key' );
         next if ( $name eq 'topic' );
         next if ( $name eq 'text' );
+        next if ( $name eq 'refresh' );
         push @qparams, $name => $query->param($name);
     }
 
@@ -219,8 +221,8 @@ sub TOC {
         }
 
         # add a anchor to be able to jump to the toc and add a outer div
-        return CGI::a( { name => 'foswikiTOC' }, '' )
-          . CGI::div( { class => 'foswikiToc' }, "$title$result\n" );
+        return CGI::div( { -class => 'foswikiToc', -id => $tocId },
+            "$title$result\n" );
 
     }
     else {
@@ -232,7 +234,7 @@ sub TOC {
 __END__
 Foswiki - The Free and Open Source Wiki, http://foswiki.org/
 
-Copyright (C) 2008-2009 Foswiki Contributors. Foswiki Contributors
+Copyright (C) 2008-2012 Foswiki Contributors. Foswiki Contributors
 are listed in the AUTHORS file in the root of this distribution.
 NOTE: Please extend that file, not this notice.
 

@@ -18,8 +18,8 @@ sub loadExtraConfig {
 }
 
 sub setLocalSite {
-    $Foswiki::cfg{Plugins}{MediaPlugin}{Enabled}     = 1;
-    $Foswiki::cfg{Plugins}{MediaPlugin}{Debug}       = $DEBUG;
+    $Foswiki::cfg{Plugins}{MediaPlugin}{Enabled} = 1;
+    $Foswiki::cfg{Plugins}{MediaPlugin}{Debug}   = $DEBUG;
 }
 
 =pod
@@ -57,9 +57,10 @@ sub test_wmv {
 
     my $topicName = $this->{test_topic};
     my $webName   = $this->{test_web};
-	my $pubUrl = Foswiki::Func::getUrlHost() . Foswiki::Func::getPubUrlPath();
+    my $pubUrl = Foswiki::Func::getUrlHost() . Foswiki::Func::getPubUrlPath();
 
-    my $input  = '%MEDIA{"http://support.microsoft.com/support/mediaplayer/wmptest/samples/new/mediaexample.wmv" height="240" width="320"}%';
+    my $input =
+'%MEDIA{"http://support.microsoft.com/support/mediaplayer/wmptest/samples/new/mediaexample.wmv" height="240" width="320"}%';
     my $expected = <<EXPECTED;
 <noautolink><object classid="clsid:6BF52A52-394A-11d3-B153-00C04F79FAA6" codebase="http://activex.microsoft.com/activex/controls/mplayer/en/nsmp2inf.cab" height="286" width="320"><param name="ShowControls" value="true" /><param name="autostart" value="true" /><param name="type" value="application/x-mplayer2" /><embed ShowControls="true" autostart="true" height="286" pluginspage="http://www.microsoft.com/windows/windowsmedia/download/AllDownloads.aspx/" src="http://support.microsoft.com/support/mediaplayer/wmptest/samples/new/mediaexample.wmv" type="application/x-mplayer2" width="320"/></object></noautolink>
 EXPECTED
@@ -79,9 +80,9 @@ sub test_mov_basic {
 
     my $topicName = $this->{test_topic};
     my $webName   = $this->{test_web};
-	my $pubUrl = Foswiki::Func::getUrlHost() . Foswiki::Func::getPubUrlPath();
+    my $pubUrl = Foswiki::Func::getUrlHost() . Foswiki::Func::getPubUrlPath();
 
-    my $input  = '%MEDIA{
+    my $input = '%MEDIA{
 "%ATTACHURL%/sample.mov"
 height="180"
 width="320"
@@ -105,9 +106,9 @@ sub test_mov_params {
 
     my $topicName = $this->{test_topic};
     my $webName   = $this->{test_web};
-	my $pubUrl = Foswiki::Func::getUrlHost() . Foswiki::Func::getPubUrlPath();
+    my $pubUrl = Foswiki::Func::getUrlHost() . Foswiki::Func::getPubUrlPath();
 
-    my $input  = '%MEDIA{
+    my $input = '%MEDIA{
 "%ATTACHURL%/sample.mov"
 height="180"
 width="320"
@@ -137,9 +138,9 @@ sub test_swf_basic {
 
     my $topicName = $this->{test_topic};
     my $webName   = $this->{test_web};
-	my $pubUrl = Foswiki::Func::getUrlHost() . Foswiki::Func::getPubUrlPath();
+    my $pubUrl = Foswiki::Func::getUrlHost() . Foswiki::Func::getPubUrlPath();
 
-    my $input  = '%MEDIA{"%ATTACHURL%/sample.swf"}%';
+    my $input    = '%MEDIA{"%ATTACHURL%/sample.swf"}%';
     my $expected = <<EXPECTED;
 <noautolink><object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=9,0,0,0" height="180" width="320"><param name="movie" value="$pubUrl/$webName/$topicName/sample.swf" /><embed height="180" src="$pubUrl/$webName/$topicName/sample.swf" width="320"/></object></noautolink>
 EXPECTED
@@ -159,9 +160,9 @@ sub test_swf_params {
 
     my $topicName = $this->{test_topic};
     my $webName   = $this->{test_web};
-	my $pubUrl = Foswiki::Func::getUrlHost() . Foswiki::Func::getPubUrlPath();
+    my $pubUrl = Foswiki::Func::getUrlHost() . Foswiki::Func::getPubUrlPath();
 
-    my $input  = '%MEDIA{
+    my $input = '%MEDIA{
 src="%ATTACHURL%/swf/ThumbController.swf"
 width="100%"
 height="100%"
@@ -189,7 +190,6 @@ EXPECTED
     $this->do_testHtmlOutput( $expected, $result, 0 );
 }
 
-
 =pod
 
 Tests pdf: should automatically generate the correct type.
@@ -201,9 +201,9 @@ sub test_pdf {
 
     my $topicName = $this->{test_topic};
     my $webName   = $this->{test_web};
-	my $pubUrl = Foswiki::Func::getUrlHost() . Foswiki::Func::getPubUrlPath();
+    my $pubUrl = Foswiki::Func::getUrlHost() . Foswiki::Func::getPubUrlPath();
 
-    my $input  = '%MEDIA{
+    my $input = '%MEDIA{
 "http://www.pdf-tools.com/public/downloads/whitepapers/whitepaper-pdfprimer.pdf"
 type="application/force-download"
 }%';
@@ -224,9 +224,9 @@ sub test_midi {
 
     my $topicName = $this->{test_topic};
     my $webName   = $this->{test_web};
-	my $pubUrl = Foswiki::Func::getUrlHost() . Foswiki::Func::getPubUrlPath();
+    my $pubUrl = Foswiki::Func::getUrlHost() . Foswiki::Func::getPubUrlPath();
 
-    my $input  = '%MEDIA{
+    my $input = '%MEDIA{
 "%ATTACHURL%/brahms-intermezzo-op118-no2.mid"
 play="false"
 }%';
@@ -237,8 +237,5 @@ EXPECTED
       Foswiki::Func::expandCommonVariables( $input, $topicName, $webName );
     $this->do_testHtmlOutput( $expected, $result, 0 );
 }
-
-
-
 
 1;

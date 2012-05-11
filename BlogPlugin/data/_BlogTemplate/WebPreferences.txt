@@ -23,6 +23,11 @@
    * [[WebBottomBar]]: bottom part, overrides [[%USERSWEB%.SiteBottomBar]], or [[%SYSTEMWEB%.SiteBottomBar]]
 
 ---++ Skin settings
+
+---+++ !PatternSkin settings
+   * #Set SKIN = blog,natedit,pattern
+
+---+++ !NatSkin settings
    * Set NATSKIN_LAYOUT = fixed
       * possible values: fixed, bordered, fluid
    * #Set NATSKIN_VARIATION = 

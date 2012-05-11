@@ -20,6 +20,7 @@ package Foswiki::Plugins::SqlPlugin::Connection;
 use DBI ();
 use strict;
 use Error qw( :try );
+use Foswiki::Sandbox ();
 
 use constant DEBUG => 0; # toggle me
 
@@ -34,11 +35,17 @@ sub new {
   my $class = shift;
 
   my $this = {
-    db=>undef,
-    id=>'',
+    db => undef,
+    id => '',
     dsn => '',
     @_
   };
+
+  # untaint this
+  foreach my $key (%$this) {
+    next unless $key && $this->{$key};
+    $this->{$key} = Foswiki::Sandbox::untaintUnchecked($this->{$key});
+  }
 
   bless($this, $class);
 

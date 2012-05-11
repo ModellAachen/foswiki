@@ -1,6 +1,6 @@
 # Plugin for Foswiki - The Free and Open Source Wiki, http://foswiki.org/
 #
-# WebLinkPlugin is Copyright (C) 2010 Michael Daum http://michaeldaumconsulting.com
+# WebLinkPlugin is Copyright (C) 2010-2012 Michael Daum http://michaeldaumconsulting.com
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -81,9 +81,10 @@ sub WEBLINK {
 
   #writeDebug("theFormat=$theFormat, theWeb=$theWeb");
 
-  my $theTooltip = $params->{tooltip} ||
+  my $theSummary = $params->{summary} || 
     Foswiki::Func::getPreferencesValue('WEBSUMMARY', $theWeb) || 
     Foswiki::Func::getPreferencesValue('SITEMAPUSETO', $theWeb) || '';
+  my $theTooltip = $params->{tooltip} || $theSummary;
 
   my $homeTopic = Foswiki::Func::getPreferencesValue('HOMETOPIC') 
     || $Foswiki::cfg{HomeTopicName} 
@@ -106,10 +107,7 @@ sub WEBLINK {
 
   my $title = '';
   if ($theFormat =~ /\$title/) {
-    if (Foswiki::Func::getContext()->{DBCachePluginEnabled}) {
-      require Foswiki::Plugins::DBCachePlugin;
-      $title = getTopicTitle($theWeb, $homeTopic);
-    }
+    $title = getTopicTitle($theWeb, $homeTopic);
     $title = $theName if $title eq $homeTopic;
   }
 
@@ -118,6 +116,7 @@ sub WEBLINK {
   $result =~ s/\$marker/$theMarker/g;
   $result =~ s/\$url/$theUrl/g;
   $result =~ s/\$tooltip/$theTooltip/g;
+  $result =~ s/\$summary/$theSummary/g;
   $result =~ s/\$name/$theName/g;
   $result =~ s/\$title/$title/g;
   $result =~ s/\$web/$theWeb/g;
@@ -138,7 +137,13 @@ sub getTopicTitle {
 
   #print STDERR "using foswiki core means\n";
 
-  my ($meta, undef) = Foswiki::Func::readTopic($web, $topic);
+  my ($meta, $text) = Foswiki::Func::readTopic($web, $topic);
+
+  if ($Foswiki::cfg{SecureTopicTitles}) {
+    my $wikiName = Foswiki::Func::getWikiName();
+    return $topic
+      unless Foswiki::Func::checkAccessPermission('VIEW', $wikiName, $text, $topic, $web, $meta);
+  }
 
   # read the formfield value
   my $title = $meta->get('FIELD', 'TopicTitle');

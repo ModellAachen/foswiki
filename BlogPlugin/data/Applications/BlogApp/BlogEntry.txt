@@ -1,4 +1,4 @@
-%META:TOPICINFO{author="ProjectContributor" comment="reprev" date="1322565484" format="1.1" reprev="15" version="17"}%
+%META:TOPICINFO{author="micha" comment="reprev" date="1332751827" format="1.1" reprev="15" version="18"}%
 %META:TOPICPARENT{name="TopicType"}%
 %DBCALL{"Applications.RenderTopicInstaller" TEXT="Install '%TOPIC%' TopicType" TYPE="TopicType"}%
 
@@ -32,7 +32,7 @@ This is the central TopicType to store blog entries.
 | Tag | tag | 30 | | keywords | |
 | Category | cat | 1 |  | categories this blog entry is field to |  |
 | State | radio | 2 | published, unpublished | only blog entries in state published are readable by other users; unpublished blog entries are only visible for the authors of this blog entry |  |
-| Sticky | checkbox+values | 4 | on frontpage=frontpage, on category=category | a sticky blog entries is rendered at the top of the frontpage or category independent of the normal timeline |
+| Sticky | checkbox+values | 4 | on frontpage=frontpage, on category=category | a sticky blog entries is rendered at the top of the frontpage or category independent of the normal timeline | |
 | <nop>MetaTitle | text | 75 | | SEO page title. Use a maximum of 60 chars for the title. <a href='#' id='blogFetchTitle'>%MAKETEXT{"Get from topic title."}%</a> | |
 | <nop>MetaDescription | textarea | 80x2 | | SEO description. Use a maximum of 160 chars for the description. <a href='#' id='blogFetchDescription'>%MAKETEXT{"Get description from content."}%</a> | | 
 | <nop>MetaKeywords | text | 75 | | SEO keywords. Specify a comma separate list of keywords. <a href='#' id='blogFetchKeywords'>%MAKETEXT{"Get from classification."}%</a> | |

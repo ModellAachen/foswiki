@@ -112,7 +112,7 @@ Copy file =lib/Foswiki/Plugins/EmptyPlugin.pm= to =&lt;name&gt;Plugin.pm=. The E
 
 The plugin documentation topic contains usage instructions and version details. (The doc topic is also included _in_ the [[#CreatePluginPackage][distribution package]].) To create a documentation topic:
 
-   1. *Copy* the plugin topic template from [[System.EmptyPlugin?raw=on][EmptyPlugin]]
+   1. *Copy* the plugin topic template from [[%SYSTEMWEB%.EmptyPlugin?raw=on][EmptyPlugin]]
    1. *Customize* your plugin topic.
       * Important: In case you plan to publish your plugin on Foswiki.org, use Interwiki names for author names and links to Foswiki.org topics, such as Foswiki:Main/%WIKINAME%. This is important because links should work properly in a plugin topic installed on any Foswiki, not just on Foswiki.org.
    1. *Save* your topic, for use in [[#CreatePluginPackage][packaging]] and [[#PublishPlugin][publishing]] your plugin.
@@ -181,7 +181,7 @@ Thank you very much for sharing your plugin with the Foswiki community :-)
 ---++ Security
 
    * Badly written plugins can open security holes in Foswiki. This is especially true if care isn't taken to prevent execution of arbitrary commands on the server.
-   * Don't allow sensitive configuration data to be edited by users. Use the =%Foswiki::cfg= hash for configuration options. Don't ask installers to edit topics in the System web.
+   * Don't allow sensitive configuration data to be edited by users. Use the =%Foswiki::cfg= hash for configuration options. Don't ask installers to edit topics in the %SYSTEMWEB% web.
       * [[#ConfigSpec][Integrating with <code>configure</code>]] describes the steps
       * Foswiki:Extensions.MailInContrib has an example
       * Foswiki:Extensions.BuildContrib can help you with this
@@ -291,10 +291,26 @@ All types can be followed by a comma-separated list of _attributes_.
 | =M= | means the setting is mandatory (may not be empty) |
 | =H= | means the option is not visible in =configure= |
 | =5x80= | means "use a 5 row, 80 column textarea". Can be used with any text entry field type, such as STRING, COMMAND, PERL etc. |
-
+| =DISPLAY_IF= | means this option is conditionally displayed based on some Javascript expression (see below for more) |
+| =ENABLE_IF= | means this option is conditionally enabled based on some Javascript expression (see below for more) |
 See =lib/Foswiki.spec= for many more examples.
 
 =Config.spec= files are also used for other (non-plugin) extensions. in this case they are stored under the =Contrib= directory instead of the =Plugins= directory.
+
+---++++ DISPLAY_IF and ENABLE_IF
+These sopisticated options support the definition of a Javascript expression that will be evaluated in the browser to determine if an option should be visible or not. The general format is:
+<verbatim>
+# **BOOLEAN DISPLAY_IF {Other}{Option}=='RequiredValue'**
+</verbatim>
+You can use almost any Javascript condition; any string of the form ={Other}{Option}= will be expanded to the value of that option in the browser. =ENABLE_IF= works the same way, except it simply disables the option unless the condition is satisified. The Javascript condition can be terminated by =/DISPLAY_IF= / =/ENABLE_IF= if it is not the last option. For example,
+
+<verbatim>
+# **BOOLEAN DISPLAY_IF {An}{Option}=='RequiredValue' /DISPLAY_IF ENABLE_IF {Another}{Option}=='AnotherValue' **
+</verbatim>
+When testing BOOLEAN options, simply stating the name of the option is enough. For example,
+<verbatim>
+**STRING DISPLAY_IF {This}{BOOLEAN}{Option} **
+</verbatim>
 
 #LinkingToConfigure
 ---+++ Linking to =configure=

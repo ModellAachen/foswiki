@@ -33,8 +33,9 @@ if [ "$1" = '--check-dependencies' ]; then
 fi
 
 webpubdir="$1"
-if [ -z "$webpubdir" ]; then
-  echo "usage: $0 WEB-DIRECTORY [TOPIC [TOPIC] ...]"
+reponame="$2"
+if [ -z "$webpubdir" ] || [ -z "$reponame" ]; then
+  echo "usage: $0 WEB-DIRECTORY REPO-NAME [TOPIC [TOPIC] ...]"
   echo "       $0 --check-dependencies"
   exit 1
 fi
@@ -42,7 +43,7 @@ shift
 
 topics="$@"
 
-repodir="$webpubdir/debian"
+repodir="$webpubdir/$reponame"
 mkdir -p "$repodir"
 
 gnupg_data_dir="$webpubdir/../../gnupg"
@@ -70,15 +71,16 @@ gnupg_publish_signing_key() {
 
 cd "$repodir" && (
 
+  topic_base=$(echo "$reponame" | sed 's/[^\/]\+/../g')
   if [ -z "$topics" ]; then
-    topics="$(ls -1 ..)"
+    topics="$(ls -1 "$topic_base")"
   fi
 
   # Packages files
   rm -f Packages
   touch Packages
   for topic in $topics; do
-    topic_folder="../$topic"
+    topic_folder="$topic_base/$topic"
     if [ -e "$topic_folder" ]; then
       apt-ftparchive packages "$topic_folder" >> Packages
     fi

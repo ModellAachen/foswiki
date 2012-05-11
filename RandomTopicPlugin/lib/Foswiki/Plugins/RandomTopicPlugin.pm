@@ -10,7 +10,7 @@
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details, published at 
+# GNU General Public License for more details, published at
 # http://www.gnu.org/copyleft/gpl.html
 
 package Foswiki::Plugins::RandomTopicPlugin;
@@ -18,8 +18,8 @@ package Foswiki::Plugins::RandomTopicPlugin;
 use strict;
 
 use vars qw(
-            $VERSION $RELEASE @topicList $defaultIncludes $defaultExcludes $doneInit
-    );
+  $VERSION $RELEASE @topicList $defaultIncludes $defaultExcludes $doneInit
+);
 
 # This should always be $Rev$ so that Foswiki can determine the checked-in
 # status of the plugin. It is used by the build automation tools, so
@@ -31,11 +31,10 @@ $VERSION = '$Rev$';
 # of the version number in PLUGINDESCRIPTIONS.
 $RELEASE = '2.0';
 
-
 sub initPlugin {
     my ( $topic, $web, $user, $installWeb ) = @_;
 
-    Foswiki::Func::registerTagHandler('RANDOMTOPIC', \&handleRandomTopic);
+    Foswiki::Func::registerTagHandler( 'RANDOMTOPIC', \&handleRandomTopic );
     $doneInit = 0;
     return 1;
 }
@@ -45,15 +44,17 @@ sub init {
 
     return if $doneInit;
 
-    $doneInit = 1;
+    $doneInit  = 1;
     @topicList = Foswiki::Func::getTopicList( $session->{webName} );
-    $defaultIncludes = Foswiki::Func::getPreferencesValue( "RANDOMTOPICPLUGIN_INCLUDE" );
-    $defaultExcludes = Foswiki::Func::getPreferencesValue( "RANDOMTOPICPLUGIN_EXCLUDE" );
+    $defaultIncludes =
+      Foswiki::Func::getPreferencesValue("RANDOMTOPICPLUGIN_INCLUDE");
+    $defaultExcludes =
+      Foswiki::Func::getPreferencesValue("RANDOMTOPICPLUGIN_EXCLUDE");
 
 }
 
 sub handleRandomTopic {
-    my ($session, $params, $topic, $web) = @_;
+    my ( $session, $params, $topic, $web ) = @_;
 
     init($session);
 
@@ -63,27 +64,27 @@ sub handleRandomTopic {
     $format = '$topic' unless defined $format;
 
     my $separator = $params->{separator} || '';
-    my $footer = $params->{footer} || '';
-    my $topics = $params->{topics} || 1;
+    my $footer    = $params->{footer}    || '';
+    my $topics    = $params->{topics}    || 1;
 
     my $includes = $params->{include};
-    $includes = ($defaultIncludes || "^.+\$") unless defined $includes;
-    
+    $includes = ( $defaultIncludes || "^.+\$" ) unless defined $includes;
+
     my $excludes = $params->{exclude};
-    $excludes = ($defaultExcludes || "^\$") unless defined $excludes;
+    $excludes = ( $defaultExcludes || "^\$" ) unless defined $excludes;
 
     my @pickFrom = grep { /$includes/ && !/$excludes/ } @topicList;
 
-    my @result = ();
-    my %chosen = ();
-    my $nrTopics = scalar( @pickFrom );
+    my @result   = ();
+    my %chosen   = ();
+    my $nrTopics = scalar(@pickFrom);
     my $pickable = $nrTopics;
     while ( $topics && $pickable ) {
-        my $i = int( rand( $nrTopics ));
+        my $i = int( rand($nrTopics) );
         unless ( $chosen{$i} ) {
             my $line = $format;
             $line =~ s/\$topic/$pickFrom[$i]/g;
-            push(@result, $line);
+            push( @result, $line );
             $topics--;
             $pickable--;
             $chosen{$i} = 1;
@@ -91,7 +92,7 @@ sub handleRandomTopic {
     }
 
     return '' unless @result;
-    my $result = $header.join($separator, @result).$footer;
+    my $result = $header . join( $separator, @result ) . $footer;
 
     return Foswiki::Func::decodeFormatTokens($result);
 }

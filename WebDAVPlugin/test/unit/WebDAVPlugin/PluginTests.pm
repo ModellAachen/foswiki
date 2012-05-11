@@ -9,8 +9,8 @@ our @ISA = qw( FoswikiTestCase );
 use TWiki::Plugins::WebDAVPlugin;
 
 sub new {
-  my $self = shift()->SUPER::new(@_);
-  return $self;
+    my $self = shift()->SUPER::new(@_);
+    return $self;
 }
 
 my $tmpdir;
@@ -21,52 +21,57 @@ my $query;
 
 # Set up the test fixture
 sub set_up {
-  my $this = shift;
+    my $this = shift;
 
-  $this->SUPER::set_up();
+    $this->SUPER::set_up();
 
-  $query = new CGI("");
-  $query->path_info("/$testweb/WebPreferences");
-  $twiki = new TWiki( "TestUser1", $query );
-  $TWiki::Plugins::SESSION = $twiki;
+    $query = new CGI("");
+    $query->path_info("/$testweb/WebPreferences");
+    $twiki = new TWiki( "TestUser1", $query );
+    $TWiki::Plugins::SESSION = $twiki;
 
-  $tmpdir = "/tmp/$$";
-  $testdb = "$tmpdir/TWiki";
-  mkdir($tmpdir);
+    $tmpdir = "/tmp/$$";
+    $testdb = "$tmpdir/TWiki";
+    mkdir($tmpdir);
 }
 
-my $dv = "   IdiotChild";
+my $dv     = "   IdiotChild";
 my $dvtest = "|IdiotChild|";
-my $av = "SpawnOfAsses,  SonOfSwine,MadGroup        ";
+my $av     = "SpawnOfAsses,  SonOfSwine,MadGroup        ";
 my $avtest = "|SpawnOfAsses|SonOfSwine|MadGroup|";
-my $dt = "   BrainlessGit,   Thicko         ";
+my $dt     = "   BrainlessGit,   Thicko         ";
 my $dttest = "|BrainlessGit|Thicko|";
 
 sub test__bad_DB {
-  my $this = shift;
+    my $this = shift;
 
-  TWiki::Func::saveTopicText($testweb, "WebPreferences", <<HERE
+    TWiki::Func::saveTopicText(
+        $testweb, "WebPreferences", <<HERE
    * Set WEBDAVPLUGIN_LOCK_DB = *
 HERE
-                            );
-  $twiki = new TWiki( "TestUser1", $query );
-  $TWiki::Plugins::SESSION = $twiki;
+    );
+    $twiki = new TWiki( "TestUser1", $query );
+    $TWiki::Plugins::SESSION = $twiki;
 
-  TWiki::Plugins::WebDAVPlugin::initPlugin("Topic", "Web", "dweeb");
-  TWiki::Plugins::WebDAVPlugin::beforeSaveHandler("", "Web", "Topic");
+    TWiki::Plugins::WebDAVPlugin::initPlugin( "Topic", "Web", "dweeb" );
+    TWiki::Plugins::WebDAVPlugin::beforeSaveHandler( "", "Web", "Topic" );
 
 }
 
 sub test__beforeSaveHandler {
-  my $this = shift;
+    my $this = shift;
 
-  TWiki::Func::saveTopicText($testweb, "WebPreferences", <<HERE
+    TWiki::Func::saveTopicText(
+        $testweb, "WebPreferences", <<HERE
    * Set WEBDAVPLUGIN_LOCK_DB = $tmpdir
 HERE
-                            );
-  $twiki = new TWiki( "TestUser1", $query );
-  $TWiki::Plugins::SESSION = $twiki;
+    );
+    $twiki = new TWiki( "TestUser1", $query );
+    $TWiki::Plugins::SESSION = $twiki;
 
-  TWiki::Plugins::WebDAVPlugin::initPlugin("Topic", "Web", "dweeb");
-  TWiki::Plugins::WebDAVPlugin::beforeSaveHandler("\t* Set DENYTOPICVIEW = $dv\n\t* Set ALLOWTOPICVIEW = $av\n\t* Set DENYTOPICCHANGE = $dt", "Web", "Topic");
+    TWiki::Plugins::WebDAVPlugin::initPlugin( "Topic", "Web", "dweeb" );
+    TWiki::Plugins::WebDAVPlugin::beforeSaveHandler(
+"\t* Set DENYTOPICVIEW = $dv\n\t* Set ALLOWTOPICVIEW = $av\n\t* Set DENYTOPICCHANGE = $dt",
+        "Web", "Topic"
+    );
 }

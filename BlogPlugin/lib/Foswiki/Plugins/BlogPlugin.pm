@@ -10,7 +10,7 @@
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details, published at 
+# GNU General Public License for more details, published at
 # http://www.gnu.org/copyleft/gpl.html
 #
 ###############################################################################
@@ -40,7 +40,7 @@ sub initPlugin {
 }
 
 ###############################################################################
-sub handleBlogConvert { 
+sub handleBlogConvert {
 
   require Foswiki::Plugins::BlogPlugin::Converter;
   my $converter = new Foswiki::Plugins::BlogPlugin::Converter;
@@ -49,10 +49,11 @@ sub handleBlogConvert {
 
   try {
     $converter->convert(@params);
-  } catch Error::Simple with {
+  }
+  catch Error::Simple with {
     my $error = shift;
 
-    print STDERR "ERROR: ".$error->{-text}."\n";
+    print STDERR "ERROR: " . $error->{-text} . "\n";
   };
 
   return "";

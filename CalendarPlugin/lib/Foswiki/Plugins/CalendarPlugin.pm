@@ -6,17 +6,19 @@ use strict;
 use warnings;
 
 # See plugin topic for complete release history
-our $VERSION = '$Rev$';
-our $RELEASE = '2.001';
-our $SHORTDESCRIPTION = 'Show a monthly calendar with highlighted events';
+our $VERSION           = '$Rev$';
+our $RELEASE           = '2.001';
+our $SHORTDESCRIPTION  = 'Show a monthly calendar with highlighted events';
 our $NO_PREFS_IN_TOPIC = 1;
 
 sub initPlugin {
     Foswiki::Func::registerTagHandler(
-        'CALENDAR', sub {
+        'CALENDAR',
+        sub {
             require Foswiki::Plugins::CalendarPlugin::Core;
             return Foswiki::Plugins::CalendarPlugin::Core::CALENDAR(@_);
-        });
+        }
+    );
     return 1;
 }
 

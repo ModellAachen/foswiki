@@ -11,7 +11,7 @@
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details, published at 
+# GNU General Public License for more details, published at
 # http://www.gnu.org/copyleft/gpl.html
 
 package Foswiki::Plugins::TocPlugin;
@@ -19,7 +19,7 @@ package Foswiki::Plugins::TocPlugin;
 our $VERSION = '$Rev$';
 our $RELEASE = '2.1.1';
 our $wif;
-our $SHORTDESCRIPTION = 'Sophisticated table of contents generation';
+our $SHORTDESCRIPTION  = 'Sophisticated table of contents generation';
 our $NO_PREFS_IN_TOPIC = 1;
 
 sub initPlugin {
@@ -32,12 +32,12 @@ sub preRenderingHandler {
     require Foswiki::Plugins::TocPlugin::TOCIF;
     require Foswiki::Plugins::TocPlugin::TOC;
     my $session = $Foswiki::Plugins::SESSION;
-    my ($web, $topic) = ($session->{webName}, $session->{topicName});
-    $wif ||= Foswiki::Plugins::TocPlugin::TOCIF->getInterface(
-        $web, $topic);
-    $_[0] = Foswiki::Plugins::TocPlugin::TOC::processTopic(
-        $wif, $web, $topic, $_[0]);
-    $_[0] =~ s/%TOCBUTTONS%//go; #dzus ugly fix - FIXME in time
+    my ( $web, $topic ) = ( $session->{webName}, $session->{topicName} );
+    $wif ||= Foswiki::Plugins::TocPlugin::TOCIF->getInterface( $web, $topic );
+    $_[0] =
+      Foswiki::Plugins::TocPlugin::TOC::processTopic( $wif, $web, $topic,
+        $_[0] );
+    $_[0] =~ s/%TOCBUTTONS%//go;    #dzus ugly fix - FIXME in time
 }
 
 1;

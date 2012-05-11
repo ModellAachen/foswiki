@@ -3,8 +3,9 @@ package TWiki::Contrib::TWikiShellContrib::DirHandling;
 use Exporter;
 use File::Path;
 
-@ISA=(Exporter);
-@EXPORT=qw(makepath dirEntries cd);
+@ISA    = (Exporter);
+@EXPORT = qw(makepath dirEntries cd);
+
 =pod
 ---++ TWiki::Contrib::TWikiShellContrib::DirHandling
 
@@ -43,9 +44,9 @@ will try to create the following directories if they don't exist:
 
 sub makepath {
     my ($to) = @_;
-     chop($to) if ($to =~ /\n$/o);
-     $to =~ m!(.+)\/([^\/]*?)$!;  
-     mkpath($1,1);
+    chop($to) if ( $to =~ /\n$/o );
+    $to =~ m!(.+)\/([^\/]*?)$!;
+    mkpath( $1, 1 );
 }
 
 =pod
@@ -57,9 +58,8 @@ sub makepath {
 
 sub cd {
     my ($file) = @_;
-    chdir($file) || die 'Failed to cd to '.$file;
+    chdir($file) || die 'Failed to cd to ' . $file;
 }
-
 
 =pod 
 
@@ -69,8 +69,8 @@ sub cd {
 =cut
 
 sub dirEntries {
-    my $dir=shift;
-    opendir DIR,$dir;
+    my $dir = shift;
+    opendir DIR, $dir;
     my @entries = readdir DIR;
     close DIR;
     return @entries;

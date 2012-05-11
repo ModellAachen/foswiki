@@ -52,10 +52,16 @@ If you have any problems, or if the extension isn't available in =configure=, th
 ---++ Info
 
 |  Author(s): | Foswiki:Main.WillNorris |
-|  Copyright: | MathJax &copy; 2009-2010 Design Science, Inc., &copy; 2010 WillNorris |
-|  License: | [[http://www.gnu.org/licenses/gpl.html][GPL (Gnu General Public License)]] |
-|  Release: | 0.9.0 |
-|  Version: | 2083 (2010-10-27) |
+|  Copyright: | !MathJax &copy; 2009-2010 Design Science, Inc., &copy; 2010 [[Foswiki:Main.WillNorris][WillNorris]] %BR% \
+                This plugin includes [[http://www.mathjax.org/][MathJax]], which is \
+                Copyright &copy; 2009-2010 Design Science, Inc. See \
+                [[%ATTACHURL%/MathJax/MathJax.js][MathJax.js]] header |
+|  License: | This Foswiki plugin is licensed under the [[http://www.gnu.org/licenses/gpl.html][GPL (Gnu General Public License)]] %BR% \
+              This plugin includes [[http://www.mathjax.org/][MathJax]], which is licensed \
+              under the [[http://www.apache.org/licenses/LICENSE-2.0][Apache License, Version 2.0]]. See \
+                [[%ATTACHURL%/MathJax/MathJax.js][MathJax.js]] header |
+|  Release: | %$RELEASE% |
+|  Version: | %$VERSION% |
 |  Change History: | <!-- versions below in reverse order -->&nbsp; |
 |  Dependencies: | None |
 |  Home: | http://foswiki.org/bin/view/Extensions/MathJaxPlugin |

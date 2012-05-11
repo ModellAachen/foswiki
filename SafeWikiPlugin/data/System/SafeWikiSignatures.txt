@@ -1,0 +1,16 @@
+%META:TOPICINFO{author="ProjectContributor" date="1329363152" format="1.1" version="1"}%
+---+ SafeWikiSignatures
+
+This topic can be used to allow trusted users to add Javascript signatures to the SafeWikiPlugin.  If this topic or a copy in another location is activated in =bin/configure=, then it will be merged with the Javascript signatures listed in the configuration.This topic is not active by default.  To avoid loosing your changes, copy this topic to a different name before activating it.
+<blockquote>%X% *This topic must be carefully protected* If a user creates Javascript with evil intent, and is able to insert its signature into this topic, then the script will be rendered and presented to users.</blockquote>
+
+---++ Signature table
+
+Insert the MD5 signature logged in the error log, along with an optional description of it's purpose. _The below example signature is covered by !LocalSite.cfg and can be safely removed from this topic_
+
+#JsSignatures
+| *Signature* | *Description* | *Added by* |
+| ftLypjekDf5EqaqMbFgFxw | The onblur handler for !FirstName field in the UserRegistration topic. | Shipped example signature |
+%COMMENT{noform="on" type="jssignature" templatetopic="%SYSTEMWEB%.SafeWikiSignaturesTemplate" }%
+
+%META:PREFERENCE{name="ALLOWTOPICCHANGE" title="ALLOWTOPICCHANGE" type="Set" value="AdminGroup"}%

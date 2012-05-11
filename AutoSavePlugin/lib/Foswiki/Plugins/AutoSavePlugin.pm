@@ -17,10 +17,11 @@ sub initPlugin {
 
     Foswiki::Func::registerRESTHandler( 'autoSaveTopic', \&_autoSaveTopic );
 
-    if ($Foswiki::cfg{Plugins}{JQueryPlugin}{Enabled}) {
+    if ( $Foswiki::cfg{Plugins}{JQueryPlugin}{Enabled} ) {
         require Foswiki::Plugins::JQueryPlugin;
-        Foswiki::Plugins::JQueryPlugin::registerPlugin("AutoSave",
-        'Foswiki::Plugins::AutoSavePlugin::AUTOSAVE');
+        Foswiki::Plugins::JQueryPlugin::registerPlugin( "AutoSave",
+            'Foswiki::Plugins::AutoSavePlugin::AUTOSAVE' );
+
         # Foswiki::Plugins::JQueryPlugin::createPlugin("AutoSave");
     }
 
@@ -28,10 +29,13 @@ sub initPlugin {
 }
 
 sub DISABLE_beforeEditHandler {
-    my $web = $_[2];
+    my $web   = $_[2];
     my $topic = $_[1];
 
-    my $language = Foswiki::Func::getPreferencesValue( 'LANGUAGE', $Foswiki::cfg{UsersWebName} ) || 'en';
+    my $language =
+      Foswiki::Func::getPreferencesValue( 'LANGUAGE',
+        $Foswiki::cfg{UsersWebName} )
+      || 'en';
     my $wikiName = Foswiki::Func::getWikiName();
 
     my $binPath = Foswiki::Func::getScriptUrl();

@@ -42,7 +42,7 @@ This plugin provides the ability to choose between attaching uploaded zip files,
    * =templates/attach.pattern.tmpl= (=attachform= section):
 <blockquote>
 <verbatim>
- <input type="checkbox" class="foswikiCheckbox" id="batchupload" checked name="batchupload" %BATCHUPLOADCHECKBOX% /><label for="batchupload">%MAKETEXT{"Batch upload for zip file"}%</label> <span class="foswikiGrayText">%MAKETEXT{"Extracts and uploads individual file in zip archive."}%</span>
+ <input type="checkbox" class="foswikiCheckbox" id="batchupload" checked name="batchupload" /><label for="batchupload">%MAKETEXT{"Batch upload for zip file"}%</label> <span class="foswikiGrayText">%MAKETEXT{"Extracts and uploads individual file in zip archive."}%</span>
 </verbatim>
 </blockquote>
    * =templates/attach.tmpl= and  =templates/attach.classic.tmpl= (=content= section):
@@ -52,7 +52,7 @@ This plugin provides the ability to choose between attaching uploaded zip files,
   <td align="right">
    Batch Upload:
   </td><td>
-   <input type="checkbox" name="batchupload" %BATCHUPLOADCHECKBOX% />Extract Files and Attach them to the Topic
+   <input type="checkbox" name="batchupload" />Extract Files and Attach them to the Topic
   </td>
  </tr>
 </verbatim>

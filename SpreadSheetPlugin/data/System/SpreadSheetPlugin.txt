@@ -93,6 +93,15 @@ This function has two modes of operation.
       * Example: ==%<nop>CALC{"$BITXOR($BITXOR(anything))"}%== returns ==anything==
    * Related: =[[#FuncHEXDECODE][$HEXDECODE()]]=, =[[#FuncHEXENCODE][$HEXENCODE()]]=, =[[#FuncLEFTTRING][$LEFTSTRING()]]=, =[[#FuncREPLACE][$REPLACE()]]=, =[[#FuncRIGHTSTRING][$RIGHTSTRING()]]=, =[[#FuncSUBSTITUTE][$SUBSTUTE][$SUBSTITUTE()]]=, =[[#FuncTRANSLATE][$TRANSLATE()]]=, =[[#FuncXOR][$XOR()]]=
 
+#FuncCEILING
+---+++ CEILING( num ) -- return the smallest integer following a number
+   * The ceiling(x) is the smallest integer not less than x
+   * Use =$INT()= to truncate a number towards zero; use =$FLOOR()= to get the largest previous integer
+   * Syntax: ==$CEILING( num )==
+   * Example: ==%<nop>CALC{"$CEILING(5.4)"}%== returns ==6==
+   * Example: ==%<nop>CALC{"$CEILING(-5.4)"}%== returns ==-5==
+   * Related: =[[#FuncEVAL][$EVAL()]]=, =[[#FuncFLOOR][$FLOOR()]]=, =[[#FuncINT][$INT()]]=, =[[#FuncROUND][$ROUND()]]=, =[[#FuncVALUE][$VALUE()]]=
+
 #FuncCHAR
 ---+++ CHAR( number ) -- ASCII character represented by number
    * Syntax: ==$CHAR( number )==
@@ -149,7 +158,7 @@ This function has two modes of operation.
    * Numbers may be decimal integers (=1234=), binary integers (=0b1110011=), octal integers (=01234=), hexadecimal integers (=0x1234=) or of exponential notation (=12.34e-56=)
    * Syntax: ==$EVAL( formula )==
    * Example: ==%<nop>CALC{"$EVAL( (5 * 3) / 2 + 1.1 )"}%== returns ==8.6==
-   * Related: =[[#FuncEXEC][$EXEC()]]=, =[[#FuncINT][$INT()]]=, =[[#FuncMOD][$MOD()]]=, =[[#FuncROUND][$ROUND()]]=, =[[#FuncVALUE][$VALUE()]]=
+   * Related: =[[#FuncCEILING][$CEILING()]]=, =[[#FuncEXEC][$EXEC()]]=,=[[#FuncFLOOR][$FLOOR()]]=,  =[[#FuncINT][$INT()]]=, =[[#FuncMOD][$MOD()]]=, =[[#FuncROUND][$ROUND()]]=, =[[#FuncVALUE][$VALUE()]]=
 
 #FuncEVEN
 ---+++ EVEN( num ) -- test for even number
@@ -197,6 +206,15 @@ This function has two modes of operation.
    * Example: ==%<nop>CALC{"$FIND(f, fluffy, 2)"}%== returns ==4==
    * Example: ==%<nop>CALC{"$FIND(@, fluffy, 1)"}%== returns ==0==
    * Related: =[[#FuncINSERTSTRING][$INSERTSTRING()]]=, =[[#FuncLEFTSTRING][$LEFTSTRING()]]=, =[[#FuncREPLACE][$REPLACE()]]=, =[[#FuncRIGHTSTRING][$RIGHTSTRING()]]=, =[[#FuncSUBSTRING][$SUBSTRING()]]=, =[[#FuncSEARCH][$SEARCH()]]=
+
+#FuncFLOOR
+---+++ FLOOR( num ) -- return the largest integer preceding a number
+   * The floor(x) is the largest integer not greater than x
+   * Use =$INT()= to truncate a number towards zero; use =$CEILING()= to get the smallest following integer
+   * Syntax: ==$FLOOR( num )==
+   * Example: ==%<nop>CALC{"$FLOOR(5.4)"}%== returns ==5==
+   * Example: ==%<nop>CALC{"$FLOOR(-5.4)"}%== returns ==-6==
+   * Related: =[[#FuncCEILING][$CEILING()]]=, =[[#FuncEVAL][$EVAL()]]=, =[[#FuncINT][$INT()]]=, =[[#FuncROUND][$ROUND()]]=, =[[#FuncVALUE][$VALUE()]]=
 
 #FuncFORMAT
 ---+++ FORMAT( type, precision, number ) -- format a number to a certain type and precision
@@ -315,7 +333,7 @@ This function has two modes of operation.
    * Syntax: ==$INT( formula )==
    * Example: ==%<nop>CALC{"$INT(10 / 4)"}%== returns ==2==
    * Example: ==%<nop>CALC{"$INT($VALUE(09))"}%== returns ==9==
-   * Related: =[[#FuncEVAL][$EVAL()]]=, =[[#FuncROUND][$ROUND()]]=, =[[#FuncVALUE][$VALUE()]]=
+   * Related: =[[#FuncCEILING][$CEILING()]]=, =[[#FuncEVAL][$EVAL()]]=, =[[#FuncFLOOR][$FLOOR()]]=, =[[#FuncROUND][$ROUND()]]=, =[[#FuncVALUE][$VALUE()]]=
 
 #FuncLEFT
 ---+++ LEFT( ) -- address range of cells to the left of the current cell
@@ -552,9 +570,11 @@ This function has two modes of operation.
 
 #FuncREPLACE
 ---+++ REPLACE( text, start, num, new ) -- replace part of a text string
-   * Replace =num= number of characters of text string =text=, starting at =start=, with new text =new=. Starting position is 1; use a negative =start= to count from the end of the text
+   * Replace =num= number of characters of text string =text=, starting at =start=, with new text =new=. Starting position is 1; use a negative =start= to count from the end of the text.  In the =new= parameter you can write =$comma= to escape comma, =$sp= to escape space.
    * Syntax: ==$REPLACE( text, start, num, new )==
    * Example: ==%<nop>CALC{"$REPLACE(abcdefghijk, 6, 5, *)"}%== returns ==abcde*k==
+   * Example: ==%<nop>CALC{"$REPLACE(abcdefghijk, 6, 5, $comma)"}%== returns ==abcde,k==
+   * Example: ==%<nop>CALC{"$REPLACE(abcdefghijk, 6, 5, $sp)"}%== returns ==abcde k==
    * Related: =[[#FuncFIND][$FIND()]]=, =[[#FuncINSERTSTRING][$INSERTSTRING()]]=, =[[#FuncLEFTSTRING][$LEFTSTRING()]]=, =[[#FuncRIGHTSTRING][$RIGHTSTRING()]]=, =[[#FuncSEARCH][$SEARCH()]]=, =[[#FuncSUBSTITUTE][$SUBSTITUTE()]]=, =[[#FuncSUBSTRING][$SUBSTRING()]]=, =[[#FuncTRANSLATE][$TRANSLATE()]]=
 
 #FuncRIGHT
@@ -584,7 +604,7 @@ This function has two modes of operation.
    * Example: ==%<nop>CALC{"$ROUND(3.149, 1)"}%== returns ==3.1==
    * Example: ==%<nop>CALC{"$ROUND(-2.475, 2)"}%== returns ==-2.48==
    * Example: ==%<nop>CALC{"$ROUND(34.9, -1)"}%== returns ==30==
-   * Related: =[[#FuncINT][$INT()]]=, =[[#FuncFORMAT][$FORMAT()]]=
+   * Related: =[[#FuncCEILING][$CEILING()]]=, =[[#FuncEVAL][$EVAL()]]=, =[[#FuncFLOOR][$FLOOR()]]=, =[[#FuncINT][$INT()]]=, =[[#FuncFORMAT][$FORMAT()]]=
 
 #FuncROW
 ---+++ ROW( offset ) -- current row number
@@ -648,11 +668,12 @@ This function has two modes of operation.
 
 #FuncSUBSTITUTE
 ---+++ SUBSTITUTE( text, old, new, instance, option ) -- substitute text
-   * Substitutes =new= text for =old= text in a =text= string. =instance= specifies which occurance of =old= you want to replace. If you specify =instance=, only that instance is replaced. Otherwise, every occurance is changed to the new text. A literal search is performed by default; a %SYSTEMWEB%.RegularExpression search if the =option= is set to ==r==
+   * Substitutes =new= text for =old= text in a =text= string. =instance= specifies which occurance of =old= you want to replace. If you specify =instance=, only that instance is replaced. Otherwise, every occurance is changed to the new text. The text may not contain commas. In the =old= and =new= parameters you can write =$comma= to escape comma, =$sp= to escape space. A literal search is performed by default; a %SYSTEMWEB%.RegularExpression search if the =option= is set to ==r==
    * Syntax: ==$SUBSTITUTE( text, old, _new_, _instance_, _option_ )==
    * Example: ==%<nop>CALC{"$SUBSTITUTE(Good morning, morning, day)"}%== returns ==Good day==
    * Example: ==%<nop>CALC{"$SUBSTITUTE(Q2-2002, 2, 3)"}%== returns ==Q3-3003==
    * Example: ==%<nop>CALC{"$SUBSTITUTE(Q2-2002,2, 3, 3)"}%== returns ==Q2-2003==
+   * Example: ==%<nop>CALC{"$SUBSTITUTE(Q2-2002, -, $comma)"}%== returns ==Q2,2002==
    * Example: ==%<nop>CALC{"$SUBSTITUTE(abc123def, [0-9], 9, , r)"}%== returns ==abc999def==
    * Related: =[[#FuncINSERTSTRING][$INSERTSTRING()]]=, =[[#FuncLEFTSTRING][$LEFTSTRING()]]=, =[[#FuncREPLACE][$REPLACE()]]=, =[[#FuncRIGHTSTRING][$RIGHTSTRING()]]=, =[[#FuncSUBSTRING][$SUBSTRING()]]=, =[[#FuncTRANSLATE][$TRANSLATE()]]=
 
@@ -855,11 +876,13 @@ Note that the =DONTSPACE= global preference overrides the =SPREADSHEETPLUGIN_DON
 
 ---++ Info
 
-|  Copyright: | Copyright (C) 2001-2011 Peter Thoeny, peter@thoeny.org and TWiki Contributors;  &copy; 2008-2012 Foswiki Contributors  |
+|  Copyright: | Copyright (C) 2001-2012 Peter Thoeny, peter@thoeny.org and TWiki Contributors;  &copy; 2008-2012 Foswiki Contributors  |
 |  License: | GPL ([[http://www.gnu.org/copyleft/gpl.html][GNU General Public License]]) |
 |  Version: | %$VERSION% |
 |  Release: | %$RELEASE% |
 |  Change History: | <!-- specify latest version first -->&nbsp; |
+|  06 Apr 2012: (1.1.6) | Foswikitask:Item11523 - support $comma, $sp in SUBSTITUTE, REPLACE.<br />\
+                  Foswikitask:Item11524 - Add FLOOR and CEILING macros. |
 |  17 Jan 2012: (1.1.5) | Foswikitask:Item11450 - ABOVE and LEFT return R0 and C0 respectively.  Should be R1 and C1 |
 |  05 Dec 2011: (1.1.4) | Foswiki release 1.1.4 - Foswikitask:Item11079: leading/trailing spaces break $LISTUNIQUE(). <br />\
                   Foswikitask:Item11183: Sync up with TWiki version. <br />\

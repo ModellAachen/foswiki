@@ -1,0 +1,82 @@
+%META:TOPICINFO{author="ProjectContributor" comment="save topic" date="1323784401" format="1.1" reprev="3" version="5"}%
+%META:TOPICPARENT{name="WebHome"}%
+---+!! %TOPICTITLE%
+
+<noautolink>
+| *Name* | *Type* | *Size* | *Values* | *Description* | *Atributes* |
+| TopicType | label | 10 | EventTopic |  | h |
+| TopicTitle | text | 50 | | | |
+| Summary | text | 50 | | %MAKETEXT{"Short description of this event"}% | |
+| StartDate | date | 20 | | %MAKETEXT{"Beginning of event, or start of recurring events"}% | |
+| EndDate | date | 20 | | %MAKETEXT{"End of event; or end of time span when the recurrences happen; leave empty for never ending recurrences"}% | |
+| Recurrence | radio+values | 50 | %MAKETEXT{"none"}%=none, %MAKETEXT{"daily"}%=daily, %MAKETEXT{"weekly"}%=weekly, %MAKETEXT{"monthly"}%=monthly, %MAKETEXT{"yearly"}%=yearly | %MAKETEXT{"Kind of recurrence"}% | |
+| WeekDay | checkbox+values | 7 | %MAKETEXT{"Monday"}%=mo, %MAKETEXT{"Tuesday"}%=tu, %MAKETEXT{"Wednesday"}%=we, %MAKETEXT{"Thursday"}%=th, %MAKETEXT{"Friday"}%=fr, %MAKETEXT{"Saturday"}%=sa, %MAKETEXT{"Sunday"}%=su | %MAKETEXT{"Weekday of a recurrence"}% | |
+| MonthDay | checkbox | 5 | 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31 | %MAKETEXT{"Day within a month of a recurrence"}% | |
+| Month | checkbox+values | 6 | %MAKETEXT{"January"}%=1, %MAKETEXT{"Feburary"}%=2, %MAKETEXT{"March"}%=3, %MAKETEXT{"April"}%=4, %MAKETEXT{"May"}%=5, %MAKETEXT{"July"}%=6, %MAKETEXT{"June"}%=7, %MAKETEXT{"August"}%=8, %MAKETEXT{"September"}%=9, %MAKETEXT{"October"}%=10, %MAKETEXT{"November"}%=11, %MAKETEXT{"December"}%=12 | %MAKETEXT{"Month within a year of a recurrence"}%  | |
+| YearDay | text | 20 | | %MAKETEXT{"Comma separate list of days within a year; values range between 1 and 365"}% | |
+| Interval | text | 3 | | %MAKETEXT{"Interval of recurrence; unit depends on recurrence type"}% | |
+</noautolink>
+
+<!--
+Not supported yet:
+
+| Count | text | 3 | 1 | %MAKETEXT{"Number of recurrences"}% | |
+| Exceptions | text | 50 | | %MAKETEXT{"Comma separated list of exception dates when to skip recurring events"}% | |
+-->
+
+<verbatim>
+%STARTSECTION{"init"}%
+<literal>
+<style>
+.Interval, WeekDay, MonthDay, Month, Exception, YearDay {
+  display:none;
+}
+</style>
+<script>
+jQuery(function($) {
+
+  $(".event").livequery(function() {
+    var $event = $(this);
+
+    function updateState(elem) {
+      var $elem = $(elem),
+          $radio = $elem.find("input[type=radio]:checked"),
+          val = $radio.val();
+
+      if ($radio.length) {
+        //console.log("val=",val);
+
+        if (val == 'daily') {
+          $event.find(".Interval, .Exception").fadeIn();
+          $event.find(".WeekDay, .MonthDay, .Month, .YearDay").stop().hide();
+        } else if (val === 'weekly') {
+          $event.find(".Interval, .Exception, .WeekDay").fadeIn();
+          $event.find(".MonthDay, .Month, .YearDay").stop().hide();
+        } else if (val === 'monthly') {
+          $event.find(".Interval, .Exception, .MonthDay").fadeIn();
+          $event.find(".WeekDay, .Month, .YearDay").stop().hide();
+        } else if (val === 'yearly') {
+          $event.find(".WeekDay").stop().hide();
+          $event.find(".Interval, .Exception, .MonthDay, .Month, .YearDay").fadeIn();
+        } else {
+          $event.find(".Interval, .WeekDay, .MonthDay, .Month, .Exception, .YearDay").stop().hide();
+        }
+      } else {
+        $elem.find("input[value=none]").attr('checked', 'checked');
+        $event.find(".Interval, .WeekDay, .MonthDay, .Month, .Exception, .YearDay").stop().hide();
+      }
+    }
+
+    $event.find(".Recurrence").each(function() {
+      $(this).change(function() {
+        updateState(this);
+      });
+      updateState(this);
+    });
+
+  });
+});
+</script>
+</literal>
+%ENDSECTION{"init"}%
+</verbatim>

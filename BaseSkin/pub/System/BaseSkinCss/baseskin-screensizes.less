@@ -1,4 +1,96 @@
 /*
+DISPLAY DIMENSIONS ACCORDING TO UI SETTINGS
+*/
+
+// defaults
+
+.foswikiContainer {
+	max-width: 0px + @fw_strand1_ratio_up_14;
+	.fw_section_padding(cosy);
+	padding-right: 0px + @fw_strand1_ratio_up_5;
+	padding-left: 0px + @fw_strand1_ratio_up_5;
+}
+.foswikiBar .foswikiContainer,
+.foswikiBar.foswikiContainer,
+.foswikiTopBar .foswikiContainer,
+.foswikiTopicActions .foswikiContainer,
+.foswikiSearchResults .foswikiSearchResult {
+	.fw_tool_padding_vertical_only(cosy);
+}	
+
+
+// UI setting specific
+
+.foswikiViewDisplayRoomy {
+	.foswikiBar .foswikiContainer,
+	.foswikiBar.foswikiContainer,
+	.foswikiTopBar .foswikiContainer,
+	.foswikiTopicActions .foswikiContainer,
+	.foswikiSearchResults .foswikiSearchResult {
+		.fw_tool_padding_vertical_only(roomy);
+	}
+	.foswikiContainer {
+		margin: 0 auto 0 0; // left aligned
+		.fw_section_padding(roomy);
+		padding-right: 0px + @fw_strand1_ratio_up_4;
+		padding-left: 0px + @fw_strand1_ratio_up_4;
+	}
+	.foswikiTopic .foswikiContainer {
+		max-width: 0px + @fw_strand1_ratio_up_12;
+	}
+
+	a.foswikiDisplayRoomy {
+		img {
+			display: inline;
+		}
+	}
+}
+
+.foswikiViewDisplayCosy {
+
+	.foswikiBar .foswikiContainer,
+	.foswikiBar.foswikiContainer,
+	.foswikiTopBar .foswikiContainer,
+	.foswikiTopicActions .foswikiContainer,
+	.foswikiSearchResults .foswikiSearchResult {
+		.fw_tool_padding_vertical_only(cosy);
+	}
+	.foswikiContainer {
+		max-width: 0px + @fw_strand1_ratio_up_14;
+		.fw_section_padding(cosy);
+		padding-right: 0px + @fw_strand1_ratio_up_5;
+		padding-left: 0px + @fw_strand1_ratio_up_5;
+	}
+	a.foswikiDisplayCosy {
+		img {
+			display: inline;
+		}
+	}
+}
+
+.foswikiViewDisplayTight {
+
+	.foswikiBar .foswikiContainer,
+	.foswikiBar.foswikiContainer,
+	.foswikiTopBar .foswikiContainer,
+	.foswikiTopicActions .foswikiContainer,
+	.foswikiSearchResults .foswikiSearchResult {
+		.fw_tool_padding_vertical_only(tight);
+	}
+	.foswikiContainer {
+		max-width: auto;
+		.fw_section_padding(tight);
+		padding-right: 20px;
+		padding-left: 20px;
+	}
+	a.foswikiDisplayTight {
+		img {
+			display: inline;
+		}
+	}
+}
+
+/*
 MEDIA QUERIES FOR DIFFERENT SCREEN SIZES
 */
 
@@ -91,30 +183,6 @@ MEDIA QUERIES FOR DIFFERENT SCREEN SIZES
 
 // Large desktop
 @media (min-width: 1080px) {
-	.foswikiContainer {
-		max-width: 0px + @fw_strand1_ratio_up_14;
-		padding-right: 0px + @fw_strand1_ratio_up_4;
-		padding-left: 0px + @fw_strand1_ratio_up_4;
-	}
-	.foswikiDisplaySpatious {
-		.foswikiContainer {
-			max-width: 0px + @fw_strand1_ratio_up_13;
-			padding-right: 0px + @fw_strand1_ratio_up_3;
-			padding-left: 0px + @fw_strand1_ratio_up_3;
-		}
-	}
-	.foswikiDisplayAverage {
-		.foswikiContainer {
-			max-width: 0px + @fw_strand1_ratio_up_14;
-			padding-right: 0px + @fw_strand1_ratio_up_4;
-			padding-left: 0px + @fw_strand1_ratio_up_4;
-		}
-	}
-	.foswikiDisplayMaxscreen {
-		.foswikiContainer {
-			max-width: auto;
-			padding-right: 20px;
-			padding-left: 20px;
-		}
-	}
+
+
 }

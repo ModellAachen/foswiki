@@ -45,8 +45,11 @@ sub setup {
     {
         _ensure( \@buttons_ensure, \@buttons_prefs, $buttons_near );
     }
-    Foswiki::Func::addToZone( 'head', 'TinyMCECleanStickyBitsPlugin',
-        _genMeta( \%stickybits ) );
+    Foswiki::Func::addToZone(
+        'head',
+        'TinyMCECleanStickyBitsPlugin',
+        _genMeta( \%stickybits )
+    );
 
     return;
 }

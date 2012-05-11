@@ -1,6 +1,6 @@
 # Plugin for Foswiki - The Free and Open Source Wiki, http://foswiki.org/
 #
-# Copyright (C) 2008-2009 MichaelDaum http://michaeldaumconsulting.com
+# Copyright (C) 2008-2012 MichaelDaum http://michaeldaumconsulting.com
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -27,7 +27,7 @@ use vars qw(
 );
 
 $VERSION = '$Rev$';
-$RELEASE = '1.0';
+$RELEASE = '1.1';
 $SHORTDESCRIPTION = 'Control naming of topics';
 $NO_PREFS_IN_TOPIC = 1;
 

@@ -2,7 +2,8 @@ package TWiki::Contrib::TWikiShellContrib::Common;
 
 use Exporter;
 @ISA = qw(Exporter);
-@EXPORT = qw(extractPackageFromSub askUser checkIfDir sys_action findRelativeTo makeExtensionPath) ;
+@EXPORT =
+  qw(extractPackageFromSub askUser checkIfDir sys_action findRelativeTo makeExtensionPath);
 
 =pod
 
@@ -11,7 +12,6 @@ use Exporter;
 Useful fuctions to be used in CommandSets. All the functions in this package are exported.
 
 =cut
-
 
 =pod
 
@@ -22,15 +22,14 @@ Receives the fully qualified name of a sub (ie: TWiki::writeDebug) and returns o
 =cut
 
 sub extractPackageFromSub {
-    my $sub=shift;
-    if ($sub=~/(.*)\:\:[^\:]+/) {
+    my $sub = shift;
+    if ( $sub =~ /(.*)\:\:[^\:]+/ ) {
         return $1;
-    } else {
+    }
+    else {
         return "";
     }
 }
-
-
 
 =pod
 
@@ -47,26 +46,27 @@ The parameters are:
 The result is a $userInput that satisfies the \&checkOk check.
 
 =cut
+
 sub askUser {
-    my ($value,$default,$prompt,$checkOk,$allwaysAsk)=@_;    
+    my ( $value, $default, $prompt, $checkOk, $allwaysAsk ) = @_;
 
-    $allwaysAsk=$allwaysAsk||0;
+    $allwaysAsk = $allwaysAsk || 0;
 
-    if (!$checkOk) {
-        $checkOk = sub {return 0};
+    if ( !$checkOk ) {
+        $checkOk = sub { return 0 };
     }
-     
-    $value=$value||$default;
-    
-   if ($allwaysAsk || !&$checkOk($value)) {
-      do {
-          print " $prompt [$default]: ---> "; 
-          chomp ($value = <STDIN>);
-      } until (&$checkOk($value) || $value eq '');
-   
-   }
-        
-    return ($value||$default);
+
+    $value = $value || $default;
+
+    if ( $allwaysAsk || !&$checkOk($value) ) {
+        do {
+            print " $prompt [$default]: ---> ";
+            chomp( $value = <STDIN> );
+        } until ( &$checkOk($value) || $value eq '' );
+
+    }
+
+    return ( $value || $default );
 }
 
 =pod 
@@ -77,9 +77,8 @@ Convenience function that checks if the given parameter is a directory. Designed
 
 =cut
 
-
 sub checkIfDir {
-   return (-d shift);
+    return ( -d shift );
 }
 
 =pod 
@@ -90,12 +89,11 @@ Perform a "system" command.
 =cut
 
 sub sys_action {
-   my ($cmd) = @_;
-   print "Command: $cmd\n";
-   system($cmd);
-   die 'Failed to '.$cmd.': '.$? if ($?);
+    my ($cmd) = @_;
+    print "Command: $cmd\n";
+    system($cmd);
+    die 'Failed to ' . $cmd . ': ' . $? if ($?);
 }
-
 
 =pod 
 
@@ -108,14 +106,14 @@ Returns the path to $name or undef if not found.
 =cut
 
 sub findRelativeTo {
-    my( $startdir, $name ) = @_;
+    my ( $startdir, $name ) = @_;
 
     my @path = split( /\/+/, $startdir );
 
-    while (scalar(@path) > 0) {
-        my $found = join( '/', @path).'/'.$name;
+    while ( scalar(@path) > 0 ) {
+        my $found = join( '/', @path ) . '/' . $name;
         return $found if -e $found;
-        pop( @path );
+        pop(@path);
     }
     return undef;
 }
@@ -134,15 +132,16 @@ Examples:
 =cut
 
 sub makeExtensionPath {
-   my $extensionName=shift;
-   my $path='lib/TWiki';
-   if ($extensionName=~/[a-zA-Z]+Contrib$/) {
-      $path.='/Contrib';
-   } else {
-      $path.='/Plugins';
-   }
+    my $extensionName = shift;
+    my $path          = 'lib/TWiki';
+    if ( $extensionName =~ /[a-zA-Z]+Contrib$/ ) {
+        $path .= '/Contrib';
+    }
+    else {
+        $path .= '/Plugins';
+    }
 
-   return $path.'/'.$extensionName;
+    return $path . '/' . $extensionName;
 }
 
 1;

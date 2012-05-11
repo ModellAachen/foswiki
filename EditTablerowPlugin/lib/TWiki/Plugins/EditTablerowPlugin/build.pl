@@ -20,15 +20,15 @@
 
 # Standard preamble
 BEGIN {
-  foreach my $pc (split(/:/, $ENV{FOSWIKI_LIBS})) {
-    unshift @INC, $pc;
-  }
+    foreach my $pc ( split( /:/, $ENV{FOSWIKI_LIBS} ) ) {
+        unshift @INC, $pc;
+    }
 }
 
 use TWiki::Contrib::Build;
 
 # Create the build object
-$build = new TWiki::Contrib::Build( 'EditTablerowPlugin' );
+$build = new TWiki::Contrib::Build('EditTablerowPlugin');
 
 # Build the target on the command line, or the default target
-$build->build($build->{target});
+$build->build( $build->{target} );

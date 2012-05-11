@@ -31,7 +31,12 @@ Write debug messages if debug is enabled.
 
 =cut
 
-sub debug { Foswiki::Func::writeDebug(@_) if $debug; }
+sub debug {
+
+    #print STDERR @_;
+    #print STDERR "\n";
+    Foswiki::Func::writeDebug(@_) if $debug;
+}
 
 =begin TML
 
@@ -134,12 +139,11 @@ sub _loadHandler {
             require $file . '.pm';
             $handler = $module->new();
             1;
-          }
-          or do {
+        } or do {
             print STDERR "FAILED TO LOAD  $@";
             warning("- ImmediateNotifyPlugin::$method failed to load $@ $!");
             return 0;
-          };
+        };
 
         if ( $handler->connect() ) {
             $methodHandlers{$method} = $handler;
@@ -299,7 +303,7 @@ sub afterSaveHandler {
       unless ($notifyTopic);
 
     while ( $notifyTopic =~
-/(\t+|(   )+)\* (?:\%MAINWEB\%|$Foswiki::cfg{UsersWebName})\.([^\r\n]+)/go
+/(\t+|(   )+)\* (?:\%MAINWEB\%\.|$Foswiki::cfg{UsersWebName}\.)?([^\r\n]+)/go
       )
     {
         push @names, $3 if $3;

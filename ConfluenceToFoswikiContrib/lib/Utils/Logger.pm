@@ -14,7 +14,7 @@ use CConfig;
 use Exporter;
 use Log::Log4perl;
 
-our @ISA = qw(Log::Log4perl);
+our @ISA    = qw(Log::Log4perl);
 our @EXPORT = qw(init_logger start_logging get_logger);
 
 =head1 NAME
@@ -39,14 +39,14 @@ start_logging:This function parses config file and intiliaze logger to required 
 #######################################################################
 sub init_logger($$$) {
 
-    my ($sLogDir, $sLogLevel, $sLogFile) = @_;
+    my ( $sLogDir, $sLogLevel, $sLogFile ) = @_;
     chomp($sLogLevel);
 
-    #We define custom log level 
-    Log::Log4perl::Logger::create_custom_level("ERROR_PARSE", "WARN");
-    Log::Log4perl::Logger::create_custom_level("ERROR_READ", "WARN");
+    #We define custom log level
+    Log::Log4perl::Logger::create_custom_level( "ERROR_PARSE", "WARN" );
+    Log::Log4perl::Logger::create_custom_level( "ERROR_READ",  "WARN" );
 
-	my $debugconf = q(
+    my $debugconf = q(
     
     # Filter to match level ERROR_READ
 	log4perl.filter.MatchError_Read  = Log::Log4perl::Filter::LevelMatch
@@ -121,19 +121,19 @@ sub init_logger($$$) {
     
     );
 
-    # Depending on loglevel configured in configuration file we choose level  
-    if ($sLogLevel eq "DEBUG") {
-        $debugconf .= 'log4perl.appender.Logfile.filename = ' . $sLogDir. '/' . $sLogFile;
-        Log::Log4perl::init(\$debugconf);
+    # Depending on loglevel configured in configuration file we choose level
+    if ( $sLogLevel eq "DEBUG" ) {
+        $debugconf .=
+          'log4perl.appender.Logfile.filename = ' . $sLogDir . '/' . $sLogFile;
+        Log::Log4perl::init( \$debugconf );
     }
     else {
-        $infoconf .= 'log4perl.appender.Logfile.filename = ' . $sLogDir. '/' . $sLogFile;
-        Log::Log4perl::init(\$infoconf);
+        $infoconf .=
+          'log4perl.appender.Logfile.filename = ' . $sLogDir . '/' . $sLogFile;
+        Log::Log4perl::init( \$infoconf );
     }
-    
 
 }
-
 
 ##############################################################################
 #Function Name : start_logging.
@@ -143,22 +143,22 @@ sub init_logger($$$) {
 ##############################################################################
 
 sub start_logging($$) {
-    
-	my ($sLogDir,$sConfFile) = @_;
+
+    my ( $sLogDir, $sConfFile ) = @_;
     my %hConfig;
-		parse_conf($sLogDir, $sConfFile, \%hConfig);
-       	my $sLogfilePath = "$sLogDir/".$hConfig{LogFile};
-    
-	if ($hConfig{Debug} eq "on") {
-       init_logger("$sLogDir", "DEBUG",$hConfig{LogFile});
+    parse_conf( $sLogDir, $sConfFile, \%hConfig );
+    my $sLogfilePath = "$sLogDir/" . $hConfig{LogFile};
+
+    if ( $hConfig{Debug} eq "on" ) {
+        init_logger( "$sLogDir", "DEBUG", $hConfig{LogFile} );
     }
     else {
-        init_logger("$sLogDir", "INFO",$hConfig{LogFile});
+        init_logger( "$sLogDir", "INFO", $hConfig{LogFile} );
     }
-	
+
     #everytime write to clean file.
-	open rLF, '>', $sLogfilePath or 
-        die "Could not create Logfile $sLogfilePath";
+    open rLF, '>', $sLogfilePath
+      or die "Could not create Logfile $sLogfilePath";
     close rLF;
 }
 

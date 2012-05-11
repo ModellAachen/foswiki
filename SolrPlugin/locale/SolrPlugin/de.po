@@ -3,15 +3,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SolrPlugin $Id\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-12-20 12:56+0000\n"
-"PO-Revision-Date: 2010-09-14 12:56+0000\n"
+"POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: 2012-02-08 11:26+0000\n"
 "Last-Translator: Michael Daum <daum@michaeldaumconsulting.com>\n"
 "Language-Team: Foswiki German Translation Team <none>\n"
+"Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"Language: de\n"
 
 #: data/System/SolrSearchBaseTemplate.txt:354
 #: data/System/SolrSearchBaseTemplate.txt:404
@@ -89,7 +89,7 @@ msgstr "Dänisch"
 msgid "Did you mean %1"
 msgstr "Meinten Sie %1"
 
-#: data/System/SolrSearchBaseTemplate.txt:857
+#: data/System/SolrSearchBaseTemplate.txt:859
 msgid "Display as"
 msgstr "Anzeige als"
 
@@ -121,15 +121,15 @@ msgstr "Französisch"
 msgid "German"
 msgstr "Deutsch"
 
-#: data/System/SolrSearchBaseTemplate.txt:896
+#: data/System/SolrSearchBaseTemplate.txt:898
 msgid "In all webs"
 msgstr "In allen Webs"
 
-#: data/System/SolrSearchBaseTemplate.txt:886
+#: data/System/SolrSearchBaseTemplate.txt:888
 msgid "In current web"
 msgstr "Im momentanen Web"
 
-#: data/System/SolrSearchBaseTemplate.txt:906
+#: data/System/SolrSearchBaseTemplate.txt:908
 msgid "In my contributions"
 msgstr "In meinen Beiträgen"
 
@@ -145,7 +145,7 @@ msgstr "Schlüsselwort"
 msgid "Language"
 msgstr "Sprache"
 
-#: data/System/SolrSearchBaseTemplate.txt:841
+#: data/System/SolrSearchBaseTemplate.txt:843
 msgid "Last changed"
 msgstr "Letzte Änderung"
 
@@ -153,7 +153,7 @@ msgstr "Letzte Änderung"
 msgid "Media"
 msgstr "Medium"
 
-#: data/System/SolrSearchBaseTemplate.txt:842
+#: data/System/SolrSearchBaseTemplate.txt:844
 msgid "Name"
 msgstr "Name"
 
@@ -165,6 +165,11 @@ msgstr "Populäre Schlüsselworte"
 msgid "Portuguese"
 msgstr "Portugisisch"
 
+#: data/System/SolrSideBar.txt:48
+msgid "Recent Changes"
+msgstr "Letzte Änderungen"
+
+#: data/System/SolrSearchBaseTemplate.txt:59
 #: data/System/WebChangesViewTemplate.txt:21
 msgid "Recent changes"
 msgstr "Letzte Änderungen"
@@ -173,11 +178,7 @@ msgstr "Letzte Änderungen"
 msgid "Recent changes in %1"
 msgstr "Letze Änderungen in %1"
 
-#: data/System/SolrSearchBaseTemplate.txt:59
-msgid "Recently changed"
-msgstr "Letzte Änderungen"
-
-#: data/System/SolrSearchBaseTemplate.txt:840
+#: data/System/SolrSearchBaseTemplate.txt:842
 msgid "Relevance"
 msgstr "Relevanz"
 
@@ -193,12 +194,16 @@ msgstr "Treffer pro Seite"
 msgid "Russian"
 msgstr "Russisch"
 
-#: data/System/SolrSearchBaseTemplate.txt:805
+#: data/System/SolrSearchBaseTemplate.txt:802
 #: data/System/SolrSearchViewTemplate.txt:19
 msgid "Search"
 msgstr "Suchen"
 
-#: data/System/SolrSearchBaseTemplate.txt:837
+#: data/System/SolrSideBar.txt:20
+msgid "Similar topics"
+msgstr "Ähnliche Topics"
+
+#: data/System/SolrSearchBaseTemplate.txt:839
 msgid "Sort by"
 msgstr "Sortierung"
 
@@ -235,22 +240,22 @@ msgstr "Webs"
 msgid "Your selection"
 msgstr "Ihre Auswahl"
 
-#: data/System/SolrSearchBaseTemplate.txt:819
+#: data/System/SolrSearchBaseTemplate.txt:821
 msgid "auto-submit"
 msgstr "auto-submit"
 
-#: data/System/SolrSearchBaseTemplate.txt:861
+#: data/System/SolrSearchBaseTemplate.txt:863
 msgid "grid"
 msgstr "Raster"
 
-#: data/System/SolrSearchBaseTemplate.txt:1010
-#: data/System/SolrSearchBaseTemplate.txt:1033
-#: data/System/SolrSearchBaseTemplate.txt:932
-#: data/System/SolrSearchBaseTemplate.txt:972
+#: data/System/SolrSearchBaseTemplate.txt:1012
+#: data/System/SolrSearchBaseTemplate.txt:1035
+#: data/System/SolrSearchBaseTemplate.txt:934
+#: data/System/SolrSearchBaseTemplate.txt:974
 msgid "in %1"
 msgstr "in %1"
 
-#: data/System/SolrSearchBaseTemplate.txt:859
+#: data/System/SolrSearchBaseTemplate.txt:861
 msgid "list"
 msgstr "Liste"
 
@@ -271,10 +276,17 @@ msgstr "älter"
 msgid "prev"
 msgstr "zur&&uuml;ck"
 
-#: data/System/SolrSearchBaseTemplate.txt:805
+#: data/System/SolrSideBar.txt:23
+msgid "score: %1"
+msgstr "Gewichtung: %1"
+
+#: data/System/SolrSearchBaseTemplate.txt:802
 msgid "submit the query"
 msgstr "Anfrage abschicken"
 
 #: data/System/SolrSearchBaseTemplate.txt:89
 msgid "today"
 msgstr "heute"
+
+#~ msgid "Recently changed"
+#~ msgstr "Letzte Änderungen"

@@ -1,21 +1,57 @@
 %META:TOPICINFO{author="ProjectContributor" date="1199552369" format="1.1" version="$Rev$"}%
 %META:TOPICPARENT{name="WebPreferences"}%
----+ WebLinks for the %WEB% web
-
-%STARTINCLUDE%<!-- foswikipedia.weblinks -->
-   * [[ClassifiedTopic][%MAKETEXT{"New Topic"}%]]
-   * [[Category][All Categories]]
-   * [[CategoryBrowser][Category Browser]]
-   * [[WebTagCloud][All Tags]]
-   * [[WebTopicList][%MAKETEXT{"Index"}%]]
-   * [[WebChanges][%MAKETEXT{"Changes"}%]]
-   * [[WebNotify][%MAKETEXT{"Notifications"}%]]
-   * [[WebStatistics][%MAKETEXT{"Statistics"}%]]
-%~~ TAGRELATEDTOPICS{"%BASETOPIC%" 
-~~~   header="<h2><a name=\"related\">Related Topics</a></h2>$n" 
-~~~   format="   1 <a href=\"%SCRIPTURLPATH{"view"}%/%BASEWEB%/$topic\"
-~~~                   title=\"$percntDBQUERY{topic=\"$topic\" format=\"$formfield(Tag)\"}$percnt\">
-*~~                $percntTOPICTITLE{\"$web.$topic\"}$percnt</a>"
-~~~   separator="$n"
-~~~ }%
-<!-- foswikipedia.weblinks -->%STOPINCLUDE%
+---+!! %TOPIC%
+<verbatim class="tml">
+%STARTINCLUDE%
+<noautolink>
+%SOLRSIMILAR{"id:%BASEWEB%.%BASETOPIC%" 
+   rows="5"
+   like="category^5,tag"
+   filter="web:%BASEWEB% type:topic"
+   header="<h2>Similar Topics</h2>$n<ul>" 
+   footer="</ul>"
+   format="<li>
+       <a href='%SCRIPTURLPATH{"view"}%/$web/$topic' title='score: $score'>
+         $percntDBCALL{\"Applications.RenderTopicThumbnail\"
+           OBJECT=\"$web.$topic\"
+           TYPE=\"plain\"
+         }$percnt 
+         $title
+         $percntDBQUERY{
+           header=\"<br /><span class='foswikiGrayText'>\"
+           topic=\"$web.$topic\" 
+           format=\"$formfield(Summary)\"
+           footer=\"</span>\"
+         }$percnt
+         %CLEAR%
+       </a>
+     </li>"
+   separator="$n"
+}%
+</noautolink>
+<noautolink>
+%DBQUERY{
+  web="%BASEWEB%" 
+  order="modified" 
+  limit="5" 
+  reverse="on"
+  exclude="WebHome|WebLinks|WebSideBar|WebPreferences|WebStatistics|WebTopicList|WebSearch|WebIndex|WebAdvancedSearch"
+  header="<h2 >%MAKETEXT{"Recent Changes"}%</h2>$n<ul>"
+  footer="</ul>"
+  format="<li>
+      <a href='%SCRIPTURLPATH{"view"}%/$web/$topic'>
+        $percntDBCALL{\"Applications.RenderTopicThumbnail\"
+          OBJECT=\"$web.$topic\"
+          TYPE=\"plain\"
+        }$percnt
+        $expand(topictitle)<br />
+        <span class='foswikiGrayText'>
+          $formfield(Summary)
+        </span>
+        %CLEAR%
+      </a>
+    </li>"
+}%
+</noautolink>
+%STOPINCLUDE%
+</verbatim>

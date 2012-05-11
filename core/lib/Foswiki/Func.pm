@@ -182,10 +182,7 @@ sub getScriptUrl {
 
 ---+++ getScriptUrlPath( $web, $topic, $script, ... ) -> $path
 
-Get script URL path. See Foswiki::Func::getScriptUrl
-
-Deprecated 28 Nov 2008, re-instated Foswiki 1.1.5 with a new calling convention
-to match =Foswiki::Func::getScriptUrl()=
+Compose absolute URL path. See Foswiki::Func::getScriptUrl
 
 *Examples:*
 <verbatim class="perl">
@@ -196,6 +193,9 @@ $path = Foswiki::Func::getScriptUrlPath();
 $path = Foswiki::Func::getScriptUrlPath(undef, undef, 'edit');
 # $path eq '/path/to/bin/edit/Web/Topic'
 $path = Foswiki::Func::getScriptUrlPath('Web', 'Topic', 'edit');</verbatim>
+
+*Since:* 19 Jan 2012 (when called without parameters, this function is
+backwards-compatible with the old version which was deprecated 28 Nov 2008).
 
 =cut
 
@@ -2499,11 +2499,26 @@ Return: =$text=     Expanded text, e.g. ='Current user is <nop>WikiGuest'=
 
 See also: expandVariablesOnTopicCreation
 
+*Caution:* This function needs all the installed plugins to have gone through initialization.
+Never call this function from within an initPlugin handler,  bad things happen.
+
 =cut
 
 sub expandCommonVariables {
     my ( $text, $topic, $web, $meta ) = @_;
     ASSERT($Foswiki::Plugins::SESSION) if DEBUG;
+
+    if (DEBUG) {
+        for ( my $i = 4 ; $i <= 7 ; $i++ ) {
+            my $caller = ( caller($i) )[3];
+            ASSERT( 0, "expandCommonVariables called during registration" )
+              if ( defined $caller
+                && $caller eq 'Foswiki::Plugin::registerHandlers' );
+        }
+    }
+
+    #ASSERT(!Foswiki::Func::webExists($topic)) if DEBUG;
+
     ( $web, $topic ) = _validateWTA(
         $web   || $Foswiki::Plugins::SESSION->{webName},
         $topic || $Foswiki::Plugins::SESSION->{topicName}
@@ -2559,6 +2574,8 @@ Render text from TML into XHTML as defined in [[%SYSTEMWEB%.TextFormattingRules]
    * =$topic= - topic name, optional, defaults to web home
 Return: =$text=    XHTML text, e.g. ='&lt;b>bold&lt;/b> and &lt;code>fixed font&lt;/code>'=
 
+NOTE: renderText expects that all %MACROS% have already been expanded - it does not expand them for you.
+
 =cut
 
 sub renderText {
@@ -2607,7 +2624,7 @@ Direct interface to %<nop>ADDTOZONE (see %SYSTEMWEB%.VarADDTOZONE)
    * =requires= optional, comma-separated list of =$id= identifiers that should
      precede the content
 
-All macros present in =$data= will be expanded before being inserted into the =<head>= section.
+All macros present in =$data= will be expanded before being inserted into the =&lt;head>= section.
 
 <blockquote class="foswikiHelp">%X%
 *Note:* Read the developer supplement at Foswiki:Development.AddToZoneFromPluginHandlers if you are
@@ -2656,16 +2673,17 @@ sub writeHeader {
 
 =begin TML
 
----+++ redirectCgiQuery( $query, $url, $passthru )
+---+++ redirectCgiQuery( $query, $url, $passthru, $status )
 
 Redirect to URL
    * =$query= - CGI query object. Ignored, only there for compatibility. The session CGI query object is used instead.
    * =$url=   - URL to redirect to
    * =$passthru= - enable passthrough.
+   * =$status= - HTTP status code (30x) to redirect with. Optional, defaults to 302. *Since* 2012-03-28
 
 Return:             none
 
-Print output to STDOUT that will cause a 302 redirect to a new URL.
+Issue a =Location= HTTP header that will cause a redirect to a new URL.
 Nothing more should be printed to STDOUT after this method has been called.
 
 The =$passthru= parameter allows you to pass the parameters that were passed
@@ -2691,9 +2709,11 @@ Foswiki installation.
 =cut
 
 sub redirectCgiQuery {
-    my ( $query, $url, $passthru ) = @_;
+    my ( $query, $url, $passthru, $status ) = @_;
     ASSERT($Foswiki::Plugins::SESSION) if DEBUG;
-    return $Foswiki::Plugins::SESSION->redirect( $url, $passthru );
+    writeWarning("redirectCgiQuery: not a valid redirect status: $status")
+      if $status && $status !~ /^\s*3\d\d.*/;
+    return $Foswiki::Plugins::SESSION->redirect( $url, $passthru, $status );
 }
 
 =begin TML
@@ -3544,7 +3564,9 @@ sub saveTopicText {
             param1   => ( $caller[0] || 'unknown' )
         );
     }
-    $topicObject->text($text);
+
+    #see Tasks.Item11586 - saveTopicText is supposed to use the embedded meta
+    $topicObject->setEmbeddedStoreForm($text);
 
     try {
         $topicObject->save( minor => $dontNotify );
@@ -3564,7 +3586,7 @@ sub saveTopicText {
 
 ---+++ addToHEAD( $id, $data, $requires )
 
-Adds =$data= to the HTML header (the <head> tag).
+Adds =$data= to the HTML header (the &lt;head> tag).
 
 *Deprecated* 26 Mar 2010 - use =addZoZone('head', ...)=.
 

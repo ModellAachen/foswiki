@@ -24,6 +24,7 @@ use POSIX ();
 use Error qw(:try);
 
 use constant DEBUG => 0; # toggle me
+#use Data::Dumper ();
 
 ##############################################################################
 sub new {
@@ -63,7 +64,7 @@ sub handleSOLRSEARCH {
   $theQuery = $this->entityDecode($theQuery);
   $params->{search} = $theQuery;
 
-  $theQuery = $this->toUtf8($theQuery);
+  #$theQuery = toUtf8($theQuery);
 
   my $theJump = Foswiki::Func::isTrue($params->{jump});
 
@@ -138,7 +139,6 @@ sub formatResponse {
   return $error if $error;
   return '' unless $gotResponse;
 
-
   #$this->log("called formatResponse()") if DEBUG;
 
   Foswiki::Plugins::JQueryPlugin::createPlugin("metadata");
@@ -184,7 +184,7 @@ HERE
     my $correction = $this->getCorrection($response);
     if ($correction) {
       my $tmp = $params->{search};
-      $params->{search} = $correction;
+      $params->{search} = toSiteCharSet($correction);
       my $scriptUrl = $this->getScriptUrl($theWeb, $theTopic, $params, $response);
       $spellcheck = $theCorrection;
       $spellcheck =~ s/\$correction/$correction/g;
@@ -203,7 +203,7 @@ HERE
 
   #$this->log("page=$page, limit=$limit, index=$index, count=$count") if DEBUG;
   
-  if ($theFormat) {
+  if (defined $theFormat && $theFormat ne '') {
     for my $doc ($response->docs) {
       my $line = $theFormat;
       my $id = '';
@@ -214,17 +214,19 @@ HERE
 
       foreach my $field ($doc->fields) {
         my $name = $field->{name};
-        next unless $line =~ /\$$name/g;
 
         my $value = $field->{value};
-	$name = $this->fromUtf8($name);
-      	$value = $this->fromUtf8($value);
 
-        $id = $value if $name eq 'id';
-        $type = $value if $name eq 'type';
-        $web = $value if $name eq 'web';
-        $topic = $value if $name eq 'topic';
-        $summary = $value if $name eq 'summary';
+        $web = fromUtf8($value) if $name eq 'web';
+        $topic = fromUtf8($value) if $name eq 'topic';
+        $id = fromUtf8($value) if $name eq 'id';
+        $type = fromUtf8($value) if $name eq 'type';
+        $summary = fromUtf8($value) if $name eq 'summary';
+
+        next unless $line =~ /\$$name/g;
+
+	$name = fromUtf8($name);
+      	$value = fromUtf8($value);
 
         $value = sprintf('%.02f', $value)
           if $name eq 'score';
@@ -278,7 +280,7 @@ HERE
   if ($facets) {
 
     foreach my $facetSpec (split(/\s*,\s*/, $theFacets)) {
-      my ($facetLabel, $facetID) = parseFacetSpec($this->fromUtf8($facetSpec));
+      my ($facetLabel, $facetID) = parseFacetSpec(fromUtf8($facetSpec));
       my $theFacetHeader = $params->{"header_$facetID"} || '';
       my $theFacetFormat = $params->{"format_$facetID"} || '';
       my $theFacetFooter = $params->{"footer_$facetID"} || '';
@@ -350,7 +352,7 @@ HERE
             my $key = $facet->[$i];
             my $count = $facet->[$i+1];
             next unless $count;
-            $key = $this->fromUtf8($key);
+            $key = fromUtf8($key);
             next if $theFacetExclude && $key =~ /$theFacetExclude/;
             next if $theFacetInclude && $key !~ /$theFacetInclude/;
             $facetTotal += $count;
@@ -386,7 +388,7 @@ HERE
             next unless $key;
 
             my $count = $facet->[$i+1];
-            $key = $this->fromUtf8($key);
+            $key = fromUtf8($key);
 
             next if $theFacetExclude && $key =~ /$theFacetExclude/;
             next if $theFacetInclude && $key !~ /$theFacetInclude/;
@@ -416,8 +418,8 @@ HERE
     my @interestingRows = ();
     while (my $termSpec = shift @$interestingTerms) {
       next unless $termSpec =~ /^(.*):(.*)$/g;
-      my $field = $this->fromUtf8($1);
-      my $term = $this->fromUtf8($2);
+      my $field = fromUtf8($1);
+      my $term = fromUtf8($2);
       my $score = shift @$interestingTerms;
 
       next if $theInterestingExclude && $term =~ /$theInterestingExclude/;
@@ -466,7 +468,7 @@ HERE
 
   #$this->log("result=$result");
 
-  return $this->toSiteCharSet($result);
+  return toSiteCharSet($result);
 }
 
 ##############################################################################
@@ -571,7 +573,6 @@ sub restSOLRSEARCH {
   my $result = '';
   try {
     $result = $response->raw_response->content();
-    $result = $this->fromUtf8($result);
   } catch Error::Simple with {
     $result = "Error parsing response";
   };
@@ -634,7 +635,7 @@ sub restSOLRAUTOCOMPLETE {
     $theQuery = '*:*';
   }
 
-  my $field = $query->param('field') || 'catchall';
+  my $field = $query->param('field') || 'text';
 
   my $solrParams = {
     "facet.prefix" => $thePrefix,
@@ -651,7 +652,6 @@ sub restSOLRAUTOCOMPLETE {
 
   if ($theRaw) {
     my $result = $response->raw_response->content()."\n\n";
-    #$result = $this->fromUtf8($result);
     return $result;
   }
   $this->log($response->raw_response->content()) if DEBUG;
@@ -660,7 +660,7 @@ sub restSOLRAUTOCOMPLETE {
   return '' unless $facets;
 
   # format autocompletion
-  #$theQuery = $this->fromUtf8($theQuery); 
+  #$theQuery = fromUtf8($theQuery); 
 
   my @result = ();
   foreach my $facet (keys %{$facets->{facet_fields}}) {
@@ -668,7 +668,7 @@ sub restSOLRAUTOCOMPLETE {
     my @list = @{$facets->{facet_fields}{$facet}};
     while (my $key = shift @list) {
       my $freq = shift @list;
-      $key = $this->fromUtf8($key);
+      $key = toSiteCharSet($key);
       $key = "$theQuery $key" if $foundPrefix;
       my $title = $key;
       if ($theEllipsis) {
@@ -710,7 +710,7 @@ sub restSOLRSIMILAR {
   my $result = '';
   try {
     $result = $response->raw_response->content();
-    $result = $this->fromUtf8($result);
+    $result = toSiteCharSet($result);
   } catch Error::Simple with {
     $result = "Error parsing result";
   };
@@ -877,7 +877,7 @@ sub restSOLRTERMS {
     my $result = '';
     try {
       $result = $response->raw_response->content();
-      $result = $this->fromUtf8($result);
+      $result = toSiteCharSet($result);
     } catch Error::Simple with {
       #
     };
@@ -901,7 +901,6 @@ sub doSearch {
   my $theSpellcheck = Foswiki::Func::isTrue($params->{spellcheck});
   my $theMoreLikeThis = Foswiki::Func::isTrue($params->{morelikethis});
   my $theWeb = $params->{web};
-  my $theContributor = $params->{contributor};
   my $theFilter = $params->{filter} || '';
   my $theExtraFilter = $params->{extrafilter};
   my $theDisjunktiveFacets = $params->{disjunctivefacets} || '';
@@ -918,23 +917,20 @@ sub doSearch {
 
   my $theStart = $params->{start} || 0;
 
-  my $theReverse = $params->{reverse};
+  my $theReverse = Foswiki::Func::isTrue($params->{reverse});
   my $theSort = $params->{sort};
   $theSort = Foswiki::Func::expandTemplate("solr::defaultsort") unless defined $theSort;
   $theSort = "score desc" unless $theSort;
 
-  if ($theSort =~ /^(.*) (.*)$/) {
-    $theSort = $1;
-    $theReverse = ($2 eq 'desc'?'on':'off');
-  }
-  unless (defined $theReverse) {
-    if ($theSort eq 'score') {
-      $theReverse = 'on'; # score desc is default
+  my @sort = ();
+  foreach my $sort (split(/\s*,\s*/, $theSort)) {
+    if ($sort =~ /^(.+) (desc|asc)$/) {
+      push @sort, $1.' '.$2;
     } else {
-      $theReverse = 'off';
+      push @sort, $sort.' '.($theReverse?'desc':'asc');
     }
   }
-  $theSort .= " ".($theReverse eq 'on'?'desc':'asc');
+  $theSort = join(", ", @sort);
 
   $theRows =~ s/[^\d]//g if defined $theRows;
   $theRows = Foswiki::Func::expandTemplate('solr::defaultrows') if !defined($theRows) || $theRows eq '';
@@ -955,9 +951,19 @@ sub doSearch {
   $solrParams->{qf} = $theQueryFields if $theQueryFields;
   $solrParams->{pf} = $thePhraseFields if $thePhraseFields;
 
+  my $theGroup = $params->{'group'};
+  my $theGroupLimit = $params->{'grouplimit'} || 1;
+  if (defined $theGroup) {
+    $solrParams->{"group"} = "true";
+#    $solrParams->{"group.main"} = "true";
+    $solrParams->{"group.ngroups"} = "true";
+    $solrParams->{"group.limit"} = $theGroupLimit;
+    $solrParams->{"group.field"} = $theGroup;
+  }
+
   if ($theHighlight && $theRows > 0) {
     $solrParams->{"hl"} = 'true';
-    $solrParams->{"hl.fl"} = 'catchall';
+    $solrParams->{"hl.fl"} = 'text'; # TODO: make the highlight field configurable
     $solrParams->{"hl.snippets"} = '2';
     $solrParams->{"hl.fragsize"} = '300';
     $solrParams->{"hl.mergeContignuous"} = 'true';
@@ -997,12 +1003,12 @@ sub doSearch {
 
   # create filter query
   my @filter;
-  my @tmpfilter = $this->parseFilter($theFilter);
+  my @tmpFilter = $this->parseFilter($theFilter);
   my %seenDisjunctiveFilter = ();
   my %seenCombinedFilter = ();
 
   # gather different types of filters
-  foreach my $item (@tmpfilter) {
+  foreach my $item (@tmpFilter) {
 
     if ($item =~ /^(.*):(.*?)$/) {
       my $facetName = $1;
@@ -1026,10 +1032,19 @@ sub doSearch {
   }
 
   # add filters for disjunctive filters
+  @tmpFilter = ();
   foreach my $facetName (keys %seenDisjunctiveFilter) {
-    my $expr = "{!tag=$facetName}$facetName:(".join(" OR ", @{$seenDisjunctiveFilter{$facetName}}).")";
-    push(@filter, $expr);
+    # disjunctive facets that are also combined with each other, produce one big disjunction
+    # gathered in tmpFilter before adding it to the overal @filter array
+    if ($combinedFacets{$facetName}) {
+      my $expr = join(" OR ", map("$facetName:$_", @{$seenDisjunctiveFilter{$facetName}}));
+      push(@tmpFilter, $expr); 
+    } else {
+      my $expr = "{!tag=$facetName}$facetName:(".join(" OR ", @{$seenDisjunctiveFilter{$facetName}}).")";
+      push(@filter, $expr);
+    }
   }
+  push(@filter, "(".join(" OR ", @tmpFilter).")") if @tmpFilter;
 
   # add filters for combined filters
   foreach my $facetValue (keys %seenCombinedFilter) {
@@ -1049,9 +1064,6 @@ sub doSearch {
   push(@filter, $this->parseFilter($theExtraFilter));
   push(@filter, "(access_granted:$wikiUser OR access_granted:all)") 
     unless Foswiki::Func::isAnAdmin($wikiUser); # add ACLs
-
-  # SMELL: do we really need these special filters
-  push(@filter, "contributor:".$theContributor) if $theContributor; # add contributor
 
   $solrParams->{"fq"} = \@filter if @filter;
 
@@ -1075,13 +1087,11 @@ sub doSearch {
   #$this->log("query=$query") if DEBUG;
   my $response = $this->solrSearch($query, $solrParams);
 
-  #$this->log("response:\n".$response->raw_response->content()) if DEBUG;
-
   # DEBUG raw response
-  if (0) {
+  if (DEBUG) {
     my $raw = $response->raw_response->content();
     #$raw =~ s/"response":.*$//s;
-    $this->log("raw params=$raw");
+    $this->log("response: $raw");
   }
 
 
@@ -1094,6 +1104,9 @@ sub solrSearch {
 
   $params ||= {};
   $params->{'q'} = $query if $query;
+
+  #print STDERR "solrSearch($query), params=".Data::Dumper->Dump([$params])."\n";
+
 
   return $this->solrRequest("select", $params);
 }
@@ -1121,7 +1134,6 @@ sub getFacetParams {
   my $theFacetOffset = $params->{facetoffset};
   my $theFacetMinCount = $params->{facetmincount};
   my $theFacetPrefix = $params->{facetprefix};
-  my $theContributor = $params->{contributor};
 
   $theFacetLimit = '' unless defined $theFacetLimit;
 
@@ -1188,7 +1200,6 @@ sub getFacetParams {
   foreach my $facetSpec (split(/\s*,\s*/, $theFacets)) {
     my ($facetLabel, $facetID) = parseFacetSpec($facetSpec);
     #next if $facetID eq 'web' && $params->{web} && $params->{web} ne 'all';
-    next if $facetID eq 'contributor' && $theContributor;
     next if $facetID eq 'facetquery';
     if ($facetID =~ /^(tag|category)$/) {
       push(@$fieldFacets, "{!key=$facetLabel}$facetID");
@@ -1338,14 +1349,14 @@ sub getHighlights {
 
   if ($struct) {
     foreach my $id (keys %$struct) {
-      my $hilite = $struct->{$id}{catchall};
+      my $hilite = $struct->{$id}{text}; # TODO: use the actual highlight field
       next unless $hilite;
       $hilite = join(" ... ", @{$hilite});
 
       # bit of cleanup in case we only get half the comment
       $hilite =~ s/<!--//g;
       $hilite =~ s/-->//g;
-      $hilites{$id} = $this->fromUtf8($hilite);
+      $hilites{$id} = fromUtf8($hilite);
     }
   }
 
@@ -1390,7 +1401,7 @@ sub getCorrection {
   return '' unless $correction;
 
   #return $correction;
-  return $this->fromUtf8($correction);
+  return fromUtf8($correction);
 }
 
 ##############################################################################
@@ -1533,11 +1544,11 @@ sub parseFilter {
 
   my @filter = ();
   $filter ||= '';
-  $filter = $this->toUtf8($this->urlDecode($this->entityDecode($filter)));
+  $filter = toUtf8($this->urlDecode($this->entityDecode($filter)));
 
   #print STDERR "parseFilter($filter)\n";
 
-  while ($filter =~ /([^\s:]+?):((?:\[[^\]]+?\])|[^\s",]+|(?:"[^"]+?")),?/g) {
+  while ($filter =~ /([^\s:]+?):((?:\[[^\]]+?\])|[^\s",\(]+|(?:"[^"]+?")|(?:\([^\)]+?\))),?/g) {
     my $field = $1;
     my $value = $2;
     $value =~ s/^"//;
@@ -1547,7 +1558,7 @@ sub parseFilter {
     #print STDERR "field=$field, value=$value\n";
     if ($value) {
       my $item;
-      if ($value =~ /\s/ && $value !~ /^["\[].*["\]]$/) {
+      if ($value !~ /^\(/ && $value =~ /\s/ && $value !~ /^["\[].*["\]]$/) {
 	#print STDERR "... adding quotes\n";
 	$item = '$field:"$value"';
       } else {
@@ -1583,12 +1594,34 @@ sub getListOfWebs {
   my $webFacet = $facets->{facet_fields}{"web"};
   my $len = scalar(@$webFacet);
   for (my $i = 0; $i < $len; $i+=2) {
-    my $web = $this->fromUtf8($webFacet->[$i]);
+    my $web = fromUtf8($webFacet->[$i]);
     push @webs, $web;
   }
 
   return @webs;
 }
 
+##############################################################################
+sub toSiteCharSet {
+  return Encode::encode($Foswiki::cfg{Site}{CharSet}, $_[0]);
+}
+
+##############################################################################
+sub fromUtf8 {
+  return Encode::decode_utf8($_[0]);
+}
+
+##############################################################################
+sub toUtf8 {
+  my $string = shift;
+
+  my $charset = $Foswiki::cfg{Site}{CharSet};
+  return $string if $charset =~ /^utf-?8$/i;
+
+
+  my $octets = Encode::decode($charset, $string);
+  $octets = Encode::encode('utf-8', $octets);
+  return $octets;
+}
 
 1;

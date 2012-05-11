@@ -49,45 +49,8 @@
     -->
   <luceneMatchVersion>LUCENE_34</luceneMatchVersion>
 
-  <!-- lib directives can be used to instruct Solr to load an Jars
-       identified and use them to resolve any "plugins" specified in
-       your solrconfig.xml or schema.xml (ie: Analyzers, Request
-       Handlers, etc...).
+  <lib dir="/var/lib/solr/lib" />
 
-       All directories and paths are resolved relative to the
-       instanceDir.
-
-       If a "./lib" directory exists in your instanceDir, all files
-       found in it are included as if you had used the following
-       syntax...
-       
-              <lib dir="./lib" />
-    -->
-  <!-- A dir option by itself adds any files found in the directory to
-       the classpath, this is useful for including all jars in a
-       directory.
-    -->
-  <lib dir="../../contrib/extraction/lib" />
-  <!-- When a regex is specified in addition to a directory, only the
-       files in that directory which completely match the regex
-       (anchored on both ends) will be included.
-    -->
-  <lib dir="../../dist/" regex="apache-solr-cell-\d.*\.jar" />
-  <lib dir="../../dist/" regex="apache-solr-clustering-\d.*\.jar" />
-  <lib dir="../../dist/" regex="apache-solr-dataimporthandler-\d.*\.jar" />
-
-  <!-- If a dir option (with or without a regex) is used and nothing
-       is found that matches, it will be ignored
-    -->
-  <lib dir="../../contrib/clustering/lib/" />
-  <lib dir="/total/crap/dir/ignored" /> 
-  <!-- an exact path can be used to specify a specific file.  This
-       will cause a serious error to be logged if it can't be loaded.
-    -->
-  <!--
-  <lib path="../a-jar-that-does-not-exist.jar" /> 
-  -->
-  
   <!-- Data Directory
 
        Used to specify an alternate directory to hold all index data
@@ -738,6 +701,7 @@
         tag_search^2.0 
         catchall
         substrings^0.5
+        charnorm^0.5
         <!-- enable this if you like to add sound-like search hits 
              phonetic^0.0001 
         -->
@@ -754,6 +718,7 @@
         title_search^3.0 
         category_search^2.0 
         substrings^0.5
+        charnorm^0.5
         <!-- enable this if you like to add sound-like search hits 
              phonetic^0.0001 
         -->
@@ -789,6 +754,7 @@
         tag_search^2.0 
         catchall
         substrings^0.5
+        charnorm^0.5
         phonetic^0.0001 
       </str>
       <!-- boost more recent documents -->
@@ -805,6 +771,7 @@
         tag_search^2.0
         catchall
         substrings^0.5
+        charnorm^0.5
         phonetic^0.0001 
       </str>
       <int name="ps">1</int>
@@ -854,9 +821,10 @@
          on each Update Request
       -->
     <lst name="defaults">
-      <!-- BUG: not using "unique": it removes any duplicate not leaving behind even a single one -->
-      <!-- <str name="update.chain">unique</str> -->
-      <!-- uncomment this to enable uima: see below for more information -->
+      <!-- default chain including language detection -->
+      <str name="update.chain">foswiki_chain</str> 
+
+      <!-- use this instead to enable uima: see below for more information -->
       <!-- <str name="update.chain">uima</str> -->
     </lst>
     </requestHandler>
@@ -890,16 +858,18 @@
                   startup="lazy"
                   class="solr.extraction.ExtractingRequestHandler" >
     <lst name="defaults">
-      <!-- All the main content goes into "text"... if you need to return
-           the extracted text or do highlighting, use a stored field. -->
+      <str name="update.chain">foswiki_chain</str> 
+      <str name="fmap.content_type">type</str>
+      <str name="fmap.content_language">language</str>
+      <str name="fmap.last_modified">date</str>
+      <str name="fmap.creation_date">createdate</str>
+      <str name="fmap.author">createauthor</str>
       <str name="fmap.content">text</str>
+      <str name="fmap.a">outgoing</str>
+
       <str name="lowernames">true</str>
       <str name="uprefix">ignored_</str>
-
-      <!-- capture link hrefs but ignore div attributes -->
       <str name="captureAttr">true</str>
-      <str name="fmap.a">links</str>
-      <str name="fmap.div">ignored_</str>
     </lst>
   </requestHandler>
 
@@ -1013,6 +983,81 @@
      <str name="echoParams">explicit</str> 
      <str name="echoHandler">true</str>
     </lst>
+  </requestHandler>
+
+  <requestHandler name="/browse" class="solr.SearchHandler">
+     <lst name="defaults">
+
+       <str name="wt">velocity</str>
+       <str name="v.template">browse</str>
+       <str name="v.layout">layout</str>
+       <!-- str name="v.properties">velocity.properties</str-->
+       <str name="v.contentType">text/html;charset=UTF-8</str>
+
+       <str name="defType">edismax</str>
+       <str name="q.alt">*:*</str>
+       <str name="rows">10</str>
+       <str name="fl">*,score</str>
+
+      <str name="qf"> 
+        web_search^8.0 
+        topic_search^5.0 
+        title_search^3.0 
+        category_search^2.0 
+        tag_search^2.0 
+        catchall
+        substrings^0.5
+        charnorm^0.5
+        phonetic^0.0001 
+      </str>
+
+      <!-- boost more recent documents -->
+      <str name="bf">
+        recip(ms(NOW,date),3.16e-11,1,1)
+      </str>
+      <!-- boost topics in favor of attachments -->
+      <str name="bq">type:topic^200</str>
+
+      <str name="pf">
+        web_search^8.0 
+        topic_search^5.0 
+        title_search^3.0 
+        category_search^2.0 
+        tag_search^2.0
+        catchall
+        substrings^0.5
+        charnorm^0.5
+        phonetic^0.0001 
+      </str>
+      <int name="ps">1</int>
+      <int name="qs">1</int>
+
+       <str name="facet">on</str>
+       <str name="facet.field">type</str>
+       <str name="facet.field">tag</str>
+       <str name="facet.field">category</str>
+       <str name="facet.field">web</str>
+       <str name="facet.field">author</str>
+       <str name="facet.mincount">1</str>
+       <str name="facet.limit">10</str>
+
+       <str name="mlt.qf">
+         category^1.4 tag^1.0 title^1.2 id^10.0 author^2.0
+       </str>
+       <str name="mlt.fl">category,tag,title,id,author</str>
+       <int name="mlt.count">3</int>
+
+       <!-- Highlighting defaults -->
+       <str name="hl">on</str>
+       <str name="hl.fl">catchall</str>
+       <str name="spellcheck">false</str>
+       <str name="spellcheck.thresholdTokenFreuqncy">0.01</str>
+       <str name="spellcheck.count">10</str>
+       <str name="spellcheck.collate">true</str>
+     </lst>
+     <arr name="last-components">
+       <str>spellcheck</str>
+     </arr>
   </requestHandler>
   
   <!-- Solr Replication
@@ -1491,6 +1536,7 @@
         <str>spell</str>
         <str>phonetic</str>
         <str>substrings</str>
+        <str>charnorm</str>
       </lst>      
     </processor>
     <processor class="solr.LogUpdateProcessorFactory" />
@@ -1557,6 +1603,24 @@
     <processor class="solr.RunUpdateProcessorFactory" />
   </updateRequestProcessorChain>
   -->
+  <updateRequestProcessorChain name="foswiki_chain">
+    <processor class="org.apache.solr.update.processor.LangDetectLanguageIdentifierUpdateProcessorFactory">
+    <!-- processor class="org.apache.solr.update.processor.TikaLanguageIdentifierUpdateProcessorFactory"-->
+       <lst name="defaults">
+	 <str name="langid.fl">title,summary,text</str>
+	 <str name="langid.langField">language</str>
+         <!-- languages we've got a tokenizer for - minus da as it brings down accuracies for the other languages (wtf) -->
+         <str name="langid.whitelist">de, en, es, fi, fr, it, nl, pt, ru, sv, tr</str> 
+	 <str name="langid.overwrite">false</str>
+	 <str name="langid.threshold">0.7</str>
+	 <str name="langid.fallback">en</str>
+         <bool name="langid.map">true</bool>
+         <bool name="langid.map.keepOrig">true</bool>
+       </lst>
+    </processor>
+    <processor class="solr.LogUpdateProcessorFactory" />
+    <processor class="solr.RunUpdateProcessorFactory" />
+  </updateRequestProcessorChain>
 
   <!-- Response Writers
 
@@ -1598,6 +1662,8 @@
   <queryResponseWriter name="xslt" class="solr.XSLTResponseWriter">
     <int name="xsltCacheLifetimeSeconds">5</int>
   </queryResponseWriter>
+
+  <queryResponseWriter name="velocity" class="solr.VelocityResponseWriter"/>
 
   <!-- Query Parsers
 

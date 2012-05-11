@@ -12,7 +12,7 @@ package Foswiki::Plugins::JSONEditorJQueryPlugin;
 use strict;
 use warnings;
 
-use Foswiki::Func ();       # The plugins API
+use Foswiki::Func    ();    # The plugins API
 use Foswiki::Plugins ();    # For the API version
 
 our $VERSION = '$Rev$';
@@ -21,7 +21,8 @@ our $RELEASE = '03 Mar 2010';
 
 # Short description of this plugin
 # One line description, is shown in the %SYSTEMWEB%.TextFormattingRules topic:
-our $SHORTDESCRIPTION = 'lightweight tree editor of JSON data, using RestPlugin to GET and SET';
+our $SHORTDESCRIPTION =
+  'lightweight tree editor of JSON data, using RestPlugin to GET and SET';
 
 our $NO_PREFS_IN_TOPIC = 1;
 
@@ -45,10 +46,10 @@ sub initPlugin {
             __PACKAGE__, ' and Plugins.pm' );
         return 0;
     }
-    if ($Foswiki::cfg{Plugins}{JQueryPlugin}{Enabled}) {
+    if ( $Foswiki::cfg{Plugins}{JQueryPlugin}{Enabled} ) {
         require Foswiki::Plugins::JQueryPlugin;
-        Foswiki::Plugins::JQueryPlugin::registerPlugin("JSONEditor",
-        'Foswiki::Plugins::JSONEditorJQueryPlugin::JSONEDITOR');
+        Foswiki::Plugins::JQueryPlugin::registerPlugin( "JSONEditor",
+            'Foswiki::Plugins::JSONEditorJQueryPlugin::JSONEDITOR' );
     }
 
     # Plugin correctly initialized

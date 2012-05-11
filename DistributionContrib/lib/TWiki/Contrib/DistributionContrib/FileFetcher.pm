@@ -30,22 +30,28 @@ scarcely. e.g. keep using the same localFileSuffix "1", "2"
 =cut
 
 sub fetchDistributionFile {
-	my ( $file, $distribution, $localFileSuffix ) = @_;
-	$localFileSuffix = "" unless ($localFileSuffix);
-	
-	$file =~ s!^twiki/!!;
-	my $fileUrl = $config{'serverUrl'}. "/" . $distribution . "/" . $file;
-	my $webTopicBodge = $config{'saveTopic'};
-	$webTopicBodge =~ s!\.!/!;
-	my $attachmentPath = TWiki::Func::getPubDir()."/".$webTopicBodge."/".$config{'saveTopicAttachmentName'}.$localFileSuffix;
-	my $ans = $attachmentPath;
-	my $status = getstore($fileUrl, $attachmentPath);
-	if (is_error($status)) {
-		my $error = "Couldn't get $distribution:$file as $fileUrl to $attachmentPath ($status)";
-		TWiki::Func::writeWarning($error."\n");
-		$ans = "Couldn't download - $error";
-	}
-	return $ans;
+    my ( $file, $distribution, $localFileSuffix ) = @_;
+    $localFileSuffix = "" unless ($localFileSuffix);
+
+    $file =~ s!^twiki/!!;
+    my $fileUrl = $config{'serverUrl'} . "/" . $distribution . "/" . $file;
+    my $webTopicBodge = $config{'saveTopic'};
+    $webTopicBodge =~ s!\.!/!;
+    my $attachmentPath =
+        TWiki::Func::getPubDir() . "/"
+      . $webTopicBodge . "/"
+      . $config{'saveTopicAttachmentName'}
+      . $localFileSuffix;
+    my $ans = $attachmentPath;
+    my $status = getstore( $fileUrl, $attachmentPath );
+
+    if ( is_error($status) ) {
+        my $error =
+"Couldn't get $distribution:$file as $fileUrl to $attachmentPath ($status)";
+        TWiki::Func::writeWarning( $error . "\n" );
+        $ans = "Couldn't download - $error";
+    }
+    return $ans;
 }
 
 1;

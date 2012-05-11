@@ -38,8 +38,8 @@ use strict;
 require Foswiki::Func;       # The plugins API
 require Foswiki::Plugins;    # For the API version
 
-our $VERSION = '$Rev: 3193 $';
-our $RELEASE = '$Date: 2009-03-19 17:32:09 +0100 (Do, 19 Mrz 2009) $';
+our $VERSION          = '$Rev: 3193 $';
+our $RELEASE          = '$Date: 2009-03-19 17:32:09 +0100 (Do, 19 Mrz 2009) $';
 our $SHORTDESCRIPTION = 'Hides away some topic content with pseudo-encryption.';
 our $NO_PREFS_IN_TOPIC = 1;
 
@@ -83,7 +83,6 @@ sub initPlugin {
     return 1;
 }
 
-
 =begin TML
 
 ---++ commonTagsHandler($text, $topic, $web, $included, $meta )
@@ -121,14 +120,16 @@ sub commonTagsHandler {
     my $query = Foswiki::Func::getCgiQuery();
 
     if ( $text =~ m/(?:<|&lt;)encrypted(?:>|&gt;)/ ) {
-      if ( $query->param("answer") eq "42" ) {
-        $_[0] =~ s/(?:<|&lt;)encrypted(?:>|&gt;)(.*?)(?:<|&lt;)\/encrypted(?:>|&gt;)/&_rot13($1, "", "")/seg;
-      } else {
-        $_[0] =~ s/(?:<|&lt;)encrypted(?:>|&gt;)(.*?)(?:<|&lt;)\/encrypted(?:>|&gt;)/$1/sg;
-      }
+        if ( $query->param("answer") eq "42" ) {
+            $_[0] =~
+s/(?:<|&lt;)encrypted(?:>|&gt;)(.*?)(?:<|&lt;)\/encrypted(?:>|&gt;)/&_rot13($1, "", "")/seg;
+        }
+        else {
+            $_[0] =~
+s/(?:<|&lt;)encrypted(?:>|&gt;)(.*?)(?:<|&lt;)\/encrypted(?:>|&gt;)/$1/sg;
+        }
     }
 }
-
 
 =begin TML
 
@@ -155,7 +156,8 @@ sub beforeSaveHandler {
     my ( $text, $topic, $web ) = @_;
 
     if ( $text =~ m/(?:<|&lt;)secret(?:>|&gt;)/ ) {
-      $_[0] =~ s/(?:<|&lt;)secret(?:>|&gt;)(.*?)(?:<|&lt;)\/secret(?:>|&gt;)/&_rot13($1, "<encrypted>", "<\/encrypted>")/seg;
+        $_[0] =~
+s/(?:<|&lt;)secret(?:>|&gt;)(.*?)(?:<|&lt;)\/secret(?:>|&gt;)/&_rot13($1, "<encrypted>", "<\/encrypted>")/seg;
     }
 }
 

@@ -1,0 +1,19 @@
+%META:TOPICINFO{author="ProjectContributor" comment="reprev" date="1329401944" format="1.1" reprev="1" version="1"}%
+%META:TOPICPARENT{name="WebHome"}%
+<div class="foswikiTipMessage">
+%MAKETEXT{"You just created a new and empty web. That's why this dashboard might look at little silly in the beginning. As soon as you start creating more content, it will fill up with hopefully useful information that helps you keeping track of what's going on in this web."}%
+
+%MAKETEXT{"Some tips:"}%
+
+   * %MAKETEXT{"Customize each section on this dashboard to your needs by hovering over the heading. It will display a pencil icon."}% %IF{"context EditChapterPluginEnabled" else="(%MAKETEXT{"requires Foswiki:Extensions/EditChapterPlugin"}%)"}%%IF{"context NatSkinPluginEnabled" else="
+   * %MAKETEXT{"Install Foswiki:Extensions/NatSkin for best usability, design and readability of your content."}%"}%<!-- -->
+   * %MAKETEXT{"Create [[[_1]][categories]] matching the subject fields covered in this web." args="Category"}%
+   * %MAKETEXT{"Edit this page and give it a name. This will be used as the display title linking to this web, e.g. in breadcrumbs and search interfaces."}%
+   * %MAKETEXT{"... and finally delete this message."}%
+</div>
+
+%META:FORM{name="Applications.ApplicationTopic"}%
+%META:FIELD{name="TopicType" title="TopicType" value="ApplicationTopic"}%
+%META:FIELD{name="TopicTitle" attributes="" title="<nop>TopicTitle" value=""}%
+%META:FIELD{name="Summary" attributes="c" title="Summary" value="used on the frontpage of newly created webs"}%
+%META:FIELD{name="WikiApplication" attributes="" title="WikiApplication" value="ClassificationApp"}%

@@ -64,14 +64,14 @@ $Foswiki::cfg{SolrPlugin}{SearchUrl} = '';
 # Enable this flag to automatically start a solr instance coming with this plugin
 $Foswiki::cfg{SolrPlugin}{AutoStartDaemon} = 0;
 
-# **COMMAND**
+# **COMMAND DISPLAY_IF {SolrPlugin}{AutoStartDaemon}**
 # Command used to start the solr instance. Note that <code>solrstart</code> is a shell script wrapping
 # around the actual startup routine
 $Foswiki::cfg{SolrPlugin}{SolrStartCmd} = '$Foswiki::cfg{ToolsDir}/solrstart %SOLRHOME|F%';
 
-# **PATH**
+# **PATH DISPLAY_IF {SolrPlugin}{AutoStartDaemon}** 
 # Path to the directory containing the <code>start.jar</code> file. That's where the jetty engine is 
-# located and where solr puts its data further down the directory structure
+# located and where solr puts its data further down the directory structure. 
 $Foswiki::cfg{SolrPlugin}{SolrHome} = '';
 
 # **STRING**

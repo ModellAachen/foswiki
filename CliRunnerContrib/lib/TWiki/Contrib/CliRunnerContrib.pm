@@ -104,21 +104,22 @@ use File::Temp;
 use TWiki::Configure::Load;
 
 # static variables
-my $start_directory        =  cwd();
-my $twikibindir_indicator  =  'setlib.cfg';
+my $start_directory       = cwd();
+my $twikibindir_indicator = 'setlib.cfg';
 
 # set the defaults
 
 TWiki::Configure::Load::readConfig();
-my $cfg = $TWiki::cfg{Contrib}{CliRunnerContrib};
-my %default_config = ('perl'            =>  $cfg->{perl}        || 'perl',
-                      'perlOptions'     =>  $cfg->{PerlOptions} || '-T',
-                      'lib_path'        =>  $cfg->{LibPath}     || '../lib',
-                      'output_options'  =>  '2>&1',
-                  );
-my $default_topic               =  'Main.WebHome';
-my $default_script              =  'view';
-my $default_callingConvention   =  'CLI';
+my $cfg            = $TWiki::cfg{Contrib}{CliRunnerContrib};
+my %default_config = (
+    'perl'        => $cfg->{perl}        || 'perl',
+    'perlOptions' => $cfg->{PerlOptions} || '-T',
+    'lib_path'    => $cfg->{LibPath}     || '../lib',
+    'output_options' => '2>&1',
+);
+my $default_topic             = 'Main.WebHome';
+my $default_script            = 'view';
+my $default_callingConvention = 'CLI';
 
 # ======================================================================
 
@@ -167,36 +168,36 @@ Redirection options, e.g. to save output files |
 =cut
 
 sub new {
-    my $proto = shift;
-    my $class = ref ($proto) || $proto;
-    my ($config)  =  @_;
+    my $proto    = shift;
+    my $class    = ref($proto) || $proto;
+    my ($config) = @_;
 
     $config ||= {};
-    if (ref $config  ne  'HASH') {
+    if ( ref $config ne 'HASH' ) {
         Carp::croak("Parameter to $class->new must be a HASH reference");
     }
 
-    my %config  =  (%default_config,%$config);
+    my %config = ( %default_config, %$config );
 
-    my $topic        =  delete $config{topic}  || $default_topic;
-    my $script       =  delete $config{script} || $default_script;
-    my $perlOptions  =  delete $config{perlOptions};
-    my $callingConvention  =  delete $config{callingConvention}
-                           || $default_callingConvention;
+    my $topic  = delete $config{topic}  || $default_topic;
+    my $script = delete $config{script} || $default_script;
+    my $perlOptions       = delete $config{perlOptions};
+    my $callingConvention = delete $config{callingConvention}
+      || $default_callingConvention;
 
-    my $self = {config             =>  \%config,
-                callingConvention  =>  $callingConvention,
-                twikiCfg           =>  [],
-                perlOptions        =>  $perlOptions,
-                develOptions       =>  [],
-                script             =>  $script,
-                scriptOptions      =>  [],
-                topic              =>  $topic,
-            };
+    my $self = {
+        config            => \%config,
+        callingConvention => $callingConvention,
+        twikiCfg          => [],
+        perlOptions       => $perlOptions,
+        develOptions      => [],
+        script            => $script,
+        scriptOptions     => [],
+        topic             => $topic,
+    };
 
-    bless $self,$class;
+    bless $self, $class;
 }
-
 
 # ======================================================================
 
@@ -213,25 +214,25 @@ fact, the =run= method has its command generated with this routine)
 
 sub command {
     my $self = shift;
-    my ($params)  =  @_;
+    my ($params) = @_;
 
     $params ||= {};
-    if (ref $params  ne  'HASH') {
+    if ( ref $params ne 'HASH' ) {
         my $class = ref $self;
         Carp::croak("Parameter to $class->run must be a HASH reference");
     }
 
-    my %params  =  (%{$self->{config}},%$params);
-    return join(" ",
-                $params{perl},
-                $self->{perlOptions},
-                "-I" . $params{lib_path},
-                @{$self->{develOptions}},
-                $self->_twikiCfgExpand($params{doCreateFile}),
-                $self->{script},
-                $self->_expandScriptParameters(),
-                $params{output_options},
-            );
+    my %params = ( %{ $self->{config} }, %$params );
+    return join( " ",
+        $params{perl},
+        $self->{perlOptions},
+        "-I" . $params{lib_path},
+        @{ $self->{develOptions} },
+        $self->_twikiCfgExpand( $params{doCreateFile} ),
+        $self->{script},
+        $self->_expandScriptParameters(),
+        $params{output_options},
+    );
 }
 
 # ======================================================================
@@ -256,11 +257,10 @@ Name of the module for which the error message is to be asserted.      |
 =cut
 
 sub error_missing_module {
-    my $class  =  shift;
-    my ($missing)  =  @_;
+    my $class = shift;
+    my ($missing) = @_;
     return qr/Can't locate $missing.*BEGIN failed/s;
 }
-
 
 # ======================================================================
 
@@ -294,12 +294,12 @@ directories, i.e. those activated in =bin/setlib.cfg= and
 =cut
 
 sub no {
-    my $self  =  shift;
-    my $modules = join ',',@_;
+    my $self = shift;
+    my $modules = join ',', @_;
 
-    push @{$self->{develOptions}}, "-MTWiki::Contrib::CliRunnerContrib::HideModule=$modules";
+    push @{ $self->{develOptions} },
+      "-MTWiki::Contrib::CliRunnerContrib::HideModule=$modules";
 }
-
 
 # ======================================================================
 
@@ -321,10 +321,9 @@ You can not remove, nor change script options right now.
 =cut
 
 sub addScriptOptions {
-    my $self  =  shift;
-    push @{$self->{scriptOptions}},@_;
+    my $self = shift;
+    push @{ $self->{scriptOptions} }, @_;
 }
-
 
 # ======================================================================
 
@@ -349,14 +348,13 @@ Gets/sets the calling convention for the runner object (see
 
 sub callingConvention {
     my $self = shift;
-    if (scalar @_) {
-        $self->{callingConvention}  =  $_[0];
+    if ( scalar @_ ) {
+        $self->{callingConvention} = $_[0];
     }
     else {
         $self->{callingConvention};
     }
 }
-
 
 # ======================================================================
 
@@ -377,15 +375,14 @@ sub callingConvention {
 =cut
 
 sub perlOptions {
-    my $self  =  shift;
-    if (scalar @_) {
-        $self->{perlOptions}  =  $_[0];
+    my $self = shift;
+    if ( scalar @_ ) {
+        $self->{perlOptions} = $_[0];
     }
     else {
         $self->{perlOptions};
     }
 }
-
 
 # ======================================================================
 
@@ -412,14 +409,14 @@ See the =$config= parameter of #MethodNew.
 
 sub run {
     my $self = shift;
-    my ($params)  =  @_;
+    my ($params) = @_;
     $params->{doCreateFile} = 1;
-    my $command  =  $self->command($params);
+    my $command = $self->command($params);
 
-    warn $command  if $cfg->{Debug};
+    warn $command if $cfg->{Debug};
 
     chdir _twiki_bin_dir();
-    my $result  =  `$command`;
+    my $result = `$command`;
     chdir $start_directory;
 
     return $result;
@@ -445,14 +442,13 @@ Gets/sets the script name for the runner object
 
 sub script {
     my $self = shift;
-    if (scalar @_) {
-        $self->{script}  =  $_[0];
+    if ( scalar @_ ) {
+        $self->{script} = $_[0];
     }
     else {
         $self->{script};
     }
 }
-
 
 # ======================================================================
 
@@ -474,14 +470,13 @@ Gets/sets the topic for the runner object
 
 sub topic {
     my $self = shift;
-    if (scalar @_) {
-        $self->{topic}  =  $_[0];
+    if ( scalar @_ ) {
+        $self->{topic} = $_[0];
     }
     else {
         $self->{topic};
     }
 }
-
 
 # ======================================================================
 
@@ -530,19 +525,16 @@ try to explain the current behaviour with some examples:
 sub twikiCfg {
     my $self = shift;
 
-    while (scalar @_) {
-        my $key  =  shift;
-        if (ref $key  eq  'ARRAY') {
-            push @{$self->{twikiCfg}},[$key,shift];
+    while ( scalar @_ ) {
+        my $key = shift;
+        if ( ref $key eq 'ARRAY' ) {
+            push @{ $self->{twikiCfg} }, [ $key, shift ];
         }
         else {
-            push @{$self->{twikiCfg}},[[$key],shift];
+            push @{ $self->{twikiCfg} }, [ [$key], shift ];
         }
     }
 }
-
-
-
 
 # ======================================================================
 
@@ -557,20 +549,17 @@ Gets/sets the twikiCfgFile to be used for the runner object
 
 sub twikiCfgFile {
     my $self = shift;
-    if (scalar @_) {
-        $self->{twikiCfgFile}  =  $_[0];
+    if ( scalar @_ ) {
+        $self->{twikiCfgFile} = $_[0];
     }
     else {
         $self->{twikiCfgFile};
     }
 }
 
-
-
 # ======================================================================
 # Non serviceable parts
 # ======================================================================
-
 
 # ----------------------------------------------------------------------
 # Purpose: return the directory where TWiki's scripts reside, as
@@ -581,7 +570,6 @@ sub _twiki_bin_dir {
     return $dir;
 }
 
-
 # ----------------------------------------------------------------------
 # Purpose: Expand parameters to be passed to the script,
 #          according to the object's callingConvention property
@@ -589,22 +577,22 @@ sub _twiki_bin_dir {
 # Returns: string containing script parameters
 sub _expandScriptParameters {
     my $self = shift;
-    if ($self->callingConvention()  eq  'CLI') {
-        return join(" ",@{$self->{scriptOptions}},$self->{topic});
+    if ( $self->callingConvention() eq 'CLI' ) {
+        return join( " ", @{ $self->{scriptOptions} }, $self->{topic} );
     }
-    elsif ($self->callingConvention()  eq  'CGI'){
-        my %options = @{$self->{scriptOptions}}; # make key/value pairs
-        # escape for shell
-        return "'" .  $self->topic  .  '?'
-                   .  join(";",map {"$_=$options{$_}"} keys %options)
-                   .  "'";
+    elsif ( $self->callingConvention() eq 'CGI' ) {
+        my %options = @{ $self->{scriptOptions} };    # make key/value pairs
+                                                      # escape for shell
+        return
+            "'"
+          . $self->topic . '?'
+          . join( ";", map { "$_=$options{$_}" } keys %options ) . "'";
     }
     else {
-        Carp::Croak('Invalid calling convention: ',
-                    $self->callingConvention());
+        Carp::Croak( 'Invalid calling convention: ',
+            $self->callingConvention() );
     }
 }
-
 
 # ----------------------------------------------------------------------
 # Purpose: Expand the object attributes regarding TWiki configuration
@@ -616,35 +604,36 @@ sub _expandScriptParameters {
 #        option.
 sub _twikiCfgExpand {
     my $self = shift;
-    my ($doCreateFile)  =  @_;
+    my ($doCreateFile) = @_;
 
-    my $cfgExists  =  0;
-    my $cfgText    =  '';
+    my $cfgExists = 0;
+    my $cfgText   = '';
 
-    if ($self->{twikiCfgFile}) {
-        $cfgExists =  1;
-        $cfgText  .=  "do '" . $self->{twikiCfgFile} . "';\n";
+    if ( $self->{twikiCfgFile} ) {
+        $cfgExists = 1;
+        $cfgText .= "do '" . $self->{twikiCfgFile} . "';\n";
     }
-    if (scalar @{$self->{twikiCfg}}) {
-        $cfgExists  =  1;
-        my @cfg     =  @{$self->{twikiCfg}};
+    if ( scalar @{ $self->{twikiCfg} } ) {
+        $cfgExists = 1;
+        my @cfg = @{ $self->{twikiCfg} };
         for my $cfg (@cfg) {
-            my ($key,$value)  =  @$cfg; # Note that $key is an array reference
-            $key  =  q($TWiki::cfg{') . join(q('}{'),@$key) . q('}=);
-            my $dumper  =  Data::Dumper->new([$value]);
+            my ( $key, $value ) = @$cfg;  # Note that $key is an array reference
+            $key = q($TWiki::cfg{') . join( q('}{'), @$key ) . q('}=);
+            my $dumper = Data::Dumper->new( [$value] );
             $dumper->Terse(1);
             $dumper->Indent(1);
-            $cfgText  .=  $key . $dumper->Dump() . ";\n";
+            $cfgText .= $key . $dumper->Dump() . ";\n";
         }
     }
 
     if ($cfgExists) {
         if ($doCreateFile) {
-            my ($cfgHandle,$cfgFileName)  =  File::Temp::tempfile();
+            my ( $cfgHandle, $cfgFileName ) = File::Temp::tempfile();
             print $cfgHandle $cfgText;
             print $cfgHandle "\n1;\n";
             close $cfgHandle;
-            return ("-MTWiki::Contrib::CliRunnerContrib::TWikiCfg=$cfgFileName");
+            return (
+                "-MTWiki::Contrib::CliRunnerContrib::TWikiCfg=$cfgFileName");
         }
         else {
             return ("-MTWiki::Contrib::CliRunnerContrib::TWikiCfg=tempfile");

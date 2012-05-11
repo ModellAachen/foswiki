@@ -107,7 +107,25 @@ Enabled for demo and testing - try it on and off
 	* You can avoid single words being looked up by using =!DontLookup= or =&lt;nop/&gt;DontLookup= syntax
 	* "Groups of webs" can use each other as lookup webs, by setting the =LOOKELSEWHEREWEBS= preference accordingly in their !WebPreferences
 
+---++ Pre Dakar TWiki linking
+Before Hierarchical or Nested webs were added to TWiki in 2005, topic linking rules were a little more relaxed. 
+If you are upgrading with content that is this old, you may find some =[<nop>[square backet]]= links don't work any more.
 
+You can fix this by setting the ={FindElsewherePlugin}{CairoLegacyLinking}= setting in =configure= to true.
+
+this will link
+<verbatim>
+   * [[Arth's Checklist]] to ArthsChecklist
+   * [[MyNNA bugs/feature requests]] to MyNNABugsfeatureRequests
+   * [[6to4.enro.net]] to 6to4enronet
+</verbatim>
+
+_Alternativly_ you can disable Hierarchical webs and add the forward Slash to the ={NameFilter}= in =configure=
+
+<verbatim>
+$Foswiki::cfg{EnableHierarchicalWebs} = 0;
+$Foswiki::cfg{NameFilter} = $Foswiki::cfg{NameFilter} = '[\/\\s\\*?~^\\$@%`"\'&;|<>\\[\\]#\\x00-\\x1f]';
+</verbatim>
 ---++ Installation Instructions
 %$INSTALL_INSTRUCTIONS%
 
@@ -118,6 +136,8 @@ Enabled for demo and testing - try it on and off
 |  Change History: | <!-- versions below in reverse order -->&nbsp; |
 |  Version: | %$VERSION% |
 |  Release: | %$RELEASE% |
+|  19 Apr 2012: | (v2.4)  Foswikitask:Item11778: FindElsewherePlugin breaks other plugins, prevents jquery.json.js from loading. |
+|  26 Mar 2012: | (v2.3) Foswiki:Main.SvenDowideit - Foswikitask:Item11695: add pre-Dakar linking |
 |  16 Nov 2011: | (v2.2) Foswiki:Main.GeorgeClark - Foswikitask:Item10460 - expand macros in web list, Foswikitask:Item11199 - Don't autolink wikiwords that are part of an email address. Added unit tests and addressed possible reusability issues under fastcgi or mod_perl.  Replace deprecated =startRenderingHandler= with =preRenderingHandler=. |
 |  10 Jun 2010: | (v2.1) Foswiki:Main.CrawfordCurrie - major tidy-up, including removal of NOAUTOLINK no-op |
 |  25 Mar 2009: | (v2.0.1) Foswiki:Main.KennethLavrsen - fixed so it does not remove square bracket links to non-existing topics. Example in plugin topic fixed |

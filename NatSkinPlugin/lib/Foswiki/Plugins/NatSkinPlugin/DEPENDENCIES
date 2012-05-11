@@ -8,8 +8,9 @@ Foswiki::Plugins::ImagePlugin,>=6307,perl,Optional
 Foswiki::Plugins::JQueryPlugin,>=3740,perl,Required
 Foswiki::Plugins::NatEditPlugin,>=1993,perl,Required
 Foswiki::Plugins::RenderPlugin,>=3644,perl,Required
-Foswiki::Plugins::SetVariablePlugin,>=4287,perl,Required
+Foswiki::Plugins::SetVariablePlugin,>=2.10,perl,Required
 Foswiki::Plugins::TopicInteractionPlugin,>=1340,perl,Required
+Foswiki::Plugins::ImagePlugin,>=2.40,perl,Required
 Foswiki::Plugins::WebLinkPlugin,>=1,perl,Optional
 ONLYIF ( $Foswiki::Plugins::VERSION < 2.1)
 Foswiki::Plugins::ZonePlugin,>=3.1,perl,Required. required for Foswiki < 1.1

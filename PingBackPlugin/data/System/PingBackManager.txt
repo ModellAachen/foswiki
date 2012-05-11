@@ -1,0 +1,23 @@
+%META:TOPICINFO{author="ProjectContributor" date="1148910943" format="1.1" version="1.1"}%
+%META:TOPICPARENT{name="PingBackPlugin"}%
+---+!! %TOPIC%
+Manager for the PingBackPlugin
+
+---++ IN Queue
+%PINGBACK{"show" queue="in"}%
+
+---++ OUT Queue
+%PINGBACK{"show" queue="out"}%
+
+---++ CUR Queue
+%PINGBACK{"show" queue="cur"}%
+
+---++ TRASH
+%PINGBACK{"show" queue="trash"}%
+
+
+<!--
+   * Set ALLOWTOPICVIEW = %MAINWEB%.AdminGroup
+   * Set STYLESIDEBAR = off
+   * Set CACHEABLE = off
+-->

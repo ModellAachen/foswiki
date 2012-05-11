@@ -19,14 +19,14 @@ package Foswiki::Plugins::PublishPlugin::zip;
 use strict;
 
 use Foswiki::Plugins::PublishPlugin::BackEnd;
-our @ISA = ( 'Foswiki::Plugins::PublishPlugin::BackEnd' );
+our @ISA = ('Foswiki::Plugins::PublishPlugin::BackEnd');
 
 use Foswiki::Func;
 use File::Path;
 
 sub new {
     my $class = shift;
-     my ($params) = @_;
+    my ($params) = @_;
     $params->{outfile} ||= "zip";
     my $this = $class->SUPER::new(@_);
 
@@ -40,11 +40,12 @@ sub new {
 sub param_schema {
     my $class = shift;
     return {
-	outfile => {
-	    default => 'zip',
-	    validator => \&Foswiki::Plugins::PublishPlugin::Publisher::validateFilename
-	},
-	%{$class->SUPER::param_schema()}
+        outfile => {
+            default => 'zip',
+            validator =>
+              \&Foswiki::Plugins::PublishPlugin::Publisher::validateFilename
+        },
+        %{ $class->SUPER::param_schema() }
     };
 }
 

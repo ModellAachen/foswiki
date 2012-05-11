@@ -11,7 +11,7 @@
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details, published at 
+# GNU General Public License for more details, published at
 # http://www.gnu.org/copyleft/gpl.html
 #
 # =========================
@@ -39,24 +39,24 @@
 #   getSessionValueHandler  ( $key )                                1.010  Use only in one Plugin
 #   setSessionValueHandler  ( $key, $value )                        1.010  Use only in one Plugin
 #
-# initPlugin is required, all other are optional. 
+# initPlugin is required, all other are optional.
 # For increased performance, all handlers except initPlugin are
 # disabled. To enable a handler remove the leading DISABLE_ from
 # the function name. Remove disabled handlers you do not need.
 #
-# NOTE: To interact with TWiki use the official TWiki functions 
+# NOTE: To interact with TWiki use the official TWiki functions
 # in the TWiki::Func module. Do not reference any functions or
 # variables elsewhere in TWiki!!
 
-
 # =========================
-package TWiki::Plugins::ChildTopicTemplatePlugin;    # change the package name and $pluginName!!!
+package TWiki::Plugins::ChildTopicTemplatePlugin
+  ;    # change the package name and $pluginName!!!
 
 # =========================
 use vars qw(
-        $web $topic $user $installWeb $VERSION $RELEASE $pluginName
-        $debug $childTopicTemplateFound
-    );
+  $web $topic $user $installWeb $VERSION $RELEASE $pluginName
+  $debug $childTopicTemplateFound
+);
 
 # This should always be $Rev$ so that TWiki can determine the checked-in
 # status of the plugin. It is used by the build automation tools, so
@@ -68,36 +68,39 @@ $VERSION = '$Rev$';
 # of the version number in PLUGINDESCRIPTIONS.
 $RELEASE = 'Dakar';
 
-$pluginName = 'ChildTopicTemplatePlugin';  # Name of this Plugin
+$pluginName = 'ChildTopicTemplatePlugin';    # Name of this Plugin
 
 # =========================
-sub initPlugin
-{
+sub initPlugin {
     ( $topic, $web, $user, $installWeb ) = @_;
 
     # check for Plugins.pm versions
-    if( $TWiki::Plugins::VERSION < 1.021 ) {
-        TWiki::Func::writeWarning( "Version mismatch between $pluginName and Plugins.pm" );
+    if ( $TWiki::Plugins::VERSION < 1.021 ) {
+        TWiki::Func::writeWarning(
+            "Version mismatch between $pluginName and Plugins.pm");
         return 0;
     }
 
     # Get plugin debug flag
-    $debug = TWiki::Func::getPluginPreferencesFlag( "DEBUG" );
+    $debug = TWiki::Func::getPluginPreferencesFlag("DEBUG");
 
-    # Get plugin preferences, the variable defined by:          * Set EXAMPLE = ...
-    $exampleCfgVar = TWiki::Func::getPluginPreferencesValue( "EXAMPLE" ) || "default";
+ # Get plugin preferences, the variable defined by:          * Set EXAMPLE = ...
+    $exampleCfgVar = TWiki::Func::getPluginPreferencesValue("EXAMPLE")
+      || "default";
 
     # Plugin correctly initialized
-    TWiki::Func::writeDebug( "- TWiki::Plugins::${pluginName}::initPlugin( $web.$topic ) is OK" ) if $debug;
+    TWiki::Func::writeDebug(
+        "- TWiki::Plugins::${pluginName}::initPlugin( $web.$topic ) is OK")
+      if $debug;
     return 1;
 }
 
 # =========================
-sub commonTagsHandler
-{
+sub commonTagsHandler {
 ### my ( $text, $topic, $web ) = @_;   # do not uncomment, use $_[0], $_[1]... instead
 
-    TWiki::Func::writeDebug( "- ${pluginName}::commonTagsHandler( $_[2].$_[1] )" ) if $debug;
+    TWiki::Func::writeDebug("- ${pluginName}::commonTagsHandler( $_[2].$_[1] )")
+      if $debug;
 
     # This is the place to define customized tags and variables
     # Called by sub handleCommonTags, after %INCLUDE:"..."%
@@ -108,29 +111,30 @@ sub commonTagsHandler
     $_[0] =~ s/%CHILDTOPICTEMPLATE *{ *(\w*?) *} *%/%CHILDTOPICTEMPLATE {$1}%/g;
 }
 
-sub endRenderingHandler
-{
+sub endRenderingHandler {
 ### my ( $text ) = @_;   # do not uncomment, use $_[0] instead
 
-    TWiki::Func::writeDebug( "- ${pluginName}::endRenderingHandler( $web.$topic )" ) if $debug;
+    TWiki::Func::writeDebug(
+        "- ${pluginName}::endRenderingHandler( $web.$topic )")
+      if $debug;
 
-    # This handler is called by getRenderedVersion just after the line loop, that is,
-    # after almost all XHTML rendering of a topic. <nop> tags are removed after this.
+# This handler is called by getRenderedVersion just after the line loop, that is,
+# after almost all XHTML rendering of a topic. <nop> tags are removed after this.
 
     # Clear childTopicTemplate
     my $childTopicTemplate = '';
-    my $result ='';
+    my $result             = '';
 
-    foreach( split /$/m, $_[0]  ) {
-		
-      if (s/%CHILDTOPICTEMPLATE {(\w*?)}%//) {
-         $childTopicTemplate = $1; 
-      }      
-      if ($childTopicTemplate ne '') {
-         s/href="(.*?)\?topicparent=([^"]+)"(.*?)<\/a>/href="$1\?topicparent=$2\&templatetopic=$childTopicTemplate"$3<\/a>/g;
-      }
-	 $result .= $_;
-    }    
+    foreach ( split /$/m, $_[0] ) {
+
+        if (s/%CHILDTOPICTEMPLATE {(\w*?)}%//) {
+            $childTopicTemplate = $1;
+        }
+        if ( $childTopicTemplate ne '' ) {
+s/href="(.*?)\?topicparent=([^"]+)"(.*?)<\/a>/href="$1\?topicparent=$2\&templatetopic=$childTopicTemplate"$3<\/a>/g;
+        }
+        $result .= $_;
+    }
 
     $_[0] = $result;
 }

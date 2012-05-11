@@ -1,0 +1,24 @@
+%META:TOPICINFO{author="ProjectContributor" comment="reprev" date="1329319823" format="1.1" reprev="2" version="2"}%
+%META:TOPICPARENT{name="TopicView"}%
+%{<verbatim class="tml">}%
+%TMPL:DEF{"sidebar"}%<div id="patternSideBar">
+<div id="patternClearHeaderLeft"></div>
+<div id="patternSideBarContents">
+%TMPL:P{"sidebar:webindicator"}%<!-- -->
+%TMPL:P{"blogplugin::sidebar"}%
+</div></div>%TMPL:END%
+%{</verbatim>}%
+
+%{<verbatim class="tml">}%
+%TMPL:DEF{"topicinfo"}%%TMPL:END%
+%TMPL:DEF{"contentheader"}%%TMPL:END%
+%TMPL:DEF{"contentfooter"}%%TMPL:END%
+%TMPL:DEF{"sidebar:webindicator"}%%TMPL:END%
+%{</verbatim>}%
+
+
+%META:FORM{name="Applications.ApplicationTopic"}%
+%META:FIELD{name="TopicType" title="TopicType" value="TopicView"}%
+%META:FIELD{name="TopicTitle" attributes="" title="<nop>TopicTitle" value=""}%
+%META:FIELD{name="Summary" attributes="c" title="Summary" value="some basic mappings into PatternSkin"}%
+%META:FIELD{name="WikiApplication" attributes="" title="WikiApplication" value="BlogApp"}%

@@ -144,6 +144,9 @@ Many thanks to the following sponsors for supporting this work:
 |  Release: | %$RELEASE% |
 |  Version: | %$VERSION% |
 |  Change History: | <!-- versions below in reverse order -->&nbsp; |
+|  16 Apr 2012: | fixed strange TOC links; adding missing dependency on Foswiki:Extensions/NatEditPlugin; \
+                  properly encoding hidden text fragments while editing a chapter; \
+                  fided =ui::dialog= not being loaded |
 |  10 Jan 2012: | added missing dependency on Foswiki:Extensions/RenderPlugin; \
                   using jquery.ui.dialog now instead of jquery.simplemodal;\
                   added plugin translations for german |

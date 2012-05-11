@@ -2,7 +2,7 @@
 <?xml version="1.0" encoding="%CHARSET%" ?>
 <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://purl.org/rss/1.0/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:wiki="http://purl.org/rss/1.0/modules/wiki/" >
 <channel rdf:about="%SCRIPTURL{"view"}%/%BASEWEB%%/%BASETOPIC%">
-  <title>%ENCODE{"%WIKITOOLNAME% - %GETTOPICTITLE{"%BASEWEB%.%BASETOPIC%"}%" type="html"}%</title>
+  <title>%ENCODE{"%URLPARAM{"title" default="%WIKITOOLNAME% - Comments on %GETTOPICTITLE{"%BASEWEB%.%BASETOPIC%"}%"}%" type="html"}%</title>
   <link>%SCRIPTURL{"view"}%/%BASEWEB%/%BASETOPIC%</link>
   <description>%MAKETEXT{"Comments"}%</description>
   <image rdf:resource="%IF{"defined WEBLOGOIMG" then="%WEBLOGOIMG%" else="%WIKILOGOIMG%"}%" />
@@ -12,14 +12,16 @@
   <dc:creator>The contributing authors of %WIKITOOLNAME%</dc:creator>
   <dc:source>%WIKITOOLNAME%</dc:source>
 %METACOMMENTS{
+  web="%URLPARAM{"web" default="%BASEWEB%"}%"
   sort="date"
   reverse="on"
-  limit="10"
+  limit="%URLPARAM{"limit" default="10"}%"
   header="  <items>$n    <rdf:Seq>$n"
-  format="      <rdf:li rdf:resource=\"%SCRIPTURL{"view"}%/%BASEWEB%/%BASETOPIC%%IF{"$COMMENTFORMAT='insidetab'" then="?tab=comments"}%#comment$id\" />"
+  format="      <rdf:li rdf:resource=\"%SCRIPTURL{"view"}%/$web/$topic%IF{"$COMMENTFORMAT='insidetab'" then="?tab=comments"}%#comment$id\" />"
   footer="$n    </rdf:Seq>$n  </items>"
   separator="$n"
   %IF{"$COMMENTMODERATION='on'" then="moderation=\"on\"" else="moderation=\"off\""}%
+  %IF{"defined search" then="search=\"$percntURLPARAM{\"search\" encode=\"off\"}$percnt\""}%
 }%
 </channel>
 <image rdf:about="%IF{"defined WEBLOGOIMG" then="%WEBLOGOIMG%" else="%WIKILOGOIMG%"}%">
@@ -28,15 +30,17 @@
   <url>%IF{"defined WEBLOGOIMG" then="%WEBLOGOIMG%" else="%WIKILOGOIMG%"}%</url>
 </image>
 %METACOMMENTS{
+  web="%URLPARAM{"web" default="%BASEWEB%"}%"
   sort="date"
   reverse="on"
-  limit="10"
+  limit="%URLPARAM{"limit" default="10"}%"
+  %IF{"defined search" then="search=\"$percntURLPARAM{\"search\" encode=\"off\"}$percnt\""}%
   %IF{"$COMMENTMODERATION='on'" then="moderation=\"on\"" else="moderation=\"off\""}%
   format="<item rdf:about=\"%SCRIPTURL{"view"}%/%BASEWEB%/%BASETOPIC%%IF{"$COMMENTFORMAT='insidetab'" then="?tab=comments"}%#comment$id\">
-  <title>$title $percntIF{\"$ismoderator and '$state'=~'unapproved'\" then=\"(needs appoval)\"}$percnt</title>
-  <link>%SCRIPTURL{"view"}%/%BASEWEB%/%BASETOPIC%%IF{"$COMMENTFORMAT='insidetab'" then="?tab=comments"}%#comment$id</link>
+  <title>$percntGETTOPICTITLE{\"$web.$topic\"}$percnt</title>
+  <link>%SCRIPTURL{"view"}%/$web/$topic%IF{"$COMMENTFORMAT='insidetab'" then="?tab=comments"}%#comment$id</link>
   <dc:creator>$author</dc:creator>
-  <dc:date>$date</dc:date>
+  <dc:date>$isodate</dc:date>
   <dc:subject>$title</dc:subject>
   <dc:contributor>
     <rdf:Description link=\"%SCRIPTURL{"view"}%/%USERSWEB%/$author\">
@@ -45,7 +49,7 @@
   </dc:contributor>
   <description>
     $percntENCODE{
-      \"$text\" 
+      \"$percntIF{\"'$title'!=''\" then=\"<h2>$title</h2>\"}$percnt $text\" 
       type=\"html\"
     }$percnt
   </description>

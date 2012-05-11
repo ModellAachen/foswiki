@@ -26,14 +26,14 @@ use Foswiki::Func    ();    # The plugins API
 use Foswiki::Plugins ();    # For the API version
 
 use URI();
-$URI::DEFAULT_QUERY_FORM_DELIMITER = ';';	# doesn't seem to work
+$URI::DEFAULT_QUERY_FORM_DELIMITER = ';';    # doesn't seem to work
 use Digest::HMAC_SHA1();
 use Encode qw( encode_utf8 );
 
-
 our $VERSION = '$Rev: 20101205 (2010-12-05) $';
 our $RELEASE = '1.0.0';
-our $SHORTDESCRIPTION = 'Easy linking to S3 storage with optional access controls';
+our $SHORTDESCRIPTION =
+  'Easy linking to S3 storage with optional access controls';
 our $NO_PREFS_IN_TOPIC = 1;
 
 sub initPlugin {
@@ -50,40 +50,37 @@ sub initPlugin {
 
     # Allow a sub to be called from the REST interface
     # using the provided alias
-#    Foswiki::Func::registerRESTHandler( 'example', \&restExample );
+    #    Foswiki::Func::registerRESTHandler( 'example', \&restExample );
 
     return 1;
 }
 
-
 ################################################################################
 sub _S3LINK {
-    my($session, $params, $topic, $web, $topicObject) = @_;
+    my ( $session, $params, $topic, $web, $topicObject ) = @_;
 
-    my $CanonicalizedResource = '/' . $params->{bucket} . '/' . $params->{_DEFAULT};
+    my $CanonicalizedResource =
+      '/' . $params->{bucket} . '/' . $params->{_DEFAULT};
     my $uri = URI->new( 'https://s3.amazonaws.com' . $CanonicalizedResource );
 
     my $awskey = $Foswiki::cfg{Plugins}{S3LinkPlugin}{AWSAccessKeyId};
 
-    my $opts = {
-	AWSAccessKeyId => $awskey,
-    };
+    my $opts = { AWSAccessKeyId => $awskey, };
     if ( my $expires_min = $params->{expires} ) {
-	$opts->{Expires} = time() + ( $expires_min * 60 );
+        $opts->{Expires} = time() + ( $expires_min * 60 );
     }
 
-    my $StringToSign = 
-	"GET\n"				# HTTP-VERB
-	. "\n"				# Content-MD5
-	. "\n"				# Content-Type
-	. $opts->{Expires} . "\n"	# Expires
-	. ''				# Canonicalized Amz Headers
-	. $CanonicalizedResource	# Canonicalized Resource
-	;
+    my $StringToSign = "GET\n"     # HTTP-VERB
+      . "\n"                       # Content-MD5
+      . "\n"                       # Content-Type
+      . $opts->{Expires} . "\n"    # Expires
+      . ''                         # Canonicalized Amz Headers
+      . $CanonicalizedResource     # Canonicalized Resource
+      ;
     my $signature = Digest::HMAC_SHA1->new($awskey);
-    $signature->add( encode_utf8( $StringToSign ) );
+    $signature->add( encode_utf8($StringToSign) );
     $opts->{Signature} = $signature->b64digest;
-    $uri->query_form( $opts );
+    $uri->query_form($opts);
     return $uri;
 }
 

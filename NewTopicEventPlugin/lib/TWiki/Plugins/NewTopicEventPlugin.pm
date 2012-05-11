@@ -2,6 +2,7 @@
 #
 # Copyright 2005 Will Norris.  All Rights Reserved.
 # License: GPL
+
 =pod
 
 ---+ package NewTopicEventPlugin
@@ -43,11 +44,12 @@ use LWP::Simple qw();
 =cut
 
 sub initPlugin {
-    my( $topic, $web, $user, $installWeb ) = @_;
+    my ( $topic, $web, $user, $installWeb ) = @_;
 
     # check for Plugins.pm versions
-    if( $TWiki::Plugins::VERSION < 1.026 ) {
-        TWiki::Func::writeWarning( "Version mismatch between $pluginName and Plugins.pm" );
+    if ( $TWiki::Plugins::VERSION < 1.026 ) {
+        TWiki::Func::writeWarning(
+            "Version mismatch between $pluginName and Plugins.pm");
         return 0;
     }
 
@@ -72,28 +74,33 @@ __Since:__ TWiki::Plugins::VERSION = '1.010'
 =cut
 
 sub beforeSaveHandler {
+
     # do not uncomment, use $_[0], $_[1]... instead
     ### my ( $text, $topic, $web ) = @_;
-    my ( $topic, $web ) = @_[1,2];
+    my ( $topic, $web ) = @_[ 1, 2 ];
 
-    my $MATCH = TWiki::Func::getPluginPreferencesValue( 'MATCH' );
+    my $MATCH = TWiki::Func::getPluginPreferencesValue('MATCH');
 
-    if ( my @a = "$web.$topic" =~ qr/$MATCH/ ) {	# SMELL: . vs / (should be using something from the core)
-	# trigger-level activation (when creating a NEW TOPIC)
-	if ( ! TWiki::Func::topicExists( $web, $topic ) ) {
-	    my $EXECUTE = TWiki::Func::getPluginPreferencesValue( 'EXECUTE' );
-	    $EXECUTE =~ s/\$(\d)/$a[$1-1]/g;		# $1 - $9 only
-	    $EXECUTE = TWiki::Func::expandCommonVariables( $EXECUTE, $topic, $web );
+    if ( my @a = "$web.$topic" =~ qr/$MATCH/ )
+    {    # SMELL: . vs / (should be using something from the core)
+            # trigger-level activation (when creating a NEW TOPIC)
+        if ( !TWiki::Func::topicExists( $web, $topic ) ) {
+            my $EXECUTE = TWiki::Func::getPluginPreferencesValue('EXECUTE');
+            $EXECUTE =~ s/\$(\d)/$a[$1-1]/g;    # $1 - $9 only
+            $EXECUTE =
+              TWiki::Func::expandCommonVariables( $EXECUTE, $topic, $web );
 
-	    foreach my $execute ( split( /\s+/, $EXECUTE ) ) {
-		my $content = LWP::Simple::head( $execute );
-#		my $content = LWP::Simple::get( $execute );
-	    }
+            foreach my $execute ( split( /\s+/, $EXECUTE ) ) {
+                my $content = LWP::Simple::head($execute);
 
-	}
+                #		my $content = LWP::Simple::get( $execute );
+            }
+
+        }
     }
 
-    TWiki::Func::writeDebug( "- ${pluginName}::beforeSaveHandler( $_[2].$_[1] )" ) if $debug;
+    TWiki::Func::writeDebug("- ${pluginName}::beforeSaveHandler( $_[2].$_[1] )")
+      if $debug;
 }
 
 1;

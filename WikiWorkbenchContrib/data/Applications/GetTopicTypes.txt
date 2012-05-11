@@ -1,4 +1,4 @@
-%META:TOPICINFO{author="ProjectContributor" comment="save topic" date="1271156528" format="1.1" reprev="1.2" version="1.2"}%
+%META:TOPICINFO{author="ProjectContributor" comment="save topic" date="1330678229" format="1.1" reprev="2" version="4"}%
 %META:TOPICPARENT{name="TopicFunction"}%
 %TOC{depth="2"}%
 
@@ -20,28 +20,22 @@ scratch on as you will be able to create an initial !TopicType !TopicType this w
 
 ---++ Implementation
 <verbatim class="tml">
-%STARTINCLUDE%
-~~~ none, 
-~~~ 
-%~~ FORMATLIST{"TopicType,
-%~~   IF{"defined ADDITION" then="%ADDITION%, "}%
-~~~
-%~~   FORMATLIST{"%IF{"defined WEBS" then="%WEBS%" else="%BASEWEB%"}%"
-~~~     format="$percntDBQUERY{\"TopicType=~'\bTopicType\b'\" 
-~~~       web=\"$1\"
-~~~       hidenull=\"on\"
-~~~       separator=\", \" 
-~~~       format=\"$dollartopic\"
-~~~     }$percnt"
-~~~   }%"
-%~~ IF{"defined EXCLUDE" then="exclude=\"%EXCLUDE%\""}%
-~~~ format="$1"
-~~~ separator=", "
-~~~ sort="on"
-~~~ unique="on"
-~~~ }%
-~~~
-%STOPINCLUDE%
+%STARTINCLUDE%none, %FORMATLIST{
+  "TopicType, %IF{"defined ADDITION" then="%ADDITION%, "}% %FORMATLIST{
+    "%IF{"defined WEBS" then="%WEBS%" else="%BASEWEB%"}%"
+    format="$percntDBQUERY{\"TopicType=~'\bTopicType\b'\" 
+        web=\"$1\"
+        hidenull=\"on\"
+        separator=\", \" 
+        format=\"$dollartopic\"
+      }$percnt"
+  }%"
+  %IF{"defined EXCLUDE" then="exclude=\"%EXCLUDE%\""}%
+  format="$1"
+  separator=", "
+  sort="on"
+  unique="on"
+}%%STOPINCLUDE%
 </verbatim>
 
 ---++ Test
@@ -58,13 +52,13 @@ scratch on as you will be able to create an initial !TopicType !TopicType this w
 %DBCALL{"Applications.RenderFunctionCallers"}%
 
 ---++ Copyright
-&copy; 2006-2010 Michael Daum http://michaeldaumconsulting.com
+&copy; 2006-2012 Michael Daum http://michaeldaumconsulting.com
 
 %DBCALL{"Applications.GnuGeneralPublicLicense" section="notice"}%
 
 
 %META:FORM{name="Applications.ApplicationTopic"}%
 %META:FIELD{name="TopicType" title="TopicType" value="DocuTopic, TopicFunction"}%
-%META:FIELD{name="TopicTitle" attributes="" title="<nop>TopicTitle" value="GetTopicTypes"}%
-%META:FIELD{name="Summary" attributes="" title="Summary" value="returns a list of TopicTypes known in the base web"}%
+%META:FIELD{name="TopicTitle" attributes="" title="<nop>TopicTitle" value=""}%
+%META:FIELD{name="Summary" attributes="c" title="Summary" value="returns a list of TopicTypes known in the base web"}%
 %META:FIELD{name="WikiApplication" attributes="" title="WikiApplication" value="WikiWorkbench"}%

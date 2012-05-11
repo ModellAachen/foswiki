@@ -23,71 +23,34 @@ use Foswiki::Attrs ();
 use vars qw(%defaultStrings $debug);
 
 %defaultStrings = (
-  'Description' => {
-    DE => 'Projektbeschreibung',
-    EN => 'Project description',
-    FR => 'Description du projet',
-  },
-  'Role' => {
-    DE => 'Aufgaben',
-    EN => 'Role',
-    FR => 'R\\\'f4le',
-  },
-  'Technologies' => {
-    'DE' => 'Technologien',
-    'EN' => 'Technologies',
-    'FR' => 'Technologies',
-  },
-  'Tools' => {
-    'DE' => 'Tools',
-    'EN' => 'Tools',
-    'FR' => 'Tools',
-  },
-  'Skills' => {
-    'DE' => 'Kenntnisse',
-    'EN' => 'Skills',
-    'FR' => 'Connaissances',
-  },
-  'Main Focus' => {
-    'DE' => 'Schwerpunkte',
-    'EN' => 'Main Focus',
-    'FR' => 'Points forts',
-  },
-  'Programming' => {
-    'DE' => 'Programmiersprachen',
-    'EN' => 'Programming Languages',
-    'FR' => 'Langues de programmation',
-  },
-  'Operating Systems' => {
-    'DE' => 'Betriebssysteme',
-    'EN' => 'Operating Systems',
-    'FR' => 'Syst\\\'e8me d\'exploitation',
-  },
-  'Databases' => {
-    'DE' => 'Datenbanken',
-    'EN' => 'Databases',
-    'FR' => 'Base de donn\\\'e9es',
-  },
-  'Methods' => {
-    'DE' => 'Methoden/Werkzeuge',
-    'EN' => 'Methods/Tools',
-    'FR' => 'M\\\'e9thodes',
-  },
-  'Communication' => {
-    'DE' => 'Kommunikation',
-    'EN' => 'Communication',
-    'FR' => 'Communication',
-  },
-  'Middleware' => {
-    'DE' => 'Middleware',
-    'EN' => 'Middleware',
-    'FR' => 'Middleware',
-  },
-  'Frameworks' => {
-    'DE' => 'Frameworks',
-    'EN' => 'Frameworks',
-    'FR' => 'Frameworks',
-  },
+  'Brief description' => { 'DE' => 'Kurzbeschreibung', 'EN' => 'Brief description', 'FR' => 'Br&egrave;ve pr&eacute;sentation', },
+  'Citizenship' => { 'DE' => 'Staatsangeh&ouml;rigkeit', 'EN' => 'Citizenship', 'FR' => 'Nationalit&eacute;', },
+  'Communication' => { 'DE' => 'Kommunikation', 'EN' => 'Communication', 'FR' => 'Communication', },
+  'Databases' => { 'DE' => 'Datenbanken', 'EN' => 'Databases', 'FR' => 'Base de donn&eacute;es', },
+  'Description' => { DE => 'Projektbeschreibung', EN => 'Project description', FR => 'Description du projet', },
+  'Education' => { 'DE' => 'Ausbildung', 'EN' => 'Education', 'FR' => 'Formation', },
+  'Employee Profile' => { DE => 'Mitarbeiter Profil', EN => 'Employee Profile', FR => 'Profil de l\'employ&eacute;' },
+  'Employment activities' => { 'DE' => 'Berufliche T&auml;tigkeiten', 'EN' => 'Employment activities', 'FR' => 'Carri&egrave;re', },
+  'Course Instructor' => { 'DE' => 'Kurs-Referent', 'EN' => 'Course Instructor', 'FR' => 'R&eacute;f&eacute;rent de cours' },
+  'Main Instructor' => { 'DE' => 'Hauptreferent', 'EN' => 'Main Instructor', 'FR' => 'R&eacute;f&eacute;rent principal'},
+  'Co-Instructor' => { 'DE' => 'Coreferent', 'EN' => 'Co-Instructor', 'FR' => 'Cor&eacute;f&eacute;rent'},
+  'Frameworks' => { 'DE' => 'Frameworks', 'EN' => 'Frameworks', 'FR' => 'Frameworks', },
+  'Function' => { 'DE' => 'Funktion', 'EN' => 'Function', 'FR' => 'Fonction', },
+  'Languages' => { 'DE' => 'Sprachen', 'EN' => 'Languages', 'FR' => 'Langues', },
+  'Main Focus' => { 'DE' => 'Schwerpunkte', 'EN' => 'Main Focus', 'FR' => 'Points forts', },
+  'Methods' => { 'DE' => 'Methoden/Werkzeuge', 'EN' => 'Methods/Tools', 'FR' => 'M&eacute;thodes', },
+  'Middleware' => { 'DE' => 'Middleware', 'EN' => 'Middleware', 'FR' => 'Middleware', },
+  'Name' => { DE => 'Name', EN => 'Name', FR => 'Nom', },
+  'of' => { DE => 'von', EN => 'of', FR => 'de', },
+  'Operating Systems' => { 'DE' => 'Betriebssysteme', 'EN' => 'Operating Systems', 'FR' => 'Syst&egrave;me d\'exploitation', },
+  'Page' => { DE => 'Seite', EN => 'Page', FR => 'Page', },
+  'Programming' => { 'DE' => 'Programmiersprachen', 'EN' => 'Programming Languages', 'FR' => 'Langues de programmation', },
+  'Projects/Role' => { 'DE' => 'Projekte/Aufgaben', 'EN' => 'Projects/Role', 'FR' => 'Projets/R&ocirc;le', },
+  'Role' => { DE => 'Aufgaben', EN => 'Role', FR => 'R&ocirc;le', },
+  'Skills' => { 'DE' => 'Kenntnisse', 'EN' => 'Skills', 'FR' => 'Connaissances', },
+  'Technologies' => { 'DE' => 'Technologien', 'EN' => 'Technologies', 'FR' => 'Technologies', },
+  'Tools' => { 'DE' => 'Tools', 'EN' => 'Tools', 'FR' => 'Tools', },
+  'Year of Birth' => { DE => 'Jahrgang', EN => 'Year of Birth', FR => ' Ann&eacute;e de naissance', },
 );
 
 @Foswiki::Contrib::RtfContrib::TriConverter::ISA = ("Foswiki::Contrib::RtfContrib::Converter");
@@ -117,14 +80,21 @@ sub processTemplate {
   my $this = shift;
 
   $this->SUPER::processTemplate(@_);  
-  $_[0] =~ s/\%JOBSTABLE%/$this->handleJobsTable()/ge;
-  $_[0] =~ s/\%JOBSTABLE\\{(.*?)\\}%/$this->handleJobsTable($1)/ge;
-  $_[0] =~ s/\%PROJECTS%/$this->handleProjects()/ge;
-  $_[0] =~ s/\%PROJECTS\\{(.*?)\\}%/$this->handleProjects($1)/ge;
-  $_[0] =~ s/\%SKILLSTABLE%/$this->handleSkills()/ge;
-  $_[0] =~ s/\%SKILLSTABLE\\{(.*?)\\}%/$this->handleSkills($1)/ge;
-  $_[0] =~ s/\%EDUCATIONTABLE%/$this->handleEducationTable()/ge;
-  $_[0] =~ s/\%EDUCATIONTABLE\\{(.*?)\\}%/$this->handleEducationTable($1)/ge;
+  $_[0] =~ s/\%JOBSTABLE(?:\\{(.*?)\\})?%/$this->handleJobsTable($1)/ge;
+  $_[0] =~ s/\%COURSETABLE(?:\\{(.*?)\\})?%/$this->handleCourseTable($1)/ge;
+  $_[0] =~ s/\%PROJECTS(?:\\{(.*?)\\})?%/$this->handleProjects($1)/ge;
+  $_[0] =~ s/\%SKILLSTABLE(?:\\{(.*?)\\})?%/$this->handleSkills($1)/ge;
+  $_[0] =~ s/\%EDUCATIONTABLE(?:\\{(.*?)\\})?%/$this->handleEducationTable($1)/ge;
+}
+
+################################################################################
+# our own version strips of the s from https
+sub DIS_getPhoto {
+  my ($this, $fileName) = @_;
+
+  $fileName =~ s/^https/http/g;
+ 
+  return $this->SUPER::getPhoto($fileName);
 }
 
 ################################################################################
@@ -134,7 +104,7 @@ sub handleJobsTable {
   $params ||= '';
   writeDebug("handleJobsTable($params)");
   $params = new Foswiki::Attrs($params);
-  my $theLang = $params->{lang} || $params->{language} || 'DE';
+  my $theLang = $params->{lang} || $params->{language} || $this->{query}->param("lang") || 'DE';
   $theLang = uc($theLang);
   my $theTopic = $params->{topic} || $this->{topic}.'CVJobs'.$theLang;
   my $theHeader = $params->{header} || '';
@@ -233,7 +203,7 @@ sub handleEducationTable {
   $params ||= '';
   writeDebug("handleEducationTable($params)");
   $params = new Foswiki::Attrs($params);
-  my $theLang = $params->{lang} || $params->{language} || 'DE';
+  my $theLang = $params->{lang} || $params->{language} || $this->{query}->param("lang") || 'DE';
   $theLang = uc($theLang);
   my $theTopic = $params->{topic} || $this->{topic}.'CVEducation'.$theLang;
   my $theHeader = $params->{header} || '';
@@ -330,7 +300,7 @@ sub handleSkills {
   $params ||= '';
   writeDebug("handleSkills($params)");
   $params = new Foswiki::Attrs($params);
-  my $theLang = $params->{lang} || $params->{language} || 'DE';
+  my $theLang = $params->{lang} || $params->{language} || $this->{query}->param("lang") || 'DE';
   my $theHeader = $params->{header} || '';
   my $theFooter = $params->{footer} || '';
   my $theTopic = $params->{topic} || $this->{topic};
@@ -416,7 +386,7 @@ HERE
     foreach my $skill (sort keys %$skillsMatrix) {
       $skill =~ s/^\s+//go;
       $skill =~ s/\s+$//go;
-      next if $skillsMatrix->{$skill} < 2;
+      next if $skillsMatrix->{$skill} < 3;
       
       my $cat = $hierarchy->getCategory($skill);
       next unless $cat;
@@ -491,13 +461,187 @@ HERE
 }
 
 ################################################################################
+sub handleCourseTable {
+  my ($this, $params) = @_;
+
+  $params ||= '';
+  writeDebug("handleCourseTable($params)");
+  $params = new Foswiki::Attrs($params);
+  my $theLang = $params->{lang} || $params->{language} || $this->{query}->param("lang") || 'DE';
+  $theLang = uc($theLang);
+  my $theName = $params->{_DEFAULT} || $this->{topic};
+  my $theWeb = $params->{web} || $this->{web};
+  my $theHeader = $params->{header} || '';
+  my $theFooter = $params->{footer} || '';
+
+  my $db = $this->{db};
+  if ($theWeb ne $this->{web}) {
+    $db = Foswiki::Plugins::DBCachePlugin::Core::getDB($theWeb);
+  }
+
+  my $mainRefereeSearch = new Foswiki::Contrib::DBCacheContrib::Search(<<"HERE");
+TopicClassification='TrainingAngebot' AND HauptReferent=~'\\b$theName\\b'
+HERE
+
+  my $coRefereeSearch = new Foswiki::Contrib::DBCacheContrib::Search(<<"HERE");
+TopicClassification='TrainingAngebot' AND CoReferenten=~'\\b$theName\\b'
+HERE
+
+  writeDebug("searching for courses for $theName in $theWeb");
+
+  my @mainReferee = ();
+  my @coReferee = ();
+  foreach my $topicName ($db->getKeys()) {
+    my $topicObj = $db->fastget($topicName);
+    next unless $topicObj;    # never
+
+    if ($mainRefereeSearch->matches($topicObj)) {
+      writeDebug("$topicName ... main-referee");
+      push @mainReferee, $topicName;
+    } elsif ($coRefereeSearch->matches($topicObj)) {
+      writeDebug("$topicName ... co-referee");
+      push @coReferee, $topicName;
+    }
+  }
+
+  my $result = '{\pard';
+
+  my $referent = $this->tml2rtf($this->translate($theLang, "Main Instructor"));
+  my $nrRows = 0;
+  foreach my $course (sort @mainReferee) {
+    my $topicObj = $db->fastget($course);
+    my $formName = $topicObj->fastget('form');
+    next unless $formName;
+
+    my $formObj = $topicObj->fastget($formName);
+    next unless $formObj;
+
+    my $abbr = $this->tml2rtf($formObj->fastget("Abkuerzung"));
+    my $title = $this->tml2rtf($formObj->fastget("Titel"));
+
+    $nrRows++;
+    $result .= 
+      '\trowd'."\n".
+      '\ts24\trgaph108\trleft0'.
+      '\trbrdrt\brdrs\brdrw15'.
+      '\trbrdrl\brdrs\brdrw15'.
+      '\trbrdrb\brdrs\brdrw15'.
+      '\trbrdrr\brdrs\brdrw15'.
+      '\trbrdrh\brdrs\brdrw15'.
+      '\trbrdrv\brdrs\brdrw15'.
+      '\trftsWidth3\trwWidth9127\trftsWidthB3\trftsWidthA3'.
+      '\trautofit1'.
+      '\trpaddl108\trpaddr108'.
+      '\trpaddfl3\trpaddft3'.
+      '\trpaddfb3\trpaddfr3'.
+      '\tbllkhdrrows\tbllkhdrcols'.
+      '\tbllklastrow\tbllklastcol'.
+      '\tblind94\tblindtype3'.
+      '\clvertalt'.
+      '\clbrdrt\brdrs\brdrw15'.
+      '\clbrdrl\brdrs\brdrw15'.
+      '\clbrdrb\brdrs\brdrw15'.
+      '\clbrdrr\brdrs\brdrw15'.
+      '\cltxlrtb\clftsWidth3\clwWidth1668\clshdrawnil'.
+      '\cellx1654'.
+      '\clvertalt'.
+      '\clbrdrt\brdrs\brdrw15'.
+      '\clbrdrl\brdrs\brdrw15'.
+      '\clbrdrb\brdrs\brdrw15'.
+      '\clbrdrr\brdrs\brdrw15'.
+      '\cltxlrtb\clftsWidth3\clwWidth5103\clshdrawnil'.
+      '\cellx6757'.
+      '\clvertalt'.
+      '\clbrdrt\brdrs\brdrw15'.
+      '\clbrdrl\brdrs\brdrw15'.
+      '\clbrdrb\brdrs\brdrw15'.
+      '\clbrdrr\brdrs\brdrw15'.
+      '\cltxlrtb\clftsWidth3\clwWidth2356\clshdrawnil'.
+      '\cellx9113'.
+      '\pard\plain'.
+      '\ltrpar\ql\li0\ri0\widctlpar'.
+      '\intbl'."\n".
+      '{\af0\cs30\f37\fs24 '.$abbr.'\par\cell}'."\n".
+      '{\af0\cs30\f37\fs24 '.$title.'\par\cell}'."\n".
+      '{\af0\cs30\f37\fs24 '.$referent.'\par\cell}'."\n".
+      '\row'."\n";
+  }
+
+  $referent = $this->tml2rtf($this->translate($theLang, "Co-Instructor"));
+  foreach my $course (sort @coReferee) {
+    my $topicObj = $db->fastget($course);
+    my $formName = $topicObj->fastget('form');
+    next unless $formName;
+
+    my $formObj = $topicObj->fastget($formName);
+    next unless $formObj;
+
+    my $abbr = $this->tml2rtf($formObj->fastget("Abkuerzung"));
+    my $title = $this->tml2rtf($formObj->fastget("Titel"));
+
+    $nrRows++;
+    $result .= 
+      '\trowd'."\n".
+      '\ts24\trgaph108\trleft0'.
+      '\trbrdrt\brdrs\brdrw15'.
+      '\trbrdrl\brdrs\brdrw15'.
+      '\trbrdrb\brdrs\brdrw15'.
+      '\trbrdrr\brdrs\brdrw15'.
+      '\trbrdrh\brdrs\brdrw15'.
+      '\trbrdrv\brdrs\brdrw15'.
+      '\trftsWidth3\trwWidth9127\trftsWidthB3\trftsWidthA3'.
+      '\trautofit1'.
+      '\trpaddl108\trpaddr108'.
+      '\trpaddfl3\trpaddft3'.
+      '\trpaddfb3\trpaddfr3'.
+      '\tbllkhdrrows\tbllkhdrcols'.
+      '\tbllklastrow\tbllklastcol'.
+      '\tblind94\tblindtype3'.
+      '\clvertalt'.
+      '\clbrdrt\brdrs\brdrw15'.
+      '\clbrdrl\brdrs\brdrw15'.
+      '\clbrdrb\brdrs\brdrw15'.
+      '\clbrdrr\brdrs\brdrw15'.
+      '\cltxlrtb\clftsWidth3\clwWidth1668\clshdrawnil'.
+      '\cellx1654'.
+      '\clvertalt'.
+      '\clbrdrt\brdrs\brdrw15'.
+      '\clbrdrl\brdrs\brdrw15'.
+      '\clbrdrb\brdrs\brdrw15'.
+      '\clbrdrr\brdrs\brdrw15'.
+      '\cltxlrtb\clftsWidth3\clwWidth5103\clshdrawnil'.
+      '\cellx6757'.
+      '\clvertalt'.
+      '\clbrdrt\brdrs\brdrw15'.
+      '\clbrdrl\brdrs\brdrw15'.
+      '\clbrdrb\brdrs\brdrw15'.
+      '\clbrdrr\brdrs\brdrw15'.
+      '\cltxlrtb\clftsWidth3\clwWidth2356\clshdrawnil'.
+      '\cellx9113'.
+      '\pard\plain'.
+      '\ltrpar\ql\li0\ri0\widctlpar'.
+      '\intbl'."\n".
+      '{\af0\cs30\f37\fs24 '.$abbr.'\par\cell}'."\n".
+      '{\af0\cs30\f37\fs24 '.$title.'\par\cell}'."\n".
+      '{\af0\cs30\f37\fs24 '.$referent.'\par\cell}'."\n".
+      '\row'."\n";
+  }
+
+  $result .= '}'."\n";
+  $result = ($nrRows>1)?$theHeader.$result.$theFooter:'';
+
+  #writeDebug("result=$result");
+  return $result;
+}
+
+################################################################################
 sub handleProjects {
   my ($this, $params) = @_;
 
   $params ||= '';
   #writeDebug("handleProjects($params)");
   $params = new Foswiki::Attrs($params);
-  my $theLang = $params->{lang} || $params->{language} || 'DE';
+  my $theLang = $params->{lang} || $params->{language} || $this->{query}->param("lang") || 'DE';
   $theLang = uc($theLang);
   my $theTopic = $params->{topic} || $this->{topic}.'CVProjects'.$theLang;
   my $theHeader = $params->{header} || '';

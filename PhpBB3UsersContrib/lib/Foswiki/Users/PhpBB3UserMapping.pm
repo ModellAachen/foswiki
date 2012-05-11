@@ -204,6 +204,7 @@ Throws an Error::Simple if user adding is not supported (the default).
 =cut
 
 sub addUser {
+
     #my ( $this, $login, $wikiname ) = @_;
 
     throw Error::Simple('PhpBB3UserMapping does not allow creation of users ');
@@ -244,7 +245,9 @@ sub getWikiName {
     my $user_number = $user;
     $user_number =~ s/^$this->{mapping_id}//;
     my $name;
-    my $userDataset = $this->dbSelect( 'SELECT username FROM phpbb_users WHERE user_id = ?', $user_number );
+    my $userDataset =
+      $this->dbSelect( 'SELECT username FROM phpbb_users WHERE user_id = ?',
+        $user_number );
     if ( exists $$userDataset[0] ) {
         $name = $$userDataset[0]{username};
     }
@@ -259,11 +262,13 @@ sub getWikiName {
     #Make sure we're in 'ok' Wiki word territory
     $name =~ s{\[}{\(}g;
     $name =~ s{\]}{\)}g;
-#    $name =~ s/[^\w]+(\w)/uc($1)/ge;
+
+    #    $name =~ s/[^\w]+(\w)/uc($1)/ge;
 
     #print STDERR "getWikiName($user) == $name";
     return $name;
-#    return ucfirst($name);
+
+    #    return ucfirst($name);
 }
 
 =pod
@@ -279,7 +284,7 @@ Subclasses *must* implement this method.
 
 sub userExists {
     my ( $this, $cUID ) = @_;
-    return ($this->canonical2login($cUID) ne $Foswiki::cfg{DefaultUserLogin});
+    return ( $this->canonical2login($cUID) ne $Foswiki::cfg{DefaultUserLogin} );
 }
 
 =pod
@@ -328,11 +333,15 @@ sub eachGroupMember {
 
     my $members = [];
 
-    #return [] if ($groupName =~ /Registered/);    #LIMIT it cos most users are resistered
-    my $groupIdDataSet = $this->dbSelect( 'SELECT group_id FROM phpbb_groups WHERE group_name=?', $groupName );
+#return [] if ($groupName =~ /Registered/);    #LIMIT it cos most users are resistered
+    my $groupIdDataSet =
+      $this->dbSelect( 'SELECT group_id FROM phpbb_groups WHERE group_name=?',
+        $groupName );
     if ( exists $$groupIdDataSet[0] ) {
-        my $group        = $$groupIdDataSet[0]{group_id};
-        my $groupDataset = $this->dbSelect( 'SELECT * FROM phpbb_users WHERE group_id = ?', $group );
+        my $group = $$groupIdDataSet[0]{group_id};
+        my $groupDataset =
+          $this->dbSelect( 'SELECT * FROM phpbb_users WHERE group_id = ?',
+            $group );
         for my $row (@$groupDataset) {
             my $user_id = $this->{mapping_id} . $$row{user_id};
             push @{$members}, $user_id;
@@ -359,13 +368,14 @@ sub isGroup {
 
     return 0;
 
-    # list of groups:
-    # SELECT DISTINCT(phpbb_users.group_id),group_name FROM phpbb_users,phpbb_groups WHERE phpbb_users.group_id=phpbb_groups.group_id;
+# list of groups:
+# SELECT DISTINCT(phpbb_users.group_id),group_name FROM phpbb_users,phpbb_groups WHERE phpbb_users.group_id=phpbb_groups.group_id;
 
     #throw Error::Simple('IMPLEMENT/TEST ME');
     my $groupIdDataSet = $this->dbSelect(
         'select group_id from jos_core_acl_aro_groups where name = ?', $user );
     if ( exists $$groupIdDataSet[0] ) {
+
         #print STDERR "$user is a GROUP\n";
         return 1;
     }
@@ -498,7 +508,9 @@ sub findUserByEmail {
     my $email = shift;
 
     if ($email) {
-        my $dataset = $this->dbSelect( 'SELECT * FROM phpbb_users WHERE user_email = ?', $email );
+        my $dataset =
+          $this->dbSelect( 'SELECT * FROM phpbb_users WHERE user_email = ?',
+            $email );
         if ( exists $$dataset[0] ) {
             my @userList = ();
             for my $row (@$dataset) {
@@ -537,7 +549,8 @@ sub getEmails {
 
     if ($cUID) {
         my $dataset =
-          $this->dbSelect( 'SELECT * FROM phpbb_users WHERE user_id = ?', $cUID );
+          $this->dbSelect( 'SELECT * FROM phpbb_users WHERE user_id = ?',
+            $cUID );
         if ( exists $$dataset[0] ) {
             return ( $$dataset[0]{user_email} );
         }
@@ -588,7 +601,9 @@ sub findUserByWikiName {
     my $wikiname = shift;
 
     if ($wikiname) {
-        my $dataset = $this->dbSelect( 'SELECT * FROM phpbb_users WHERE username = ?', $wikiname );
+        my $dataset =
+          $this->dbSelect( 'SELECT * FROM phpbb_users WHERE username = ?',
+            $wikiname );
         if ( exists $$dataset[0] ) {
             my @userList = ();
             for my $row (@$dataset) {
@@ -621,21 +636,25 @@ Default behaviour is to return 1.
 sub checkPassword {
     my ( $this, $user, $password, $encrypted ) = @_;
 
-    #print STDERR "checkPassword($user, $password, ".($encrypted||'undef').")\n";
+   #print STDERR "checkPassword($user, $password, ".($encrypted||'undef').")\n";
 
     ASSERT( $this->isa('Foswiki::Users::PhpBB3UserMapping') ) if DEBUG;
 
     my $pw = $this->fetchPass($user);
+
     #print STDERR "pw=[$pw], length=[", length $pw, "]\n";
     #print STDERR "password=[$password]\n";
-    
+
     my $pwhash;
-    if (length($pw) == 34) {
-	# phpBB3-style is 34 bytes long
-	$pwhash = _phpbb_hash($password, $pw);
-    } else {
-	# phpBB2 password entry
-	$pwhash = Digest::MD5::md5_hex($password);
+    if ( length($pw) == 34 ) {
+
+        # phpBB3-style is 34 bytes long
+        $pwhash = _phpbb_hash( $password, $pw );
+    }
+    else {
+
+        # phpBB2 password entry
+        $pwhash = Digest::MD5::md5_hex($password);
     }
 
     $this->{error} = undef;
@@ -718,8 +737,9 @@ sub getPhpBB3DB {
         }
         catch Error::Simple with {
             $this->{error} = $!;
+
 #            $this->{session}->writeWarning( "ERROR: DBIx::SQLEngine->new( $dbi_dsn, $dbi_user, ...) : $!");
-            #die 'MYSQL login error (' . $dbi_dsn . ', ' . $dbi_user . ') ' . $!;
+#die 'MYSQL login error (' . $dbi_dsn . ', ' . $dbi_user . ') ' . $!;
         };
     }
     return $this->{PhpBB3DB};
@@ -743,6 +763,7 @@ sub dbSelect {
         catch Error::Simple with {
             $this->{error} = $!;
             print STDERR "            ERROR: fetch_select(@query) : $!";
+
 #            $this->{session}->writeWarning("ERROR: fetch_select(@query) : $!");
         };
     }
@@ -768,7 +789,9 @@ sub login2canonical {
 
         # use bytes to ignore character encoding
         #$login =~ s/([^a-zA-Z0-9])/'_'.sprintf('%02d', ord($1))/ge;
-        my $userDataset = $this->dbSelect( 'SELECT * FROM phpbb_users WHERE username = ?', $login );
+        my $userDataset =
+          $this->dbSelect( 'SELECT * FROM phpbb_users WHERE username = ?',
+            $login );
         if ( exists $$userDataset[0] ) {
             $canonical_id = $$userDataset[0]{user_id};
 
@@ -795,7 +818,9 @@ sub canonical2login {
     return $Foswiki::cfg{DefaultUserLogin} if ( $user == -1 );
 
     my $login = $Foswiki::cfg{DefaultUserLogin};
-    my $userDataset = $this->dbSelect( 'SELECT username FROM phpbb_users WHERE user_id = ?', $user );
+    my $userDataset =
+      $this->dbSelect( 'SELECT username FROM phpbb_users WHERE user_id = ?',
+        $user );
     if ( exists $$userDataset[0] ) {
         $login = $$userDataset[0]{username};
     }
@@ -835,7 +860,8 @@ sub _getListOfGroups {
 
     unless ( $this->{groupsList} ) {
         $this->{groupsList} = [];
-        my $dataset = $this->dbSelect('SELECT group_name FROM phpbb_groups ORDER BY group_name ASC');
+        my $dataset = $this->dbSelect(
+            'SELECT group_name FROM phpbb_groups ORDER BY group_name ASC');
         for my $row (@$dataset) {
             my $groupID = $$row{group_name};
             push @{ $this->{groupsList} }, $groupID;
@@ -857,10 +883,13 @@ sub lookupLoginName {
 sub fetchPass {
     my ( $this, $user ) = @_;
     ASSERT( $this->isa('Foswiki::Users::PhpBB3UserMapping') ) if DEBUG;
+
     #print STDERR "fetchPass($user)\n";
 
     if ($user) {
-        my $dataset = $this->dbSelect( 'SELECT * FROM phpbb_users WHERE username = ?', $user );
+        my $dataset =
+          $this->dbSelect( 'SELECT * FROM phpbb_users WHERE username = ?',
+            $user );
 
       #$this->{session}->writeWarning("$@$dataset");
       #print STDERR "fetchpass got - ".join(', ', keys(%{$$dataset[0]}))."\n";
@@ -895,92 +924,81 @@ sub deleteUser {
 
 ################################################################################
 
-sub _phpbb_hash
-{
-  use bytes;
-  my ($password, $setting) = @_;
-  my $itoa64
-    = './0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+sub _phpbb_hash {
+    use bytes;
+    my ( $password, $setting ) = @_;
+    my $itoa64 =
+      './0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
 
-  my $output = undef;
+    my $output = undef;
 
-  if (substr($setting, 0, 3) ne '$H$')
-  {
-    return;
-  }
+    if ( substr( $setting, 0, 3 ) ne '$H$' ) {
+        return;
+    }
 
-  my $count_log2 = index($itoa64, substr($setting, 3, 1));
-  if ($count_log2 < 7 || $count_log2 > 30)
-  {
-    return;
-  }
-  my $count = 1 << $count_log2;
+    my $count_log2 = index( $itoa64, substr( $setting, 3, 1 ) );
+    if ( $count_log2 < 7 || $count_log2 > 30 ) {
+        return;
+    }
+    my $count = 1 << $count_log2;
 
-  my $salt = substr($setting, 4, 8);
-  if (length($salt) != 8)
-  {
-    return;
-  }
+    my $salt = substr( $setting, 4, 8 );
+    if ( length($salt) != 8 ) {
+        return;
+    }
 
-  # hash the salt and password
-  my $hash = Digest::MD5::md5($salt . $password);
-  do
-  {
-    $hash = Digest::MD5::md5($hash . $password);
-  } while (--$count);
+    # hash the salt and password
+    my $hash = Digest::MD5::md5( $salt . $password );
+    do {
+        $hash = Digest::MD5::md5( $hash . $password );
+    } while ( --$count );
 
-  $output = substr($setting, 0, 12) . _hash_encode64($hash, 16, $itoa64);
+    $output = substr( $setting, 0, 12 ) . _hash_encode64( $hash, 16, $itoa64 );
 
-  return $output;
-}  # sub phpbb_hash
+    return $output;
+}    # sub phpbb_hash
 
 ################################################################################
 
-sub _hash_encode64
-{
-  my ($input, $count, $itoa64) = @_;
+sub _hash_encode64 {
+    my ( $input, $count, $itoa64 ) = @_;
 
-  my $output = undef;
-  my $i = 0;
+    my $output = undef;
+    my $i      = 0;
 
   ENCODE_LOOP:
-  {
-    do
     {
-      my $value = ord(substr($input, $i, 1));
-      $output .= substr($itoa64, $value & 0x3f, 1);
+        do {
+            my $value = ord( substr( $input, $i, 1 ) );
+            $output .= substr( $itoa64, $value & 0x3f, 1 );
 
-      ++$i;
-      if ($i < $count)
-      {
-        $value |= ord(substr($input, $i, 1)) << 8;
-      }
-      $output .= substr($itoa64, ($value >> 6) & 0x3f, 1);
+            ++$i;
+            if ( $i < $count ) {
+                $value |= ord( substr( $input, $i, 1 ) ) << 8;
+            }
+            $output .= substr( $itoa64, ( $value >> 6 ) & 0x3f, 1 );
 
-      if ($i >= $count)
-      {
-        last ENCODE_LOOP;
-      }
-      ++$i;
+            if ( $i >= $count ) {
+                last ENCODE_LOOP;
+            }
+            ++$i;
 
-      if ($i < $count)
-      {
-        $value |= ord(substr($input, $i, 1)) << 16;
-      }
-      $output .= substr($itoa64, ($value >> 12) & 0x3f, 1);
+            if ( $i < $count ) {
+                $value |= ord( substr( $input, $i, 1 ) ) << 16;
+            }
+            $output .= substr( $itoa64, ( $value >> 12 ) & 0x3f, 1 );
 
-      if ($i >= $count)
-      {
-        last ENCODE_LOOP;
-      }
-      ++$i;
+            if ( $i >= $count ) {
+                last ENCODE_LOOP;
+            }
+            ++$i;
 
-      $output .= substr($itoa64, ($value >> 18) & 0x3f, 1);
-    } while ($i < $count);
-  } # ENCODE_LOOP
+            $output .= substr( $itoa64, ( $value >> 18 ) & 0x3f, 1 );
+        } while ( $i < $count );
+    }    # ENCODE_LOOP
 
-  return $output;
-}  # sub hash_encode64
+    return $output;
+}    # sub hash_encode64
 
 ################################################################################
 

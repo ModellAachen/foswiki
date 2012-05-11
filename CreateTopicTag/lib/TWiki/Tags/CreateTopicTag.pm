@@ -26,31 +26,36 @@ use strict;
 use vars qw($tagname);
 use TWiki::Tags::CreateTopicTag::Support;
 
-$tagname='CREATETOPIC';
+$tagname = 'CREATETOPIC';
 
 sub CREATETOPIC {
-    my ($session, $params, $topic, $web) = @_;
+    my ( $session, $params, $topic, $web ) = @_;
 
-    my $jsstart = TWiki::Tags::CreateTopicTag::Support::getJSPrefix();
-    my $jsend = TWiki::Tags::CreateTopicTag::Support::getJSSuffix();
+    my $jsstart       = TWiki::Tags::CreateTopicTag::Support::getJSPrefix();
+    my $jsend         = TWiki::Tags::CreateTopicTag::Support::getJSSuffix();
     my $templatetopic = $params->{templatetopic};
-    my $showparents = $params->{showparents} || 'off';
-    my $action = $params->{action};
-    my $initialtext = $params->{initialtext};
-    my $form = $params->{form};
+    my $showparents   = $params->{showparents} || 'off';
+    my $action        = $params->{action};
+    my $initialtext   = $params->{initialtext};
+    my $form          = $params->{form};
 
     my $formtext = TWiki::Tags::CreateTopicTag::Support::getFormStart();
     $formtext .= TWiki::Tags::CreateTopicTag::Support::getStep1();
-    $formtext .= TWiki::Tags::CreateTopicTag::Support::getStep2() if $showparents eq 'on';
+    $formtext .= TWiki::Tags::CreateTopicTag::Support::getStep2()
+      if $showparents eq 'on';
     $formtext .= TWiki::Tags::CreateTopicTag::Support::getStep3();
     $formtext .= TWiki::Tags::CreateTopicTag::Support::getFormEnd();
 
-    $formtext .= "\n<input type='hidden' name='templatetopic' value='$templatetopic'>" if $templatetopic;
-    $formtext .= "\n<input type='hidden' name='action' value='$action'>" if $action;
-    $formtext .= "\n<input type='hidden' name='text' value='$initialtext'>" if $initialtext;
+    $formtext .=
+      "\n<input type='hidden' name='templatetopic' value='$templatetopic'>"
+      if $templatetopic;
+    $formtext .= "\n<input type='hidden' name='action' value='$action'>"
+      if $action;
+    $formtext .= "\n<input type='hidden' name='text' value='$initialtext'>"
+      if $initialtext;
     $formtext .= "\n<input type='hidden' name='form' value='$form'>" if $form;
 
-    return join("\n", $jsstart, $formtext, "</form>", $jsend);
+    return join( "\n", $jsstart, $formtext, "</form>", $jsend );
 }
 
 1;

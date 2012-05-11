@@ -18,9 +18,11 @@ One line description, required for extensions repository catalog.
 </tr>
 </table>
 
-This is a commandline tool to import <nop>MediaWiki pages and images
-to Foswiki. It processes a <nop>MediaWiki XML dump to extract the pages
-and thus does not need a database access once the dump was created.
+This is a commandline tool to import <nop>MediaWiki pages and images to
+Foswiki. It processes a
+[[http://www.mediawiki.org/wiki/Manual:Backing_up_a_wiki#XML_dump][MediaWiki XML dump]] 
+to extract the pages and thus does not need a database access once the dump was
+created.
 
 The conversion tool takes care of almost all peculiarities of <nop>MediaWiki
 and Foswiki. It does _not_ map <nop>MediaWiki's category system onto Foswiki
@@ -109,7 +111,7 @@ should test the conversion result by using the -debug, -dry and -max.
 Sponsored by <a href="http://www.schenck-rotec.net"><img src="%ATTACHURLPATH%/schenck_logo.gif" border="0" title="Schenck-RoTec"/></a>
 
 |  Author: | Michael Daum |
-|  Copyright &copy;: | 2006-2009, Michael Daum http://michaeldaumconsulting.com |
+|  Copyright &copy;: | 2006-2012, Michael Daum http://michaeldaumconsulting.com |
 |  License: | GPL ([[http://www.gnu.org/copyleft/gpl.html][GNU General Public License]]) |
 |  Release: | %$RELEASE% |
 |  Version: | %$VERSION% |

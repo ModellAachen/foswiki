@@ -1,9 +1,13 @@
-Foswiki::Plugins::FlexFormPlugin,>=2.40,perl,Required.
-Foswiki::Plugins::JQueryPlugin,>=3740,perl,Required.
-Foswiki::Plugins::FlexPaperPlugin,>=1.1,perl,Optional.
+Foswiki::Contrib::JQPrettyPhotoContrib,>=1.10,perl,Optional.
 Foswiki::Plugins::FilterPlugin,>=2.07,perl,Required.
+Foswiki::Plugins::FlexFormPlugin,>=2.40,perl,Required.
+Foswiki::Plugins::FlexPaperPlugin,>=1.1,perl,Optional.
+Foswiki::Plugins::ImageGalleryPlugin,>=6.00,perl,Optional.
 Foswiki::Plugins::ImagePlugin,>=2.41,perl,Optional.
+Foswiki::Plugins::JQueryPlugin,>=3740,perl,Required.
+Foswiki::Plugins::MetaCommentPlugin,>=1.11,perl,Optional.
 Foswiki::Plugins::MimeIconPlugin,>=1.1,perl,Required.
+Foswiki::Plugins::RenderPlugin,>=3.01,perl,Required.
 Archive::Zip,>=0,cpan,Required.
 ONLYIF ( $Foswiki::Plugins::VERSION < 2.1)
 Foswiki::Plugins::ZonePlugin,>=3.1,perl,Required. required for Foswiki < 1.1

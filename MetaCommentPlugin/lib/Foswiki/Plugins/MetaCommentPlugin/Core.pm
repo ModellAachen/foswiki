@@ -285,17 +285,7 @@ sub METACOMMENTS {
     return;
   }
 
-  Foswiki::Plugins::JQueryPlugin::createPlugin("simplemodal");
-  Foswiki::Plugins::JQueryPlugin::createPlugin("form");
-  Foswiki::Plugins::JQueryPlugin::createPlugin("jsonrpc");
-  Foswiki::Plugins::JQueryPlugin::createPlugin("hoverintent");
-  Foswiki::Func::addToZone("head", "METACOMMENTPLUGIN::CSS", <<'HERE', 'JQUERYPLUGIN::SIMPLEMODAL');
-<link rel='stylesheet' href='%PUBURLPATH%/%SYSTEMWEB%/MetaCommentPlugin/metacomment.css' type='text/css' media='all' />
-HERE
-
-  Foswiki::Func::addToZone("script", "METACOMMENTPLUGIN::JS", <<'HERE', 'JQUERYPLUGIN::SIMPLEMODAL, JQUERYPLUGIN::FORM, JQUERYPLUGIN::JSONRPC');
-<script type='text/javascript' src='%PUBURLPATH%/%SYSTEMWEB%/MetaCommentPlugin/metacomment.js'></script>
-HERE
+  Foswiki::Func::readTemplate("metacomments");
 
   # sanitize params
   $params->{topic} ||= $topic;
@@ -371,85 +361,154 @@ HERE
 
 ##############################################################################
 sub getComments {
-  my ($web, $topic, $params, $meta) = @_;
+  my ($web, $topic, $params) = @_;
 
   my $wikiName = Foswiki::Func::getWikiName();
+  my $isModerator = isModerator($wikiName, $web, $topic);
 
   #writeDebug("called getComments");
 
-  unless ($meta) {
+  my @topics = ();
+  if (defined $params->{search}) {
+    @topics = getTopics($web, $params->{search}, $params);
+  } else {
     return undef unless Foswiki::Func::checkAccessPermission('VIEW', $wikiName, undef, $topic, $web);
-    ($meta, undef) = Foswiki::Func::readTopic($web, $topic);
+    push @topics, $topic;
   }
 
   my %comments = ();
-  my $isModerator = isModerator($wikiName, $web, $topic);
+  foreach my $thisTopic (@topics) {
+    my ($meta) = Foswiki::Func::readTopic($web, $thisTopic);
 
-  my @comments = $meta->find('COMMENT');
-  foreach my $comment (@comments) {
-    my $id = $comment->{name};
-    #writeDebug("id=$id, moderation=$params->{moderation}, isModerator=$isModerator, author=$comment->{author}, wikiName=$wikiName, state=$comment->{state}, isclosed=$params->{isclosed}");
-    next if $params->{author} && $comment->{author} !~ /$params->{author}/;
-    next if $params->{mindate} && $comment->{date} < $params->{mindate};
-    next if $params->{maxdate} && $comment->{date} > $params->{maxdate};
-    next if $params->{id} && $id ne $params->{id};
-    next if $params->{ref} && $params->{ref} ne $comment->{ref};
-    next if $params->{moderation} eq 'on' && !($isModerator || $comment->{author} eq $wikiName) && (!$comment->{state} || $comment->{state} !~ /\bapproved\b/);
-    next if $params->{moderation} eq 'on' && $params->{isclosed} && (!$comment->{state} || $comment->{state} !~ /\bapproved\b/);
+    my @comments = $meta->find('COMMENT');
+    foreach my $comment (@comments) {
+      my $id = $comment->{name};
+      #writeDebug("id=$id, moderation=$params->{moderation}, isModerator=$isModerator, author=$comment->{author}, wikiName=$wikiName, state=$comment->{state}, isclosed=$params->{isclosed}");
+      next if $params->{author} && $comment->{author} !~ /$params->{author}/;
+      next if $params->{mindate} && $comment->{date} < $params->{mindate};
+      next if $params->{maxdate} && $comment->{date} > $params->{maxdate};
+      next if $params->{id} && $id ne $params->{id};
+      next if $params->{ref} && $params->{ref} ne $comment->{ref};
+      next if $params->{state} && (!$comment->{state} || $comment->{state} !~ /^($params->{state})$/);
+      next if $params->{moderation} eq 'on' && !($isModerator || $comment->{author} eq $wikiName) && (!$comment->{state} || $comment->{state} !~ /\bapproved\b/);
+      next if $params->{moderation} eq 'on' && $params->{isclosed} && (!$comment->{state} || $comment->{state} !~ /\bapproved\b/);
 
-    next if $params->{include} && !(
-      $comment->{author} =~ /$params->{include}/ ||
-      $comment->{title} =~ /$params->{include}/ ||
-      $comment->{text} =~ /$params->{include}/
-    );
+      next if $params->{include} && !(
+        $comment->{author} =~ /$params->{include}/ ||
+        $comment->{title} =~ /$params->{include}/ ||
+        $comment->{text} =~ /$params->{include}/
+      );
 
-    next if $params->{exclude} && (
-      $comment->{author} =~ /$params->{exclude}/ ||
-      $comment->{title} =~ /$params->{exclude}/ ||
-      $comment->{text} =~ /$params->{exclude}/
-    );
+      next if $params->{exclude} && (
+        $comment->{author} =~ /$params->{exclude}/ ||
+        $comment->{title} =~ /$params->{exclude}/ ||
+        $comment->{text} =~ /$params->{exclude}/
+      );
 
-    #writeDebug("adding $id");
-    $comments{$id} = $comment;
+      $comment->{topic} = $thisTopic;
+      $comment->{web} = $web;
+
+      #writeDebug("adding $id");
+      $comments{$thisTopic.'::'.$id} = $comment;
+    }
   }
 
   # gather children
   if ($params->{threaded} && $params->{threaded} eq 'on') {
-    foreach my $id (keys %comments) {
-      my $cmt = $comments{$id};
+    while (my ($key, $cmt) = each %comments) {
       next unless $cmt->{ref};
-      my $parent = $comments{$cmt->{ref}};
+      my $parent = $comments{$cmt->{topic}.'::'.$cmt->{ref}};
       if ($parent) {
         push @{$parent->{children}}, $cmt;
       } else {
-        #writeDebug("parent $cmt->{ref} not found for $id");
-        delete $comments{$id};
+        #writeDebug("parent $cmt->{ref} not found for $cmt->{name}");
+        delete $comments{$key};
       }
     }
     # mark all reachable children and remove the unmarked
-    foreach my $id (keys %comments) {
-      my $cmt = $comments{$id};
+    while (my ($key, $cmt) = each %comments) {
       $cmt->{_tick} = 1 unless $cmt->{ref};
       next unless $cmt->{children};
       foreach my $child (@{$cmt->{children}}) {
         $child->{_tick} = 1;
       }
     }
-    foreach my $id (keys %comments) {
-      my $cmt = $comments{$id};
+    while (my ($key, $cmt) = each %comments) {
       next if $cmt->{_tick};
-      #writeDebug("found unticked comment $id");
-      delete $comments{$id};
+      #writeDebug("found unticked comment $cmt->{name}");
+      delete $comments{$key};
     }
   }
-
 
   return \%comments;
 }
 
 ##############################################################################
+sub getTopics {
+  if ($Foswiki::cfg{Plugins}{DBCachePlugin}{Enabled}) {
+    require Foswiki::Plugins::DBCachePlugin;
+    return getTopics_DBQUERY(@_);
+  } else {
+    return getTopics_SEARCH(@_);
+  }
+}
+
+##############################################################################
+sub getTopics_DBQUERY {
+  my ($web, $where, $params) = @_;
+
+  my $search = new Foswiki::Contrib::DBCacheContrib::Search($where);
+  return unless $search;
+
+  my $wikiName = Foswiki::Func::getWikiName();
+
+  my $db = Foswiki::Plugins::DBCachePlugin::getDB($web);
+  my @topicNames = $db->getKeys();
+  my @selectedTopics = ();
+
+  foreach my $topic (@topicNames) { # loop over all topics
+    my $topicObj = $db->fastget($topic);
+    next unless $search->matches($topicObj); # that match the query
+    next unless Foswiki::Func::checkAccessPermission('VIEW', 
+      $wikiName, undef, $topic, $web);
+    my $commentDate = $topicObj->fastget("commentdate");
+    next unless $commentDate;
+    push @selectedTopics, $topic;
+  }
+
+  return @selectedTopics;
+}
+
+##############################################################################
+sub getTopics_SEARCH {
+  my ($web, $where, $params) = @_;
+
+  $where .= ' and comment';
+
+  #print STDERR "where=$where, web=$web\n";
+
+  my $matches = Foswiki::Func::query($where, undef, { 
+    web => $web,
+    casesensitive => 0, 
+    files_without_match => 1 
+  });
+
+  my @selectedTopics = ();
+  while ($matches->hasNext) {
+    my $topic = $matches->next;
+    (undef, $topic) = Foswiki::Func::normalizeWebTopicName('', $topic);
+    push @selectedTopics, $topic;
+  }
+
+  #print STDERR "topics=".join(', ', @selectedTopics)."\n";
+  return @selectedTopics;
+}
+
+##############################################################################
 sub formatComments {
   my ($comments, $params, $parentIndex, $seen) = @_;
+
+  my $session = $Foswiki::Plugins::SESSION;
 
   $parentIndex ||= '';
   $seen ||= {};
@@ -500,12 +559,17 @@ sub formatComments {
     }
 
     my $title = $comment->{title};
-#   unless ($title) {
-#     my $session = $Foswiki::Plugins::SESSION;
-#     $title = substr($comment->{text}, 0, 40);
-#     $title =~ s/^\s*\-\-\-\++//g; # don't remove heading, just strip tml
-#     $title = $session->renderer->TML2PlainText($title, undef, "showvar") . " ...";
-#   }
+
+    my $summary = '';
+    if ($params->{format} =~ /\$summary/) {
+      $summary = substr($comment->{text}, 0, 100);
+      $summary =~ s/^\s*\-\-\-\++//g; # don't remove heading, just strip tml
+      $summary = $session->renderer->TML2PlainText($summary, undef, "showvar") . " ...";
+      $summary =~ s/\n/<br \/>/g;
+    }
+
+    my $permlink = Foswiki::Func::getScriptUrl($comment->{web},
+      $comment->{topic}, "view", "#"=>"comment".($comment->{name}||0));
 
     my $line = expandVariables($params->{format},
       author=>$comment->{author},
@@ -515,6 +579,7 @@ sub formatComments {
       timestamp=>$comment->{date} || 0,
       date=>Foswiki::Time::formatTime(($comment->{date}||0)),
       modified=>Foswiki::Time::formatTime(($comment->{modified}||0)),
+      isodate=> Foswiki::Func::formatTime($comment->{modified} || $comment->{date}, 'iso', 'gmtime'),
       evenodd=>($index % 2)?'Odd':'Even',
       id=>($comment->{name}||0),
       index=>$indexString,
@@ -522,6 +587,10 @@ sub formatComments {
       text=>$comment->{text},
       title=>$title,
       subcomments=>$subComments,
+      topic=>$comment->{topic},
+      web=>$comment->{web},
+      summary=>$summary,
+      permlink=>$permlink,
     );
 
     next unless $line;
@@ -619,6 +688,9 @@ sub indexTopicHandler {
       'text' => $comment->{text},
       'url' => $url,
       'state' => ($comment->{state}||'null'),
+      'container_id' => $web.'.'.$topic,
+      'container_url' => Foswiki::Func::getViewUrl($web, $topic),
+      'container_title' => $indexer->getTopicTitle($web, $topic, $meta),
     );
     $doc->add_fields('catchall' => $title);
     $doc->add_fields('catchall' => $comment->{text});

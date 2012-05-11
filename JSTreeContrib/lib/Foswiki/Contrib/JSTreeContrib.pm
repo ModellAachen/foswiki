@@ -3,8 +3,9 @@ package Foswiki::Contrib::JSTreeContrib;
 
 use strict;
 
-our $VERSION = '$Rev$'; # version of *this file*.
-our $RELEASE = '1.0.7';; # keep in synch with jquery.jstree.js
+our $VERSION = '$Rev$';    # version of *this file*.
+our $RELEASE = '1.0.7';
+;                          # keep in synch with jquery.jstree.js
 our $SHORTDESCRIPTION = 'The popular jsTree jQuery plugin, packaged for reuse';
 
 =begin TML
@@ -18,13 +19,16 @@ Foswiki::Contrib::JSTreeContrib::init();
 =cut
 
 sub init {
-    unless (Foswiki::Plugins::JQueryPlugin::registerPlugin(
-		'JSTree',
-		'Foswiki::Contrib::JSTreeContrib::JSTREE')) {
-	die 'Failed to register JSTree plugin';
+    unless (
+        Foswiki::Plugins::JQueryPlugin::registerPlugin(
+            'JSTree', 'Foswiki::Contrib::JSTreeContrib::JSTREE'
+        )
+      )
+    {
+        die 'Failed to register JSTree plugin';
     }
-    unless ( Foswiki::Plugins::JQueryPlugin::createPlugin( "JSTree" )) {
-	die 'Failed to create JSTree plugin';
+    unless ( Foswiki::Plugins::JQueryPlugin::createPlugin("JSTree") ) {
+        die 'Failed to create JSTree plugin';
     }
     return 1;
 }

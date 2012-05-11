@@ -1,4 +1,4 @@
-%META:TOPICINFO{author="ProjectContributor" comment="save topic" date="1308911143" format="1.1" reprev="16" version="17"}%
+%META:TOPICINFO{author="micha" comment="reprev" date="1335191051" format="1.1" reprev="19" version="19"}%
 %META:TOPICPARENT{name="TopicFunction"}%
 %TOC{depth="2"}%
 
@@ -13,7 +13,7 @@ None
 
 ---++ Implementation
 <verbatim class="tml">
-%STARTINCLUDE%<!-- render wiki application webhome -->
+%STARTINCLUDE%<!-- -->
 <div class="wwbBox wwbModel">
 ---++ Data Model
 <img src='%PUBURLPATH%/%SYSTEMWEB%/WikiWorkbenchContrib/model.png' align='left' />
@@ -37,6 +37,8 @@ None
 </div>
 %CLEAR%
 
+See the CompleteDocumentation.
+
 %GRID{
   query="%IF{"'%URLPARAM{"q"}%'!=''" then="TopicType=~'%URLPARAM{"q"}%'" else="topic='.*'"}%"
   web="%BASEWEB%"
@@ -52,7 +54,7 @@ None
   reverse="on"
 }%
 %ADDTOZONE{"head" section="css"}%<!-- -->
-<!-- //render wiki application webhome -->%STOPINCLUDE%
+<!-- -->%STOPINCLUDE%
 </verbatim>
 
 ---++ CSS
@@ -93,7 +95,7 @@ None
 %DBCALL{"Applications.RenderFunctionCallers"}%
 
 ---++ Copyright
-&copy; 2008-2010 Michael Daum http://michaeldaumconsulting.com
+&copy; 2008-2012 Michael Daum http://michaeldaumconsulting.com
 
 %DBCALL{"Applications.GnuGeneralPublicLicense" section="notice"}%
 

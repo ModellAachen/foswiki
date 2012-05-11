@@ -32,6 +32,8 @@ This logger implementation maps groups of levels to a single logfile, viz.
 use Foswiki::Time         ();
 use Foswiki::ListIterator ();
 
+use constant TRACE => 0;
+
 # Map from a log level to the root of a log file name
 our %LEVEL2LOG = (
     debug     => 'debug',
@@ -43,13 +45,11 @@ our %LEVEL2LOG = (
     emergency => 'error'
 );
 
-our %nextCheckDue =
-    (
-        debug  => 0,
-        events => 0,
-        error  => 0,
-    );
-
+our %nextCheckDue = (
+    debug  => 0,
+    events => 0,
+    error  => 0,
+);
 
 # Symbols used so we can override during unit testing
 our $dontRotate = 0;
@@ -139,6 +139,7 @@ sub log {
         while ( $this->SUPER::hasNext() ) {
             my @line = split( /\s*\|\s*/, $this->SUPER::next() );
             shift @line;    # skip the leading empty cell
+            next unless scalar(@line) && defined $line[0];
             if (
                 $line[0] =~ s/\s+$this->{_level}\s*$//    # test the level
                   # accept a plain 'old' format date with no level only if reading info (statistics)
@@ -147,6 +148,9 @@ sub log {
               )
             {
                 $line[0] = Foswiki::Time::parseTime( $line[0] );
+                next
+                  unless ( defined $line[0] )
+                  ;    # Skip record if time doesn't decode.
                 if ( $line[0] >= $this->{_threshold} ) {    # test the time
                     $this->{_nextEvent} = \@line;
                     return 1;
@@ -224,7 +228,7 @@ sub eachEventSince {
 
             # Would be nice to report this, but it's chicken and egg and
             # besides, empty logfiles can happen.
-            #print STDERR "Failed to open $logfile: $!";
+            print STDERR "Failed to open $logfile: $!" if (TRACE);
         }
     }
     return new Foswiki::ListIterator( \@iterators ) if scalar(@iterators) == 0;
@@ -256,7 +260,7 @@ sub _time2month {
 # See if the log needs to be rotated. If the log was last modified
 # last month, we need to rotate it.
 sub _rotate {
-    my ($level, $log, $now ) = @_;
+    my ( $level, $log, $now ) = @_;
 
     return if $dontRotate;
     return unless $level;
@@ -278,6 +282,8 @@ sub _rotate {
         $m = sprintf( '%0.2d', $m );
     }
     $nextCheckDue{$level} = Foswiki::Time::parseTime("$y-$m-01");
+    print STDERR "Next log check due $nextCheckDue{$level} for $level\n"
+      if (TRACE);
 
     # If there's no existing log, there's nothing to rotate
     return unless -e $log;
@@ -286,6 +292,7 @@ sub _rotate {
     # month, if may need to be rotated.
     my @stat     = _stat($log);
     my $modMonth = _time2month( $stat[9] );
+    print STDERR "compare $modMonth,  $curMonth\n" if (TRACE);
     return if ( $modMonth == $curMonth );
 
     # The log was last modified in a month that was not the current month.
@@ -293,43 +300,70 @@ sub _rotate {
 
     # Open the current log
     my $lf;
-    return unless open( $lf, '<', $log );
+    unless ( open( $lf, '<', $log ) ) {
+        print STDERR
+          "ERROR: PlainFile Logger could not open logfile $log for read: $! \n";
+        return;
+    }
 
-    # Analyse the log and partition the lines into month groups
     my %months;
 
     local $/ = "\n";
     my $line;
+    my $linecount;
+    my $stashline = '';
     while ( $line = <$lf> ) {
+        $stashline .= $line;
         my @event = split( /\s*\|\s*/, $line );
-        last unless $event[1];
+        $linecount++;
+        if ( scalar(@event) > 7 ) {
+            print STDERR "Bad log " . join( ' | ', @event ) . " | - Skipped \n "
+              if (TRACE);
+            $stashline = '';
+            next;
+        }
+
+        unless ( $event[1] ) {
+            print STDERR
+              "BAD LOGFILE LINE - skip $line - line $linecount in $log\n"
+              if (TRACE);
+            next;
+        }
         my $eventTime = Foswiki::Time::parseTime( $event[1] );
 
         if ( !$eventTime ) {
 
-            #print STDERR ">> Bad time in log: $line\n";
-            close($lf);
-            return;
+            print STDERR
+              ">> Bad time in log - skip: $line - line $linecount in $log\n"
+              if (TRACE);
+            next;
         }
 
         my $eventMonth = _time2month($eventTime);
 
         if ( $eventMonth < $curMonth ) {
-            push( @{ $months{$eventMonth} }, $line );
+            push( @{ $months{$eventMonth} }, $stashline );
+            $stashline = '';
         }
         else {
 
             # Reached the start of log entries for this month
+            print STDERR ">> Reached start of this month - count $linecount \n"
+              if (TRACE);
             last;
         }
     }
+    print STDERR " Months "
+      . join( ' ', keys %months )
+      . " - processed $linecount records \n"
+      if (TRACE);
 
     if ( !scalar( keys %months ) ) {
 
         # no old months, we're done. The modify time on the current
         # log will be touched by the next write, so we won't attempt
-        # to rotate again until next month (or $forceRotate is set).
-        #print STDERR ">> No old months\n";
+        # to rotate again until next month.
+        print STDERR ">> No old months\n" if (TRACE);
         close($lf);
         return;
     }
@@ -344,9 +378,14 @@ sub _rotate {
         my $bf;
         my $backup = $log;
         $backup =~ s/log$/$month/;
-        if ( -e $backup || !open( $bf, '>', $backup ) ) {
-
-            #print STDERR ">> Could not create $backup\n";
+        if ( -e $backup ) {
+            print STDERR
+"ERROR: PlainFile Logger could not create $backup - file exists\n";
+            return;
+        }
+        unless ( open( $bf, '>', $backup ) ) {
+            print STDERR
+              "ERROR: PlainFile Logger could not create $backup - $! \n";
             return;
         }
         print $bf join( '', @{ $months{$month} } );
@@ -354,7 +393,11 @@ sub _rotate {
     }
 
     # Finally rewrite the shortened current log
-    return unless open( $lf, '>', $log );
+    unless ( open( $lf, '>', $log ) ) {
+        print STDERR
+"ERROR: PlainFile Logger could not open logfile $log for write: $! \n";
+        return;
+    }
     print $lf $curLog;
     close($lf);
 }

@@ -1,0 +1,4 @@
+!noci
+data/System/AcronymDefinitionsPlugin.txt 0644 Documentation page
+lib/Foswiki/Plugins/AcronymDefinitionsPlugin.pm 0444 Perl module
+lib/Foswiki/Plugins/AcronymDefinitionsPlugin/Config.spec 0444 Configuration

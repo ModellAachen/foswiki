@@ -1,0 +1,201 @@
+%META:TOPICINFO{author="ProjectContributor" comment="reprev" date="1335363042" format="1.1" reprev="2" version="2"}%
+---+!! %TOPIC%
+%SHORTDESCRIPTION%
+
+%TOC%
+
+This plugin allows to store data sets to Foswiki topics. Foswiki itself 
+is a structured wiki already using %SYSTEMWEB%.DataForms which are attached a topic.
+This in essence makes each topic a database _record_. !MetaDataPlugin goes one step
+further by making each Foswiki topic a full _database_. That way each topic can serve as a container
+for _multiple_ data records, even of different kind.
+
+Technically, !MetaDataPlugin combines technologies in a new way that are already part of Foswiki:
+
+   1 !MetaData types are defined using %SYSTEMWEB%.DataForms (like normal forms).
+   1 !MetaData types are registered to the Foswiki store using =Foswiki::Meta::registerMETA()=
+   1 Records are stored as =%<nop>META:MYDATA{...}%= hashes.
+   1 Records are rendered using the =renderForEdit()= and =renderForDisplay()= API of =Foswiki::Form=
+     leveraged to wiki application programming similar to Foswiki:Extensions/FlexFormPlugin
+
+In short: !MetaDataPlugin marries !DataForms with custom =%META= data.
+
+!MetaDataPlugin comes with an example UI to list records and make them editable. See the Sandbox.TimeTracker
+application for example.
+
+Below screenshot 3 shows an integration with Foswiki:Extensions/HolidayListPlugin and Foswiki:Extensions/ICalPlugin
+to render a ical driven resource view where all events are stored in =%<nop>META:EVENT{}%= records.
+
+%X% Note: this plugin requires a Foswiki engine >= 1.1.0.
+
+---++ Screenshots
+<a href='%ATTACHURLPATH%/MetaDataPluginSnap1.png' class='foswikiImage' title='screenshot 1'><img src='%ATTACHURLPATH%/MetaDataPluginSnap1.png' width='300' /></a>
+
+<a href='%ATTACHURLPATH%/MetaDataPluginSnap2.png' class='foswikiImage' title='screenshot 2'><img src='%ATTACHURLPATH%/MetaDataPluginSnap2.png' width='300' /></a>
+
+<a href='%ATTACHURLPATH%/MetaDataPluginSnap3.png' class='foswikiImage' title='screenshot 3'><img src='%ATTACHURLPATH%/MetaDataPluginSnap3.png' width='300' /></a>
+
+---++ Syntax
+
+---+++ =%<nop>RENDERMETADATA{...}%=
+
+This macro allows to access !MetaData records attached to a topic. It can operate in two modes - =view= and =edit= - to either
+display records or render an editor for one specific record. By default RENDERMETADATA will list all records found as a table.
+Rows of the table can be clicked to edit the related editor. A modal dialog opens with an appropriate edit interface based on
+the [[%SYSTEMWEB%.DataForms][DataForm]] definition, similar to the interface when editing a !DataForm as part of a normal
+topic edit screen.
+
+| *Parameter* | *Description* | *Default* |
+| "..." | key of the !MetaData to be rendered; this name is derived from the topic name holding the !DataForm definition (see below) | |
+| action | indicates the action to perform on the records, can be =edit= or =view= | view |
+| field(s) | list of formfields to render the interface for | all known formfields of a !DataForm |
+| name | select the id of a !MetaData record to be extracted | all records attached to the given topic |
+| topic | the topic to extract the !MetaData from | the current topic |
+| web | the web part of the topic to be processed; note: a web part in the =topic= parameter will override any value specified via the =web= parameter | the current web |
+| format | format string to render each formfield with, more info below |  |
+| header | header string to be put in front of the output | |
+| footer | footer string to apped to the output | |
+| separator | string to be put between each formatted output per formfield | |
+| valueseparator | | |
+| include | regular expression fieldnames must match to be included in the output | |
+| exclude | regular expression fieldnames must match to be excluded from the output | |
+| includeattr | regular expression field attributes must match to be included in the output | |
+| excludeattr | regular expression field attributes must match to be excluded from the output | |
+| sort | name of attribute used for sorting | name |
+| reverse | boolean flag to reverse the sorting order | off |
+| mandatory | string to be inserted when a field is mandatory | <span class='foswikiAlert'>**</span> |
+| hiddenformat | format string to be used to render hidden formfields | |
+| hideempty | boolean flag to hide/show empty formfields | off |
+| autolink | boolean flag to enable/prevent !WikiWord linking | on |
+| fieldformat | format string for a single formfield value in a row | |
+| &lt;field_name>_attributes, %BR% \
+  &lt;field_name>_autolink, %BR% \
+  &lt;field_name>_default, %BR% \
+  &lt;field_name>_description, %BR% \
+  &lt;field_name>_format, %BR% \
+  &lt;field_name>_hidden, %BR% \
+  &lt;field_name>_size, %BR% \
+  &lt;field_name>_title, %BR% \
+  &lt;field_name>_tooltip, %BR% \
+  &lt;field_name>_type, %BR% \
+  &lt;field_name>_value, %BR% \
+  &lt;field_name>_values  | these parameters allow to override properties of a record as specified in the !DataForm definition temporarily, or specify field-specific rendering parameters while iterating over all !MetaData | |
+
+If all three =format=, =header= and =footer= are undefined a =foswikiFormSteps= block will be rendered as illustrated in the example below.
+
+The =format= parameter may contain the following pseudo-variables:
+   * =$actions=: edit actions per row; these are normally appended to each row to display the pencil and trashcan icons while hovering over the row
+   * =$attrs=: attribute string as given in the !DataForm definition
+   * =$count=: total number of records rendered
+   * =$default=: this is the default value if no value is specified in the topic itself
+   * =$description=: formfield description in !DataForm 
+   * =$edit=: the HTML form element as specified by the !DataForm definition, that is a input field, a textarea, a select box, whatever
+   * =$extra=: the "extra" return value of the =Foswiki::Form::renderForEdit()= call
+   * =$form=: topic of the !DataForm definition for the !MetaData being rendered
+   * =$index=: running index while iterating over all !MetaData records
+   * =$mandatory=: placeholder to display the =mandatory= flag when a formfield is mandatory; the format of the mandatroy flag can be defined in the =mandatory= parameter
+   * =$metadata=: key of the !MetaData used interally
+   * =$name=: the original fieldname
+   * =$origvalues=: list of all allowed values; for =+value= formfields this is the original _unmapped_ value of the formfield
+   * =$size=: size parameter of the formfield as given in the !DataForm definition
+   * =$title=: the fieldtitle derived from the fieldname and remapped as specified in the =map= parameter
+   * =$type=: type of formfield as given in the !DataForm definition
+   * =$values=: list of all allowed values for the formfield as defined in the !DataForm definition
+   * =$&lt;field_name>=: value of the given field
+   * =$orig&lt;field_name>=: original value of the formfield as stored; for =+value= formfields this is the original _unmapped_ value of the formfield
+   * =$value=: (in &lt;field_name>_format) current value of the formfield; for =+value= formfields this is the _mapped_ value use =$origvalue= to get the original one
+   * =$origvalue=: (in &lt;field_name>_format) original value of the formfield as stored
+
+---+++ =%<nop>NEWMETADATA{...}%=
+
+This macro is used to render a button to start the "Add record" dialog. It takes a known !MetaData key and a display title and will
+render a modal edit dialog according to the associated !DataForm definition.
+
+| *Parameter* | *Description* | *Default* |
+| "..." | !MetaData key | |
+| topic | the location where to store the newly created records |
+| format | format string to render the button | defined in the =metadataplugin.tmpl= template |
+| template | name of the TMPL:DEF to render the button | metadata::new |
+| title | display title for the button | |
+
+---++ Registering !MetaData 
+
+Foswiki's store has got the ability to register additional !MetaData definitions. The store will then take care that data passed to
+it is valid and well defined according to the !MetaData definitions available. While the Foswiki core already knows about its native
+!MetaData, like =%<nop>META:PREFERENCE=, =%<nop>META:ATTACHMENT=, =%<nop>META:FIELD= and =%<nop>META:FORM=, all additional _custom_
+definitions have to be registered early in the process. This is done using the =WEBMETADATA= preference setting, similar in use
+to the =WEBFORMS= preference settings to register plain old !DataForms to be attached to topics. 
+
+Only !MetaData registered using =WEBMETADATA= may be processed any further.
+
+Example:
+<pre>
+   * Set <!-- -->WEBMETADATA = Applications.ProjectApp.InvoiceForm, 
+                       Applications.ProjectApp.EffortForm, 
+                       Applications.MovieApp.Role, 
+                       Applications.CalendarApp.EventTopic
+</pre>
+
+=WEBMETADATA= is a list of topics holding the !DataForm definition to be registered as !MetaData to the store. While doing so each !DataForm
+definition is associated with a _key_ to be used storing a record in a topic. This key is then used to store data in the form =%<nop>META:&lt;key>{...}%=.
+
+In the above example !MetaDataPlugin will register !MetaData to store:
+
+   * =%<nop>META:INVOICE=,
+   * =%<nop>META:EFFORT=,
+   * =%<nop>META:ROLE= and
+   * =%<nop>META:EVENT= records. 
+
+A !MetaData _key_ is derived from the !DataForm definition by stripping off any "Topic" and "Form" suffix and translating the remaining name to uppercase.
+The resulting key is also available using an all-lowercase alias, that is =invoice=, =effort=, =role= and =event= in the above example.
+
+---++ Examples
+
+To illustrate the use of !MetaData, an example wiki application is shipped with !MetaDataPlugin. The !TimeTracker application may be used to track
+working efforts and compute resulting earnings based on standard rates and taxes. The application allows to create new !TimeTracker topics which
+have a database of efforts recorded on that tracker.
+
+   * Sandbox.TimeTracker: this is the starting point of the application; and defines the !DataForm for each !TimeTracker topic 
+   * Sandbox.EffortForm: this is a !DataForm definition for effort !MetaData
+   * Sandbox.TimeTrackerTemplate: this is a minimal template topic that basically makes sure the WEBMETADATA is set properly
+     (note: that this is _not_ recommended way to go in production environments; set the WEBMETADATA preference either in the !WebPreferences or !SitePreferences instead)
+   * Sandbox.TimeTrackerEditTemplate: this is the edit template to edit !TimeTracker topics
+   * Sandbox.TimeTrackerViewTemplate: this is the view template to view a !TimeTracker topic and all tracked efforts for it.
+
+%X% Note: to run this application, you'll need:
+
+   * Foswiki:Extensions/JQGridPlugin
+   * Foswiki:Extensions/FlexFormPlugin
+   * Foswiki:Extensions/JsonRpcContrib
+
+---++ Installation Instructions
+
+%$INSTALL_INSTRUCTIONS%
+
+---++ Info
+<!--
+   * Set SHORTDESCRIPTION = %$SHORTDESCRIPTION%
+-->
+
+|  Author(s): | Michael Daum|
+|  Copyright: | &copy; 2011-2012 Michael Daum http://michaeldaumconsulting.com |
+|  License: | [[http://www.gnu.org/licenses/gpl.html][GPL (Gnu General Public License)]] |
+|  Release: | %$RELEASE% |
+|  Version: | %$VERSION% |
+|  Change History: | <!-- versions below in reverse order -->&nbsp; |
+|  10 May 2012: | fixed error when meta data definition is read-protected; \
+                  implemented a way to store meta data in a distant / hidden topic;
+                  added =$origvalue= for field-specific format strings |
+|  08 May 2012: | added =sort= and =reverse= parameters to RENDERMETADATA |
+|  27 Apr 2012: | fixed access to the original value of +values formfields |
+|  26 Apr 2012: | fixing table editor for firefox; \
+                  added dependency on Foswiki:Extensions/JsonRpcContrib; \
+                  fixed row click in table editor |
+|  25 Apr 2012: | initial release | 
+|  Dependencies: | %$DEPENDENCIES% |
+|  Home page: | Foswiki:Extensions/%TOPIC% |
+|  Support: | Foswiki:Support/%TOPIC% |
+
+%META:FILEATTACHMENT{name="MetaDataPluginSnap1.png" attachment="MetaDataPluginSnap1.png" attr="" comment="" date="1335356137" size="27517" user="ProjectContributor" version="1"}%
+%META:FILEATTACHMENT{name="MetaDataPluginSnap2.png" attachment="MetaDataPluginSnap2.png" attr="" comment="" date="1335354029" size="18653" user="ProjectContributor" version="1"}%
+%META:FILEATTACHMENT{name="MetaDataPluginSnap3.png" attachment="MetaDataPluginSnap3.png" attr="" comment="" date="1335354684" size="33426" user="ProjectContributor" version="1"}%

@@ -26,11 +26,11 @@
 # http://www.gnu.org/copyleft/gpl.html
 #
 
-use lib ( '.' );
-use lib ( '../lib' );
+use lib ('.');
+use lib ('../lib');
 
 # these variables will be set by TWiki.cfg:
-$revCiDateCmd = "";
+$revCiDateCmd    = "";
 $defaultUserName = "";
 
 # read the configuration part
@@ -47,7 +47,7 @@ $revCiDateCmd = $settingsHash{ciDateCmd};
 $inDir  = "";
 $outDir = "";
 
-if( @ARGV ) {
+if (@ARGV) {
     $inDir  = $ARGV[0] if $ARGV[0];
     $outDir = $ARGV[1] if $ARGV[1];
     $inDir  = "" unless -d $inDir;
@@ -56,18 +56,21 @@ if( @ARGV ) {
 
 &main();
 
-sub main
-{
-    print "Kwiki to TWiki text converter. Copyright (C) 2003, Fred Morris, m3047 at inwa d0t net\n";
-    print "                               Copyright (C) 2001, Peter Thoeny, http://TWiki.org/\n";
-    if( ! $inDir || ! $outDir ) {
+sub main {
+    print
+"Kwiki to TWiki text converter. Copyright (C) 2003, Fred Morris, m3047 at inwa d0t net\n";
+    print
+"                               Copyright (C) 2001, Peter Thoeny, http://TWiki.org/\n";
+    if ( !$inDir || !$outDir ) {
         print "example% kwiki2twiki fromDir toDir\n";
         print "fromDir:   Directory containing Kwiki text files\n";
-        print "toDir:     Directory where converted .txt and .txt,v files are stored\n";
-        print "Attention: toDir is assumed to be empty. Existing files will be overwritten!\n";
+        print
+"toDir:     Directory where converted .txt and .txt,v files are stored\n";
+        print
+"Attention: toDir is assumed to be empty. Existing files will be overwritten!\n";
         return;
     }
-    if( $inDir eq $outDir ) {
+    if ( $inDir eq $outDir ) {
         print "Error: toDir and fromDir must be different!\n";
         return;
     }
@@ -77,13 +80,13 @@ sub main
     closedir DIR;
     my $text = "";
     my $time = 0;
-    foreach( @inList ) {
+    foreach (@inList) {
         print "- $_: read";
-        $text = readFile( "$inDir/$_" );
+        $text = readFile("$inDir/$_");
         print ", convert";
-        ( $text, $time ) = convertText( $text );
-	
-	$outf = "$outDir/$_" . '.txt';
+        ( $text, $time ) = convertText($text);
+
+        $outf = "$outDir/$_" . '.txt';
 
         print ", save";
         saveFile( $outf, $text );
@@ -94,88 +97,101 @@ sub main
 }
 
 # =========================
-sub convertText
-{
-    my( $theText ) = @_;
-    my $text = '%META:TOPICINFO{author="' . $defaultUserName
-	     . '" date="' . time . '" format="1.0" version="1.1"}%' . "\n";
-    my $time = 0;
+sub convertText {
+    my ($theText) = @_;
+    my $text =
+        '%META:TOPICINFO{author="'
+      . $defaultUserName
+      . '" date="'
+      . time
+      . '" format="1.0" version="1.1"}%' . "\n";
+    my $time     = 0;
     my $verbatim = 0;
     $theText =~ s/\r//gos;
-    foreach( split( /\n/, $theText ) ) {
+    foreach ( split( /\n/, $theText ) ) {
 
         # in a verbatim block
-    	if    ($verbatim) {
+        if ($verbatim) {
 
-	    if ( m/^ /o ) {
+            if (m/^ /o) {
 
-	        $text .= "$_\n";
-		next;
-	    }
-	    else {
+                $text .= "$_\n";
+                next;
+            }
+            else {
 
-	    	$text .= "</verbatim>\n";
-		$verbatim = 0;
-	    }
-	}
+                $text .= "</verbatim>\n";
+                $verbatim = 0;
+            }
+        }
 
-	# start a verbatim block
-	if    ( m/^ /o ) {
+        # start a verbatim block
+        if (m/^ /o) {
 
-	    $text .= "<verbatim>\n$_\n";
-	    $verbatim = 1;
+            $text .= "<verbatim>\n$_\n";
+            $verbatim = 1;
 
-	    next;
-	}
+            next;
+        }
 
-	# = Head 		--> ---+ Head
-	if    ( m/^(=+)\s+(.*)/o ) {
+        # = Head 		--> ---+ Head
+        if (m/^(=+)\s+(.*)/o) {
 
-	    my $indent = $1;
-	    my $header = $2;
+            my $indent = $1;
+            my $header = $2;
 
-	    $indent =~ s/=/+/go;
-	    $header =~ s/=+$//o;
-	    $_ = "---$indent $header";
-	}
-	# [=code]		--> =code=
-	s/\[=(.*?)]/=$1=/go;
-	# [Name URL]		--> [[URL][Name]]
-	s/\[\s*(.*)\s+(http.*)\s*]/[[$2][$1]]/go;
-	# /*bolditalic*/ 	--> __bolditalic__
-	s/(^|\s)\/\*(\S.*?\S)\*\/(\W|$)/$1__$2__$3/go;
-	# /italic/ 		--> _italic_
-	s/(^|\s)\/(\S.*?\S)\/(\W|$)/$1_$2_$3/go;
-	# &			--> &amp;
-	s/&/&amp;/go;
-	# <			--> &lt;
-	s/</&lt;/gi;
-	# >			--> &gt;
-	s/>/&gt;/gi;
-	# !WikiWord		--> <nop>WikiWord
-	s/!([A-Z]\S+)/<nop>$1/go;
-	# * list		-->   * list
-	if    ( m/^([*]+)\s*(.*)/go ) {
+            $indent =~ s/=/+/go;
+            $header =~ s/=+$//o;
+            $_ = "---$indent $header";
+        }
 
-	    my $indent = $1;
-	    my $item = $2;
+        # [=code]		--> =code=
+        s/\[=(.*?)]/=$1=/go;
 
-	    $indent =~ s/./\t/go;
+        # [Name URL]		--> [[URL][Name]]
+        s/\[\s*(.*)\s+(http.*)\s*]/[[$2][$1]]/go;
 
-	    $_ = $indent . '* ' . $item;
-	}
-	# 0 list		-->   1 list
-	if    ( m/^([0-9]+)\s*(.*)/go ) {
+        # /*bolditalic*/ 	--> __bolditalic__
+        s/(^|\s)\/\*(\S.*?\S)\*\/(\W|$)/$1__$2__$3/go;
 
-	    my $indent = $1;
-	    my $item = $2;
+        # /italic/ 		--> _italic_
+        s/(^|\s)\/(\S.*?\S)\/(\W|$)/$1_$2_$3/go;
 
-	    $indent =~ s/./\t/go;
+        # &			--> &amp;
+        s/&/&amp;/go;
 
-	    $_ = $indent . '1 ' . $item;
-	}
+        # <			--> &lt;
+        s/</&lt;/gi;
 
-	$text .= "$_\n";
+        # >			--> &gt;
+        s/>/&gt;/gi;
+
+        # !WikiWord		--> <nop>WikiWord
+        s/!([A-Z]\S+)/<nop>$1/go;
+
+        # * list		-->   * list
+        if (m/^([*]+)\s*(.*)/go) {
+
+            my $indent = $1;
+            my $item   = $2;
+
+            $indent =~ s/./\t/go;
+
+            $_ = $indent . '* ' . $item;
+        }
+
+        # 0 list		-->   1 list
+        if (m/^([0-9]+)\s*(.*)/go) {
+
+            my $indent = $1;
+            my $item   = $2;
+
+            $indent =~ s/./\t/go;
+
+            $_ = $indent . '1 ' . $item;
+        }
+
+        $text .= "$_\n";
     }
 
     $text =~ s/\n\n+/\n\n/gos;
@@ -183,44 +199,48 @@ sub convertText
 }
 
 # =========================
-sub readFile
-{
-    my( $theName ) = @_;
+sub readFile {
+    my ($theName) = @_;
     my $data = "";
-    undef $/; # set to read to EOF
+    undef $/;    # set to read to EOF
     open( IN_FILE, "<$theName" ) || return "";
     $data = <IN_FILE>;
-    $/ = "\n";
-    close( IN_FILE );
+    $/    = "\n";
+    close(IN_FILE);
     return $data;
 }
 
 # =========================
-sub saveFile
-{
-    my( $theName, $theText ) = @_;
+sub saveFile {
+    my ( $theName, $theText ) = @_;
     open( FILE, ">$theName" ) or warn "Can't create file $theName";
     print FILE $theText;
-    close( FILE);
+    close(FILE);
 }
 
 # =========================
-sub ciFile
-{
-    my( $theName, $theTime ) = @_;
-    my @arr = gmtime( $theTime );
+sub ciFile {
+    my ( $theName, $theTime ) = @_;
+    my @arr = gmtime($theTime);
+
     # format to RCS date "2000/12/31/23:59:59"
-    my $date = sprintf( "%.4u/%.2u/%.2u/%.2u:%.2u:%.2u", $arr[5] + 1900,
-                         $arr[4] + 1, $arr[3], $arr[2], $arr[1], $arr[0] );
+    my $date = sprintf(
+        "%.4u/%.2u/%.2u/%.2u:%.2u:%.2u",
+        $arr[5] + 1900,
+        $arr[4] + 1,
+        $arr[3], $arr[2], $arr[1], $arr[0]
+    );
     my $cmd = $revCiDateCmd;
     $cmd =~ s/%USERNAME%/$defaultUserName/;
     $cmd =~ s/%FILENAME%/$theName/;
     $cmd =~ s/%DATE%/$date/;
-#   print "\n   $cmd\n";
-#   my $rcsError = `$cmd`;
+
+    #   print "\n   $cmd\n";
+    #   my $rcsError = `$cmd`;
     my $rcsError = `$cmd 2>&1 1>/dev/null`;
-    if( $rcsError ) {
+    if ($rcsError) {
         print " $rcsError";
-#        print " $rcsError\n";
+
+        #        print " $rcsError\n";
     }
 }

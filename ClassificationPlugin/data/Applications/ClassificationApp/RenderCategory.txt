@@ -1,4 +1,4 @@
-%META:TOPICINFO{author="ProjectContributor" comment="reprev" date="1306772530" format="1.1" reprev="10" version="10"}%
+%META:TOPICINFO{author="ProjectContributor" comment="reprev" date="1329896281" format="1.1" reprev="10" version="12"}%
 %META:TOPICPARENT{name="TopicFunction"}%
 %TOC{depth="2"}%
 
@@ -17,8 +17,7 @@ See the CategoryTemplate.
 
 ---++ Implementation
 <verbatim class="tml">
-%STARTINCLUDE%<!-- -->
-<noautolink><div class='clsMakeIndexWrapper'>
+%STARTINCLUDE%<noautolink><div class='clsMakeIndexWrapper'>
 %MAKEINDEX{
   "%HIERARCHY{
      web="%BASEWEB%"
@@ -59,14 +58,14 @@ See the CategoryTemplate.
   sort="nocase"
   %IF{"'%SHOWHEADER%'='on'" then="header=\"$anchors\""}%
     format="$percntDBCALL{\"$3.$2->RenderIndexItem\"}$percnt"
-  }%
+  }%<!-- -->
 </div></noautolink>
 <!--  -->%STOPINCLUDE%
 </verbatim>
 
 ---++ Toolbar 
 <verbatim class="tml">
-%STARTSECTION{"toolbar"}%<!-- toolbar -->
+%STARTSECTION{"toolbar"}%<!-- -->
 <div class="toolbar">
 %~~ BUTTON{"New Topic" href="%SCRIPTURLPATH{view}%/%BASEWEB%/ClassifiedTopic?cat=%URLPARAM{"catname" default="%BASETOPIC%"}%
 *~~
@@ -85,7 +84,7 @@ See the CategoryTemplate.
 }%
 </div>
 <br clear='both' />
-<!-- //toolbar -->%ENDSECTION{"toolbar"}%
+<!--  -->%ENDSECTION{"toolbar"}%
 </verbatim>
 
 ---++ Test

@@ -71,6 +71,20 @@ You can gain even more control of what goes into your repository by restricting
 the write access to Topic1 and Topic2 using
 [[System.AccessControl][Foswiki's access control capabilities]].
 
+---++ Changing the repository directory
+
+By default, this plugin will put the repository files in a directory called
+=debian= under the web public directory. If for some reason you need a
+different name, set the variable DEBIAN_REPOSITORY_NAME in the WebPreferences
+topic. For example, to make the repository in =debian/squeeze= directory, use:
+
+<verbatim>
+   * Set DEBIAN_REPOSITORY_NAME = debian/squeeze
+</verbatim>
+
+Remember to also replace "debian" with "debian/squeeze" if you copied the
+installation instructions template above.
+
 ---++ Installation Instructions
 
 %$INSTALL_INSTRUCTIONS%
@@ -109,10 +123,11 @@ Many thanks to [[http://colivre.coop.br][Colivre]] for supporting this work.
 
 |  Author(s): | [[Foswiki:Main/AntonioTerceiro][Antonio Terceiro]] |
 |  Copyright: | &copy; 2011 Antonio Terceiro (http://colivre.coop.br/) |
-|  License: | [[http://www.gnu.org/licenses/gpl.html][GPL (Gnu General Public License)]] version 2+ |
+|  License: | [[http://www.gnu.org/licenses/gpl.html][GPL (GNU General Public License)]] version 2+ |
 |  Release: | %$RELEASE% |
 |  Version: | %$VERSION% |
 |  Change History: | <!-- versions below in reverse order -->&nbsp; |
+|| 0.2.0 - added support for DEBIAN_REPOSITORY_NAME option -- 07 Mar 2012, Foswiki:Main/AntonioTerceiro |
 |  Dependencies: | %$DEPENDENCIES% |
 |  Home page: | http://foswiki.org/bin/view/Extensions/DebianRepositoryPlugin |
 |  Support: | http://foswiki.org/bin/view/Support/DebianRepositoryPlugin |

@@ -18,6 +18,7 @@ package Foswiki::Plugins::SqlPlugin::Core;
 use strict;
 use Foswiki::Plugins::SqlPlugin::Connection ();
 use Error qw( :try );
+use Foswiki::Sandbox ();
 
 our $baseWeb;
 our $baseTopic;
@@ -80,11 +81,16 @@ sub handleSQL {
   my $result = '';
 
   my $wikiName = Foswiki::Func::getWikiName();
-  Foswiki::Func::writeWarning("User $wikiName has sent query '$theQuery'");
+  my $message = $theQuery;
+  $message =~ s/\n/ /g; # remove newlines
+  Foswiki::Func::writeEvent("sql", $message);
 
   try {
 
     $connection->connect();
+    $theQuery =~ m/(.*)/;
+    $theQuery = $1;
+    
     my $sth = $connection->{db}->prepare_cached($theQuery) or
       throw Error::Simple("Can't prepare cmd '$theQuery': ".$connection->{db}->errstr);
 
@@ -108,7 +114,7 @@ sub handleSQL {
 
   } catch Error::Simple with {
     my $msg = shift->{-text};
-    $msg =~ s/ at .*?$//gs;
+    #$msg =~ s/ at .*?$//gs;
     $result = inlineError($msg);
   };
 

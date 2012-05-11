@@ -38,11 +38,14 @@ Construct a new back end.
 sub new {
     my ( $class, $params, $path, $logger ) = @_;
     $path .= '/' unless $path =~ m#/$#;
-    my $this = bless( {
-        path   => $path,
-        params => $params,
-        logger => $logger
-    }, $class );
+    my $this = bless(
+        {
+            path   => $path,
+            params => $params,
+            logger => $logger
+        },
+        $class
+    );
     return $this;
 }
 
@@ -54,9 +57,7 @@ Get schema of query parameters, in the same format as Publisher.pm
 =cut
 
 sub param_schema {
-    return {
-	relativeurl => { default => '/' },
-    };
+    return { relativeurl => { default => '/' }, };
 }
 
 =begin TML

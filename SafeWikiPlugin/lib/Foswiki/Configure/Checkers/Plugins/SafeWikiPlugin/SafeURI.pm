@@ -21,7 +21,7 @@ sub getGoodURIs {
 
 sub expandVars {
     my $thestring = shift;
-    
+
     $thestring =~ s/(\$Foswiki::cfg({.*?})+)/eval($1)/ge;
 
     return $thestring;

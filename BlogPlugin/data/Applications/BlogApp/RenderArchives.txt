@@ -1,4 +1,4 @@
-%META:TOPICINFO{author="ProjectContributor" comment="reprev" date="1320867705" format="1.1" reprev="7" version="8"}%
+%META:TOPICINFO{author="micha" comment="reprev" date="1334847022" format="1.1" reprev="11" version="11"}%
 %META:TOPICPARENT{name="TopicFunction"}%
 %TOC{depth="2"}%
 
@@ -31,9 +31,10 @@
      </h2>
      <div class='jqSerialPager'><ul>"
    format="<li>
-     <a href='%SCRIPTURLPATH{"view"}%/%BASEWEB%/WebSearch?filter=$percntENCODE{createdate:[$percntCALC{\"$FORMATTIME($TIME(01 $key2 $key3), $year-$month-01T00:00:00Z)\"}$percnt/MONTH TO $percntCALC{\"$FORMATTIME($TIME(01 $key2 $key3), $year-$month-01T00:00:00Z)\"}$percnt/MONTH+1MONTH]}$percnt'>
-       <span class='foswikiRight'>$count</span>
-       $key
+     <a href='%SCRIPTURLPATH{"view"}%/%BASEWEB%/TopCategory?time=$percntCALC{\"$TIME(01 $key2 $key3)\"}$percnt$percntIF{\"not '%CAT%'=~'^([%]CAT%)?$'\" 
+            then=\"&catname=%CAT%\"
+          }$percnt'>
+       <span class='foswikiRight'>$count</span>$key
      </a></li>"
    footer="</ul></div></div>"
 }%<!-- -->%STOPINCLUDE%
@@ -41,12 +42,11 @@
 
 ---++ Test
 %DBCALL{"%TOPIC%"}%
-%JQREQUIRE{"serialpager"}%
 
 %DBCALL{"Applications.RenderFunctionCallers"}%
 
 ---++ Copyright
-&copy; 2005-2011 http://michaeldaumconsulting.com
+&copy; 2005-2012 http://michaeldaumconsulting.com
 
 %DBCALL{"Applications.GnuGeneralPublicLicense" section="notice"}%
 

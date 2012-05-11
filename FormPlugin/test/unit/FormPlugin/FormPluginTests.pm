@@ -2328,6 +2328,7 @@ sub _performTestHtmlOutput {
 
     # remove random id token
     $actual =~ s/caldate[0-9]+/caldate/go;
+    $actual =~ s/<!--A2Z:.*?-->//go;
 
     $this->assert_html_equals( $expected, $actual );
 }

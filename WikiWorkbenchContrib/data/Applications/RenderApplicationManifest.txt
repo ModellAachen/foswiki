@@ -1,7 +1,7 @@
-%META:TOPICINFO{author="ProjectContributor" date="1271157064" format="1.1" version="1.2"}%
+%META:TOPICINFO{author="micha" comment="save topic" date="1335190795" format="1.1" reprev="4" version="4"}%
 %META:TOPICPARENT{name="TopicFunction"}%
 ---++ Parameters
-   * NAME: name of WikiApplication, defaults to BASETOPIC
+   * NAME: name of WikiApplication, defaults to BASEWEB
    * THEWEB: web where the application is located, defaults to BASEWEB
 
 ---++ Css
@@ -14,7 +14,7 @@
 %STARTINCLUDE%<noautolink>
 <div class="twbManifestHolder">
 %DBQUERY{
-  "WikiApplication='%IF{"defined NAME" then="%NAME%" else="%BASETOPIC%"}%'"
+  "WikiApplication='%IF{"defined NAME" then="%NAME%" else="%EXTRACT{text="%BASEWEB%" pattern=".*/(.+?)$" format="$1"}%"}%'"
   web="%IF{"defined THEWEB" then="%THEWEB%" else="%BASEWEB%"}%"
   sort="name"
   header="| *#* | *Name* | *Type* |$n"
@@ -31,12 +31,12 @@
 %DBCALL{"RenderFunctionCallers"}%
 
 ---++ Copyright
-&copy; 2006-2010 Michael Daum http://michaeldaumconsulting.com
+&copy; 2006-2012 Michael Daum http://michaeldaumconsulting.com
 
 %DBCALL{"GnuGeneralPublicLicense" section="notice"}%
 
 %META:FORM{name="Applications.ApplicationTopic"}%
 %META:FIELD{name="TopicType" title="TopicType" value="TopicFunction"}%
-%META:FIELD{name="TopicTitle" attributes="" title="<nop>TopicTitle" value="RenderApplicationManifest"}%
-%META:FIELD{name="Summary" attributes="" title="Summary" value="Render a list of all files making up a given application"}%
+%META:FIELD{name="TopicTitle" attributes="" title="<nop>TopicTitle" value=""}%
+%META:FIELD{name="Summary" attributes="c" title="Summary" value="Render a list of all files making up a given application"}%
 %META:FIELD{name="WikiApplication" attributes="" title="WikiApplication" value="WikiWorkbench"}%

@@ -17,92 +17,104 @@ package Foswiki::Plugins::SetTopicValuesPlugin;
 
 use strict;
 
-require Foswiki::Func;    # The plugins API
-require Foswiki::Plugins; # For the API version
+require Foswiki::Func;       # The plugins API
+require Foswiki::Plugins;    # For the API version
 
 use Error qw( :try );
 
-
-our $VERSION = '$Rev: 1340 $';
-our $RELEASE = '$Date: 2008-12-15 04:49:56 +1100 (Mon, 15 Dec 2008) $';
+our $VERSION          = '$Rev: 1340 $';
+our $RELEASE          = '$Date: 2008-12-15 04:49:56 +1100 (Mon, 15 Dec 2008) $';
 our $SHORTDESCRIPTION = 'Set addressible sub-elements of topics';
 our $NO_PREFS_IN_TOPIC = 1;
 our $beforeSaveHandlerONCE;
 our $debug;
 
 sub initPlugin {
-    my( $topic, $web, $user, $installWeb ) = @_;
+    my ( $topic, $web, $user, $installWeb ) = @_;
 
     # check for Plugins.pm versions
-    if( $Foswiki::Plugins::VERSION < 2.0 ) {
+    if ( $Foswiki::Plugins::VERSION < 2.0 ) {
         Foswiki::Func::writeWarning( 'Version mismatch between ',
-                                     __PACKAGE__, ' and Plugins.pm' );
+            __PACKAGE__, ' and Plugins.pm' );
         return 0;
     }
     undef $beforeSaveHandlerONCE;
-    
+
     return 1;
 }
 
 sub afterSaveHandler {
+
     #prevent nested calls
-    return if (defined($beforeSaveHandlerONCE));
+    return if ( defined($beforeSaveHandlerONCE) );
     $beforeSaveHandlerONCE = 1;
-    
+
 #print STDERR "afterSaveHandler - (".$_[2].".".$_[1].") ";#.$_[3]->getEmbeddedStoreForm()."\n";
-    
+
     # do not uncomment, use $_[0], $_[1]... instead
     ### my ( $text, $topic, $web, $meta ) = @_;
-    Foswiki::Func::writeDebug( "- SetTopicValuesPlugin::afterSaveHandler( $_[2].$_[1] )" ) if $debug;
+    Foswiki::Func::writeDebug(
+        "- SetTopicValuesPlugin::afterSaveHandler( $_[2].$_[1] )")
+      if $debug;
     my $cgi = Foswiki::Func::getCgiQuery();
-    
+
 #TODO: we should be transactional by default - test that we can write to all topics, and take out leases
-    
-    #?set+SOMESETTGIN=value
-    #?set+Sandbox.TestTopic5:preferences[EditDocumentState]=SomeValue
-    #?set+Sandbox.TestTopic5:fields[EditDocumentState]=SomeValue
-    #http://quad/airdrilling/bin/save/Sandbox/TestTopic55?set+Sandbox.TestTopic5Edit:fields[EditDocumentState]=SomeValue
+
+#?set+SOMESETTGIN=value
+#?set+Sandbox.TestTopic5:preferences[EditDocumentState]=SomeValue
+#?set+Sandbox.TestTopic5:fields[EditDocumentState]=SomeValue
+#http://quad/airdrilling/bin/save/Sandbox/TestTopic55?set+Sandbox.TestTopic5Edit:fields[EditDocumentState]=SomeValue
     my @paramKeys = $cgi->param();
     foreach my $key (@paramKeys) {
-#print STDERR "====== $key\n";
-        if ($key =~ /^([Uu]n)?[Ss]et[\+ ](.*)$/ ) {
+
+        #print STDERR "====== $key\n";
+        if ( $key =~ /^([Uu]n)?[Ss]et[\+ ](.*)$/ ) {
             my $unset = lc($1);
-            my $addr = $2;
-            
-            #TODO: this code is going to be replaced with the nodeParser ideas from my RestPlugin
-            
-            my $webTopic = $_[2].'.'.$_[1];
-            if ($addr =~ /^(.*):(.*)$/ ) {
+            my $addr  = $2;
+
+#TODO: this code is going to be replaced with the nodeParser ideas from my RestPlugin
+
+            my $webTopic = $_[2] . '.' . $_[1];
+            if ( $addr =~ /^(.*):(.*)$/ ) {
                 $webTopic = $1;
-                $addr = $2;
+                $addr     = $2;
             }
             my $type = 'PREFERENCE';
-            if ($addr =~ /^(.*)\[(.*)\]$/ ) {
+            if ( $addr =~ /^(.*)\[(.*)\]$/ ) {
                 $type = uc($1);
                 $addr = $2;
             }
-            
+
             my $value = $cgi->param($key);
-            #TODO: this is to prevent Scripting attacks, but also preventsvalues being set to %TML%, which is unfortuanate.
+
+#TODO: this is to prevent Scripting attacks, but also preventsvalues being set to %TML%, which is unfortuanate.
             $value = Foswiki::entityEncode($value);
-            my ($sWeb, $sTopic) = Foswiki::Func::normalizeWebTopicName($_[2], $webTopic);
-print STDERR "Set ($sWeb.$sTopic)($type)[$addr] = ($value)\n" if $debug;
-            if (Foswiki::Func::topicExists($sWeb, $sTopic)) {
-                my( $sMeta, $sText ) = Foswiki::Func::readTopic($sWeb, $sTopic);
+            my ( $sWeb, $sTopic ) =
+              Foswiki::Func::normalizeWebTopicName( $_[2], $webTopic );
+            print STDERR "Set ($sWeb.$sTopic)($type)[$addr] = ($value)\n"
+              if $debug;
+            if ( Foswiki::Func::topicExists( $sWeb, $sTopic ) ) {
+                my ( $sMeta, $sText ) =
+                  Foswiki::Func::readTopic( $sWeb, $sTopic );
                 $type =~ s/S$//;
 
-                if ($unset eq 'un') {
-                    $sMeta->remove($type, $addr);
-                } else {
-                    $sMeta->putKeyed($type, { name=>$addr, value=>$value} );
+                if ( $unset eq 'un' ) {
+                    $sMeta->remove( $type, $addr );
+                }
+                else {
+                    $sMeta->putKeyed( $type,
+                        { name => $addr, value => $value } );
                 }
 
                 try {
-#TODO: don't save once per setting - should cache..
-                    Foswiki::Func::saveTopic($sWeb, $sTopic, $sMeta, $sText);
-#                } catch Foswiki::OopsException {
-#                } catch Foswiki::AccessControlException with  {
-                } catch  Error::Simple with {
+
+                    #TODO: don't save once per setting - should cache..
+                    Foswiki::Func::saveTopic( $sWeb, $sTopic, $sMeta, $sText );
+
+                #                } catch Foswiki::OopsException {
+                #                } catch Foswiki::AccessControlException with  {
+                }
+                catch Error::Simple with {
                     my $e = shift;
                     print STDERR "ERROR: $e\n";
                 }

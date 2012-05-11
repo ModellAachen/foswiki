@@ -1,6 +1,6 @@
 # Plugin for Foswiki - The Free and Open Source Wiki, http://foswiki.org/
 #
-# Copyright (C) 2009-2011 Michael Daum http://michaeldaumconsulting.com
+# Copyright (C) 2009-2012 Michael Daum http://michaeldaumconsulting.com
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -14,6 +14,8 @@
 package Foswiki::Plugins::SolrPlugin::Base;
 
 use strict;
+use warnings;
+
 use Foswiki::Func ();
 use Foswiki::Plugins ();
 use WebService::Solr ();
@@ -270,34 +272,6 @@ sub inlineError {
   my ($this, $text) = @_;
   return "<span class='foswikiAlert'>$text</span>";
 }
-
-##############################################################################
-sub fromUtf8 {
-  my ($this, $string) = @_;
-
-  return Encode::decode_utf8($string);
-}
-
-##############################################################################
-sub toUtf8 {
-  my ($this, $string) = @_;
-
-  my $charset = $Foswiki::cfg{Site}{CharSet};
-  return $string if $charset =~ /^utf-?8$/i;
-
-
-  my $octets = Encode::decode($charset, $string);
-  $octets = Encode::encode('utf-8', $octets);
-  return $octets;
-}
-
-##############################################################################
-sub toSiteCharSet {
-  my ($this, $string) = @_;
-
-  return Encode::encode($Foswiki::cfg{Site}{CharSet}, $string);
-}
-
 
 ##############################################################################
 sub entityDecode {

@@ -1,4 +1,5 @@
 # See bottom of file for default license and copyright information
+
 =begin TML
 
 ---+ package Foswiki::Contrib::EmptyContrib

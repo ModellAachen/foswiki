@@ -1,8 +1,9 @@
-%META:TOPICINFO{author="ProjectContributor" date="1181297829" format="1.1" reprev="1.4" version="$Rev$"}%
+%META:TOPICINFO{author="micha" comment="save topic" date="1335181801" format="1.1" reprev="2" version="2"}%
 
 
 %META:FORM{name="Applications.TopicStub"}%
-%META:FIELD{name="TopicType" attributes="" title="TopicType" value="TopicStub, TopicType"}%
+%META:FIELD{name="TopicType" title="TopicType" value="TopicStub, TopicType"}%
+%META:FIELD{name="TopicTitle" attributes="" title="<nop>TopicTitle" value=""}%
 %META:FIELD{name="Summary" attributes="" title="Summary" value="Tool to create a TopicType"}%
 %META:FIELD{name="WikiApplication" attributes="" title="WikiApplication" value="WikiWorkbench"}%
 %META:FIELD{name="Target" attributes="" title="Target" value="Applications.TopicType"}%

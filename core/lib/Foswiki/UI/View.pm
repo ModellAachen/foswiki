@@ -57,8 +57,8 @@ sub view {
         Monitor::MARK("found page in cache");
 
         # render uncacheable areas
-        my $text = $cachedPage->{text};
-        $cache->renderDirtyAreas( \$text ) if $cachedPage->{isDirty};
+        my $text = $cachedPage->{data};
+        $cache->renderDirtyAreas( \$text ) if $cachedPage->{isdirty};
 
         # set status
         my $status = $cachedPage->{status};
@@ -72,7 +72,7 @@ sub view {
         }
 
         # set headers
-        $session->generateHTTPHeaders( 'view', $cachedPage->{contentType},
+        $session->generateHTTPHeaders( 'view', $cachedPage->{contenttype},
             $text, $cachedPage );
 
         # send it out
@@ -98,8 +98,18 @@ sub view {
 
     Foswiki::UI::checkWebExists( $session, $web, 'view' );
 
-    my $requestedRev = Foswiki::Store::cleanUpRevID( $query->param('rev') );
-    my $showLatest   = !$requestedRev;
+    my $requestedRev;
+    if ( defined $query->param('rev') ) {
+        $requestedRev = Foswiki::Store::cleanUpRevID( $query->param('rev') );
+        unless ($requestedRev) {
+
+            # Invalid request, remove it from the query.
+            $requestedRev = undef;
+            $query->delete('rev');
+        }
+    }
+
+    my $showLatest = !$requestedRev;
     my $showRev;
 
     my $topicObject;    # the stub of the topic we are to display

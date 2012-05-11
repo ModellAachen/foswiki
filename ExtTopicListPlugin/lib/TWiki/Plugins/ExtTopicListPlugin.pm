@@ -75,15 +75,16 @@ and highly dangerous!
 =cut
 
 sub initPlugin {
-    my( $topic, $web, $user, $installWeb ) = @_;
+    my ( $topic, $web, $user, $installWeb ) = @_;
 
     # check for Plugins.pm versions
-    if( $TWiki::Plugins::VERSION < 1.026 ) {
-        TWiki::Func::writeWarning( "Version mismatch between $pluginName and Plugins.pm" );
+    if ( $TWiki::Plugins::VERSION < 1.026 ) {
+        TWiki::Func::writeWarning(
+            "Version mismatch between $pluginName and Plugins.pm");
         return 0;
     }
 
-    $debug = TWiki::Func::getPluginPreferencesValue( 'DEBUG' );
+    $debug = TWiki::Func::getPluginPreferencesValue('DEBUG');
 
     # register the _EXTTOPICLIST function to handle %EXTTOPICLIST{...}%
     TWiki::Func::registerTagHandler( 'EXTTOPICLIST', \&_EXTTOPICLIST );
@@ -95,7 +96,8 @@ sub initPlugin {
 # The function used to handle the %EXTTOPICLIST{...}% tag
 # You would have one of these for each tag you want to process.
 sub _EXTTOPICLIST {
-    my($session, $params, $theTopic, $theWeb) = @_;
+    my ( $session, $params, $theTopic, $theWeb ) = @_;
+
     # $session  - a reference to the TWiki session object (if you don't know
     #             what this is, just ignore it)
     # $params=  - a reference to a TWiki::Attrs object containing parameters.
@@ -113,7 +115,7 @@ sub _EXTTOPICLIST {
     $format ||= '$name';
     my $separator = $params->{separator} || "\n";
     $separator =~ s/\$n/\n/;
-    my $web = $params->{web} || $session->{webName};
+    my $web       = $params->{web}       || $session->{webName};
     my $selection = $params->{selection} || '';
     $selection =~ s/\,/ /g;
     $selection = " $selection ";
@@ -123,36 +125,38 @@ sub _EXTTOPICLIST {
 
     $web =~ s#\.#/#go;
 
-    return '' if
-        $web ne $session->{webName} &&
-        $session->{prefs}->getWebPreferencesValue( 'NOSEARCHALL', $web );
+    return ''
+      if $web ne $session->{webName}
+          && $session->{prefs}->getWebPreferencesValue( 'NOSEARCHALL', $web );
 
     my @items;
-    foreach my $item ( $session->{store}->getTopicNames( $web ) ) {
-	unless ($item =~ $excludetopic) {
-	    my $line = $format;
-	    $line =~ s/\$web\b/$web/g;
-	    $line =~ s/\$name\b/$item/g;
-	    $line =~ s/\$qname/"$item"/g;
-	    my $mark = ( $selection =~ / \Q$item\E / ) ? $marker : '';
-	    $line =~ s/\$marker/$mark/g;
-	    push( @items, $line );
-	}
+    foreach my $item ( $session->{store}->getTopicNames($web) ) {
+        unless ( $item =~ $excludetopic ) {
+            my $line = $format;
+            $line =~ s/\$web\b/$web/g;
+            $line =~ s/\$name\b/$item/g;
+            $line =~ s/\$qname/"$item"/g;
+            my $mark = ( $selection =~ / \Q$item\E / ) ? $marker : '';
+            $line =~ s/\$marker/$mark/g;
+            push( @items, $line );
+        }
     }
 
     return join( $separator, @items );
 }
 
 sub _makeTopicPattern {
-    my( $topic ) = @_ ;
-    return '' unless( $topic );
+    my ($topic) = @_;
+    return '' unless ($topic);
+
     # 'Web*, FooBar' ==> ( 'Web*', 'FooBar' ) ==> ( 'Web.*', "FooBar" )
-    my @arr = map { s/[^\*\_$TWiki::regex{mixedAlphaNum}]//go; s/\*/\.\*/go; $_ }
-	split( /,\s*/, $topic );
-    return '' unless( @arr );
+    my @arr =
+      map { s/[^\*\_$TWiki::regex{mixedAlphaNum}]//go; s/\*/\.\*/go; $_ }
+      split( /,\s*/, $topic );
+    return '' unless (@arr);
+
     # ( 'Web.*', 'FooBar' ) ==> "^(Web.*|FooBar)$"
     return '^(' . join( '|', @arr ) . ')$';
 }
-
 
 1;

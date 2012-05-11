@@ -31,14 +31,13 @@ sub new {
 =begin TML
 
 ---++ getDefaultValue() -> $value
-The default for a select is always the empty string, as there is no way in
-Foswiki form definitions to indicate selected values. This defers the decision
-on a value to the browser.
+From System.DataForms, "The first item in the list for a select or
+radio type is the default item."
 
 =cut
 
 sub getDefaultValue {
-    return '';
+    return shift->getOptions()->[0];
 }
 
 sub getOptions {
@@ -59,9 +58,9 @@ sub getOptions {
         foreach my $val (@$vals) {
             if ( $val =~ /^(.*[^\\])*=(.*)$/ ) {
                 $str = TAINT( $1 || '' );
-		my $descr = $this->{_descriptions}{$val};
+                my $descr = $this->{_descriptions}{$val};
                 $val = $2;
-		$this->{_descriptions}{$val} = $descr;
+                $this->{_descriptions}{$val} = $descr;
                 $str =~ s/\\=/=/g;
             }
             else {
@@ -104,16 +103,17 @@ sub renderForDisplay {
 
     $this->getOptions();
 
-    if ($this->isValueMapped()) {
-      my @vals = ();
-      foreach my $val (split(/\s*,\s*/, $value)) {
-        if ( defined( $this->{valueMap}{$val} ) ) {
-            push @vals, $this->{valueMap}{$val};
-        } else {
-            push @vals, $val;
+    if ( $this->isValueMapped() ) {
+        my @vals = ();
+        foreach my $val ( split( /\s*,\s*/, $value ) ) {
+            if ( defined( $this->{valueMap}{$val} ) ) {
+                push @vals, $this->{valueMap}{$val};
+            }
+            else {
+                push @vals, $val;
+            }
         }
-      }
-      $value = join(", ", @vals);
+        $value = join( ", ", @vals );
     }
 
     return $this->SUPER::renderForDisplay( $format, $value, $attrs );
@@ -126,11 +126,12 @@ sub renderForEdit {
 
     my %isSelected = map { $_ => 1 } split( /\s*,\s*/, $value );
     foreach my $item ( @{ $this->getOptions() } ) {
-        my $option = $item;
+        my $option = $item
+          ; # Item9647: make a copy not to modify the original value in the array
         my %params = ( class => 'foswikiOption', );
         $params{selected} = 'selected' if $isSelected{$option};
-        if ($this->{_descriptions}{$option}) {
-          $params{title} = $this->{_descriptions}{$option};
+        if ( $this->{_descriptions}{$option} ) {
+            $params{title} = $this->{_descriptions}{$option};
         }
         if ( defined( $this->{valueMap}{$option} ) ) {
             $params{value} = $option;

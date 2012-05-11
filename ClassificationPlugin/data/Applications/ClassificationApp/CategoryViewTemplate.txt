@@ -1,4 +1,4 @@
-%META:TOPICINFO{author="ProjectContributor" comment="reprev" date="1294243029" format="1.1" reprev="9" version="9"}%
+%META:TOPICINFO{author="ProjectContributor" comment="reprev" date="1329317858" format="1.1" reprev="12" version="12"}%
 %META:TOPICPARENT{name="TopicView"}%
 %{<verbatim class="tml">}%
 %TMPL:INCLUDE{"Applications.WikiTopicView"}%
@@ -8,6 +8,7 @@
 %TMPL:DEF{"breadcrumbs"}%%DBCALL{
   "Applications.ClassificationApp.RenderCategoryBreadcrumbs"
   CAT="%URLPARAM{"catname"}%"
+  SEP="%TMPL:P{"sep"}%"
 }%%TMPL:END%
 %{</verbatim>}%
 

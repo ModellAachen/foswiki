@@ -32,14 +32,13 @@ the text had been included from another topic.
 
 =cut
 
-
 package Foswiki::Plugins::ClickToCallPlugin;
 
 # Always use strict to enforce variable scoping
 use strict;
 
-require Foswiki::Func;    # The plugins API
-require Foswiki::Plugins; # For the API version
+require Foswiki::Func;       # The plugins API
+require Foswiki::Plugins;    # For the API version
 
 # $VERSION is referred to by Foswiki, and is the only global variable that
 # *must* exist in this package.
@@ -55,7 +54,8 @@ our $RELEASE = '$Date: 2008-12-14 18:49:56 +0100 (Sun, 14 Dec 2008) $';
 
 # Short description of this plugin
 # One line description, is shown in the %SYSTEMWEB%.TextFormattingRules topic:
-our $SHORTDESCRIPTION = 'This plugin allows to click on a phone number and then triggers a call via Asterisk.';
+our $SHORTDESCRIPTION =
+'This plugin allows to click on a phone number and then triggers a call via Asterisk.';
 
 # You must set $NO_PREFS_IN_TOPIC to 0 if you want your plugin to use
 # preferences set in the plugin topic. This is required for compatibility
@@ -94,12 +94,12 @@ FOOBARSOMETHING. This avoids namespace issues.
 =cut
 
 sub initPlugin {
-    my( $topic, $web, $user, $installWeb ) = @_;
+    my ( $topic, $web, $user, $installWeb ) = @_;
 
     # check for Plugins.pm versions
-    if( $Foswiki::Plugins::VERSION < 2.0 ) {
+    if ( $Foswiki::Plugins::VERSION < 2.0 ) {
         Foswiki::Func::writeWarning( 'Version mismatch between ',
-                                     __PACKAGE__, ' and Plugins.pm' );
+            __PACKAGE__, ' and Plugins.pm' );
         return 0;
     }
 
@@ -112,19 +112,19 @@ sub initPlugin {
     # Optional: See %SYSTEMWEB%.DevelopingPlugins#ConfigSpec for information
     # on integrating your plugin configuration with =configure=.
 
-    # Always provide a default in case the setting is not defined in
-    # LocalSite.cfg. See %SYSTEMWEB%.Plugins for help in adding your plugin
-    # configuration to the =configure= interface.
-    # my $setting = $Foswiki::cfg{Plugins}{ClickToCallPlugin}{ExampleSetting} || 0;
+ # Always provide a default in case the setting is not defined in
+ # LocalSite.cfg. See %SYSTEMWEB%.Plugins for help in adding your plugin
+ # configuration to the =configure= interface.
+ # my $setting = $Foswiki::cfg{Plugins}{ClickToCallPlugin}{ExampleSetting} || 0;
 
     # Register the _EXAMPLETAG function to handle %EXAMPLETAG{...}%
     # This will be called whenever %EXAMPLETAG% or %EXAMPLETAG{...}% is
     # seen in the topic text.
     Foswiki::Func::registerTagHandler( 'EXAMPLETAG', \&_EXAMPLETAG );
 
-    # Allow a sub to be called from the REST interface 
+    # Allow a sub to be called from the REST interface
     # using the provided alias
-    Foswiki::Func::registerRESTHandler('example', \&restExample);
+    Foswiki::Func::registerRESTHandler( 'example', \&restExample );
 
     # Plugin correctly initialized
     return 1;

@@ -27,19 +27,19 @@ package Foswiki::Plugins::ImportPlugin::SharepointHTML2TML;
 use Foswiki::Plugins::WysiwygPlugin::HTML2TML;
 our @ISA = qw( Foswiki::Plugins::WysiwygPlugin::HTML2TML );
 
-my %discardTag = map { $_ => 1 } qw {font strong};
+my %discardTag  = map { $_ => 1 } qw {font strong};
 my %discardAttr = map { $_ => 1 } qw {span p div};
 
 sub _openTag {
     my ( $this, $tag, $attrs ) = @_;
 
     $tag = lc($tag);
-    
-    if ($discardTag{$tag}) {
+
+    if ( $discardTag{$tag} ) {
         print STDERR "discard $tag\n";
         return;
     }
-    if ($discardAttr{$tag}) {
+    if ( $discardAttr{$tag} ) {
         print STDERR "discard attr $tag\n";
         $attrs = '';
     }
@@ -69,7 +69,7 @@ sub _closeTag {
 
     $tag = lc($tag);
 
-    if ($discardTag{$tag}) {
+    if ( $discardTag{$tag} ) {
         print STDERR "discard $tag\n";
         return;
     }
@@ -90,7 +90,6 @@ sub _closeTag {
         $this->_apply($tag);
     }
 }
-
 
 1;
 __END__

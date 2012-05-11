@@ -1,0 +1,4 @@
+Foswiki::Plugins,>=2.1,perl,Requires version 2.0 of handler API.
+Foswiki::Contrib::JsonRpcContrib,>=1.21,perl,Required.
+Foswiki::Plugins::JQGridPlugin,>=2.0,perl,Optional
+Foswiki::Plugins::FlexFormPlugin,>=2.5,perl,Optional

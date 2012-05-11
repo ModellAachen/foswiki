@@ -12,24 +12,24 @@
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details, published at 
+# GNU General Public License for more details, published at
 # http://www.gnu.org/copyleft/gpl.html
 #
 # =========================
 #
-# This is the TouchGraph TWiki plugin. 
-# It is almost unchanged from EmptyPlugin 
+# This is the TouchGraph TWiki plugin.
+# It is almost unchanged from EmptyPlugin
 # it only provides replacement for the %TGPOPUP% TWikiVariable
 #
 
 # =========================
-package TWiki::Plugins::TouchGraphPlugin;  
+package TWiki::Plugins::TouchGraphPlugin;
 
 # =========================
 use vars qw(
-        $web $topic $user $installWeb $VERSION $RELEASE $pluginName
-        $debug $tgPopup
-    );
+  $web $topic $user $installWeb $VERSION $RELEASE $pluginName
+  $debug $tgPopup
+);
 
 # This should always be $Rev$ so that TWiki can determine the checked-in
 # status of the plugin. It is used by the build automation tools, so
@@ -41,36 +41,39 @@ $VERSION = '$Rev$';
 # of the version number in PLUGINDESCRIPTIONS.
 $RELEASE = 'Dakar';
 
-$pluginName = 'TouchGraphPlugin'; 
+$pluginName = 'TouchGraphPlugin';
 
 # =========================
-sub initPlugin
-{
+sub initPlugin {
     ( $topic, $web, $user, $installWeb ) = @_;
 
     # check for Plugins.pm versions
-    if( $TWiki::Plugins::VERSION < 1 ) {
-        TWiki::Func::writeWarning( "Version mismatch between $pluginName and Plugins.pm" );
+    if ( $TWiki::Plugins::VERSION < 1 ) {
+        TWiki::Func::writeWarning(
+            "Version mismatch between $pluginName and Plugins.pm");
         return 0;
     }
 
     # Get plugin debug flag
-    $debug = TWiki::Func::getPreferencesFlag( "\U$pluginName\E_DEBUG" );
+    $debug = TWiki::Func::getPreferencesFlag("\U$pluginName\E_DEBUG");
 
-    # Get plugin preferences, the variable defined by:          * Set EXAMPLE = ...
-    $tgPopup = &TWiki::Func::getPreferencesValue("TOUCHGRAPHPLUGIN_TGPOPUP") || "";
+ # Get plugin preferences, the variable defined by:          * Set EXAMPLE = ...
+    $tgPopup = &TWiki::Func::getPreferencesValue("TOUCHGRAPHPLUGIN_TGPOPUP")
+      || "";
 
     # Plugin correctly initialized
-    TWiki::Func::writeDebug( "- TWiki::Plugins::${pluginName}::initPlugin( $web.$topic ) is OK" ) if $debug;
+    TWiki::Func::writeDebug(
+        "- TWiki::Plugins::${pluginName}::initPlugin( $web.$topic ) is OK")
+      if $debug;
     return 1;
 }
 
 # =========================
-sub commonTagsHandler
-{
+sub commonTagsHandler {
 ### my ( $text, $topic, $web ) = @_;   # do not uncomment, use $_[0], $_[1]... instead
 
-    TWiki::Func::writeDebug( "- ${pluginName}::commonTagsHandler( $_[2].$_[1] )" ) if $debug;
+    TWiki::Func::writeDebug("- ${pluginName}::commonTagsHandler( $_[2].$_[1] )")
+      if $debug;
 
     # This is the place to define customized tags and variables
     # Called by sub handleCommonTags, after %INCLUDE:"..."%

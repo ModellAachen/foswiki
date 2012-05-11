@@ -1,11 +1,57 @@
+%META:TOPICINFO{author="ProjectContributor" comment="reprev" date="1335457249" format="1.1" reprev="2" version="2"}%
 ---+!! %TOPIC%
 %SHORTDESCRIPTION%
 
 %TOC%
 
----++ Usage
+This plugin redesigns the way how users interact with topics and attachments in various ways:
+
+   * improved attachment handling
+   * improved visuals displaying !DataForms
+   * improved integration of Foswiki:Extensions/MetaCommentPlugin and Foswiki:Extensions/FlexPaperPlugin
+
+Other features are:
+
+   * cross-browser compatible bulk upload of multiple files
+   * bulk actions on attachments: delete, move, hide, download as zip archive, create image gallery, insert links
+   * thumbnail and lightbox preview of image attachments
+   * easy renaming of attachments using modal dialogs
+   * easy access to previous revisions of attachments
+   * loading the list of attachments via ajax not to slow down display of topics with lots of attachments
+   * filtering and pagination for topics with a lot of attachments
+   * drag & drop upload for browsers supporting it (currently firefox and chrome only)
+
+To activate you'll need to add =topicinteraction= to your SKIN path setting in your !SitePreferences, like
+
+<verbatim>
+    * Set SKIN = topicinteraction, pattern
+</verbatim>
+
+Use the =insidetab= setting of !MetaCommentPlugin to render comments inside a tab at the bottom of the page:
+
+<verbatim>
+    * Set SKIN = topicinteraction, metacomment, pattern
+    * Set DISPLAYCOMMENTS = on
+    * Set COMMENTFORMAT = insidetab
+</verbatim>
+
+Note you won't need using Foswiki:Extensions/NatSkin as that's integrated automatically.
+
+---++ Screenshots
+
+<a href='%ATTACHURLPATH%/TopicInteractionPluginSnap1.png' class='foswikiImage'><img src='%ATTACHURLPATH%/TopicInteractionPluginSnap1.png' width='500' /></a>
+
+<a href='%ATTACHURLPATH%/TopicInteractionPluginSnap2.png' class='foswikiImage'><img src='%ATTACHURLPATH%/TopicInteractionPluginSnap2.png' width='500' /></a>
+
+<a href='%ATTACHURLPATH%/TopicInteractionPluginSnap3.png' class='foswikiImage'><img src='%ATTACHURLPATH%/TopicInteractionPluginSnap3.png' width='500' /></a>
+
+<a href='%ATTACHURLPATH%/TopicInteractionPluginSnap4.png' class='foswikiImage'><img src='%ATTACHURLPATH%/TopicInteractionPluginSnap4.png' width='500' /></a>
+
+<a href='%ATTACHURLPATH%/TopicInteractionPluginSnap5.png' class='foswikiImage'><img src='%ATTACHURLPATH%/TopicInteractionPluginSnap5.png' width='500' /></a>
 
 ---++ Syntax
+
+!TopicInteractionPlugin implements some macros to actually implement the user interface. These macros can be used for other purposes too of course.
 
 ---+++ ATTACHMENTS
 List all attachments of a given topic. Without any parameters it displays a
@@ -56,7 +102,6 @@ The following variables can be used in the format parameter:
    * $sizeK: the size in kilo bytes 
    * $sizeM: the size in mega bytes 
    * $topic: the name of the topic of whose attachments are listed
-   * $type: the file type of the current attachment
    * $url: the attachments url
    * $urlpath: the attachments urlpath
    * $user: the user that uploaded the attachment
@@ -73,10 +118,22 @@ The format, header and footer may contain the standard escape sequences:
    * $n: newline
    * $percnt: % sign
    * $quot: " sign
+
 Example:
-<verbatim>%ATTACHMENTS{format="| $name: | $type |"}%</verbatim>
+<verbatim>
+%ATTACHMENTS{
+  header="| *&nbsp;* | *Name* | *Url* | *Size* | *Author* | $n"
+  format="| $idnex | $name: | $url | $sizeK |"
+}%
+</verbatim>
 generates:
-%ATTACHMENTS{format="| $name: | $type |"}%
+
+<noautolink>
+%ATTACHMENTS{
+  header="| *#* | *Icon* | *Name* | *Size* | *Author* | *Date* |$n"
+  format="| $index | $percntMIMEICON{\"$name\" size=\"48\"}$percnt | <a href='$url'>$name</a> | $sizeK | $user | $date |"
+}%
+</noautolink>
 
 ---++ Installation Instructions
 
@@ -93,6 +150,17 @@ generates:
 |  Release: | %$RELEASE% |
 |  Version: | %$VERSION% |
 |  Change History: | <!-- versions below in reverse order -->&nbsp; |
+|  08 May 2012: | fixed silent dependency on !DBCachePlugin; \
+                  fixed integration with !PatternSkin; \
+                  fixed dependency on Foswiki:Extensions/RenderPlugin; 
+                  fixed interaction with Foswiki:Extensions/MetaCommentPlugin |
+|  26 Apr 2012: | initial release |
 |  Dependencies: | %$DEPENDENCIES% |
 |  Home page: | Foswiki:Extensions/%TOPIC% |
 |  Support: | Foswiki:Support/%TOPIC% |
+
+%META:FILEATTACHMENT{name="TopicInteractionPluginSnap5.png" attachment="TopicInteractionPluginSnap5.png" attr="" comment="" date="1335456088" size="36218" user="ProjectContributor" version="1"}%
+%META:FILEATTACHMENT{name="TopicInteractionPluginSnap4.png" attachment="TopicInteractionPluginSnap4.png" attr="" comment="" date="1335456089" size="45039" user="ProjectContributor" version="1"}%
+%META:FILEATTACHMENT{name="TopicInteractionPluginSnap3.png" attachment="TopicInteractionPluginSnap3.png" attr="" comment="" date="1335456090" size="99574" user="ProjectContributor" version="1"}%
+%META:FILEATTACHMENT{name="TopicInteractionPluginSnap2.png" attachment="TopicInteractionPluginSnap2.png" attr="" comment="" date="1335456091" size="111026" user="ProjectContributor" version="1"}%
+%META:FILEATTACHMENT{name="TopicInteractionPluginSnap1.png" attachment="TopicInteractionPluginSnap1.png" attr="" comment="" date="1335456092" size="16199" user="ProjectContributor" version="1"}%

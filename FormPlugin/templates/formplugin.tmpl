@@ -48,10 +48,6 @@
 ---------------------------------------------------
 }%%TMPL:DEF{formplugin:message:no_redirect:body}% Check if =AllowRedirectUrl= has been set in [[%SCRIPTURL{configure}%#Environment$SecurityAndAuthentication][configure]] and if the url [[$url]] is listed in configure's [[%SCRIPTURL{configure}%#GeneralPathSettings][General path settings]].%TMPL:END%%{
 ---------------------------------------------------
-Redirect warning will be written inside a hint-formatted span
----------------------------------------------------
-}%%TMPL:DEF{formplugin:message:redirect_warning}%Next step: you will be asked to confirm%TMPL:END%%{
----------------------------------------------------
 }%%TMPL:DEF{formplugin:javascript:fields}%%ADDTOZONE{
 "script"
 id="$id"

@@ -1,7 +1,7 @@
 # Test for DOC_abiword.pm
 package Doc_abiwordTests;
-use FoswikiFnTestCase;
-our @ISA = qw( FoswikiFnTestCase );
+use StringifierTest;
+our @ISA = qw( StringifierTest );
 
 use strict;
 use utf8;
@@ -20,6 +20,7 @@ sub set_up {
 
     $this->SUPER::set_up();
     # Use RcsLite so we can manually gen topic revs
+
     $Foswiki::cfg{StoreImpl} = 'RcsLite';
     $Foswiki::cfg{StringifierContrib}{WordIndexer} = 'abiword';
 
@@ -63,7 +64,7 @@ sub test_SpecialCharacters {
 
     my $text  = $stringifier->stringForFile($this->{attachmentDir}.'Simple_example.doc');
 
-    $this->assert(($text =~ m/Größer/)==1, "Text Größer not found.");
+    $this->assert_matches($this->encode('Größer'), $text, "Text Größer not found.");
 }
 
 1;

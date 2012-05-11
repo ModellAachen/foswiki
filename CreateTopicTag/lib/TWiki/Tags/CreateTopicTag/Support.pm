@@ -22,6 +22,7 @@
 
 # Always use strict to enforce variable scoping
 use strict;
+
 package TWiki::Tags::CreateTopicTag::Support;
 
 sub getJSPrefix {

@@ -64,21 +64,18 @@ sub initPlugin {
     # Get plugin debug flag
     $debug = Foswiki::Func::getPluginPreferencesFlag("DEBUG");
 
-    # Get plugin preferences, the variable defined by:          * Set EXAMPLE = ...
+ # Get plugin preferences, the variable defined by:          * Set EXAMPLE = ...
     $attachmentComments =
       Foswiki::Func::getPluginPreferencesValue("ATTACHMENT_COMMENTS") || 1;
 
     $cachedCommentWeb   = '';
     $cachedCommentTopic = '';
 
-
     # Need to register meta, Item11249
     if ( defined &Foswiki::Meta::registerMETA ) {
-	Foswiki::Meta::registerMETA(
-		'REVCOMMENT', 
-		allow => [qw(comment t minor rev ncomments)]
-		);
-	}
+        Foswiki::Meta::registerMETA( 'REVCOMMENT',
+            allow => [qw(comment t minor rev ncomments)] );
+    }
 
     # Plugin correctly initialized
     Foswiki::Func::writeDebug(
@@ -93,7 +90,8 @@ sub initPlugin {
 sub commonTagsHandler {
 ### my ( $text, $topic, $web ) = @_;   # do not uncomment, use $_[0], $_[1]... instead
 
-    Foswiki::Func::writeDebug("- ${pluginName}::commonTagsHandler( $_[2].$_[1] )")
+    Foswiki::Func::writeDebug(
+        "- ${pluginName}::commonTagsHandler( $_[2].$_[1] )")
       if $debug;
 
     # This is the place to define customized tags and variables
@@ -108,16 +106,18 @@ sub beforeSaveHandler {
 ### my ( $text, $topic, $web, $meta ) = @_;   # do not uncomment, use $_[0], $_[1]... instead
     my ( $topic, $web, $meta ) = @_[ 1 .. 3 ];
 
-    Foswiki::Func::writeDebug("- ${pluginName}::beforeSaveHandler( $_[2].$_[1] )")
+    Foswiki::Func::writeDebug(
+        "- ${pluginName}::beforeSaveHandler( $_[2].$_[1] )")
       if $debug;
 
-    # This handler is called by Foswiki::Store::saveTopic just before the save action.
-    # New hook in Foswiki::Plugins $VERSION = '1.010'
+# This handler is called by Foswiki::Store::saveTopic just before the save action.
+# New hook in Foswiki::Plugins $VERSION = '1.010'
 
     my $query = Foswiki::Func::getCgiQuery();
 
     # Get current revision
-    my ( $date, $user, $currev ) = Foswiki::Func::getRevisionInfo( $_[2], $_[1] );
+    my ( $date, $user, $currev ) =
+      Foswiki::Func::getRevisionInfo( $_[2], $_[1] );
     $currev ||= 0;
 
     my @comments = _extractComments($meta);
@@ -157,9 +157,9 @@ sub beforeSaveHandler {
 
         $newComment = {
             comment => $commentFromForm,
-            t     => $t,
-            minor => defined $query->param('dontnotify'),
-            rev   => undef,
+            t       => $t,
+            minor   => defined $query->param('dontnotify'),
+            rev     => undef,
         };
     }
 
@@ -237,14 +237,15 @@ sub handleRevComment {
       if $debug;
     my $params = $_[0] || '';
 
-    # SMELL: this "convenience" should probably be removed; you can \" in Attributes
+# SMELL: this "convenience" should probably be removed; you can \" in Attributes
     $params =~ s/''/"/g;
 
     my %params = Foswiki::Func::extractParameters($params);
 
     my $web   = $params{web}   || $web;
     my $topic = $params{topic} || $topic;
-    my $rev   = $params{rev}
+    my $rev =
+         $params{rev}
       || $params{_DEFAULT}
       || ( Foswiki::Func::getRevisionInfo( $web, $topic ) )[2];
     $rev =~ s/^1\.//;
@@ -254,7 +255,8 @@ sub handleRevComment {
     $delimiter =~ s/\\n/\n/g;
     $delimiter =~ s/\\t/\t/g;
     my $pre = $params{pre};
-    $pre = '<noautolink><ul><li style="margin-left:-1em;">' unless defined($pre);
+    $pre = '<noautolink><ul><li style="margin-left:-1em;">'
+      unless defined($pre);
     my $post = $params{post};
     $post = '</li></ul></noautolink>' unless defined($post);
     my $minor = $params{minor};
@@ -265,7 +267,7 @@ sub handleRevComment {
     }
     my @comments;
 
-    # SMELL: doesn't respect access permissions (too bad there isn't a version that does, like readTopic() does...)
+# SMELL: doesn't respect access permissions (too bad there isn't a version that does, like readTopic() does...)
     my ( $meta, undef ) = Foswiki::Func::readTopic( $web, $topic, $rev );
 
     @comments = _extractComments($meta);

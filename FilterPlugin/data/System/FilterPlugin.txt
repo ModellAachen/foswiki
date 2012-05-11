@@ -84,6 +84,7 @@ prepended with a header and appended with a footer in case the list is not empty
    * &lt;list>: the list 
    * tokenize="...": regex to tokenize the list before spliting it up, tokens are inserted back again after the split stage has been passed
    * split="...": the split expression (default ",")
+   * replace="key1=value1,key2=value2, ...": this allows to preprocess each list item by replacing the given keys with their value
    * pattern="...": pattern applied to each item (default "\s(.*)\s")
    * format="...": the format string for each item (default "$1")
    * header="...": header string
@@ -101,7 +102,8 @@ prepended with a header and appended with a footer in case the list is not empty
    * selection="...": regular expression that a list item must match to be "selected"; if this matches the =$marker= is inserted
    * marker="...": string to be inserted when the =selection= regex matches; this will be inserted at the position =$marker= as
      indicated in =format= .
-   * map="key1=value1,key2=value2, ...": this establishes a key-value hash available via the =$map()= variable.
+   * map="key1=value1,key2=value2, ...": this establishes a key-value hash available via the =$map()= variable. (see also the =replace= parameter for means
+     to preprocess list items automatically.)
 
 The pattern string shall group matching substrings in the list item to which you can refer to by 
 using $1, $2, ... in the format string. Any format string (=format=, =header=, =footer=) may
@@ -264,6 +266,11 @@ compare with [[http://en.wikipedia.org/wiki/Category:Philosophy_articles_needing
 |  Release: | %$RELEASE% |
 |  Version: | %$VERSION% |
 |  Change History: | <!-- versions below in reverse order -->&nbsp; |
+|  05 May 2012: | fixed lists not being processed properly before iterating over them in FORMATLIST and MAKEINDEX |
+|  19 Apr 2012: | modernized plugin by using a proper OO-core; \
+                  fixed processing of =tokenize= properly;\
+                  added =replace= parameter for FORMATLIST; \
+                  fixed the plugin calling =Foswiki::Func::expandCommonVariables()= itself unnecessarily  |
 |  10 Jan 2012: | fixed filtering zero; fixed counting list items without formating them; added =hideempty= parameter to enable/disable rendering empty list items |
 |  29 Sep 2011: | fixed SUBST macro =topic= param processing embedded META |
 |  25 Aug 2011: | fixed perl rookie error initializing defaults |

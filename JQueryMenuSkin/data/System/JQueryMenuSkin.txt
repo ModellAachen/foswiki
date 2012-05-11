@@ -71,6 +71,7 @@ You can also simply overwrite CSS for the default menu definition JQueryMenuSkin
 |  Release: | %$RELEASE% |
 |  Version: | %$VERSION% |
 |  Change History: | <!-- versions below in reverse order -->&nbsp; |
+|  19 Mar 2012: | Foswiki:Tasks.Item11676 (v0.1.2) |
 |  11 Jan 2012: | Foswiki:Tasks.Item10244 (v0.1.0) |
 |  27 Dec 2010: | Foswiki:Tasks.Item10180 (v0.0.5) |
 |  23 Dec 2010: | Foswiki:Tasks.Item10180 (v0.0.4) |

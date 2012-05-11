@@ -11,7 +11,7 @@ use DBI;
 use Error qw(:try);
 use CGI ();
 
-use Foswiki::Func    ();
+use Foswiki::Func ();
 
 our $VERSION          = '$Rev: 7193 $';
 our $RELEASE          = '1.3';
@@ -75,7 +75,7 @@ sub db_set_codepage {
 
 sub userIsInGroup {
     my ( $user, $group ) = @_;
-    return Foswiki::Func::isGroupMember($group, $user);
+    return Foswiki::Func::isGroupMember( $group, $user );
 }
 
 =begin TML
@@ -87,8 +87,8 @@ needed. =$db_identifier= parameter is database ID as specified in the
 =cut
 
 sub db_connect {
-    my $conname    = shift;
-    my $connection = $connections->{$conname};
+    my $conname         = shift;
+    my $connection      = $connections->{$conname};
     my @required_fields = qw(database driver);
     my $curUser         = Foswiki::Func::getWikiUserName();
 
@@ -168,18 +168,12 @@ sub db_connect {
 }
 
 sub db_disconnect {
-    foreach
-      my $conname ( keys %$connections )
-    {
+    foreach my $conname ( keys %$connections ) {
         if ( $connections->{$conname}{dbh} ) {
-            $connections->{$conname}{dbh}
-              ->commit
-              unless $connections
-                  ->{$conname}{dbh}{AutoCommit};
-            $connections->{$conname}{dbh}
-              ->disconnect;
-            delete $connections
-              ->{$conname}{dbh};
+            $connections->{$conname}{dbh}->commit
+              unless $connections->{$conname}{dbh}{AutoCommit};
+            $connections->{$conname}{dbh}->disconnect;
+            delete $connections->{$conname}{dbh};
         }
     }
 }
@@ -672,8 +666,7 @@ sub processPage {
     # $_[0] =~ s/%XYZ{(.*?)}%/&handleXyz($1)/ge;
     my $doHandle = 0;
     $_[0] =~ s/%DBI_VERSION%/$VERSION/gs;
-    if (
-        $_[0] =~ s/%DBI_DO{(.*?)}%(?:(.*?)%DBI_DO%)?/storeDoQuery($1, $2)/ges )
+    if ( $_[0] =~ s/%DBI_DO{(.*?)}%(?:(.*?)%DBI_DO%)?/storeDoQuery($1, $2)/ges )
     {
         $doHandle = 1;
     }

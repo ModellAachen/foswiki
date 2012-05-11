@@ -29,10 +29,10 @@ Supported languages are:
    * Finnish (thanks to Olli Wilkman)
    * French
    * German
-   * Greek, monoton, polyton and ancient (thanks to Pablo Rodríguez)
-   * Hungarian (thanks to Péter Nagy)
+   * Greek, monoton, polyton and ancient (thanks to Pablo RodrÃ­guez)
+   * Hungarian (thanks to PÃ©ter Nagy)
    * Italian (thanks to Stefano Gorini)
-   * Latin (thanks to Pablo Rodríguez)
+   * Latin (thanks to Pablo RodrÃ­guez)
    * Latvian (coming soon, thanks to Kristaps Karlsons)
    * Lithuanian (thanks to Rogut&#279;s Sparnuotos)
    * Malayalam, Tamil, Hindi, Oriya, Kannda, Telugu, Bengali, Gujarati and Panjabi (thanks to Santhosh Thottingal)
@@ -42,7 +42,7 @@ Supported languages are:
    * Russian (thanks to Dmitry Vedernikov)
    * Slovakian (thanks to Zdenko Podobny)
    * Slovenian (thanks to Mojca Miklavec)
-   * Spanish (thanks to Luis Pabón)
+   * Spanish (thanks to Luis PabÃ³n)
    * Swedish (thanks to Andreas Johansson)
    * Turkish (thanks to Andreas Lappe)
    * Ukrainian (thanks to Alexey Grekov)

@@ -2,7 +2,7 @@
 By default we include all the CSS for the Superfish menu. We customize below
 Remember if you copy this file remember to update the following relative path
 ***/
-@import "../JQueryPlugin/plugins/superfish/jquery.superfish.css";
+@import url('../JQueryPlugin/plugins/superfish/jquery.superfish.css');
 
 /*** JQueryMenuSkin Customizations ***/
 

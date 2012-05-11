@@ -8,7 +8,7 @@ use warnings;
 
 our $NO_PREFS_IN_TOPIC = 1;
 our $VERSION           = '$Rev$';
-our $RELEASE           = '2.2';
+our $RELEASE           = '2.4';
 our $SHORTDESCRIPTION =
 "Automatically link to another web(s) if a topic isn't found in the current web.";
 
@@ -41,7 +41,7 @@ Copyright (C) 2002 Mike Barton, Marco Carnut, Peter HErnst
 Copyright (C) 2003 Martin Cleaver
 Copyright (C) 2004 Matt Wilkie
 Copyright (C) 2007 Crawford Currie http://c-dot.co.uk
-Copyright (C) 2008-2011 Foswiki Contributors
+Copyright (C) 2008-2012 Foswiki Contributors
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License

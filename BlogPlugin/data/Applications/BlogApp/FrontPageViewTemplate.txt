@@ -1,4 +1,4 @@
-%META:TOPICINFO{author="ProjectContributor" comment="reprev" date="1319612874" format="1.1" reprev="14" version="14"}%
+%META:TOPICINFO{author="ProjectContributor" comment="reprev" date="1329332872" format="1.1" reprev="14" version="16"}%
 %META:TOPICPARENT{name="TopicView"}%
 %{<verbatim class="tml">}%
 %TMPL:INCLUDE{"view"}%
@@ -13,7 +13,6 @@
 %DBCALL{
   "Applications.BlogApp.RenderBlogEntries"
   CAT="%URLPARAM{"catname"}%"
-  LIMIT="1"
   SKIP="%URLPARAM{"skip" default="0"}%"
   STICKY="%IF{"$'URLPARAM{skip}'" then="disabled" else="frontpage"}%"
   NOSTICKY=""

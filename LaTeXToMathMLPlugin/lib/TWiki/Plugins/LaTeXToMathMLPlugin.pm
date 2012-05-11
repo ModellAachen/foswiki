@@ -19,19 +19,18 @@
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details, published at 
+# GNU General Public License for more details, published at
 # http://www.gnu.org/copyleft/gpl.html
 #
 # =========================
 #
-# This is the LaTeX To MathML TWiki plugin.  
+# This is the LaTeX To MathML TWiki plugin.
 #
 # See TWiki.LaTeXToMathMLPlugin for details on syntax, markup and installation.
 
 # Basically anything inside %$ ... $% or $\[ ... \]% or %MATHMODE{ ... }% is
 # formatted from LaTeX to MathML using the itex2MML program.  We do need to
 # assert the text/xhtml header or Mozilla will ignore the math mode stuff.
-
 
 # =========================
 package TWiki::Plugins::LaTeXToMathMLPlugin;
@@ -41,9 +40,9 @@ use English;
 
 # =========================
 use vars qw(
-        $web $topic $user $installWeb $VERSION $RELEASE $debug $pluginName
-		$equationNumber $equationList $hasAnyMarkup
-    );
+  $web $topic $user $installWeb $VERSION $RELEASE $debug $pluginName
+  $equationNumber $equationList $hasAnyMarkup
+);
 
 #this is the first release of this plugin
 # This should always be $Rev$ so that TWiki can determine the checked-in
@@ -56,8 +55,7 @@ $VERSION = '$Rev$';
 # of the version number in PLUGINDESCRIPTIONS.
 $RELEASE = 'Dakar';
 
-
-$pluginName = 'LaTeXToMathMLPlugin';  # Name of this Plugin
+$pluginName = 'LaTeXToMathMLPlugin';    # Name of this Plugin
 
 #We'll use IPC::Open2 to wrap the itex2MML program
 use IO::Handle;
@@ -79,25 +77,27 @@ my $equationList;
 #these variables are used by the plugin
 
 # =========================
-sub initPlugin
-{
+sub initPlugin {
     ( $topic, $web, $user, $installWeb ) = @_;
-	
+
     # check for Plugins.pm versions
-    if( $TWiki::Plugins::VERSION < 1 ) {
-        &TWiki::Func::writeWarning( "Version mismatch between LaTeXToMathMLPlugin and Plugins.pm" );
+    if ( $TWiki::Plugins::VERSION < 1 ) {
+        &TWiki::Func::writeWarning(
+            "Version mismatch between LaTeXToMathMLPlugin and Plugins.pm");
         return 0;
     }
 
-	$hasAnyMarkup   = 0;
-	$equationList   = [];
-	$equationNumber = 0;
+    $hasAnyMarkup   = 0;
+    $equationList   = [];
+    $equationNumber = 0;
 
-	# Get plugin debug flag
-    $debug = &TWiki::Func::getPreferencesFlag( "LATEXTOMATHMLPLUGIN_DEBUG" );
-		 
+    # Get plugin debug flag
+    $debug = &TWiki::Func::getPreferencesFlag("LATEXTOMATHMLPLUGIN_DEBUG");
+
     # Plugin correctly initialized
-    &TWiki::Func::writeDebug( "- TWiki::Plugins::LaTeXToMathMLPlugin::initPlugin( $web.$topic ) is OK" ) if $debug;
+    &TWiki::Func::writeDebug(
+        "- TWiki::Plugins::LaTeXToMathMLPlugin::initPlugin( $web.$topic ) is OK"
+    ) if $debug;
 
     return 1;
 }
@@ -106,131 +106,123 @@ sub initPlugin
 # We'll check first if there is any markup at all, otherwise we'll set a flag
 # and skip the more detailed work.
 
-sub startRenderingHandler
-{
+sub startRenderingHandler {
 ### my ( $text, $web ) = @_;   # do not uncomment, use $_[0], $_[1] instead
 
-	$hasAnyMarkup = (   ( $_[0] =~ /%\$(.*?)\$%/mgs       )
-					 or ( $_[0] =~ /%\\\[(.*?)\\\]%/mgs   )
-					 or ( $_[0] =~ /%MATHMODE{(.*?)}%/mgs ) );
+    $hasAnyMarkup = (
+             ( $_[0] =~ /%\$(.*?)\$%/mgs )
+          or ( $_[0] =~ /%\\\[(.*?)\\\]%/mgs )
+          or ( $_[0] =~ /%MATHMODE{(.*?)}%/mgs )
+    );
 
-	$_[0] =~ s/%MATHMODE{(.*?)}%/&replaceMath($1,1)/mgseo;
+    $_[0] =~ s/%MATHMODE{(.*?)}%/&replaceMath($1,1)/mgseo;
 
-	$_[0];
-};
-
+    $_[0];
+}
 
 # =========================
 # This does nothing if there is no markup.
-sub outsidePREHandler
-{
+sub outsidePREHandler {
 ### my ( $text ) = @_;   # do not uncomment, use $_[0] instead
-	return $_[0] if ( not $hasAnyMarkup );
+    return $_[0] if ( not $hasAnyMarkup );
 
-	$_[0] =~ s/%\$(.*?)\$%/&replaceMath($1,0)/gseo;
-	$_[0] =~ s/%\\\[(.*?)\\\]%/&replaceMath($1,1)/gseo;
-	$_[0] =~ s/%MATHMODE{(.*?)}%/&replaceMath($1,1)/gseo;
+    $_[0] =~ s/%\$(.*?)\$%/&replaceMath($1,0)/gseo;
+    $_[0] =~ s/%\\\[(.*?)\\\]%/&replaceMath($1,1)/gseo;
+    $_[0] =~ s/%MATHMODE{(.*?)}%/&replaceMath($1,1)/gseo;
 
-	return $_[0];
-};
+    return $_[0];
+}
 
-sub replaceMath
-{
-	my $placeHolder = sprintf ( '%%ITEXMATHMLEQUATION%08d%%', $equationNumber );
+sub replaceMath {
+    my $placeHolder = sprintf( '%%ITEXMATHMLEQUATION%08d%%', $equationNumber );
 
-	if ( $_[1] ) 
-	{ 
-		$equationList->[ $equationNumber ] = '\[' . $_[0] . '\]' . "\n"; 
-	}
-	else         
-	{ 
-		$equationList->[ $equationNumber ] = '$'  . $_[0] . '$'  . "\n"; 
-	};
+    if ( $_[1] ) {
+        $equationList->[$equationNumber] = '\[' . $_[0] . '\]' . "\n";
+    }
+    else {
+        $equationList->[$equationNumber] = '$' . $_[0] . '$' . "\n";
+    }
 
-	$equationNumber++;
+    $equationNumber++;
 
-	$placeHolder;
-};
+    $placeHolder;
+}
 
 # =========================
 # After processing the equations into tags, we process the equation set using
 # itex2MML.
 
-sub endRenderingHandler
-{
-	# This does nothing if, throughout, no markup was found.
+sub endRenderingHandler {
 
-	if ( $equationNumber > 0 )
-	{
-		&TWiki::Func::writeDebug( "- TWiki::Plugins::LaTeXToMathMLPlugin::"
-								 ."endRenderingHandler ( $web.$topic ) has "
-								 ."found markup" ) if $debug;
+    # This does nothing if, throughout, no markup was found.
 
-		# Do something intelligent ought something to go awry.
+    if ( $equationNumber > 0 ) {
+        &TWiki::Func::writeDebug( "- TWiki::Plugins::LaTeXToMathMLPlugin::"
+              . "endRenderingHandler ( $web.$topic ) has "
+              . "found markup" )
+          if $debug;
 
-		my $oldSigAlrm = $SIG{ ALRM };
-		my $oldSigPipe = $SIG{ PIPE };
+        # Do something intelligent ought something to go awry.
 
-		alarm(5);		# Longer and something is very wrong.
+        my $oldSigAlrm = $SIG{ALRM};
+        my $oldSigPipe = $SIG{PIPE};
 
-		$SIG{ ALRM } = sub { die "SIGALRM: itex2MML seems to have hung."; };
-		$SIG{ PIPE } = sub { die "SIGALRM: itex2MML seems to have died."; };
+        alarm(5);    # Longer and something is very wrong.
 
-		# Fire up the child process.
+        $SIG{ALRM} = sub { die "SIGALRM: itex2MML seems to have hung."; };
+        $SIG{PIPE} = sub { die "SIGALRM: itex2MML seems to have died."; };
 
-		my $childPID;
+        # Fire up the child process.
 
-		eval
-		{
-			$childPID = open2( *ITEXREAD, *ITEXWRITE, $itex2MML );
-		};
+        my $childPID;
 
-		if ( $EVAL_ERROR )
-		{
-			&TWiki::Func::writeDebug( "open2 failed for itex2MML: "
-									  . $EVAL_ERROR ) if $debug;
-		};
+        eval { $childPID = open2( *ITEXREAD, *ITEXWRITE, $itex2MML ); };
 
-		# Feed the child everything at once, pull off the results.
+        if ($EVAL_ERROR) {
+            &TWiki::Func::writeDebug(
+                "open2 failed for itex2MML: " . $EVAL_ERROR )
+              if $debug;
+        }
 
-		my $transText;
+        # Feed the child everything at once, pull off the results.
 
-		eval
-		{
-			print ITEXWRITE join( "THISISNOTANEQ__XXX\n", @{ $equationList } );
-			close ITEXWRITE;
-			$transText = join '', <ITEXREAD>;
-			close ITEXREAD;
-			waitpid $childPID, 0;
-		};
+        my $transText;
 
-		if ( $EVAL_ERROR )
-		{
-			&TWiki::Func::writeDebug( "itex2MML failed: "
-									  . $EVAL_ERROR ) if $debug;
-		};
+        eval {
+            print ITEXWRITE join( "THISISNOTANEQ__XXX\n", @{$equationList} );
+            close ITEXWRITE;
+            $transText = join '', <ITEXREAD>;
+            close ITEXREAD;
+            waitpid $childPID, 0;
+        };
 
-		# Tidy up.
+        if ($EVAL_ERROR) {
+            &TWiki::Func::writeDebug( "itex2MML failed: " . $EVAL_ERROR )
+              if $debug;
+        }
 
-		alarm(0);
-		$SIG{ PIPE } = $oldSigPipe;
-		$SIG{ ALRM } = $oldSigAlrm;
+        # Tidy up.
 
-		# Parse out the results into the text.
+        alarm(0);
+        $SIG{PIPE} = $oldSigPipe;
+        $SIG{ALRM} = $oldSigAlrm;
 
-		my @transArr = split /THISISNOTANEQ__XXX/m, $transText;
+        # Parse out the results into the text.
 
-		for ( my $i = 0 ; $i < $equationNumber ; $i++ )
-		{
-			my $tag = sprintf ( '%%ITEXMATHMLEQUATION%08d%%', $i );
+        my @transArr = split /THISISNOTANEQ__XXX/m, $transText;
 
-			$_[0] =~ s/$tag/$transArr[$i]/m;
-		};
+        for ( my $i = 0 ; $i < $equationNumber ; $i++ ) {
+            my $tag = sprintf( '%%ITEXMATHMLEQUATION%08d%%', $i );
 
-		&TWiki::Func::writeDebug( "- TWiki::Plugins::LaTeXToMathMLPlugin::startRenderingHandler( $web.$topic ) has finished." ) if $debug;
-	};
+            $_[0] =~ s/$tag/$transArr[$i]/m;
+        }
 
-	$_[0];
+        &TWiki::Func::writeDebug(
+"- TWiki::Plugins::LaTeXToMathMLPlugin::startRenderingHandler( $web.$topic ) has finished."
+        ) if $debug;
+    }
+
+    $_[0];
 }
 
 # =========================
@@ -238,36 +230,38 @@ sub endRenderingHandler
 # Basically we just feed the line to the write handler, and wait until we
 # see a </math> token back from the read handler.
 #
-sub handleMath
-{
-	# Spit math at the translation program.
-    &TWiki::Func::writeDebug( "- TWiki::Plugins::LaTeXToMathMLPlugin::handleMath does $_[0] " ) if $debug;
+sub handleMath {
 
-	if ( $_[1] )   # The equation is set on its own line
-	{
-		$_[3]->print( '\[' . $_[0] . '\]' . "\n" );
-	}
-	else
-	{
-		$_[3]->print( '$' . $_[0] . '$' . "\n" );
-	};
+    # Spit math at the translation program.
+    &TWiki::Func::writeDebug(
+        "- TWiki::Plugins::LaTeXToMathMLPlugin::handleMath does $_[0] ")
+      if $debug;
 
-	# The program is a flex script so shouldn't block.
+    if ( $_[1] )    # The equation is set on its own line
+    {
+        $_[3]->print( '\[' . $_[0] . '\]' . "\n" );
+    }
+    else {
+        $_[3]->print( '$' . $_[0] . '$' . "\n" );
+    }
 
-	my $mathML = '';
-	my $mathLine;
+    # The program is a flex script so shouldn't block.
 
-	while( $mathLine = <$_[2]>  )
-	{
+    my $mathML = '';
+    my $mathLine;
 
-		&TWiki::Func::writeDebug( "- TWiki::Plugins::LaTeXToMathMLPlugin::handleMath receives $_ " ) if $debug;
+    while ( $mathLine = <$_[2]> ) {
 
-		$mathML .= $_;
-		last if ( $mathLine =~ /<\/math>/ );
-	};
+        &TWiki::Func::writeDebug(
+            "- TWiki::Plugins::LaTeXToMathMLPlugin::handleMath receives $_ ")
+          if $debug;
 
-	return $mathML;
-};
+        $mathML .= $_;
+        last if ( $mathLine =~ /<\/math>/ );
+    }
+
+    return $mathML;
+}
 
 # Benedictimus Larry
 

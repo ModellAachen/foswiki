@@ -51,27 +51,40 @@ my $jqPluginName = "JQueryCompatibilityModePlugin";
 
 sub initPlugin {
     my ( $topic, $web, $user, $installWeb ) = @_;
-    
-    return 1 if(!$Foswiki::cfg{Plugins}{AutoCompletionLibPlugin}{AutoInclude} );        
-        
-    my $pluginPubHome = Foswiki::Func::getPubUrlPath()."/System/$pluginName";
-    my $output = "<script type='text/javascript' src='$pluginPubHome/js/lib/jquery.ajaxQueue.js'></script>";
-    Foswiki::Func::addToHEAD($pluginName."_jqueryajaxQueuejs",$output,$jqPluginName."_jq_init");
-    
-    $output = "<script type='text/javascript' src='$pluginPubHome/js/lib/thickbox-compressed.js'></script>";
-    Foswiki::Func::addToHEAD($pluginName."_thickboxjs",$output,$jqPluginName."_jq_init");
-    
-    $output = "<script language='javascript' type='text/javascript' src='$pluginPubHome/js/jquery.autocomplete.pack.js'></script>";
-    Foswiki::Func::addToHEAD($pluginName."_jqueryautocompletejs",$output,$jqPluginName."_jq_init");
-    
-    $output = "<script type='text/javascript' src='$pluginPubHome/js/lib/jquery.bgiframe.min.js'></script>";
-    Foswiki::Func::addToHEAD($pluginName."_bgiframejs",$output,$jqPluginName."_jq_init");
-   
-    $output = "<link media='screen' rel='stylesheet' type='text/css' href='$pluginPubHome/css/jquery.autocomplete.css' />";
-    Foswiki::Func::addToHEAD($pluginName."_autocompletecss",$output,$pluginName."_jqueryautocompletejs");
-    
-    $output = "<link media='screen' rel='stylesheet' type='text/css' href='$pluginPubHome/css/thickbox.css' />";
-    Foswiki::Func::addToHEAD($pluginName."_thickboxcss",$output,$pluginName."_jqueryautocompletejs");
-     
+
+    return 1
+      if ( !$Foswiki::cfg{Plugins}{AutoCompletionLibPlugin}{AutoInclude} );
+
+    my $pluginPubHome = Foswiki::Func::getPubUrlPath() . "/System/$pluginName";
+    my $output =
+"<script type='text/javascript' src='$pluginPubHome/js/lib/jquery.ajaxQueue.js'></script>";
+    Foswiki::Func::addToHEAD( $pluginName . "_jqueryajaxQueuejs",
+        $output, $jqPluginName . "_jq_init" );
+
+    $output =
+"<script type='text/javascript' src='$pluginPubHome/js/lib/thickbox-compressed.js'></script>";
+    Foswiki::Func::addToHEAD( $pluginName . "_thickboxjs",
+        $output, $jqPluginName . "_jq_init" );
+
+    $output =
+"<script language='javascript' type='text/javascript' src='$pluginPubHome/js/jquery.autocomplete.pack.js'></script>";
+    Foswiki::Func::addToHEAD( $pluginName . "_jqueryautocompletejs",
+        $output, $jqPluginName . "_jq_init" );
+
+    $output =
+"<script type='text/javascript' src='$pluginPubHome/js/lib/jquery.bgiframe.min.js'></script>";
+    Foswiki::Func::addToHEAD( $pluginName . "_bgiframejs",
+        $output, $jqPluginName . "_jq_init" );
+
+    $output =
+"<link media='screen' rel='stylesheet' type='text/css' href='$pluginPubHome/css/jquery.autocomplete.css' />";
+    Foswiki::Func::addToHEAD( $pluginName . "_autocompletecss",
+        $output, $pluginName . "_jqueryautocompletejs" );
+
+    $output =
+"<link media='screen' rel='stylesheet' type='text/css' href='$pluginPubHome/css/thickbox.css' />";
+    Foswiki::Func::addToHEAD( $pluginName . "_thickboxcss",
+        $output, $pluginName . "_jqueryautocompletejs" );
+
     return 1;
 }

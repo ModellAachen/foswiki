@@ -4,14 +4,15 @@ package Foswiki::Plugins::PrefsCachePlugin;
 
 use strict;
 
-our $VERSION = '$Rev: 5771 $';
-our $RELEASE = '1.1.1';
+our $VERSION          = '$Rev: 5771 $';
+our $RELEASE          = '1.1.1';
 our $SHORTDESCRIPTION = 'Cache preferences for faster access';
 
 sub initPlugin {
     my ( $topic, $web, $user, $installWeb ) = @_;
-    return 0 unless $Foswiki::cfg{Store}{PrefsBackend} eq
-      'Foswiki::Prefs::BerkeleyDBRAM';
+    return 0
+      unless $Foswiki::cfg{Store}{PrefsBackend} eq
+          'Foswiki::Prefs::BerkeleyDBRAM';
     return 1;
 }
 

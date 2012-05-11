@@ -19,7 +19,7 @@ package Foswiki::Plugins::PublishPlugin::tgz;
 use strict;
 
 use Foswiki::Plugins::PublishPlugin::BackEnd;
-our @ISA = ( 'Foswiki::Plugins::PublishPlugin::BackEnd' );
+our @ISA = ('Foswiki::Plugins::PublishPlugin::BackEnd');
 
 use Foswiki::Func;
 use File::Path;
@@ -40,11 +40,12 @@ sub new {
 sub param_schema {
     my $class = shift;
     return {
-	outfile => {
-	    default => 'tgz',
-	    validator => \&Foswiki::Plugins::PublishPlugin::Publisher::validateFilename
-	},
-	%{$class->SUPER::param_schema()}
+        outfile => {
+            default => 'tgz',
+            validator =>
+              \&Foswiki::Plugins::PublishPlugin::Publisher::validateFilename
+        },
+        %{ $class->SUPER::param_schema() }
     };
 }
 

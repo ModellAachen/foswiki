@@ -9,8 +9,7 @@
   requires="NATSKIN"
   text="<literal>
 %IF{"defined NATSKIN_SIDEBARWIDTH" 
-  then="<literal>
-<style>
+  then="<style>
   .natTopRight, .natSideBarHeader, .natSideBar { 
     width:%NATSKIN_SIDEBARWIDTH%; 
   }
@@ -18,7 +17,7 @@
   .natBodyBoth .natWebMenu {
     padding-left:%NATSKIN_SIDEBARWIDTH%;
   }
-</style></literal>"
+</style>"
   else="<!-- -->"
 }%</literal>"
 }%%TMPL:END%

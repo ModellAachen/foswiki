@@ -12,8 +12,8 @@ This CommandSet does not have any commands. It exist only to discover all the in
 =cut
 
 sub onImport {
-    my ($shell) = @_; 
-       configure(@_);
+    my ($shell) = @_;
+    configure(@_);
 }
 
 1;

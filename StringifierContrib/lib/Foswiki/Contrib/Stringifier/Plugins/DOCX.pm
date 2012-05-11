@@ -31,7 +31,9 @@ sub stringForFile {
     my ($text, $exit) = Foswiki::Sandbox->sysCommand($cmd, FILENAME => $filename);
 
     return '' unless ($exit == 0);
-    return $self->fromUtf8($text);
+
+    $text = $self->decode($text, $Foswiki::cfg{StringifierContrib}{CharSet}{docx2txt} || 'utf-8');
+    return $self->encode($text);
 }
 
 1;

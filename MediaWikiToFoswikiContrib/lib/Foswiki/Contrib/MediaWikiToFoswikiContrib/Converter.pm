@@ -1,4 +1,4 @@
-# Copyright (C) 2006-2009 Michael Daum http://michaeldaumconsulting.com
+# Copyright (C) 2006-2012 Michael Daum http://michaeldaumconsulting.com
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -16,6 +16,9 @@ package Foswiki::Contrib::MediaWikiToFoswikiContrib::Converter;
 use strict;
 use vars qw(%language $attachmentTemplate
   $translationToken0 $translationToken1 $translationToken2);
+
+use utf8;
+use Encode ();
 
 BEGIN {
   %language = (
@@ -44,7 +47,6 @@ use Foswiki::Time;
 use Digest::MD5 qw(md5_hex);
 use File::Copy;
 use Parse::MediaWikiDump;
-use Unicode::MapUTF8 qw(from_utf8 to_utf8);
 use Carp;
 
 $SIG{__DIE__} = \&Carp::confess;
@@ -270,8 +272,19 @@ sub convert {
   while(defined(my $page = $this->{pages}->next)) {
     my $mwTitle = $page->title;
 
+    if ($page->redirect) {
+      #$this->writeDebug("skipping redirect");
+      next;
+    }
+
     # handle category topics
     if ($mwTitle =~ /^$this->{language}{Category}/) {
+      $this->handleCategory($page);
+      next;
+    }
+
+    # try en as a default language
+    if ($mwTitle =~ /^$language{en}{Category}/) {
       $this->handleCategory($page);
       next;
     }
@@ -283,7 +296,7 @@ sub convert {
     }
 
     if ($this->{excludePattern} && $mwTitle =~ /$this->{excludePattern}/) {
-      $this->writeDebug("disallowed title '$mwTitle'");
+      #$this->writeDebug("disallowed title '$mwTitle'");
       next;
     }
 
@@ -329,7 +342,7 @@ sub convert {
     my ($twWeb, $twTopic) = $this->getTitle($page);
     my $webTopicName = "$twWeb.$twTopic";
 
-    $this->writeDebug("### processing $mwTitle -> $webTopicName");
+    $this->writeDebug("### processing $webTopicName");
     my $origText = $text;
 
     # create directories for namespaces
@@ -344,9 +357,9 @@ sub convert {
     # execute afterConvert handler
     $this->execHandler('after', $page, $text);
 
-    #if ($this->{debug}) {
+    if ($this->{debug}) {
       $text .= "---++ Original Source \n<verbatim>\n$origText\n</verbatim>\n";
-    #}
+    }
 
     # save
     $this->saveTopic($page, $text, $twWeb, $twTopic) if defined $text;
@@ -516,6 +529,7 @@ sub saveTopic {
     unless (open(FILE, ">$topicFileName")) {
       die "Can't create file $topicFileName - $!\n";
     }
+    $text = $this->toSiteCharSet($text);
     print FILE $text;
     close( FILE);
   }
@@ -539,6 +553,8 @@ sub convertMarkup {
   # multimedia
   $_[0] =~ s/\[\[$this->{language}{Image}:(.+)\]\]/$this->handleImage($page, $1)/ge;
   $_[0] =~ s/\[\[$this->{language}{Media}:(.+)\]\]/$this->handleMedia($page, $1)/ge;
+  $_[0] =~ s/\[\[$language{en}{Image}:(.+)\]\]/$this->handleImage($page, $1)/ge;
+  $_[0] =~ s/\[\[$language{en}{Media}:(.+)\]\]/$this->handleMedia($page, $1)/ge;
 
   # mailto
   $_[0] =~ s/\[mailto:([^\s]+?)\]/$1/g;
@@ -920,10 +936,11 @@ sub handleGallery {
       $file =~ s/ +/_/g;
       # attach the image
       $file = $this->attachMedia($page, $file, $comment);
-      push @images, $file;
+      push @images, $file if $file;
     }
   }
-  $result .= '%IMAGEGALLERY{include="'.join('|',@images).'"}%'."\n";
+  $result .= '%IMAGEGALLERY{include="'.join('|',@images).'"}%'."\n"
+    if @images;
 
   return $result;
 }
@@ -948,6 +965,8 @@ sub handleImage {
 
   # attach the image
   $file = $this->attachMedia($page, $file);
+
+  return '' unless $file;
 
   # recursive call for the caption
   if ($args) {
@@ -1005,10 +1024,7 @@ sub attachMedia {
   $comment ||= '';
 
   # cope with attachments that have umlauts in their name
-  my $utf8file = $file;
-  $utf8file = to_utf8(-string=>$utf8file, -charset=>$Foswiki::cfg{Site}{CharSet})
-    if $Foswiki::cfg{Site}{CharSet} !~ /^utf-?8$/i;
-
+  my $utf8file = $this->toUtf8($file);
   my $key = md5_hex($utf8file);
   my $source = $this->{images}.'/'.substr($key,0,1).'/'.substr($key,0,2).'/'.$utf8file;
 
@@ -1041,8 +1057,7 @@ sub attachMedia {
     }
   }
   my $target = $pubDir.'/'.$file;
-  $target = from_utf8(-string=>$target, -charset=>$Foswiki::cfg{Site}{CharSet})
-    unless $Foswiki::cfg{Site}{CharSet} =~ /^utf-?8$/i;
+  $target = $this->fromUtf8(string=>$target);
 
   if ($this->{dry}) {
     $this->writeDebug("would copy media file $source to $target");
@@ -1158,6 +1173,7 @@ sub getTitle {
   }
 
   $topicName = $this->getCamelCase($topicName);
+  #print STDERR "topicName=$topicName\n";
 
   # check topic map for the full web.topic
   if ($this->{topicMap}{"$webName.$topicName"}) {
@@ -1217,8 +1233,8 @@ sub getPageText {
   my ($this, $page) = @_;
 
   my $text = ${$page->text};
-  $text = from_utf8(-string=>$text, -charset=>$Foswiki::cfg{Site}{CharSet})
-    unless $Foswiki::cfg{Site}{CharSet} =~ /^utf-?8$/i;
+  $text = $this->fromUtf8($text);
+  $text = $this->toUtf8($text);
 
   return $text;
 }
@@ -1226,6 +1242,15 @@ sub getPageText {
 ##############################################################################
 sub getCamelCase {
   my ($this, $name) = @_;
+
+  # transliterate umlaute
+  $name =~ s/ä/ae/go;
+  $name =~ s/ö/oe/go;
+  $name =~ s/ü/ue/go;
+  $name =~ s/Ä/Ae/go;
+  $name =~ s/Ö/Oe/go;
+  $name =~ s/Ü/Ue/go;
+  $name =~ s/ß/ss/go;
 
   my $result = '';
   foreach my $part (split(/[^$Foswiki::regex{mixedAlphaNum}]/, $name)) {
@@ -1251,7 +1276,7 @@ sub getCategoryName {
 sub handleCategory {
   my ($this, $page) = @_;
 
-  #$this->writeDebug("called handleCategory(".$page->title.")");
+  $this->writeDebug("called handleCategory(".$page->title.")");
 
   # create a category object
   my $title = $page->title;
@@ -1271,6 +1296,7 @@ sub handleCategory {
   @parentCategories = sort @parentCategories;
   my $text = $this->getPageText($page);
   $text =~ s/\[\[$this->{language}{Category}:.+?\]\]//g;
+  $text =~ s/\[\[$language{en}{Category}:.+?\]\]//g;
   my $summary = '';
   if ($text =~ s/^\s*==\s*(.*?)\s*==\s*$//m) {
     $summary = $1;
@@ -1300,5 +1326,33 @@ sub handleCategory {
   # save it
   $this->{categories}{$category->{topic}} = $category;
 }
+
+##############################################################################
+sub fromUtf8 {
+  my ($this, $string) = @_;
+
+  return Encode::decode_utf8($string);
+}
+
+##############################################################################
+sub toUtf8 {
+  my ($this, $string) = @_;
+
+  my $charset = $Foswiki::cfg{Site}{CharSet};
+  return $string if $charset =~ /^utf-?8$/i;
+
+
+  my $octets = Encode::decode($charset, $string);
+  $octets = Encode::encode('utf-8', $octets);
+  return $octets;
+}
+
+##############################################################################
+sub toSiteCharSet {
+  my ($this, $string) = @_;
+
+  return Encode::encode($Foswiki::cfg{Site}{CharSet}, $string);
+}
+
 
 1;

@@ -1,0 +1,4 @@
+Foswiki::Contrib::XmlRpcContrib,>=0.02,perl,Required. Download from Foswiki:Extensions/XmlRpcContrib
+RPC::XML,>=0.57,cpan,Required. Download from CPAN:RPC::XML
+LWP::UserAgent,>=5.803,cpan,Required. Download from CPAN:LWP::UserAgent
+HTML::Entities,>=5.36,cpan,Required. Download from CPAN:LWP::UserAgent

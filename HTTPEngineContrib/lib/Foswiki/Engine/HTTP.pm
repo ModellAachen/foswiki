@@ -5,9 +5,9 @@ use Foswiki::Engine ();
 
 use strict;
 
-use Foswiki::Request              ();
-use Foswiki::Request::Upload      ();
-use Foswiki::Response             ();
+use Foswiki::Request         ();
+use Foswiki::Request::Upload ();
+use Foswiki::Response        ();
 
 my $CRLF = "\x0D\x0A";
 

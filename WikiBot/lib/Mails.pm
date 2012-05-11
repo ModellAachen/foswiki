@@ -32,12 +32,13 @@ use Carp;
 
 # send mail to the owner
 sub mailowner {
-    my ($subject, $text) = @_;
+    my ( $subject, $text ) = @_;
     &$Mails::debug('I am going to mail the owner!!!');
-    return &sendmail($$Mails::owner, $0, $subject, $text);
+    return &sendmail( $$Mails::owner, $0, $subject, $text );
 }
 
 sub RFC822time {
+
     # Returns today's date as an RFC822 compliant string with the
     # exception that the year is returned as four digits.  In my
     # extremely valuable opinion RFC822 was wrong to specify the year
@@ -46,24 +47,31 @@ sub RFC822time {
     # Today is defined as the first parameter, if given, or else the
     # value that time() gives.
 
-    my ($tsec,$tmin,$thour,$tmday,$tmon,$tyear,$twday,$tyday,$tisdst) = gmtime(shift || time());
-    $tyear += 1900; # as mentioned above, this is not RFC822 compliant, but is Y2K-safe.
-    $tsec = "0$tsec" if $tsec < 10;
-    $tmin = "0$tmin" if $tmin < 10;
+    my ( $tsec, $tmin, $thour, $tmday, $tmon, $tyear, $twday, $tyday, $tisdst )
+      = gmtime( shift || time() );
+    $tyear +=
+      1900; # as mentioned above, this is not RFC822 compliant, but is Y2K-safe.
+    $tsec  = "0$tsec"  if $tsec < 10;
+    $tmin  = "0$tmin"  if $tmin < 10;
     $thour = "0$thour" if $thour < 10;
-    $tmon = ('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec')[$tmon];
-    $twday = ('Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat')[$twday];
+    $tmon  = (
+        'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+    )[$tmon];
+    $twday = ( 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat' )[$twday];
     return "$twday, $tmday $tmon $tyear $thour:$tmin:$tsec GMT";
 
 }
 
 sub sendmail {
-    my ($to, $from, $subject, $text, $sig) = (@_, $0);
+    my ( $to, $from, $subject, $text, $sig ) = ( @_, $0 );
     eval {
         use Net::SMTP;
         my $date = &RFC822time();
-        my $smtp = Net::SMTP->new($Mails::smtphost) or confess("Could not create SMTP connection to $Mails::smtphost! Giving Up");
-        $smtp->mail($ENV{USER}); # XXX ?
+        my $smtp = Net::SMTP->new($Mails::smtphost)
+          or confess(
+            "Could not create SMTP connection to $Mails::smtphost! Giving Up");
+        $smtp->mail( $ENV{USER} );    # XXX ?
         $smtp->to($to);
         $smtp->data(<<end);
 X-Mailer: $0, Mails.pm; $$Mails::owner
@@ -80,32 +88,32 @@ end
     } or do {
         &$Mails::debug('Failed to send e-mail.');
         &$Mails::debug($@);
-        &$Mails::debug('-'x40);
+        &$Mails::debug( '-' x 40 );
         &$Mails::debug("To: $to");
         &$Mails::debug("From: $from");
         &$Mails::debug("Subject: $subject");
         &$Mails::debug("\n$text\n-- \n$sig");
-        &$Mails::debug('-'x40);
+        &$Mails::debug( '-' x 40 );
         return 0;
     };
     return 1;
 }
-
 
 ##########################################################
 ####  The Mails ##########################################
 ##########################################################
 
 sub ServerDown {
-    my ($server, $port, $localAddr, $nick, $ircname, $username) = @_;
+    my ( $server, $port, $localAddr, $nick, $ircname, $username ) = @_;
     my $localAddrMessage;
-    if (defined($localAddr)) {
+    if ( defined($localAddr) ) {
         $localAddrMessage = <<end;
 You've configured me to assume that '$localAddr' is the address of the
 network interface to use. If this is wrong, change the localAddr
 setting in the configuration file (or remove it to enable autodetect).
 end
-    } else {
+    }
+    else {
         $localAddrMessage = <<end;
 I'm currently autodetecting the address of the network interface to
 use. If this host has more than one interface, set the localAddr
@@ -113,7 +121,7 @@ setting in the configuration file to the IP address of the outgoing
 connection I should use.
 end
     }
-    return &mailowner("Help! I can't talk to $server:$port!", <<end);
+    return &mailowner( "Help! I can't talk to $server:$port!", <<end);
 
 Hello Sir or Madam!
 
@@ -143,7 +151,7 @@ end
 
 sub ServerUp {
     my ($server) = @_;
-    return &mailowner("Woohoo! $server let me in!", <<end);
+    return &mailowner( "Woohoo! $server let me in!", <<end);
 
 Hello again.
 
@@ -154,9 +162,9 @@ end
 }
 
 sub NickShortage {
-    my ($cfgfile, $hostname, $port, $username, $ircname, @nicks) = @_;
+    my ( $cfgfile, $hostname, $port, $username, $ircname, @nicks ) = @_;
     local $" = "\n   ";
-    return &mailowner('There is a nick shortage!', <<end);
+    return &mailowner( 'There is a nick shortage!', <<end);
 
 Hello Sir or Madam.
 
@@ -183,7 +191,7 @@ end
 
 sub NickOk {
     my ($nick) = @_;
-    return &mailowner("It's ok, I'm now using $nick as my nick.", <<end);
+    return &mailowner( "It's ok, I'm now using $nick as my nick.", <<end);
 
 Hello again.
 
@@ -193,4 +201,4 @@ Seeya later,
 end
 }
 
-1; # end
+1;    # end

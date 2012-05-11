@@ -1,4 +1,4 @@
-%META:TOPICINFO{author="ProjectContributor" comment="save topic" date="1323093757" format="1.1" reprev="15" version="19"}%
+%META:TOPICINFO{author="micha" comment="save topic" date="1332748534" format="1.1" reprev="15" version="21"}%
 %META:TOPICPARENT{name="TopicType"}%
 %TOC{depth="2"}%
 %DBCALL{"Applications.RenderTopicInstaller" TEXT="Install '%TOPIC%' TopicType" TYPE="TopicType" PARENT="TopicType"}%
@@ -12,7 +12,7 @@ See also: ClassifiedTopicTemplate, ClassifiedTopicViewTemplate
 %ENDSECTION{name="documentation" type="section"}%
 
 ---++ Topics of type '%TOPIC%'
-%STARTINCLUDE%<!-- classified topic -->
+%STARTINCLUDE%<!--  -->
 %TWISTY{link="%BUTTON{"%IF{"defined 'LABEL'" then="%LABEL%" else="%MAKETEXT{"New"}%"}%" icon="add"}%%CLEAR%"}%
 
 <form action="%SCRIPTURLPATH{"edit"}%/%BASEWEB%/" method="post" >
@@ -63,7 +63,7 @@ See also: ClassifiedTopicTemplate, ClassifiedTopicViewTemplate
   FIELDS="TopicTitle, Summary, Tag, Category, Changed"
   ROWS="20"
 }%
-<!-- //classified topic -->%STOPINCLUDE%
+<!--  -->%STOPINCLUDE%
 
 ---++ Javascript
 <verbatim class="tml">

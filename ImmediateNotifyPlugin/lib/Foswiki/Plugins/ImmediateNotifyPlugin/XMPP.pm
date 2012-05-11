@@ -13,6 +13,8 @@ package Foswiki::Plugins::ImmediateNotifyPlugin::XMPP;
 use strict;
 use warnings;
 
+# SMELL: Net::XMPP::Debug requires a patch in perl >= 5.12 to avoid warnings
+# https://rt.cpan.org/Ticket/Display.html?id=58333
 use Net::XMPP;
 
 my $debug;
@@ -57,9 +59,21 @@ sub connect {
           && defined( $this->{xmppPass} )
           && defined( $this->{xmppServer} );
 
+# SMELL: XML::Stream::Parser < 1.23_02 has a bug in new{}.
+# See: https://rt.cpan.org/Ticket/Display.html?id=56574
+# It fails to shift $this off of the parameter list and therefor has an odd
+# number of arguments.   The while loop that converts the arg list to a hash array
+# then throws a warning - undefined argument to call to lc.   Shifting $this off of
+# parameter list would be a fix.   For now suppress warnings.
+    $^W = 0;
+
     $this->{con} = Net::XMPP::Client->new();
     &$debug("- XMPP: Connecting to server $this->{xmppServer}...");
-    $this->{con}->Connect( hostname => $this->{xmppServer} );
+    $this->{con}->Connect(
+        hostname => $this->{xmppServer},
+        port     => 5222,
+        timeout  => 2,                   # Want this fast - don's slow down save
+    );
     unless ( $this->{con}->Connected() ) {
         &$warning(
             "- XMPP: Could not connect to XMPP server $this->{xmppServer}");
@@ -81,6 +95,10 @@ sub connect {
         undef $this->{con};
         return 0;
     }
+
+    # Restore warnings
+    $^W = 1;
+
     return 1;
 }
 

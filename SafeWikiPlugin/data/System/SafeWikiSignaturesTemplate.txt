@@ -1,0 +1,23 @@
+%META:TOPICINFO{author="ProjectContributor" date="1329360731" format="1.1" version="1"}%
+<verbatim>
+%TMPL:DEF{PROMPT:jssignature}%%TMPL:P{promptbox}%%TMPL:END%
+
+%TMPL:DEF{FORM:jssignature}%
+<blockquote class="foswikiHelp">
+Use this form to add new signatures and their descriptions to the above table of authorized signatures.  Enter the 22 character MD5 signature and an optional description, and press the [Add Signature] button.
+</blockquote>
+<form method="post" action="%SCRIPTURL{rest}%/CommentPlugin/comment" enctype="application/x-www-form-urlencoded" name="jssignaturecomment" id="jssignaturecomment">
+<input type="hidden" name="endPoint" value="%BASEWEB%.%BASETOPIC%" />
+<input type="hidden" name="topic" value="%BASEWEB%.%BASETOPIC%" />
+<input type="text"   name="signature" size="22" />
+<input type="text"   name="description" size="50" />
+<input type="hidden" name="comment_type" value="jssignature" />
+<input type="hidden" name="comment_templatetopic" value="%BASEWEB%.SafeWikiSignaturesTemplate" />
+<input type="submit" class="foswikiButton"  value="Add Signature" />
+</form>
+%TMPL:END%
+
+%TMPL:DEF{OUTPUT:jssignature}%%POS:BEFORE%| %URLPARAM{"signature" encode="off"}% | %URLPARAM{"description" encode="off"}% | %WIKIUSERNAME% |
+%TMPL:END%
+
+%TMPL:INCLUDE{"%SYSTEMWEB%.CommentPlugin"}%</verbatim>

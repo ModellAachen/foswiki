@@ -1,4 +1,4 @@
-# Copyright (C) 2006-2009 Michael Daum http://michaeldaumconsulting.com
+# Copyright (C) 2006-2012 Michael Daum http://michaeldaumconsulting.com
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -17,7 +17,7 @@ use strict;
 use vars qw( $VERSION $RELEASE $SHORTDESCRIPTION );
 
 $VERSION = '$Rev$';
-$RELEASE = 'v2.0';
+$RELEASE = '2.1';
 $SHORTDESCRIPTION = 'MediaWiki 2 Foswiki Conversion Tool';
 
 use Getopt::Long;

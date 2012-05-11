@@ -66,15 +66,15 @@ sub loadExtraConfig {
     $Foswiki::cfg{RCS}{AutoAttachPubFiles}  = 0;
     $Foswiki::cfg{Register}{AllowLoginName} = 1;
     $Foswiki::cfg{Htpasswd}{FileName} = "$Foswiki::cfg{WorkingDir}/htpasswd";
-    unless (-e $Foswiki::cfg{Htpasswd}{FileName} ) {
-	my $fh;
-	open($fh, ">", $Foswiki::cfg{Htpasswd}{FileName}) || die $!;
-	close($fh) || die $!;
+    unless ( -e $Foswiki::cfg{Htpasswd}{FileName} ) {
+        my $fh;
+        open( $fh, ">", $Foswiki::cfg{Htpasswd}{FileName} ) || die $!;
+        close($fh) || die $!;
     }
-    $Foswiki::cfg{PasswordManager}    = 'Foswiki::Users::HtPasswdUser';
+    $Foswiki::cfg{PasswordManager}       = 'Foswiki::Users::HtPasswdUser';
     $Foswiki::cfg{Htpasswd}{GlobalCache} = 0;
-    $Foswiki::cfg{UserMappingManager} = 'Foswiki::Users::TopicUserMapping';
-    $Foswiki::cfg{LoginManager}       = 'Foswiki::LoginManager::TemplateLogin';
+    $Foswiki::cfg{UserMappingManager}    = 'Foswiki::Users::TopicUserMapping';
+    $Foswiki::cfg{LoginManager} = 'Foswiki::LoginManager::TemplateLogin';
     $Foswiki::cfg{Register}{EnableNewUserRegistration} = 1;
     $Foswiki::cfg{RenderLoggedInButUnknownUsers} = 0;
 
@@ -95,10 +95,10 @@ sub set_up {
     $this->{response} = new Unit::Response();
     @mails = ();
     $this->{session}->net->setMailHandler( \&FoswikiFnTestCase::sentMail );
-    my $webObject = Foswiki::Meta->new( $this->{session}, $this->{test_web} );
-    $webObject->populateNewWeb();
-    $webObject = Foswiki::Meta->new( $this->{session}, $this->{users_web} );
-    $webObject->populateNewWeb();
+    my $webObject = $this->populateNewWeb( $this->{test_web} );
+    $webObject->finish();
+    $webObject = $this->populateNewWeb( $this->{users_web} );
+    $webObject->finish();
 
     $this->{test_user_forename} = 'Scum';
     $this->{test_user_surname}  = 'Bag';
@@ -113,10 +113,9 @@ sub set_up {
     $this->{test_user_cuid} =
       $this->{session}->{users}->getCanonicalUserID( $this->{test_user_login} );
     $this->{test_topicObject}->finish() if $this->{test_topicObject};
-    $this->{test_topicObject} = Foswiki::Meta->new(
-        $this->{session},    $this->{test_web},
-        $this->{test_topic}, "BLEEGLE\n"
-    );
+    ( $this->{test_topicObject} ) =
+      Foswiki::Func::readTopic( $this->{test_web}, $this->{test_topic} );
+    $this->{test_topicObject}->text("BLEEGLE\n");
     $this->{test_topicObject}->save( forcedate => ( time() + 60 ) );
 }
 

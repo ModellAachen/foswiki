@@ -25,22 +25,27 @@ Constructor
 =cut
 
 sub new {
-  my $class = shift;
-  my $session = shift || $Foswiki::Plugins::SESSION;
+    my $class = shift;
+    my $session = shift || $Foswiki::Plugins::SESSION;
 
-  my $this = bless($class->SUPER::new( 
-    $session,
-    name => 'jsoneditor',
-    version => '0.1',
-    author => 'jadesoul',
-    homepage => 'http://jadesoul.org/projects/jsoneditor/',
-    documentation => "$Foswiki::cfg{SystemWebName}.JQueryJSONEditor",
-    puburl => '%PUBURLPATH%/%SYSTEMWEB%/JSONEditorJQueryPlugin/jsoneditor',
-    javascript => ['../jquery.json-2.2.min.js', 'jquery.jsoneditor.js'],
-    css => ['jsoneditor.css']
-  ), $class);
+    my $this = bless(
+        $class->SUPER::new(
+            $session,
+            name          => 'jsoneditor',
+            version       => '0.1',
+            author        => 'jadesoul',
+            homepage      => 'http://jadesoul.org/projects/jsoneditor/',
+            documentation => "$Foswiki::cfg{SystemWebName}.JQueryJSONEditor",
+            puburl =>
+              '%PUBURLPATH%/%SYSTEMWEB%/JSONEditorJQueryPlugin/jsoneditor',
+            javascript =>
+              [ '../jquery.json-2.2.min.js', 'jquery.jsoneditor.js' ],
+            css => ['jsoneditor.css']
+        ),
+        $class
+    );
 
-  return $this;
+    return $this;
 }
 
 1;

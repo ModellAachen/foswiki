@@ -327,7 +327,7 @@ sub formQueryOnDB {
     }
 
     # Make sure the DB is loaded
-    my ( $rc, $rf, $r ) = $this->load( 0 );
+    my ( $rc, $rf, $r ) = $this->load(0);
     ASSERT( $this->cache ) if DEBUG;
 
     #print STDERR "Cache: $rc, File: $rf, Removed: $r\n";
@@ -466,11 +466,8 @@ sub showQuery {
 
     ## get finished html or twiki format table as string
     # Patch from SimonHardyFrancis
-    return $format->formatTable(
-        $matches,        $attrs->{separator}, $attrs->{newline},
-        $attrs->{start}, $attrs->{limit},     $topic,
-        $web
-    );
+    return $format->formatTable( $matches, $attrs->{separator},
+        $attrs->{newline}, $attrs->{start}, $attrs->{limit}, $topic, $web );
 }
 
 # PUBLIC return the sum of all occurrences of a numeric
@@ -563,8 +560,8 @@ sub toTable {
         throw Error::Simple "Query '$name' returned no values";
     }
 
-    return $format->toTable( $matches, $attrs->{start}, $attrs->{limit},
-                             $topic, $web );
+    return $format->toTable( $matches, $attrs->{start}, $attrs->{limit}, $topic,
+        $web );
 }
 
 1;

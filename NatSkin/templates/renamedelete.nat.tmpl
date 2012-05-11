@@ -2,59 +2,40 @@
 
 %{ ################################################################################ }%
 %TMPL:DEF{"titleaction"}%%MAKETEXT{"delete"}%%TMPL:END%
-%TMPL:DEF{"contenttitle"}%%MAKETEXT{"Delete [_1]"  args="<nop>%TOPIC%"}%%TMPL:END%
+%TMPL:DEF{"contenttitle"}%<h1>%MAKETEXT{"Delete [_1]"  args="<nop>%TOPIC%"}%</h1>%TMPL:END%
 %TMPL:DEF{"breadcrumbs::tail"}%%TMPL:P{"sep"}%<a href="%SCRIPTURLPATH{"rename"}%/%BASEWEB%/%BASETOPIC%?%QUERYSTRING%">%MAKETEXT{"Delete"}%</a>%TMPL:END%
-%TMPL:DEF{"buttons"}%<!-- buttons -->
-%BUTTON{type="save" "%MAKETEXT{"Delete"}%" icon="bin"}%
-%BUTTON{"%MAKETEXT{"Cancel"}%" icon="cross" target="%WEB%.%TOPIC%"}%
-%IF{"$'URLPARAM{currentwebonly}'='on'"
-  then="$percntBUTTON{\"%MAKETEXT{"Search in all webs"}%\" icon=\"find\" target=\"%SCRIPTURLPATH{"rename"}%/%WEB%/%TOPIC%?newweb=%URLPARAM{"newweb"}%\" title=\"%MAKETEXT{"Search for backlinks in all webs"}%\"}$percnt"
-}%
-<!-- //buttons -->%TMPL:END%
+%TMPL:DEF{"changetostep"}%%TMPL:END%
+%TMPL:DEF{"titlestep"}%%TMPL:END%
+%TMPL:DEF{"backlinks::checked"}%%TMPL:END%
 
 %{ ################################################################################ }%
-%TMPL:DEF{"content"}%<!-- content -->
-<h1>%TMPL:P{"contenttitle"}%</h1>
+%TMPL:DEF{"buttons"}%<!-- -->
+%BUTTON{type="save" "%MAKETEXT{"Delete"}%" icon="bin"}%
+%BUTTON{"%MAKETEXT{"Cancel"}%" icon="cross" target="%WEB%.%TOPIC%"}%
+%IF{"$'URLPARAM{currentwebonly}'='on' and not context SolrPluginEnabled"
+  then="$percntBUTTON{\"%MAKETEXT{"Search in all webs"}%\" icon=\"find\" target=\"%SCRIPTURLPATH{"rename"}%/%WEB%/%TOPIC%?newweb=%URLPARAM{"newweb"}%\" title=\"%MAKETEXT{"Search for backlinks in all webs"}%\"}$percnt"
+}%
+<!-- -->%TMPL:END%
+
+%{ ################################################################################ }%
+%TMPL:DEF{"formstart"}%<!-- -->
 <form name="rename" action="%SCRIPTURLPATH{"rename"}%/%WEB%/%TOPIC%" method="post">
+<input type="hidden" name="nonwikiword" value="on" />
 <input type="hidden" name="newweb" value="%TRASHWEB%" />
 <input type="hidden" name="newtopic" value="%NEW_TOPIC%" />
-<input type="hidden" name="nonwikiword" value="on" />
 <!--input type="hidden" name="confirm" value="on"-->
 <div class="foswikiFormSteps">
-  <div class="foswikiFormStep">
-    <h3>%MAKETEXT{"Move this topic into the [_1] web" args="[[%TRASHWEB%.%HOMETOPIC%][<span class='foswikiAlert'>%TRASHWEB%</span>]]"}%</h3>
+<!-- -->%TMPL:END%
 
-    <div class="foswikiFormDescription">
-      %MAKETEXT{"The topic will be renamed to [_1]." args="_%TRASHWEB%.%NEW_TOPIC%_"}%
-    </div>
-  </div>
----
-  <div class="natSearchBacklinks" %IF{"'%SEARCH_COUNT%'='0'" then="style='display:none'"}%>
-    <div class="foswikiFormStep">
-      <h3>%MAKETEXT{"Update links in the '[_1]' web" args="<nop>%WEB%"}%:</h3>
-      <div class="natSearchRenameContents">
-        %LOCAL_SEARCH%
-      </div>
-    </div>
-    <div class="foswikiFormStep">
-      <h3>%MAKETEXT{"Update links in all webs"}%:</h3>
-      <div class="natSearchRenameContents">
-        %GLOBAL_SEARCH%
-      </div>
-    </div>
-    <div class="foswikiFormStep foswikiFormButtons">
-      %BUTTON{"%MAKETEXT{"Set all"}%" icon="add" class="natRenameSetAll" title="%MAKETEXT{"Select all topics"}%"}%
-      %BUTTON{"%MAKETEXT{"Clear all"}%" icon="delete" class="natRenameClearAll" title="%MAKETEXT{"Clear selection"}%"}%
-      %CLEAR%
-    </div>
----
-  </div>
-  <div class="foswikiFormStep foswikiFormButtons">
-    %TMPL:P{"buttons"}%
-    %CLEAR%
+%{ ################################################################################ }%
+%TMPL:DEF{"changefromstep"}%<!-- -->
+<div class="foswikiFormStep">
+  <h3>%MAKETEXT{"Move this topic into the [_1] web" args="[[%TRASHWEB%.%HOMETOPIC%][<span class='foswikiAlert'>%TRASHWEB%</span>]]"}%</h3>
+
+  <div class="foswikiFormDescription">
+    %MAKETEXT{"The topic will be renamed to [_1]." args="_%TRASHWEB%.%NEW_TOPIC%_"}%
   </div>
 </div>
-</form>
-%TMPL:P{"rename::javascript"}%
-<!-- //content -->%TMPL:END%
+---
+<!-- -->%TMPL:END%
 

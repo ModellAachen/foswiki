@@ -80,7 +80,7 @@ sub formatOutNum {
 sub formatNode {
     my ( $this, $node, $count, $level ) = @_;
 
-    return "" if ( ! $this->isInsideLevelBounds( $level ) );
+    return "" if ( !$this->isInsideLevelBounds($level) );
 
     # no formatting applied
     return &Foswiki::Plugins::TreePlugin::getLinkName($node);
@@ -93,14 +93,15 @@ sub formatBranch {
 
 sub formatChild {
     my ( $this, $node, $count, $level ) = @_;
-    $this->setOutNum( $node, $count ) if ( ! $this->isInsideLevelBounds( $level ) );
+    $this->setOutNum( $node, $count )
+      if ( !$this->isInsideLevelBounds($level) );
     return $node->toHTMLFormat( $this, $count, $level );
 }
 
-sub separator { 
-    my ( $this ) = @_;
+sub separator {
+    my ($this) = @_;
     return $this->data('separator');
-} 
+}
 
 1;
 

@@ -22,13 +22,14 @@ use TWiki::Func;
 
 use vars qw( $VERSION $pluginName );
 
-$VERSION = 1.10;
+$VERSION    = 1.10;
 $pluginName = 'ExtendedSelectPlugin';
 
 sub initPlugin {
     my ( $topic, $web, $user, $installWeb ) = @_;
-    if( $TWiki::Plugins::VERSION < 1.1 ) {
-        TWiki::Func::writeWarning( "Version mismatch between $pluginName and Plugins.pm" );
+    if ( $TWiki::Plugins::VERSION < 1.1 ) {
+        TWiki::Func::writeWarning(
+            "Version mismatch between $pluginName and Plugins.pm");
         return 0;
     }
 
@@ -39,46 +40,48 @@ sub renderFormFieldForEditHandler {
     my ( $name, $type, $size, $value, $attributes, $possibleValues ) = @_;
 
     return unless $type =~ /^select\+/;
-    my ( $isMulti, $isShrink, $isValues, $selected, $item,
-	 $params, $itemValue );
-    $isMulti= ( $type =~ /\+multi(\+.+)?$/o);
-    $isShrink= ( $type =~ /\+shrink(\+.+)?$/o);
-    $isValues= ( $type =~ /\+values(\+.+)?$/o);
+    my ( $isMulti, $isShrink, $isValues, $selected, $item, $params,
+        $itemValue );
+    $isMulti  = ( $type =~ /\+multi(\+.+)?$/o );
+    $isShrink = ( $type =~ /\+shrink(\+.+)?$/o );
+    $isValues = ( $type =~ /\+values(\+.+)?$/o );
     my $choices = '';
-    foreach $item ( @$possibleValues ) {
-        $item = &TWiki::urlDecode($item);
-        $params={};
-	$itemValue=$item;
-	if( $isValues && ($item =~ /^(.*?[^\\])=(.*)$/o) ) {
-	    $item=$1;
-	    $item =~ s/\\=/=/go;
-            $itemValue=$2;
-	    $params->{'value'}=$itemValue;
-	}
-	elsif ($isValues) {
-	    $item =~ s/\\=/=/go;
-	}
-	if( $isMulti ) {
-	    $selected = ( $value =~ /^(.*,)?\s*$itemValue\s*(,.*)?$/ );
-	} else {
-	    $selected = ( $itemValue eq $value );
-	}
-	if( $selected ) {
-	    $params->{'selected'}='selected';
-	}
-	$item =~ s/<nop/&lt\;nop/go;
-	$choices .= CGI::option($params, $item );
+    foreach $item (@$possibleValues) {
+        $item      = &TWiki::urlDecode($item);
+        $params    = {};
+        $itemValue = $item;
+        if ( $isValues && ( $item =~ /^(.*?[^\\])=(.*)$/o ) ) {
+            $item = $1;
+            $item =~ s/\\=/=/go;
+            $itemValue = $2;
+            $params->{'value'} = $itemValue;
+        }
+        elsif ($isValues) {
+            $item =~ s/\\=/=/go;
+        }
+        if ($isMulti) {
+            $selected = ( $value =~ /^(.*,)?\s*$itemValue\s*(,.*)?$/ );
+        }
+        else {
+            $selected = ( $itemValue eq $value );
+        }
+        if ($selected) {
+            $params->{'selected'} = 'selected';
+        }
+        $item =~ s/<nop/&lt\;nop/go;
+        $choices .= CGI::option( $params, $item );
     }
-    if( $isShrink && $#$possibleValues<$size) {
-	if( $#$possibleValues >= 0 ) {
-	    $size = $#$possibleValues+1;
-	} else {
-	    $size = 1;
-	}
+    if ( $isShrink && $#$possibleValues < $size ) {
+        if ( $#$possibleValues >= 0 ) {
+            $size = $#$possibleValues + 1;
+        }
+        else {
+            $size = 1;
+        }
     }
-    $params={ name=>$name, size=>$size };
-    if( $isMulti ) {
-	$params->{'multiple'}='on';
+    $params = { name => $name, size => $size };
+    if ($isMulti) {
+        $params->{'multiple'} = 'on';
     }
     return CGI::Select( $params, $choices );
 }

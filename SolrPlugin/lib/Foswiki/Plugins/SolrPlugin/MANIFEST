@@ -6,11 +6,15 @@ data/System/PatternSkinSolrSearchViewTemplate.txt 0644
 data/System/PatternSkinWebChangesViewTemplate.txt 0644
 data/System/SiteChangesViewTemplate.txt 0644
 data/System/SolrPlugin.txt 0644
+data/System/SolrSideBar.txt 0644
 data/System/SolrSearchBaseTemplate.txt 0644
 data/System/SolrSearch.txt 0644
 data/System/SolrSearchViewTemplate.txt 0644
 data/System/WebChangesViewTemplate.txt 0644
 lib/CharsetDetector.pm 0644
+lib/Foswiki/Configure/Checkers/SolrPlugin/SolrHome.pm 0644
+lib/Foswiki/Configure/Checkers/SolrPlugin/SolrStartCmd.pm 0644
+lib/Foswiki/Configure/Checkers/SolrPlugin/SupportedLanguages.pm 0644
 lib/Foswiki/Plugins/SolrPlugin/Base.pm 0644
 lib/Foswiki/Plugins/SolrPlugin/Config.spec 0644
 lib/Foswiki/Plugins/SolrPlugin/Index.pm 0644

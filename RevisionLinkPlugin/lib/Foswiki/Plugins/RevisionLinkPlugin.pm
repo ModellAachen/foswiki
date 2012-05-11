@@ -3,7 +3,7 @@
 # Copyright (C) 2001-2006 Peter Thoeny, peter@thoeny.org
 # Copyright (C) 2003 Richard Baar, richard.baar@centrum.cz
 # Copyright (C) 2009 Kenneth Lavrsen, kenneth@lavrsen.dk
-# and Foswiki Contributors. 
+# and Foswiki Contributors.
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -35,6 +35,7 @@ use strict;
 # $VERSION is referred to by Foswiki, and is the only global variable that
 # *must* exist in this package
 use vars qw( $VERSION $RELEASE $debug $pluginName );
+
 #$web $topic $user $installWeb
 
 # This should always be $Rev$ so that Foswiki can determine the checked-in
@@ -49,7 +50,6 @@ $RELEASE = '2.2 (27 Jan 2009)';
 
 # Name of this Plugin, only used in this module
 $pluginName = 'RevisionLinkPlugin';
-
 
 =pod
 
@@ -78,34 +78,35 @@ and highly dangerous!
 
 =cut
 
-sub initPlugin
-{
+sub initPlugin {
     my ( $topic, $web, $user, $installWeb ) = @_;
 
     # check for Plugins.pm versions
-    if( $Foswiki::Plugins::VERSION < 1 ) {
-      &Foswiki::Func::writeWarning( "Version mismatch between RevisionLinkPlugin and Plugins.pm" );
-      return 0;
+    if ( $Foswiki::Plugins::VERSION < 1 ) {
+        &Foswiki::Func::writeWarning(
+            "Version mismatch between RevisionLinkPlugin and Plugins.pm");
+        return 0;
     }
 
     # Get plugin debug flag
-    $debug = &Foswiki::Func::getPreferencesFlag( "REVISIONLINKPLUGIN_DEBUG" );
+    $debug = &Foswiki::Func::getPreferencesFlag("REVISIONLINKPLUGIN_DEBUG");
 
-    Foswiki::Func::registerTagHandler( 'REV', \&handleRevision, 'context-free' );
+    Foswiki::Func::registerTagHandler( 'REV', \&handleRevision,
+        'context-free' );
 
     # Plugin correctly initialized
     return 1;
 }
 
-
 sub handleRevision {
-#  my ( $text, $topic, $web ) = @_;
-    my ($session, $params, $topic, $web) = @_;
 
-    my $tmpWeb = $params->{'web'} || $web;
-    my $rev = $params->{'rev'} || '';
-    my $format = $params->{'format'} || '';
-    my $emptyAttr = $params->{'_DEFAULT'} || '';
+    #  my ( $text, $topic, $web ) = @_;
+    my ( $session, $params, $topic, $web ) = @_;
+
+    my $tmpWeb        = $params->{'web'}        || $web;
+    my $rev           = $params->{'rev'}        || '';
+    my $format        = $params->{'format'}     || '';
+    my $emptyAttr     = $params->{'_DEFAULT'}   || '';
     my $tmpAttachment = $params->{'attachment'} || '';
 
     my $tmpTopic = $topic;
@@ -122,22 +123,28 @@ sub handleRevision {
     my $targetTopic = $params->{'topic'} || $tmpTopic;
 
     if ( $rev < 0 ) {
-        my $maxRev = (Foswiki::Func::getRevisionInfo( $tmpWeb, $targetTopic, undef, $tmpAttachment ))[2];
+        my $maxRev = (
+            Foswiki::Func::getRevisionInfo(
+                $tmpWeb, $targetTopic, undef, $tmpAttachment
+            )
+        )[2];
         $rev = $maxRev + $rev;
     }
-  
+
     # Remove 1. prefix in case the Foswiki contains old Cairo topics and they
     # use the plugin the old way
     $rev =~ s/1\.(.*)/$1/;
-  
+
     if ( $rev ne '' && $rev < 1 ) {
         $rev = 1;
     }
-  
-    my ( $revDate, $revUser, $tmpRev, $revComment ) = Foswiki::Func::getRevisionInfo( $tmpWeb, $targetTopic, $rev, $tmpAttachment);
+
+    my ( $revDate, $revUser, $tmpRev, $revComment ) =
+      Foswiki::Func::getRevisionInfo( $tmpWeb, $targetTopic, $rev,
+        $tmpAttachment );
 
     if ( $format eq "" ) {
-        if ( $tmpAttachment ) {
+        if ($tmpAttachment) {
             $format = "!$tmpAttachment($rev)!";
         }
         else {
@@ -157,11 +164,13 @@ sub handleRevision {
         $format =~ s/\$comment/$revComment/geo;
     }
 
-    if ( $tmpAttachment ) {
-        $format =~ s/!(.*?)!/[[%SCRIPTURLPATH{"viewfile"}%\/$tmpWeb\/$targetTopic\/$tmpAttachment\?rev=$rev][$1]]/g;
+    if ($tmpAttachment) {
+        $format =~
+s/!(.*?)!/[[%SCRIPTURLPATH{"viewfile"}%\/$tmpWeb\/$targetTopic\/$tmpAttachment\?rev=$rev][$1]]/g;
     }
     else {
-        $format =~ s/!(.*?)!/[[%SCRIPTURLPATH{"view"}%\/$tmpWeb\/$targetTopic\?rev=$rev][$1]]/g;
+        $format =~
+s/!(.*?)!/[[%SCRIPTURLPATH{"view"}%\/$tmpWeb\/$targetTopic\?rev=$rev][$1]]/g;
     }
     return $format;
 }

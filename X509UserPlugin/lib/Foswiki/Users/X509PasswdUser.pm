@@ -12,7 +12,7 @@
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details, published at 
+# GNU General Public License for more details, published at
 # http://www.gnu.org/copyleft/gpl.html
 
 =begin TML 
@@ -60,18 +60,19 @@ use Error qw( :try );
 # 'Use locale' for internationalisation of Perl sorting in getTopicNames
 # and other routines - main locale settings are done in Foswiki::setupLocale
 BEGIN {
+
     # Do a dynamic 'use locale' for this module
-    if( $Foswiki::cfg{UseLocale} ) {
+    if ( $Foswiki::cfg{UseLocale} ) {
         require locale;
-        import locale ();
+        import locale();
     }
 }
 
 sub new {
-    my( $class, $session) = @_;
+    my ( $class, $session ) = @_;
     my $this = bless( $class->SUPER::new($session), $class );
     $this->{error} = undef;
- 
+
     # Always plaintext encoding for X509
 
     return $this;
@@ -91,7 +92,7 @@ sub finish {
     my $this = shift;
     $this->SUPER::finish();
     undef $this->{passworddata};
-    close $this->{passwordlock} if( $this->{passwordlock} );
+    close $this->{passwordlock} if ( $this->{passwordlock} );
     undef $this->{passwordlock};
 }
 
@@ -106,8 +107,9 @@ returns true if the password file is not currently modifyable
 sub readOnly {
     my $this = shift;
     my $path = $Foswiki::cfg{Htpasswd}{FileName};
+
     #TODO: what if the data dir is also read only?
-    if ((!-e $path) || ( -e $path && -r $path && !-d $path && -w $path)) {
+    if ( ( !-e $path ) || ( -e $path && -r $path && !-d $path && -w $path ) ) {
         $this->{session}->enterContext('passwords_modifyable');
         return 0;
     }
@@ -117,19 +119,20 @@ sub readOnly {
 sub canFetchUsers {
     return 1;
 }
+
 sub fetchUsers {
     my $this = shift;
-    my $db = $this->_readPasswd();
+    my $db   = $this->_readPasswd();
     my @users;
-    foreach  (sort keys %$db) {
-	push @users, $_ if( $_ eq $db->{$_}->{wikiname} );
+    foreach ( sort keys %$db ) {
+        push @users, $_ if ( $_ eq $db->{$_}->{wikiname} );
     }
     require Foswiki::ListIterator;
-    return new Foswiki::ListIterator(\@users);
+    return new Foswiki::ListIterator( \@users );
 }
 
 sub wiki2Login {
-    my $this = shift;
+    my $this     = shift;
     my $wikiname = shift;
 
     my $db = $this->_readPasswd();
@@ -140,50 +143,59 @@ sub _readPasswd {
     my $this = shift;
     my $lock = shift;
 
-    if (defined($this->{passworddata})) {
-	return $this->{passworddata} unless( $lock );
+    if ( defined( $this->{passworddata} ) ) {
+        return $this->{passworddata} unless ($lock);
     }
 
     my $db = {};
-    if ( ! -e $Foswiki::cfg{Htpasswd}{FileName} ) {
+    if ( !-e $Foswiki::cfg{Htpasswd}{FileName} ) {
         return $db;
     }
 
     # Htpasswd contains certificate, wikiname and emails
     # WikiUsers topic is not used (anymore)
     my $ifh;
-    if( $lock ) {
-	open( $ifh, "+<$Foswiki::cfg{Htpasswd}{FileName}" ) ||
-	    throw Error::Simple( $Foswiki::cfg{Htpasswd}{FileName}.' open failed: '.$! );
-	$this->{passwordlock} = $ifh;
-	flock( $ifh, LOCK_EX )or throw Error::Simple( "Unable to lock $Foswiki::cfg{Htpasswd}{FileName}: $!" );
-	return $this->{passworddata} if( defined( $this->{passworddata} ) );
-    } else {
-	open( $ifh, "<$Foswiki::cfg{Htpasswd}{FileName}" ) ||
-	    throw Error::Simple( $Foswiki::cfg{Htpasswd}{FileName}.' open failed: '.$! );
-	flock( $ifh, LOCK_SH )or throw Error::Simple( "Unable to lock $Foswiki::cfg{Htpasswd}{FileName}: $!" );
+    if ($lock) {
+        open( $ifh, "+<$Foswiki::cfg{Htpasswd}{FileName}" )
+          || throw Error::Simple(
+            $Foswiki::cfg{Htpasswd}{FileName} . ' open failed: ' . $! );
+        $this->{passwordlock} = $ifh;
+        flock( $ifh, LOCK_EX )
+          or throw Error::Simple(
+            "Unable to lock $Foswiki::cfg{Htpasswd}{FileName}: $!");
+        return $this->{passworddata} if ( defined( $this->{passworddata} ) );
+    }
+    else {
+        open( $ifh, "<$Foswiki::cfg{Htpasswd}{FileName}" )
+          || throw Error::Simple(
+            $Foswiki::cfg{Htpasswd}{FileName} . ' open failed: ' . $! );
+        flock( $ifh, LOCK_SH )
+          or throw Error::Simple(
+            "Unable to lock $Foswiki::cfg{Htpasswd}{FileName}: $!");
     }
     my $line = '';
-    while (defined ($line =<$ifh>) ) {
-        if( $line =~ /^(.+?):(.*?):(.*?)(?::(.*))?$/ ) {
-	    my( $certname, $pass, $wikiname, $email ) = ($1, $2, $3, $4 );
+    while ( defined( $line = <$ifh> ) ) {
+        if ( $line =~ /^(.+?):(.*?):(.*?)(?::(.*))?$/ ) {
+            my ( $certname, $pass, $wikiname, $email ) = ( $1, $2, $3, $4 );
 
-	    # Map from login to password and e-mail.  
+            # Map from login to password and e-mail.
 
-	    $db->{$certname} = {
-		                    certname => $certname,   # For reverse lookups
-			            pass => "xxj31ZMTZzkVA", # Required for apache certificate authentication
-				    emails => $email || '',
-				    wikiname => $wikiname || '',
-			       };
-	    # Map data from wikiname as well.
-	    # Wikinames don't look anything like a login name, so there's no conflict.
-	    # Perhaps we should have 2 separate hashes to reduce the sort costs.  Not today.
+            $db->{$certname} = {
+                certname => $certname,        # For reverse lookups
+                pass     => "xxj31ZMTZzkVA"
+                ,    # Required for apache certificate authentication
+                emails   => $email    || '',
+                wikiname => $wikiname || '',
+            };
 
-	    $db->{$wikiname} = $db->{$certname} if( $wikiname );
+# Map data from wikiname as well.
+# Wikinames don't look anything like a login name, so there's no conflict.
+# Perhaps we should have 2 separate hashes to reduce the sort costs.  Not today.
+
+            $db->{$wikiname} = $db->{$certname} if ($wikiname);
         }
     }
-    close( $ifh ) unless( $lock );
+    close($ifh) unless ($lock);
 
     $this->{passworddata} = $db;
     return $db;
@@ -191,39 +203,47 @@ sub _readPasswd {
 
 sub _dumpPasswd {
     my $db = shift;
-    my $s = '';
+    my $s  = '';
     foreach ( sort keys %$db ) {
-	# db has the same data keyed by login and by wikiname.  Only write it once.
-        $s .= $_.':'.$db->{$_}->{pass}.':'.$db->{$_}->{wikiname}.':'.$db->{$_}->{emails}."\n" unless( $_ eq $db->{$_}->{wikiname} );
+
+     # db has the same data keyed by login and by wikiname.  Only write it once.
+        $s .=
+            $_ . ':'
+          . $db->{$_}->{pass} . ':'
+          . $db->{$_}->{wikiname} . ':'
+          . $db->{$_}->{emails} . "\n"
+          unless ( $_ eq $db->{$_}->{wikiname} );
     }
     return $s;
 }
 
 sub _savePasswd {
     my $this = shift;
-    my $db = shift;
+    my $db   = shift;
 
-    umask( 077 );
-    my $fh = $this->{passwordlock} or 
-	throw Error::Simple(  "X509 write without lock for $Foswiki::cfg{Htpasswd}{FileName}" );
-    seek( $fh, 0, SEEK_SET ) or
-	throw Error::Simple(  "X509 seek 0 failed for $Foswiki::cfg{Htpasswd}{FileName}" );
+    umask(077);
+    my $fh = $this->{passwordlock}
+      or throw Error::Simple(
+        "X509 write without lock for $Foswiki::cfg{Htpasswd}{FileName}");
+    seek( $fh, 0, SEEK_SET )
+      or throw Error::Simple(
+        "X509 seek 0 failed for $Foswiki::cfg{Htpasswd}{FileName}");
     print $fh _dumpPasswd($db);
-    truncate( $fh, tell( $fh ) ) or
-	throw Error::Simple(  "X509 truncate failed for $Foswiki::cfg{Htpasswd}{FileName}" );
+    truncate( $fh, tell($fh) )
+      or throw Error::Simple(
+        "X509 truncate failed for $Foswiki::cfg{Htpasswd}{FileName}");
 
-    close( $fh );
+    close($fh);
     undef $this->{passwordlock};
 }
 
 sub encrypt {
     my ( $this, $login, $passwd, $fresh ) = @_;
 
+    $passwd = "xxj31ZMTZzkVA"; # Required for apache certificate authentication;
 
-    $passwd = "xxj31ZMTZzkVA";     # Required for apache certificate authentication;
-
-    # X509 never encrypts (but don't worry, the password is only to make apache happy.
-    # The real authentication is done by the certificate validation there.
+# X509 never encrypts (but don't worry, the password is only to make apache happy.
+# The real authentication is done by the certificate validation there.
     return $passwd;
 }
 
@@ -231,19 +251,22 @@ sub fetchPass {
     my ( $this, $login ) = @_;
     my $ret = 0;
 
-    if( $login ) {
+    if ($login) {
         try {
             my $db = $this->_readPasswd();
-            if( exists $db->{$login} ) {
+            if ( exists $db->{$login} ) {
                 $ret = $db->{$login}->{pass};
-            } else {
+            }
+            else {
                 $this->{error} = 'Login invalid';
                 $ret = undef;
             }
-        } catch Error::Simple with {
+        }
+        catch Error::Simple with {
             $this->{error} = $!;
         };
-    } else {
+    }
+    else {
         $this->{error} = 'No user';
     }
     return $ret;
@@ -252,26 +275,28 @@ sub fetchPass {
 sub addUser( ) {
     my ( $this, $login, $wikiname, $password, $emails ) = @_;
 
-    die "X509 Not a login name $login in add" unless( $login =~ m/\/(\w+)=/);
+    die "X509 Not a login name $login in add" unless ( $login =~ m/\/(\w+)=/ );
 
-    if( $this->fetchPass( $login )) {
-        $this->{error} = $login.' already exists';
+    if ( $this->fetchPass($login) ) {
+        $this->{error} = $login . ' already exists';
         return 0;
     }
-    die "No wikiname in X509 addUser" unless( $wikiname );
+    die "No wikiname in X509 addUser" unless ($wikiname);
 
     try {
-        my $db = $this->_readPasswd( 1 );
+        my $db = $this->_readPasswd(1);
 
-	$db->{$login} = {
-	                    certname => $login, 
-	                    pass => "xxj31ZMTZzkVA", # Required for apache certificate authentication
-			    emails => $emails || '',
-			    wikiname => $wikiname || '',
-			};
-	$db->{$wikiname} = $db->{$login};
-        $this->_savePasswd( $db );
-    } catch Error::Simple with {
+        $db->{$login} = {
+            certname => $login,
+            pass =>
+              "xxj31ZMTZzkVA",  # Required for apache certificate authentication
+            emails   => $emails   || '',
+            wikiname => $wikiname || '',
+        };
+        $db->{$wikiname} = $db->{$login};
+        $this->_savePasswd($db);
+    }
+    catch Error::Simple with {
         $this->{error} = $!;
         print STDERR "ERROR: failed to add User - $!";
         return undef;
@@ -284,12 +309,13 @@ sub addUser( ) {
 sub setPassword {
     my ( $this, $login, $newUserPassword, $oldUserPassword ) = @_;
 
-    # This was called at registration to add a user, but X509UserMapping will never do that..
-    #
-    # There's no point in changing the password, since it's a constant for all users
-    # when using X509 authentication.  So we just fail.
+# This was called at registration to add a user, but X509UserMapping will never do that..
+#
+# There's no point in changing the password, since it's a constant for all users
+# when using X509 authentication.  So we just fail.
 
-    $this->{error} = "X.509 Authentication does not use passwords, and they can not be set or changed";
+    $this->{error} =
+"X.509 Authentication does not use passwords, and they can not be set or changed";
     return undef;
 }
 
@@ -299,16 +325,19 @@ sub removeUser {
     $this->{error} = undef;
 
     try {
-        my $db = $this->_readPasswd( 1 );
-        unless( $db->{$login} ) {
-            $this->{error} = 'No such user '.$login;
-        } else {
-	    delete $db->{$db->{$login}->{wikiname}} if( $db->{$db->{$login}->{wikiname}} );
+        my $db = $this->_readPasswd(1);
+        unless ( $db->{$login} ) {
+            $this->{error} = 'No such user ' . $login;
+        }
+        else {
+            delete $db->{ $db->{$login}->{wikiname} }
+              if ( $db->{ $db->{$login}->{wikiname} } );
             delete $db->{$login};
-            $this->_savePasswd( $db );
+            $this->_savePasswd($db);
             $result = 1;
         }
-    } catch Error::Simple with {
+    }
+    catch Error::Simple with {
         $this->{error} = shift->{-text};
     };
     return $result;
@@ -320,11 +349,13 @@ sub checkPassword {
 
     $this->{error} = undef;
 
-    my $pw = $this->fetchPass( $login );
+    my $pw = $this->fetchPass($login);
     return 0 unless defined $pw;
+
     # $pw will be 0 if there is no pw
 
-    return 1 if( $pw && ($encryptedPassword eq $pw) );
+    return 1 if ( $pw && ( $encryptedPassword eq $pw ) );
+
     # pw may validly be '', and must match an unencrypted ''. This is
     # to allow for sysadmins removing the password field in .htpasswd in
     # order to reset the password.
@@ -339,46 +370,48 @@ sub isManagingEmails {
 }
 
 sub getEmails {
-    my( $this, $login ) = @_;
+    my ( $this, $login ) = @_;
 
     my $db = $this->_readPasswd();
-    if( $db->{$login}->{emails}) {
-        return split(/;/, $db->{$login}->{emails});
+    if ( $db->{$login}->{emails} ) {
+        return split( /;/, $db->{$login}->{emails} );
     }
     return;
 }
 
 sub setEmails {
-    my $this = shift;
+    my $this  = shift;
     my $login = shift;
     ASSERT($login) if DEBUG;
 
-    my $db = $this->_readPasswd( 1 );
-    if ($db->{$login}) {
-	if( defined($_[0]) ) {
-	    $db->{$login}->{emails} = join(';', @_);
-	} else {
-	    $db->{$login}->{emails} = '';
-	}
-	$this->_savePasswd($db);
-    } else {
-	close $this->{passwordlock};
-	undef $this->{passwordlock};
+    my $db = $this->_readPasswd(1);
+    if ( $db->{$login} ) {
+        if ( defined( $_[0] ) ) {
+            $db->{$login}->{emails} = join( ';', @_ );
+        }
+        else {
+            $db->{$login}->{emails} = '';
+        }
+        $this->_savePasswd($db);
+    }
+    else {
+        close $this->{passwordlock};
+        undef $this->{passwordlock};
     }
     return 1;
 }
 
 # Searches the password DB for users who have set this email.
 sub findUserByEmail {
-    my( $this, $email ) = @_;
+    my ( $this, $email ) = @_;
     my $logins = [];
-    my $db = _readPasswd();
-    while (my ($k, $v) = each %$db) {
-	next unless $db->{$k}->{wikiname} eq $k;
+    my $db     = _readPasswd();
+    while ( my ( $k, $v ) = each %$db ) {
+        next unless $db->{$k}->{wikiname} eq $k;
 
-        my %ems = map { $_ => 1 } split(';', $v->{emails});
-        if ($ems{$email}) {
-            push(@$logins, $k);
+        my %ems = map { $_ => 1 } split( ';', $v->{emails} );
+        if ( $ems{$email} ) {
+            push( @$logins, $k );
         }
     }
     return $logins;

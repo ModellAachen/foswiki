@@ -126,7 +126,7 @@ sub _parseOptions {
     $options->{dateformat} = $params->{dateformat};
     $options->{mandatory}  = Foswiki::Func::isTrue( $params->{mandatory}, 0 )
       if defined $params->{mandatory};
-    
+    $options->{hint}      = $params->{hint};
     $options->{title}     = $params->{title};
     $options->{condition} = $params->{condition};
     $options->{validate}  = $params->{validate};
@@ -135,23 +135,6 @@ sub _parseOptions {
         $options->{tabindex} = $Foswiki::Plugins::FormPlugin::tabIndex++;
     }
 
-    $options->{hint}      = $params->{hint};
-    # add hint for Firefox users
-    # only if hint does not exist yet
-    if (!defined $options->{hint}) {
-    	# don't overwrite existing hints
-	    if (!$formData->{options}->{disableValidation} && !$formData->{options}->{inlineValidationOnly}) {
-    		# we are validating
-			if ( $ENV{HTTP_USER_AGENT} =~ m/Firefox/ ) {
-				# Firefox user
-				if ( $options->{type} eq 'submit') {
-					# submit field
-					$options->{hint} = $Foswiki::Plugins::FormPlugin::Constants::TEMPLATE_REDIRECT_WARNING;
-				}
-			}
-		}
-    }
-    
     $options->{class} = $params->{cssclass};
     $options->{placeholder} = $params->{placeholder} || $params->{beforeclick};
     $options->{spellcheck} =

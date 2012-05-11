@@ -185,10 +185,12 @@ sub _REPO {
         return $report;
     }
     elsif ( $default eq 'status' ) {
+
         #my ($curdir) = getcwd =~ m/^(.*)$/;
         #chdir($repoRoot);
         ( my $repoInfo, $exit ) =
           Foswiki::Sandbox->sysCommand( "$gitbin $repoLoc status -uno", );
+
         #chdir($curdir);
         my $report .= " " . '<verbatim>' . $repoInfo . '</verbatim>'
           unless $exit;
@@ -203,7 +205,8 @@ sub _REPO {
 
         $fileStatus = substr( $fileStatus, 0, 2 );
 
-        return "*File not known to git:* =$absfile= " if ( $fileStatus eq '??' );
+        return "*File not known to git:* =$absfile= "
+          if ( $fileStatus eq '??' );
 
         my $status =
             $fileStatus =~ m/\ [MD]/  ? 'Modified, not updated in index'
@@ -213,7 +216,7 @@ sub _REPO {
           : $fileStatus =~ m/R[\ MD]/ ? 'renamed in index'
           : $fileStatus =~ m/C[\ MD]/ ? 'copied in index'
           : $fileStatus eq '' ? 'up to date'
-          :                      'unknown';
+          :                     'unknown';
 
         ( my $topicinfo, $exit ) =
           Foswiki::Sandbox->sysCommand( "$gitbin $repoLoc log -1  $absfile ", );
@@ -222,15 +225,15 @@ sub _REPO {
 
         $report .= "*File Status:* ($fileStatus) - $status\n\n";
 
-        $report .= "*Last Commit:* \n" . '<verbatim>' . $topicinfo . '</verbatim>'
+        $report .=
+          "*Last Commit:* \n" . '<verbatim>' . $topicinfo . '</verbatim>'
           unless $exit;
 
         return $report;
     }
 
-
 ###
-### DEAD CODE 
+### DEAD CODE
 ###
     my ( $gitinfo, $gexit ) =
       Foswiki::Sandbox->sysCommand( "$gitbin $repoLoc svn info ", );
@@ -242,7 +245,6 @@ sub _REPO {
       Foswiki::Sandbox->sysCommand( "$svnbin $repoLoc info ", );
     $repoInfo{type} = 'svn'
       unless ( $sexit || $svninfo =~ m/not a working copy/ );
-
 
     my $cmd = $params->{_DEFAULT} || '';
 

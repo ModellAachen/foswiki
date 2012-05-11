@@ -1,5 +1,7 @@
 # Release manifest for SafeWikiPlugin
 data/System/SafeWikiPlugin.txt 0644 Documentation
+data/System/SafeWikiSignatures.txt 0644 Documentation
+data/System/SafeWikiSignaturesTemplate.txt 0644 Documentation
 lib/Foswiki/Configure/Checkers/Plugins/SafeWikiPlugin/Enabled.pm 0644
 lib/Foswiki/Configure/Checkers/Plugins/SafeWikiPlugin/SafeURI.pm 0644
 lib/Foswiki/Configure/Checkers/Plugins/SafeWikiPlugin/UnsafeURI.pm 0644
@@ -12,3 +14,4 @@ lib/Foswiki/Plugins/SafeWikiPlugin/Parser.pm 0644
 pub/System/SafeWikiPlugin/safewiki.png 0644
 #pub/System/SafeWikiPlugin/safewiki.svg 0644
 pub/System/SafeWikiPlugin/wikiringlogo20x20.png 0644
+templates/safewikierror.tmpl

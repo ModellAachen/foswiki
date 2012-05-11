@@ -16,6 +16,7 @@ package Foswiki::Plugins::SolrPlugin;
 use strict;
 use Foswiki::Func ();
 use Foswiki::Plugins ();
+use Error qw(:try);
   
 our $VERSION = '$Rev: 20091124 (2009-11-24) $';
 our $RELEASE = '1.10';
@@ -34,15 +35,83 @@ sub initPlugin {
   %searcher = ();
   %indexer = ();
 
-  Foswiki::Func::registerTagHandler('SOLRSEARCH', \&SOLRSEARCH);
-  Foswiki::Func::registerTagHandler('SOLRFORMAT', \&SOLRFORMAT);
-  Foswiki::Func::registerTagHandler('SOLRSIMILAR', \&SOLRSIMILAR);
-  Foswiki::Func::registerTagHandler('SOLRSCRIPTURL', \&SOLRSCRIPTURL);
-  Foswiki::Func::registerRESTHandler('search', \&restSOLRSEARCH);
-  Foswiki::Func::registerRESTHandler('terms', \&restSOLRTERMS);
-  Foswiki::Func::registerRESTHandler('similar', \&restSOLRSIMILAR);
-  Foswiki::Func::registerRESTHandler('autocomplete', \&restSOLRAUTOCOMPLETE);
-  Foswiki::Func::registerRESTHandler('optimize', \&restOPTIMIZE);
+  Foswiki::Func::registerTagHandler('SOLRSEARCH', sub {
+    my ($session, $params, $theTopic, $theWeb) = @_;
+
+    return getSearcher($session)->handleSOLRSEARCH($params, $theWeb, $theTopic);
+  });
+
+
+  Foswiki::Func::registerTagHandler('SOLRFORMAT', sub {
+    my ($session, $params, $theTopic, $theWeb) = @_;
+
+    return getSearcher($session)->handleSOLRFORMAT($params, $theWeb, $theTopic);
+  });
+
+
+  Foswiki::Func::registerTagHandler('SOLRSIMILAR', sub {
+    my ($session, $params, $theTopic, $theWeb) = @_;
+
+    return getSearcher($session)->handleSOLRSIMILAR($params, $theWeb, $theTopic);
+  });
+
+  Foswiki::Func::registerTagHandler('SOLRSCRIPTURL', sub {
+    my ($session, $params, $theTopic, $theWeb) = @_;
+
+    return getSearcher($session)->handleSOLRSCRIPTURL($params, $theWeb, $theTopic);
+  });
+
+
+  Foswiki::Func::registerRESTHandler('search', sub {
+    my $session = shift;
+
+    my $web = $session->{webName};
+    my $topic = $session->{topicName};
+    return getSearcher($session)->restSOLRSEARCH($web, $topic);
+  });
+
+
+  Foswiki::Func::registerRESTHandler('terms', sub {
+    my $session = shift;
+
+    my $web = $session->{webName};
+    my $topic = $session->{topicName};
+    return getSearcher($session)->restSOLRTERMS($web, $topic);
+  });
+
+
+  Foswiki::Func::registerRESTHandler('similar', sub {
+    my $session = shift;
+
+    my $web = $session->{webName};
+    my $topic = $session->{topicName};
+    return getSearcher($session)->restSOLRSIMILAR($web, $topic);
+  });
+
+  Foswiki::Func::registerRESTHandler('autocomplete', sub {
+    my $session = shift;
+
+    my $web = $session->{webName};
+    my $topic = $session->{topicName};
+    return getSearcher($session)->restSOLRAUTOCOMPLETE($web, $topic);
+  });
+
+
+  Foswiki::Func::registerRESTHandler('optimize', sub {
+    my $session = shift;
+    return getIndexer($session)->optimize();
+  });
+
+  Foswiki::Func::registerRESTHandler('crawl', sub {
+    my $session = shift;
+
+    my $query = Foswiki::Func::getCgiQuery();
+    my $name = $query->param("name");
+    my $path = $query->param("path");
+    my $depth = $query->param("depth");
+
+    return getCrawler($session, $name)->crawl($path, $depth);
+  });
 
   return 1;
 }
@@ -77,68 +146,22 @@ sub getIndexer {
   return $indexer;
 }
 
-sub SOLRSEARCH {
-  my ($session, $params, $theTopic, $theWeb) = @_;
+sub getCrawler {
+  my ($session , $name) = @_;
 
-  return getSearcher($session)->handleSOLRSEARCH($params, $theWeb, $theTopic);
-}
+  throw Error::Simple("no crawler name") unless defined $name;
+    
+  my $params = $Foswiki::cfg{SolrPlugin}{Crawler}{$name};
 
-sub SOLRFORMAT {
-  my ($session, $params, $theTopic, $theWeb) = @_;
+  throw Error::Simple("unknown crawler $name") unless defined $params;
 
-  return getSearcher($session)->handleSOLRFORMAT($params, $theWeb, $theTopic);
-}
+  my $module = $params->{module};
+  eval "use $module";
+  if ($@) {
+    throw Error::Simple($@);
+  }
 
-sub SOLRSIMILAR {
-  my ($session, $params, $theTopic, $theWeb) = @_;
-
-  return getSearcher($session)->handleSOLRSIMILAR($params, $theWeb, $theTopic);
-}
-
-sub SOLRSCRIPTURL {
-  my ($session, $params, $theTopic, $theWeb) = @_;
-
-  return getSearcher($session)->handleSOLRSCRIPTURL($params, $theWeb, $theTopic);
-}
-
-
-sub restOPTIMIZE {
-  my $session = shift;
-
-  getIndexer($session)->optimize();
-}
-
-
-sub restSOLRSEARCH {
-  my $session = shift;
-
-  my $web = $session->{webName};
-  my $topic = $session->{topicName};
-  return getSearcher($session)->restSOLRSEARCH($web, $topic);
-}
-
-sub restSOLRTERMS {
-  my $session = shift;
-
-  my $web = $session->{webName};
-  my $topic = $session->{topicName};
-  return getSearcher($session)->restSOLRTERMS($web, $topic);
-}
-
-sub restSOLRSIMILAR {
-  my $session = shift;
-
-  my $web = $session->{webName};
-  my $topic = $session->{topicName};
-  return getSearcher($session)->restSOLRSIMILAR($web, $topic);
-}
-
-sub restSOLRAUTOCOMPLETE {
-  my $session = shift;
-
-  my $web = $session->{webName};
-  my $topic = $session->{topicName};
-  return getSearcher($session)->restSOLRAUTOCOMPLETE($web, $topic);
+  return $module->new($session, %$params);
 }
 
 sub indexCgi {

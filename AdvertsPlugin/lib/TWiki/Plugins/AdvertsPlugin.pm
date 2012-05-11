@@ -23,61 +23,63 @@
 # =========================
 package TWiki::Plugins::AdvertsPlugin;
 
-
 # =========================
 use vars qw(
   $web $topic $user $installWeb $VERSION $RELEASE $pluginName
   $debug $phpAdsNewBase $selectionStringPrefix $selectionStringSuffix;
 );
 
-$VERSION = '$Rev$';
-$RELEASE = 'Dakar';
+$VERSION    = '$Rev$';
+$RELEASE    = 'Dakar';
 $pluginName = 'AdvertsPlugin';    # Name of this Plugin
 
 # =========================
 sub initPlugin {
- ( $topic, $web, $user, $installWeb ) = @_;
+    ( $topic, $web, $user, $installWeb ) = @_;
 
- # check for Plugins.pm versions
- if ( $TWiki::Plugins::VERSION < 1.001 ) {
-  TWiki::Func::writeWarning(
-   "Version mismatch between $pluginName and Plugins.pm");
-  return 0;
- }
+    # check for Plugins.pm versions
+    if ( $TWiki::Plugins::VERSION < 1.001 ) {
+        TWiki::Func::writeWarning(
+            "Version mismatch between $pluginName and Plugins.pm");
+        return 0;
+    }
 
- # Get plugin debug flag
-# $debug = TWiki::Func::getPluginPreferencesFlag("DEBUG");
+    # Get plugin debug flag
+    # $debug = TWiki::Func::getPluginPreferencesFlag("DEBUG");
 
  # Get plugin preferences, the variable defined by:          * Set EXAMPLE = ...
- $phpAdsNewBase = TWiki::Func::getPreferencesValue("ADVERTSPLUGIN_ADVERTSCRIPTBASE");
- 
- $selectionStringPrefix = TWiki::Func::getPreferencesValue("ADVERTSPLUGIN_ADVERTSPREFIX") || "";
- $selectionStringSuffix = TWiki::Func::getPreferencesValue("ADVERTSPLUGIN_ADVERTSSUFFIX") || "";
+    $phpAdsNewBase =
+      TWiki::Func::getPreferencesValue("ADVERTSPLUGIN_ADVERTSCRIPTBASE");
 
- # Plugin correctly initialized
- TWiki::Func::writeDebug(
-  "- TWiki::Plugins::${pluginName}::initPlugin( $web.$topic ) is OK")
-   if $debug;
- return 1;
+    $selectionStringPrefix =
+      TWiki::Func::getPreferencesValue("ADVERTSPLUGIN_ADVERTSPREFIX") || "";
+    $selectionStringSuffix =
+      TWiki::Func::getPreferencesValue("ADVERTSPLUGIN_ADVERTSSUFFIX") || "";
+
+    # Plugin correctly initialized
+    TWiki::Func::writeDebug(
+        "- TWiki::Plugins::${pluginName}::initPlugin( $web.$topic ) is OK")
+      if $debug;
+    return 1;
 }
 
 # =========================
 sub commonTagsHandler {
 ### my ( $text, $topic, $web ) = @_;   # do not uncomment, use $_[0], $_[1]... instead
 
- TWiki::Func::writeDebug("- ${pluginName}::commonTagsHandler( $_[2].$_[1] )")
-   if $debug;
+    TWiki::Func::writeDebug("- ${pluginName}::commonTagsHandler( $_[2].$_[1] )")
+      if $debug;
 
- # This is the place to define customized tags and variables
- # Called by sub handleCommonTags, after %INCLUDE:"..."%
+    # This is the place to define customized tags and variables
+    # Called by sub handleCommonTags, after %INCLUDE:"..."%
 
- $_[0] =~ s/%ADVERT%/&handleAdvertRIJS()/ge;
- $_[0] =~ s/%ADVERT{(.*)}%/&handleAdvertRIJS($1)/ge;
+    $_[0] =~ s/%ADVERT%/&handleAdvertRIJS()/ge;
+    $_[0] =~ s/%ADVERT{(.*)}%/&handleAdvertRIJS($1)/ge;
 
- $_[0] =~ s/%ADVERTRIJS%/&handleAdvertRIJS()/ge;
- $_[0] =~ s/%ADVERTRIJS{(.*)}%/&handleAdvertRIJS($1)/ge;
+    $_[0] =~ s/%ADVERTRIJS%/&handleAdvertRIJS()/ge;
+    $_[0] =~ s/%ADVERTRIJS{(.*)}%/&handleAdvertRIJS($1)/ge;
 
- # $_[0] =~ s/%XYZ{(.*?)}%/&handleXyz($1)/ge;
+    # $_[0] =~ s/%XYZ{(.*?)}%/&handleXyz($1)/ge;
 }
 
 # =========================
@@ -127,21 +129,23 @@ which then causes this:
 sub handleAdvertRIJS {
     my ($param) = @_;
     my $ans = getTemplateAdvertRemoteInvocationJavaScript();
-    $selectionString          = $param || "";
-    $selectionString = $selectionStringPrefix . $selectionString . $selectionStringSuffix;
-    TWiki::Func::writeDebug("Advert selection string: '".$selectionString."'");
-    $random        = "ad13xc123"; # TODO fix this
+    $selectionString = $param || "";
+    $selectionString =
+      $selectionStringPrefix . $selectionString . $selectionStringSuffix;
+    TWiki::Func::writeDebug(
+        "Advert selection string: '" . $selectionString . "'" );
+    $random        = "ad13xc123";      # TODO fix this
     $serverUrlBase = $phpAdsNewBase;
-    
+
     $ans =~ s/%WHAT%/$selectionString/g;
     $ans =~ s/%RANDOM%/$random/g;
     $ans =~ s/%SERVERURLBASE%/$serverUrlBase/g;
-    
+
     return $ans;
 }
 
 sub getTemplateAdvertRemoteInvocationJavaScript {
- my $ans = <<EOM;
+    my $ans = <<EOM;
 <script language='JavaScript' type='text/javascript'>
 <!-- Hide JavaScript and <pre> escape TWiki rendering
    if (!document.phpAds_used) document.phpAds_used = ',';
@@ -157,13 +161,14 @@ sub getTemplateAdvertRemoteInvocationJavaScript {
 // Stop hiding and stop </pre> escaping TWiki rendering -->
 </script><noscript><a href='%SERVERURLBASE%?n=%RANDOM%' target='_blank'><img src='%SERVERURLDIR%/adview.php?what=%WHAT%;%RANDOM%' border='0' alt=''></a></noscript>
 EOM
- return $ans;
+    return $ans;
 
 }
+
 # Template taken from https://www.google.com/adsense/faq-tech
 #
 sub getTemplateAdvertGoogleAdSense {
- my $ans = <<EOM;
+    my $ans = <<EOM;
 <script language='JavaScript' type='text/javascript'>
 <!-- Hide JavaScript and <pre> escape TWiki rendering
 google_ad_client = "pub-0000000000000000"; 

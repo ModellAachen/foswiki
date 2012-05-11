@@ -17,9 +17,7 @@
 # -v Be verbose
 # Standard preamble
 BEGIN {
-	#Alex: Sonst klappt´s nicht
-	$ENV{FOSWIKI_LIBS} = 'C:/Benutzer/Alexander/git/foswiki/core/lib';
-    unshift @INC, split( /;/, $ENV{FOSWIKI_LIBS} );
+    unshift @INC, split( /:/, $ENV{FOSWIKI_LIBS} );
 }
 
 use Foswiki::Contrib::Build;
@@ -31,7 +29,7 @@ our @ISA = qw( Foswiki::Contrib::Build );
 
 sub new {
     my $class = shift;
-    return bless( $class->SUPER::new( "BuildContrib" ), $class );
+    return bless( $class->SUPER::new("BuildContrib"), $class );
 }
 
 # Example: Override the build target

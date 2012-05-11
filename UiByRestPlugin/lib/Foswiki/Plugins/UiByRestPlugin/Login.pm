@@ -42,11 +42,13 @@ which end in a redirect.
 
 sub do {
     my $session = shift;
+
     # check preconditions. If something fails and is critical
     # a status code will be set and a template will be returned if.
 
     my $template = _checkPrecondition($session);
-    if($template ne 0) { # if a template has been returned, we have errors. So lets print the template to the body and return.
+    if ( $template ne 0 )
+    { # if a template has been returned, we have errors. So lets print the template to the body and return.
         return $template;
     }
 
@@ -56,6 +58,7 @@ sub do {
 
     return "";
 }
+
 =begin TML
 
 ---++ template( $session )
@@ -67,37 +70,39 @@ sub template {
     my $query    = $session->{cgiQuery};
     my $theTopic = $session->{topicName};
     my $theWeb   = $session->{webName};
-    my $theSkin  = $query->param("skin") || Foswiki::Func::getSkin(); # SMELL: should be sanatized
+    my $theSkin  = $query->param("skin")
+      || Foswiki::Func::getSkin();    # SMELL: should be sanatized
 
     # as we dont care about the template the hardPrecondition returns
     # we load the one requested
     return _showTemplate( $theTopic, $theWeb, $theSkin, $templatename );
 }
 
-
 sub _checkPrecondition {
-    my $session     = shift;
-    my $query       = $session->{cgiQuery};
-    my $theTopic    = $session->{topicName};
-    my $theWeb      = $session->{webName};
-    my $theSkin     = $query->param("skin")     || Foswiki::Func::getSkin(); # SMELL: should be sanatized
+    my $session  = shift;
+    my $query    = $session->{cgiQuery};
+    my $theTopic = $session->{topicName};
+    my $theWeb   = $session->{webName};
+    my $theSkin  = $query->param("skin")
+      || Foswiki::Func::getSkin();    # SMELL: should be sanatized
     my $theUsername = $query->param("username") || undef;
     my $thePassword = $query->param("password") || undef;
 
     # already logged in?
     if ( Foswiki::Func::getWikiName() ne $Foswiki::cfg{DefaultUserWikiName} ) {
-      $session->{response}->status( "400 Already logged in" );
-      return _showTemplate( $theTopic, $theWeb, $theSkin, $templatename );
+        $session->{response}->status("400 Already logged in");
+        return _showTemplate( $theTopic, $theWeb, $theSkin, $templatename );
     }
 
     # check if we miss parameters
     my @missing = ();
-    if (!defined($theUsername)) { push( @missing, "username") };
-    if (!defined($thePassword)) { push( @missing, "password") };
+    if ( !defined($theUsername) ) { push( @missing, "username" ) }
+    if ( !defined($thePassword) ) { push( @missing, "password" ) }
 
     if ( scalar(@missing) > 0 ) {
-      $session->{response}->status( "400 Missing parameter: ".join(",", @missing) );
-      return _showTemplate( $theTopic, $theWeb, $theSkin, $templatename );
+        $session->{response}
+          ->status( "400 Missing parameter: " . join( ",", @missing ) );
+        return _showTemplate( $theTopic, $theWeb, $theSkin, $templatename );
     }
 
     return 0;
@@ -107,5 +112,6 @@ sub _showTemplate {
     my ( $topic, $web, $skin, $templatename ) = @_;
 
     my $template = Foswiki::Func::loadTemplate( $templatename, $skin, undef );
-    return Foswiki::Func::expandCommonVariables( $template, $topic, $web, undef );
+    return Foswiki::Func::expandCommonVariables( $template, $topic, $web,
+        undef );
 }

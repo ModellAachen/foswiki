@@ -169,6 +169,8 @@
                 result = (opts.isDone) ? 'done' : (!opts.appendCallback) ? 'no-append' : 'append',
                 frag, children;
 
+            opts.loadingMsg.hide();
+
             switch (result) {
 
                 case 'done':
@@ -215,11 +217,7 @@
 
             }
 
-            // fadeout currently makes the <em>'d text ugly in IE6
-
             // this is where the loadingEnd function goes!!!
-
-            opts.loadingMsg.fadeOut('normal');
 
 
             // smooth scroll to ease in the new content

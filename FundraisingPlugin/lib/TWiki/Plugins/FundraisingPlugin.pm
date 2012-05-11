@@ -11,7 +11,7 @@
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details, published at 
+# GNU General Public License for more details, published at
 # http://www.gnu.org/copyleft/gpl.html
 #
 # $Revision$
@@ -43,93 +43,105 @@
 #   getSessionValueHandler  ( $key )                                1.010  Use only in one Plugin
 #   setSessionValueHandler  ( $key, $value )                        1.010  Use only in one Plugin
 #
-# initPlugin is required, all other are optional. 
+# initPlugin is required, all other are optional.
 # For increased performance, all handlers except initPlugin are
 # disabled. To enable a handler remove the leading DISABLE_ from
 # the function name. Remove disabled handlers you do not need.
 #
-# NOTE: To interact with TWiki use the official TWiki functions 
+# NOTE: To interact with TWiki use the official TWiki functions
 # in the TWiki::Func module. Do not reference any functions or
 # variables elsewhere in TWiki!!
 
-
 # =========================
-package TWiki::Plugins::FundraisingPlugin;    # change the package name and $pluginName!!!
+package TWiki::Plugins::FundraisingPlugin
+  ;    # change the package name and $pluginName!!!
 
 # =========================
 use vars qw(
-        $web $topic $user $installWeb $VERSION $pluginName
-        $debug $twikiWebname
-        $fundraisingEndDate $fundraisingGoal $fundraisingPledged $fundraisingDonateTopic
-    );
+  $web $topic $user $installWeb $VERSION $pluginName
+  $debug $twikiWebname
+  $fundraisingEndDate $fundraisingGoal $fundraisingPledged $fundraisingDonateTopic
+);
 
 use Time::Local;
 
-$VERSION = '0.2.1';
+$VERSION    = '0.2.1';
 $pluginName = 'FundraisingPlugin';
 
-
 # =========================
-sub initPlugin
-{
+sub initPlugin {
     ( $topic, $web, $user, $installWeb ) = @_;
 
     # check for Plugins.pm versions
-    if( $TWiki::Plugins::VERSION < 1.021 ) {
-        TWiki::Func::writeWarning( "Version mismatch between $pluginName and Plugins.pm" );
+    if ( $TWiki::Plugins::VERSION < 1.021 ) {
+        TWiki::Func::writeWarning(
+            "Version mismatch between $pluginName and Plugins.pm");
         return 0;
     }
 
     # Get plugin debug flag
-    $debug = TWiki::Func::getPreferencesFlag( "\U$pluginName\E_DEBUG" );
+    $debug = TWiki::Func::getPreferencesFlag("\U$pluginName\E_DEBUG");
 
     # Get plugin preferences
-    $fundraisingEndDate = TWiki::Func::getPreferencesValue( "\U$pluginName\E_ENDDATE" ) || "";
-    $fundraisingGoal = TWiki::Func::getPreferencesValue( "\U$pluginName\E_GOAL" ) || "0";
-    $fundraisingPledged = TWiki::Func::getPreferencesValue( "\U$pluginName\E_PLEDGED" ) || "0";
-    $fundraisingPreMsg = TWiki::Func::getPreferencesValue( "\U$pluginName\E_PREMSG" ) || TWiki::Func::getWikiToolName() . " needs money";
-    $fundraisingToGoMsg = TWiki::Func::getPreferencesValue( "\U$pluginName\E_TOGOMSG" ) || '$TOGO to go';
-    $fundraisingPledgedMsg = TWiki::Func::getPreferencesValue( "\U$pluginName\E_PLEDGEDMSG" ) || "$fundraisingPledged";
-    $fundraisingPostMsg = TWiki::Func::getPreferencesValue( "\U$pluginName\E_POSTMSG" ) || "before $fundraisingEndDate.";
+    $fundraisingEndDate =
+      TWiki::Func::getPreferencesValue("\U$pluginName\E_ENDDATE") || "";
+    $fundraisingGoal = TWiki::Func::getPreferencesValue("\U$pluginName\E_GOAL")
+      || "0";
+    $fundraisingPledged =
+      TWiki::Func::getPreferencesValue("\U$pluginName\E_PLEDGED") || "0";
+    $fundraisingPreMsg =
+         TWiki::Func::getPreferencesValue("\U$pluginName\E_PREMSG")
+      || TWiki::Func::getWikiToolName() . " needs money";
+    $fundraisingToGoMsg =
+      TWiki::Func::getPreferencesValue("\U$pluginName\E_TOGOMSG")
+      || '$TOGO to go';
+    $fundraisingPledgedMsg =
+      TWiki::Func::getPreferencesValue("\U$pluginName\E_PLEDGEDMSG")
+      || "$fundraisingPledged";
+    $fundraisingPostMsg =
+      TWiki::Func::getPreferencesValue("\U$pluginName\E_POSTMSG")
+      || "before $fundraisingEndDate.";
 
     # Parse configuration variables that need parsing, do any calculus needed
     if ( "$fundraisingEndDate" =~ /^(\d+)-(\d+)-(\d+)$/ ) {
-      $theYear = $1;
-      $theMonth = $2;
-      $theDay = $3;
+        $theYear  = $1;
+        $theMonth = $2;
+        $theDay   = $3;
     }
     $fundraisingToGo = $fundraisingGoal - $fundraisingPledged;
     $fundraisingToGoMsg =~ s/TOGO/$fundraisingToGo/;
 
     # Check configuration variables consistency and plugin activation
-    $fundraisingActivated = 1 unless
-      (
-       (timelocal(0, 0, 0, $theDay, $theMonth, $theYear) < time()) or
-       ($fundraisingToGo <= 0)
-      );
+    $fundraisingActivated = 1
+      unless ( ( timelocal( 0, 0, 0, $theDay, $theMonth, $theYear ) < time() )
+        or ( $fundraisingToGo <= 0 ) );
 
     # Plugin correctly initialized?
     if ($debug) {
-      if ( $fundraisingActivated == 1 ) {
-	TWiki::Func::writeDebug( "- TWiki::Plugins::${pluginName}::initPlugin( $web.$topic ) is OK" );
-      } else {
-	TWiki::Func::writeDebug( "- TWiki::Plugins::${pluginName}::initPlugin( $web.$topic ) will display nothing" );
-      }
+        if ( $fundraisingActivated == 1 ) {
+            TWiki::Func::writeDebug(
+"- TWiki::Plugins::${pluginName}::initPlugin( $web.$topic ) is OK"
+            );
+        }
+        else {
+            TWiki::Func::writeDebug(
+"- TWiki::Plugins::${pluginName}::initPlugin( $web.$topic ) will display nothing"
+            );
+        }
     }
     return 1;
 }
 
 # =========================
-sub handleFundraisingMessage
-{
-  my $message = "";
+sub handleFundraisingMessage {
+    my $message = "";
 
-  if ($fundraisingActivated) {
+    if ($fundraisingActivated) {
 
-    my $pledgedPercentage = $fundraisingPledged * 100 / $fundraisingGoal;
-    my $toGoPercentage = 100 - $pledgedPercentage;
+        my $pledgedPercentage = $fundraisingPledged * 100 / $fundraisingGoal;
+        my $toGoPercentage    = 100 - $pledgedPercentage;
 
-    $message = qq{
+        $message = qq{
 <div class="fundraisingBanner" align="center" style="margin: 1em; font-size: 100%;">
   <div style="text-align: center">
     <div style="width: 100%; margin: 0 auto;">
@@ -157,18 +169,18 @@ sub handleFundraisingMessage
   </div>
 </div>
 };
-  }
+    }
 
-  return $message;
+    return $message;
 
 }
 
 # =========================
-sub commonTagsHandler
-{
+sub commonTagsHandler {
 ### my ( $text, $topic, $web ) = @_;   # do not uncomment, use $_[0], $_[1]... instead
 
-    TWiki::Func::writeDebug( "- ${pluginName}::commonTagsHandler( $_[2].$_[1] )" ) if $debug;
+    TWiki::Func::writeDebug("- ${pluginName}::commonTagsHandler( $_[2].$_[1] )")
+      if $debug;
 
     # This is the place to define customized tags and variables
     # Called by TWiki::handleCommonTags, after %INCLUDE:"..."%

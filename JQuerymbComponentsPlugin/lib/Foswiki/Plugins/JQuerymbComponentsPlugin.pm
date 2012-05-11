@@ -8,17 +8,17 @@ import and simplify the use of mb.ideas jQuery GUI components
 
 =cut
 
-
 package Foswiki::Plugins::JQuerymbComponentsPlugin;
 
 use strict;
 
-use Foswiki::Func ();       # The plugins API
+use Foswiki::Func    ();    # The plugins API
 use Foswiki::Plugins ();    # For the API version
 
 our $VERSION = '$Rev: 7105 $';
 our $RELEASE = '0.3';
-our $SHORTDESCRIPTION = 'import and simplify the use of mb.ideas jQuery GUI components';
+our $SHORTDESCRIPTION =
+  'import and simplify the use of mb.ideas jQuery GUI components';
 our $NO_PREFS_IN_TOPIC = 1;
 
 =begin TML
@@ -37,10 +37,10 @@ sub initPlugin {
         return 0;
     }
 
-    if ($Foswiki::cfg{Plugins}{JQueryPlugin}{Enabled}) {
+    if ( $Foswiki::cfg{Plugins}{JQueryPlugin}{Enabled} ) {
         require Foswiki::Plugins::JQueryPlugin;
-        Foswiki::Plugins::JQueryPlugin::registerPlugin("mb.menu",
-        'Foswiki::Plugins::JQuerymbComponentsPlugin::MBMENU');
+        Foswiki::Plugins::JQueryPlugin::registerPlugin( "mb.menu",
+            'Foswiki::Plugins::JQuerymbComponentsPlugin::MBMENU' );
     }
 
     # Plugin correctly initialized

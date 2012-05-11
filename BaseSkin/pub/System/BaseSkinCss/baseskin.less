@@ -7,13 +7,8 @@
 	width: auto;
 	max-width: 1180px;
 	margin: 0 auto;
-	.fw_section_padding();
 	padding-left: 20px;
 	padding-right: 20px;
-}
-.foswikiBar .foswikiContainer {
-	padding-top: 0;
-	padding-bottom: 0;
 }
 
 .foswikiSection {
@@ -32,10 +27,6 @@
 	margin: 0;
 	.box-shadow(none);
 	background: none;
-	
-	.foswikiSection {
-		.fw_tool_padding_vertical_only();
-	}	
 	
 	form {
 		float: none;
@@ -183,31 +174,21 @@
 	z-index: 2; /* for foldout menus */
 	border: none;
 
-	.foswikiContainer {
-		.fw_tool_padding_vertical_only();
-		> nav,
-		> div {
-			margin-left: -@fw_universal_side_padding;
+	.foswikiNavigation > li,
+	.foswikiNavigationSecondary > li {
+		> a {
+			margin: 0;
+			padding: @fw_topbar_button_padding;
 		}
-	}
-	
-	.foswikiLogo {
-		position: absolute;
-		left: 46%;
-		right: 46%;
-		padding: 0;
-		display: block;
-		width: 45px;
-		height: 45px;
-		text-indent: -999px;
-		overflow: hidden;
-		margin: 0px auto;
-	}
-	
-	.foswikiNavigation > li > a,
-	.foswikiNavigationSecondary > li > a {
-		margin: 0;
-		padding: @fw_topbar_button_padding;
+		&.foswikiLogo {
+			a {
+				display: block;
+				width: inherit;
+				height: inherit;
+				text-indent: -999px;
+			}
+			margin-right: 15px;
+		}
 	}
 	
 	ul.menu-dropdown,
@@ -220,10 +201,6 @@
 	z-index: 1;
 	.border-radius(0);
 
-	.foswikiContainer {
-		.fw_tool_padding_vertical_only();
-	}
-	
 	.foswikiTopicActionButtons {
 		float: right;
 		
@@ -367,8 +344,9 @@ form .foswikiFormStep.foswikiClearfix {
 
 	margin-bottom: @baseline;
 	padding: 0;
-	border-collapse: separate; // Done so we can round those corners!
-	*border-collapse: collapse; /* IE7, collapse table to remove spacing */
+//	border-collapse: separate; // Done so we can round those corners!
+//	*border-collapse: collapse; /* IE7, collapse table to remove spacing */
+	border-collapse: collapse; /* Don't need to round corners */
 	border-style: solid;
 	border-width: 1px;
 	th, td {
@@ -399,14 +377,26 @@ form .foswikiFormStep.foswikiClearfix {
 .foswikiSeparator {}
 .foswikiTopicInfo {}
 
+a.foswikiDisplayRoomy,
+a.foswikiDisplayCosy,
+a.foswikiDisplayTight {
+	img {
+		display: none;
+		padding-left: 1em;
+		vertical-align: text-top;
+	}
+}
+
 .foswikiBreadcrumb {
-	> ul {
+	& > ul {
 		list-style: none;
 		margin: 0;
 		padding: 0;
-	
+		float: none;
+		
 		& > li {
 			display: inline;
+			float: none;
 			padding: @fw_button_padding;
 			padding-bottom: @fw_button_padding_bottom - 2;
 			padding-left: 0;
@@ -443,8 +433,6 @@ form .foswikiFormStep.foswikiClearfix {
 	font-style: normal;
 }
 
-.foswikiLogo {}
-
 .foswikiHorizontalList {
 	ul,
 	ol {
@@ -475,9 +463,7 @@ form .foswikiFormStep.foswikiClearfix {
 .foswikiContentHeader,
 .foswikiContentFooter {}
 
-.foswikiTopic {
-	min-height: 0em + @fw_strand1_ratio_up_8 / @fw_basefont;
-}
+.foswikiTopic {}
 
 .foswikiToolbar {
 	.fw_tool_padding_all();
@@ -496,7 +482,6 @@ form .foswikiFormStep.foswikiClearfix {
 .foswikiSearchResults {
 
 	.foswikiSearchResult {
-		.fw_tool_padding_vertical_only();
 		position: relative;
 		border-style: none none solid none;
 		border-width: 1px;
@@ -743,6 +728,14 @@ td {
 .foswikiEditPage {
 	.foswikiTopicText {
 		padding-top: 0;
+		
+		> .foswikiContainer {
+			padding-top: 0;
+		}
+	}
+	
+	.foswikiEditForm {
+		margin: 0;
 	}
 	
 	.foswikiEditControls {		
@@ -760,14 +753,33 @@ td {
 		border-width: 1px;
 	}
 	
-	#foswikiEditControlsContainer {
-		border-style: solid solid none solid;
-		border-width: 1px;
-	}
-	
 	.foswikiHasWysiwyg .foswikiEditTextarea {
 		border-style: none solid;
 		border-width: 1px;
+	}
+}
+
+.foswikiFormTable {
+	input[type='text'],
+	input[type='password'],
+	textarea {
+		.span12();
+	}
+	td,
+	th {
+		padding: 0 0 .5em .5em;
+		vertical-align: top;
+	}
+	th {
+		.span4();
+		padding-top: 4px; /* add same padding as form fields */
+	}
+	td {
+		.span12();
+	}
+	th.foswikiFormTableHRow {
+		text-align: right;
+		.span16();
 	}
 }
 

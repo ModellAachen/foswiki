@@ -3,6 +3,11 @@
 # Tests for the Foswiki::Store API used by the Foswiki::Meta class to
 # interact with the store.
 #
+# Note: these are not really Store tests; they are actually tests for
+# store functionality that resides in Foswiki::Meta. If you were
+# looking for the unit tests for the actual Store API, see
+# StoreImplementationTests.pm
+#
 # These tests must be independent of the actual store implementation.
 
 package StoreTests;
@@ -16,7 +21,6 @@ our @ISA = qw( FoswikiStoreTestCase );
 use Assert;
 use Foswiki();
 use Foswiki::Plugin();
-use Foswiki::Meta();
 use Foswiki::Func();
 use File::Temp();
 use Foswiki::AccessControlException();
@@ -41,8 +45,7 @@ sub set_up {
 
     $this->SUPER::set_up();
 
-    my $testWebObj = Foswiki::Meta->new( $this->{session}, $web );
-    $testWebObj->populateNewWeb();
+    my $testWebObj = $this->populateNewWeb($web);
     $testWebObj->finish();
 
     #  Store doesn't do access checks anyway, so run as admin
@@ -82,8 +85,7 @@ sub verify_CreateEmptyWeb {
     my $this = shift;
 
     #create an empty web
-    my $webObject = Foswiki::Meta->new( $this->{session}, $web );
-    $webObject->populateNewWeb();
+    my $webObject = $this->populateNewWeb($web);
     $this->assert( $this->{session}->webExists($web) );
     my @topics = $webObject->eachTopic()->all();
     my $tops = join( " ", @topics );
@@ -100,8 +102,8 @@ sub verify_CreateEmptyWeb {
 sub verify_CreateWeb {
     my $this = shift;
 
-    my $webObject = Foswiki::Meta->new( $this->{session}, $web );
-    $webObject->populateNewWeb( '_default',
+    my $webObject =
+      $this->populateNewWeb( $web, '_default',
         { WEBBGCOLOR => '#123432', SITEMAPLIST => 'on' } );
     $this->assert( $this->{session}->webExists($web) );
     $this->assert_equals( '#123432', $webObject->getPreference('WEBBGCOLOR') );
@@ -110,8 +112,8 @@ sub verify_CreateWeb {
     my @topics = $it->all();
     $webObject->removeFromStore();
     $webObject->finish();
-    $webObject = Foswiki::Meta->new( $this->{session}, '_default' );
-    $it = $webObject->eachTopic();
+    $webObject = $this->getWebObject('_default');
+    $it        = $webObject->eachTopic();
     my @defaultTopics = $it->all();
     $this->assert_equals( $#topics, $#defaultTopics,
         join( ",", @topics ) . " != " . join( ',', @defaultTopics ) );
@@ -155,11 +157,7 @@ sub verify_CreateSimpleTextTopic {
     my ($readMeta) = Foswiki::Func::readTopic( $web, $topic );
     $this->assert_str_equals( $text, $readMeta->text );
     $readMeta->finish();
-    my $webObject = Foswiki::Meta->new( $this->{session}, $web );
-    $webObject->removeFromStore();
-    $webObject->finish();
-    $readMeta->finish();
-    $meta->finish();
+    $this->removeFromStore($web);
 
     return;
 }
@@ -189,8 +187,6 @@ sub verify_CreateSimpleMetaTopic {
           $m->{_loadedRev} = undef;
     }
     $this->assert_deep_equals( $meta, $readMeta );
-    my $webObject = Foswiki::Meta->new( $this->{session}, $web );
-    $webObject->finish();
     $meta->finish();
     $readMeta->finish();
 
@@ -234,9 +230,7 @@ sub verify_noForceRev_RepRev {
     $this->assert_num_equals( 1, $rev );
 
     #cleanup
-    my $webObject = Foswiki::Meta->new( $this->{session}, $web );
-    $webObject->removeFromStore();
-    $webObject->finish();
+    $this->removeFromStore($web);
     $readMeta->finish();
     $meta->finish();
 
@@ -277,9 +271,7 @@ sub verify_ForceRev {
     $this->assert_num_equals( 2, $rev );
 
     #cleanup
-    my $webObject = Foswiki::Meta->new( $this->{session}, $web );
-    $webObject->removeFromStore();
-    $webObject->finish();
+    $this->removeFromStore($web);
     $readMeta->finish();
     $meta->finish();
 
@@ -316,9 +308,7 @@ sub verify_getRevisionInfo {
 
  #TODO
  #getRevisionDiff (  $web, $topic, $rev1, $rev2, $contextLines  ) -> \@diffArray
-    my $webObject = Foswiki::Meta->new( $this->{session}, $web );
-    $webObject->removeFromStore();
-    $webObject->finish();
+    $this->removeFromStore($web);
     $readMeta->finish();
     $meta->finish();
 
@@ -362,9 +352,7 @@ sub verify_moveTopic {
 
     #compare number of refering topics?
     #compare list of references to moved topic
-    my $webObject = Foswiki::Meta->new( $this->{session}, $web );
-    $webObject->removeFromStore();
-    $webObject->finish();
+    $this->removeFromStore($web);
     $meta->finish();
     $metaOrig->finish();
     $metaNew->finish();
@@ -398,9 +386,7 @@ sub verify_leases {
     $m->clearLease( $web, $testtopic );
     $lease = $m->getLease( $web, $testtopic );
     $this->assert_null($lease);
-    my $webObject = Foswiki::Meta->new( $this->{session}, $web );
-    $webObject->removeFromStore();
-    $webObject->finish();
+    $this->removeFromStore($web);
     $m->finish();
 
     return;
@@ -463,9 +449,7 @@ sub verify_beforeSaveHandlerChangeText {
     # set expected meta
     $meta->putKeyed( 'FIELD', { name => 'fieldname', value => 'text' } );
     $this->assert_str_equals( $meta->stringify(), $readMeta->stringify() );
-    my $webObject = Foswiki::Meta->new( $this->{session}, $web );
-    $webObject->removeFromStore();
-    $webObject->finish();
+    $this->removeFromStore($web);
     $readMeta->finish();
     $meta->finish();
 
@@ -515,9 +499,7 @@ sub verify_beforeSaveHandlerChangeMeta {
         delete $readMeta->get('TOPICINFO')->{$fld};
     }
     $this->assert_str_equals( $meta->stringify(), $readMeta->stringify() );
-    my $webObject = Foswiki::Meta->new( $this->{session}, $web );
-    $webObject->removeFromStore();
-    $webObject->finish();
+    $this->removeFromStore($web);
     $readMeta->finish();
     $meta->finish();
 
@@ -569,9 +551,7 @@ sub verify_beforeSaveHandlerChangeBoth {
         delete $readMeta->get('TOPICINFO')->{$fld};
     }
     $this->assert_str_equals( $meta->stringify(), $readMeta->stringify() );
-    my $webObject = Foswiki::Meta->new( $this->{session}, $web );
-    $webObject->removeFromStore();
-    $webObject->finish();
+    $this->removeFromStore($web);
     $meta->finish();
     $readMeta->finish();
 

@@ -1,0 +1,83 @@
+%META:TOPICINFO{author="ProjectContributor" comment="reprev" date="1330537641" format="1.1" reprev="4" version="7"}%
+---+!! %TOPIC%
+
+This is a set of widgets to be used in a sidebar navigation. This is used like this:
+
+<verbatim class="tml">
+%INCLUDE{"%SYSTEMWEB%.SolrSideBar"}%
+</verbatim>
+
+You can also pick individual components using
+
+<verbatim class="tml">
+%INCLUDE{"%SYSTEMWEB%.SolrSideBar" section="solrsimilar"}%
+</verbatim>
+
+Note: all components make use of Foswiki:Extensions/DBCachePlugin for greater flexibility and performance.
+
+---++ Implememntation
+Default sidebar implementation that includes all of the components listed below.
+
+<verbatim class="tml">
+%STARTINCLUDE%<!-- -->
+%INCLUDE{"%WEB%.%TOPIC%" section="solrsimilar"}%
+%INCLUDE{"%WEB%.%TOPIC%" section="recentchanges"}%
+<!-- -->%STOPINCLUDE%
+</verbatim>
+
+---++ Component: "solrsimilar"
+Renders a list of topics similar to the current one. This can be customized
+using the =%<nop>SOLRSIMILAR_LIKE%= preference variable set in your web's <nop>WebPreferences
+or on  the current topic the sidebar is rendered for. See the documentation of =%<nop>SOLRSIMILAR{}%
+part of the %SYSTEMWEB%.SolrPlugin documentation.
+
+<verbatim class="tml">
+%STARTSECTION{"solrsimilar"}%<noautolink>
+%SOLRSIMILAR{"id:%BASEWEB%.%BASETOPIC%" 
+   filter="web:%BASEWEB% type:topic"
+   %IF{"defined SOLRSIMILAR_LIKE" then="like=\"%SOLRSIMILAR_LIKE%\""}%
+   fields="web,topic,title,score,field_Summary_s"
+   rows="5"
+   header="<h2 >%MAKETEXT{"Similar topics"}%</h2>$n<ul>" 
+   footer="</ul>"
+   format="<li>
+       <a href='%SCRIPTURLPATH{"view"}%/$web/$topic' title='%MAKETEXT{"score: [_1]" args="$score"}%'>
+         $percntDBCALL{\"$web.$topic->Applications.RenderTopicThumbnail\" TYPE=\"plain\"}$percnt <!-- -->
+         <!-- -->$title<br />
+         <span class='foswikiGrayText'>$field_Summary_s</span>
+         %CLEAR%
+       </a>
+     </li>"
+   separator="$n"
+}%<!-- -->
+</noautolink>%ENDSECTION{"solrsimilar"}%
+</verbatim>
+
+---++ Component: "recentchanges"
+
+Renders a list of the five most recent changes in the current web.
+
+<verbatim class="tml">
+%STARTSECTION{"recentchanges"}%<noautolink>
+%DBQUERY{
+  "topic!='%BASETOPIC%'"
+  web="%BASEWEB%" 
+  order="modified" 
+  limit="5" 
+  reverse="on"
+  exclude="WebHome|WebLinks|WebSideBar|WebPreferences|WebStatistics|WebTopicList|WebSearch|WebIndex|WebAdvancedSearch"
+  header="<h2 >%MAKETEXT{"Recent Changes"}%</h2>$n<ul>"
+  footer="</ul>"
+  format="<li>
+      <a href='%SCRIPTURLPATH{"view"}%/$web/$topic'>
+        $percntDBCALL{\"$web.$topic->Applications.RenderTopicThumbnail\" TYPE=\"plain\"}$percnt<!-- -->
+        $expand(topictitle)<br />
+        <span class='foswikiGrayText'>
+          $formfield(Summary)<!-- -->
+        </span>
+        %CLEAR%
+      </a>
+    </li>"
+}%
+</noautolink>%ENDSECTION{"recentchanges"}%
+</verbatim>

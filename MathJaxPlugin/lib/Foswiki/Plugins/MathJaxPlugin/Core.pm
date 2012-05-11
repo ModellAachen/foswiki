@@ -10,7 +10,7 @@
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details, published at 
+# GNU General Public License for more details, published at
 # http://www.gnu.org/copyleft/gpl.html
 #
 ###############################################################################
@@ -19,102 +19,112 @@ package Foswiki::Plugins::MathJaxPlugin::Core;
 
 use strict;
 
-use constant DEBUG => 0; # toggle me
+use constant DEBUG => 0;    # toggle me
 
 ###############################################################################
 # static
 sub writeDebug {
-  #&Foswiki::Func::writeDebug('- MathJaxPlugin - '.$_[0]) if DEBUG;
-  print STDERR '- MathJaxPlugin - '.$_[0]."\n" if DEBUG;
+
+    #&Foswiki::Func::writeDebug('- MathJaxPlugin - '.$_[0]) if DEBUG;
+    print STDERR '- MathJaxPlugin - ' . $_[0] . "\n" if DEBUG;
 }
 
 ###############################################################################
 sub new {
-  my $class = shift;
+    my $class = shift;
 
-  my $this = {
-    hashedMathStrings => {}, 
-      # contains the math strings, indexed by their hash code
+    my $this = {
+        hashedMathStrings => {},
 
-    fgColors => {},
-      # contains the foreground color of a math string
+        # contains the math strings, indexed by their hash code
 
-    bgColor => {},
-      # contains the background color for all formulas
+        fgColors => {},
 
-    sizes => {},
-      # font size of a math string, can be; can be
-      # tiny, scriptsize, footnotesize, small, normalsize, large, Large, LARGE,
-      # huge or Huge
+        # contains the foreground color of a math string
 
-    scaleFactor => $Foswiki::cfg{MathJaxPlugin}{ScaleFactor} || 1.2,
-      # factor to scale images;
-      # may be overridden by a LATEXSCALEFACTOR preference variable
+        bgColor => {},
 
-    latexFGColor => $Foswiki::cfg{MathJaxPlugin}{LatexFGColor} || 'black',
-      # default text color
+        # contains the background color for all formulas
 
-    latexBGColor => $Foswiki::cfg{MathJaxPlugin}{LatexBGColor} || 'white',
-      # default background color
+        sizes => {},
 
-    latexFontSize => $Foswiki::cfg{MathJaxPlugin}{LatexFontSize} || 'normalsize',
-      # default text color
+       # font size of a math string, can be; can be
+       # tiny, scriptsize, footnotesize, small, normalsize, large, Large, LARGE,
+       # huge or Huge
 
-    @_
-  };
+        scaleFactor => $Foswiki::cfg{MathJaxPlugin}{ScaleFactor} || 1.2,
 
-  return bless($this, $class);
+        # factor to scale images;
+        # may be overridden by a LATEXSCALEFACTOR preference variable
+
+        latexFGColor => $Foswiki::cfg{MathJaxPlugin}{LatexFGColor} || 'black',
+
+        # default text color
+
+        latexBGColor => $Foswiki::cfg{MathJaxPlugin}{LatexBGColor} || 'white',
+
+        # default background color
+
+        latexFontSize => $Foswiki::cfg{MathJaxPlugin}{LatexFontSize}
+          || 'normalsize',
+
+        # default text color
+
+        @_
+    };
+
+    return bless( $this, $class );
 }
 
 ###############################################################################
 # delayed initialization
 sub init {
-  my ($this, $web, $topic) = @_;
+    my ( $this, $web, $topic ) = @_;
 
-  # prevent a doubled invokation
-  return if $this->{isInitialized};
-  $this->{isInitialized} = 1;
+    # prevent a doubled invokation
+    return if $this->{isInitialized};
+    $this->{isInitialized} = 1;
 
-  # get preverences
-  my $value = Foswiki::Func::getPreferencesValue('LATEXSCALEFACTOR');
-  $this->{scaleFactor} = $value if $value;
+    # get preverences
+    my $value = Foswiki::Func::getPreferencesValue('LATEXSCALEFACTOR');
+    $this->{scaleFactor} = $value if $value;
 
-  $value = Foswiki::Func::getPreferencesValue('LATEXIMAGETYPE');
-  $this->{imageType} = $value if $value;
-  $this->{imageType} = 'png' unless $this->{imageType} =~ /^(png|gif)$/i;
+    $value = Foswiki::Func::getPreferencesValue('LATEXIMAGETYPE');
+    $this->{imageType} = $value if $value;
+    $this->{imageType} = 'png' unless $this->{imageType} =~ /^(png|gif)$/i;
 
-  $value = Foswiki::Func::getPreferencesValue('LATEXPREAMBLE');
-  $this->{latexPreamble} = $value if $value;
+    $value = Foswiki::Func::getPreferencesValue('LATEXPREAMBLE');
+    $this->{latexPreamble} = $value if $value;
 
-  $value = Foswiki::Func::getPreferencesValue('LATEXBGCOLOR');
-  $this->{latexBGColor} = $value if $value;
+    $value = Foswiki::Func::getPreferencesValue('LATEXBGCOLOR');
+    $this->{latexBGColor} = $value if $value;
 
-  $value = Foswiki::Func::getPreferencesValue('LATEXFGCOLOR');
-  $this->{latexFGColor} = $value if $value;
+    $value = Foswiki::Func::getPreferencesValue('LATEXFGCOLOR');
+    $this->{latexFGColor} = $value if $value;
 
-  $value = Foswiki::Func::getPreferencesValue('LATEXFONTSIZE');
-  $this->{latexFontSize} = $value if $value;
+    $value = Foswiki::Func::getPreferencesValue('LATEXFONTSIZE');
+    $this->{latexFontSize} = $value if $value;
 
 }
 
 ###############################################################################
 # This function takes a string of math and wrap in the appropriate markup for MathJax
 sub handleMath {
-  my ($this, $web, $topic, $text, $inlineFlag, $args) = @_;
-  
-  # store the string in a hash table, indexed by the MD5 hash
-  $text =~ s/^\s+//go;
-  $text =~ s/\s+$//go;
+    my ( $this, $web, $topic, $text, $inlineFlag, $args ) = @_;
 
-  # extract latex options
-  $args ||= '';
-  require Foswiki::Attrs;
-  my $params = new Foswiki::Attrs($args);
-  $this->{fgColors}{$text} = $params->{color} || $this->{latexFGColor};
-  $this->{bgColor} = $params->{bgcolor} || $this->{latexBGColor};
+    # store the string in a hash table, indexed by the MD5 hash
+    $text =~ s/^\s+//go;
+    $text =~ s/\s+$//go;
 
-  my $size = $params->{size} || '';
-  $this->{sizes}{$text} = $size if $size;
+    # extract latex options
+    $args ||= '';
+    require Foswiki::Attrs;
+    my $params = new Foswiki::Attrs($args);
+    $this->{fgColors}{$text} = $params->{color} || $this->{latexFGColor};
+    $this->{bgColor} = $params->{bgcolor} || $this->{latexBGColor};
+
+    my $size = $params->{size} || '';
+    $this->{sizes}{$text} = $size if $size;
 
     Foswiki::Func::addToZone( 'head', 'MATHJAX_PLUGIN', <<__SCRIPT__ );
 <script type="text/javascript" src="%PUBURL%/%SYSTEMWEB%/MathJaxPlugin/MathJax/MathJax.js">
@@ -125,19 +135,22 @@ sub handleMath {
 </script>
 __SCRIPT__
 
-  my $result = '<noautolink><script type="math/tex">' . $text . "</script></noautolink>\n";
-  return $result;
+    my $result =
+        '<noautolink><script type="math/tex">' 
+      . $text
+      . "</script></noautolink>\n";
+    return $result;
 }
 
 ###############################################################################
 # returns the arguments to the latex commands \color or \pagecolor
 sub formatColorSpec {
-  my $color = shift;
+    my $color = shift;
 
-  # try to auto-detect the color spec
-  return "{$color}" if $color =~ /^[a-zA-Z]+$/; # named
-  return "[HTML]{$color}" if $color =~ /^[a-fA-F0-9]{6}$/; # named
-  return "$color";
+    # try to auto-detect the color spec
+    return "{$color}"       if $color =~ /^[a-zA-Z]+$/;         # named
+    return "[HTML]{$color}" if $color =~ /^[a-fA-F0-9]{6}$/;    # named
+    return "$color";
 }
 
 1;

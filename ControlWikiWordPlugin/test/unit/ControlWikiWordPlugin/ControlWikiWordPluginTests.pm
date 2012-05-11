@@ -228,12 +228,11 @@ END_EXPECTED
     # Verify blocks with plugin setting
 
     # Note that the short preference takes prescedence so need to clear.
-    Foswiki::Func::setPreferencesValue(
-        'STOPWIKIWORDLINK',
-        '' );
+    Foswiki::Func::setPreferencesValue( 'STOPWIKIWORDLINK', '' );
     Foswiki::Func::setPreferencesValue(
         'CONTROLWIKIWORDPLUGIN_STOPWIKIWORDLINK',
-        'MacDonald, WikiWord, MyTest, FiSa', );
+        'MacDonald, WikiWord, MyTest, FiSa',
+    );
     $this->doTest( $source, $expected, 0 );
 
 # Verify blocks with simple setting, and simple setting takes precedence over Plugin setting

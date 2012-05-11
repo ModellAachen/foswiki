@@ -27,7 +27,6 @@ use vars qw( $VERSION $RELEASE $debug $pluginName );
 
 use Error qw(:try);
 
-
 # This should always be $Rev: 9813$ so that TWiki can determine the checked-in
 # status of the plugin. It is used by the build automation tools, so
 # you should leave it alone.
@@ -42,212 +41,235 @@ $RELEASE = '1.0';
 $pluginName = 'TWikiUmlPlugin';
 
 sub initPlugin {
-  my($topic, $web, $user, $installWeb) = @_;
+    my ( $topic, $web, $user, $installWeb ) = @_;
 
-  # check for Plugins.pm versions
-  if( $TWiki::Plugins::VERSION < 1.1 ) {
-    TWiki::Func::writeWarning( "Version mismatch between TWikiDrawPlugin and Plugins.pm" );
-    return 0;
-  }
+    # check for Plugins.pm versions
+    if ( $TWiki::Plugins::VERSION < 1.1 ) {
+        TWiki::Func::writeWarning(
+            "Version mismatch between TWikiDrawPlugin and Plugins.pm");
+        return 0;
+    }
 
-  TWiki::Func::registerTagHandler( 'UML', \&handleUml );
+    TWiki::Func::registerTagHandler( 'UML', \&handleUml );
 
-  TWiki::Func::registerRESTHandler('save', \&restSave);
+    TWiki::Func::registerRESTHandler( 'save', \&restSave );
 
-  return 1;
+    return 1;
 }
 
 sub commonTagsHandler {
-  # do not uncomment, use $_[0], $_[1]... instead
-  ### my ( $text, $topic, $web ) = @_;
 
+    # do not uncomment, use $_[0], $_[1]... instead
+    ### my ( $text, $topic, $web ) = @_;
 
-  # add dojo javascript initialization
-  if ($_[0] =~ m/<head>/ && $_[0] !~ m/$pluginName JSInit/) {
-    $_[0] =~ s/<head>/&getJSInit()/oe;
-  }
-  
-  # smell: IE and dojo does not seem to like the DOCTYPE defined by TWiki
-  $_[0] =~ s/<!DOCTYPE.*?>//o;
+    # add dojo javascript initialization
+    if ( $_[0] =~ m/<head>/ && $_[0] !~ m/$pluginName JSInit/ ) {
+        $_[0] =~ s/<head>/&getJSInit()/oe;
+    }
+
+    # smell: IE and dojo does not seem to like the DOCTYPE defined by TWiki
+    $_[0] =~ s/<!DOCTYPE.*?>//o;
 }
 
 sub getJSInit() {
-  return '<head><!-- '.$pluginName.' JSInit --><script language="JavaScript" type="text/javascript">djConfig = { isDebug: false };</script><script type="text/javascript" src="%PUBURLPATH%/%SYSTEMWEB%/TWikiUmlPlugin/dojo/dojo.js"></script>';
+    return
+        '<head><!-- '
+      . $pluginName
+      . ' JSInit --><script language="JavaScript" type="text/javascript">djConfig = { isDebug: false };</script><script type="text/javascript" src="%PUBURLPATH%/%SYSTEMWEB%/TWikiUmlPlugin/dojo/dojo.js"></script>';
 }
 
 sub handleUml {
-  my($session, $params, $theTopic, $theWeb) = @_;
-  # $session  - a reference to the TWiki session object (if you don't know
-  #             what this is, just ignore it)
-  # $params=  - a reference to a TWiki::Attrs object containing parameters.
-  #             This can be used as a simple hash that maps parameter names
-  #             to values, with _DEFAULT being the name for the default
-  #             parameter.
-  # $theTopic - name of the topic in the query
-  # $theWeb   - name of the web in the query
-  # Return: the result of processing the variable
+    my ( $session, $params, $theTopic, $theWeb ) = @_;
 
-  # For example, %EXAMPLETAG{'hamburger' sideorder="onions"}%
-  # $params->{_DEFAULT} will be 'hamburger'
-  # $params->{sideorder} will be 'onions'
+    # $session  - a reference to the TWiki session object (if you don't know
+    #             what this is, just ignore it)
+    # $params=  - a reference to a TWiki::Attrs object containing parameters.
+    #             This can be used as a simple hash that maps parameter names
+    #             to values, with _DEFAULT being the name for the default
+    #             parameter.
+    # $theTopic - name of the topic in the query
+    # $theWeb   - name of the web in the query
+    # Return: the result of processing the variable
 
-  my $nameVal = $params->{_DEFAULT};
-  if (!$nameVal) {
-    $nameVal = "untitled";
-  }
-  $nameVal =~ s/[^A-Za-z0-9_\.\-]//go; # delete special characters
-  $nameVal = "TWikiUmlPlugin_" . $nameVal;
-  
-  my $width = $params->{width};
-  if (!$width) {
-    $width = 800;
-  }
-  my $height = $params->{height};
-  if (!$height) {
-    $height = 400;
-  }
-  
-  my $toolbar = $nameVal . "Toolbar";
-  my $editor = $nameVal . "Editor";
-  my $content = $nameVal . "Content";
+    # For example, %EXAMPLETAG{'hamburger' sideorder="onions"}%
+    # $params->{_DEFAULT} will be 'hamburger'
+    # $params->{sideorder} will be 'onions'
 
-  my $wikiName = TWiki::Func::getWikiName();
-  my $isGuest = $wikiName eq "WikiGuest"; # TWiki::Func::isGuest() does not seem to work...
-  my $isChangeAllowed = 
-    !$isGuest &&
-    TWiki::Func::checkAccessPermission('CHANGE', $wikiName, undef, $theTopic, $theWeb, undef);
+    my $nameVal = $params->{_DEFAULT};
+    if ( !$nameVal ) {
+        $nameVal = "untitled";
+    }
+    $nameVal =~ s/[^A-Za-z0-9_\.\-]//go;    # delete special characters
+    $nameVal = "TWikiUmlPlugin_" . $nameVal;
 
-  my $retVal = "";
+    my $width = $params->{width};
+    if ( !$width ) {
+        $width = 800;
+    }
+    my $height = $params->{height};
+    if ( !$height ) {
+        $height = 400;
+    }
 
-  my $display;
-  if ($isChangeAllowed) {
-    $display = 'block';
-  } else {
-    $display = 'none';
-  }
-  
-  $retVal .= "<div id='$toolbar' style='width: $width" . "px; display: $display;'></div>";
-  $retVal .= "<div id='$editor' style='width: $width" . "px; height: $height" . "px;'></div>";
-  
-  my $headVal = "";
-  $headVal .= "<script type='text/javascript'>\n";
-  
-  $headVal .= "dojo.require('diagram.editor');\n";
-  $headVal .= "dojo.require('diagram.uml');\n";
-  $headVal .= "dojo.require('dojo.debug.console')\n";
-  
-  $headVal .= "function init() {\n";
-  $headVal .= "  var hrefTranslate = function(href) {\n";
-  $headVal .= "    var currentHRef = location.href;\n";
-  $headVal .= "    var i = currentHRef.lastIndexOf( '/' );\n";
-  $headVal .= "    return currentHRef.substring(0, i + 1) + href;\n";
-  $headVal .= "  };\n";
-  
-  $headVal .= "  var editorContainer = dojo.byId('$editor');\n";
-  $headVal .= "  var editor = new diagram.Editor(editorContainer, false, hrefTranslate);\n";
+    my $toolbar = $nameVal . "Toolbar";
+    my $editor  = $nameVal . "Editor";
+    my $content = $nameVal . "Content";
 
-  if ($isChangeAllowed) {
-    $headVal .= "  var toolbarContainer = dojo.byId('$toolbar');\n";
-    $headVal .= "  var toolbar = new diagram.uml.Toolbar(toolbarContainer, editor);\n";
-  }
+    my $wikiName = TWiki::Func::getWikiName();
+    my $isGuest = $wikiName eq
+      "WikiGuest";    # TWiki::Func::isGuest() does not seem to work...
+    my $isChangeAllowed = !$isGuest
+      && TWiki::Func::checkAccessPermission( 'CHANGE', $wikiName, undef,
+        $theTopic, $theWeb, undef );
 
-  my $fileName = getFileName($nameVal);
-  
-  if (TWiki::Func::attachmentExists($theWeb, $theTopic, $fileName)) {
-    $headVal .= "  var xmiHandler = new diagram.xmi.Handler();\n";
-    $headVal .= "  xmiHandler.xmiFileImport('%ATTACHURLPATH%/$fileName', editor);\n";
-  }
-  
-  if ($isChangeAllowed) {
-    $headVal .= "  var wikiUrl = '%PUBURL%';\n";
-    $headVal .= "  wikiUrl = wikiUrl.substr(0, wikiUrl.lastIndexOf('/pub'));\n";
-    $headVal .= "  wikiUrl += '/bin/rest/$pluginName/save';\n";
-    $headVal .= "  var topicName = '%TOPIC%';\n";
-    $headVal .= "  toolbar.xmiExport = function() {\n";
-    $headVal .= "    var doc = new diagram.xmi.Handler().xmiExport(this.editor);\n";
-    $headVal .= "    var kw = {\n";
-    $headVal .= "      url:     wikiUrl,\n";
-    $headVal .= "      load:    function(type, data, evt) {\n"; 
-    $headVal .= "                 dojo.debug(data);\n";
-    $headVal .= "               },\n";
-    $headVal .= "      method:  'POST',\n";
-    $headVal .= "      content: {xmi: doc, web: '%WEB%', topicName: topicName, fileName: '$nameVal'}\n";
-    $headVal .= "    };\n";
-    $headVal .= "    dojo.io.bind(kw);\n";
+    my $retVal = "";
+
+    my $display;
+    if ($isChangeAllowed) {
+        $display = 'block';
+    }
+    else {
+        $display = 'none';
+    }
+
+    $retVal .= "<div id='$toolbar' style='width: $width"
+      . "px; display: $display;'></div>";
+    $retVal .=
+        "<div id='$editor' style='width: $width"
+      . "px; height: $height"
+      . "px;'></div>";
+
+    my $headVal = "";
+    $headVal .= "<script type='text/javascript'>\n";
+
+    $headVal .= "dojo.require('diagram.editor');\n";
+    $headVal .= "dojo.require('diagram.uml');\n";
+    $headVal .= "dojo.require('dojo.debug.console')\n";
+
+    $headVal .= "function init() {\n";
+    $headVal .= "  var hrefTranslate = function(href) {\n";
+    $headVal .= "    var currentHRef = location.href;\n";
+    $headVal .= "    var i = currentHRef.lastIndexOf( '/' );\n";
+    $headVal .= "    return currentHRef.substring(0, i + 1) + href;\n";
     $headVal .= "  };\n";
-  }
-  
-  $headVal .= "}\n";
-  
-  $headVal .= "dojo.addOnLoad(init);\n</script>\n";
-  
-  TWiki::Func::addToHEAD("UmlPlugin::$nameVal", $headVal);
 
-  return $retVal;
+    $headVal .= "  var editorContainer = dojo.byId('$editor');\n";
+    $headVal .=
+"  var editor = new diagram.Editor(editorContainer, false, hrefTranslate);\n";
+
+    if ($isChangeAllowed) {
+        $headVal .= "  var toolbarContainer = dojo.byId('$toolbar');\n";
+        $headVal .=
+"  var toolbar = new diagram.uml.Toolbar(toolbarContainer, editor);\n";
+    }
+
+    my $fileName = getFileName($nameVal);
+
+    if ( TWiki::Func::attachmentExists( $theWeb, $theTopic, $fileName ) ) {
+        $headVal .= "  var xmiHandler = new diagram.xmi.Handler();\n";
+        $headVal .=
+          "  xmiHandler.xmiFileImport('%ATTACHURLPATH%/$fileName', editor);\n";
+    }
+
+    if ($isChangeAllowed) {
+        $headVal .= "  var wikiUrl = '%PUBURL%';\n";
+        $headVal .=
+          "  wikiUrl = wikiUrl.substr(0, wikiUrl.lastIndexOf('/pub'));\n";
+        $headVal .= "  wikiUrl += '/bin/rest/$pluginName/save';\n";
+        $headVal .= "  var topicName = '%TOPIC%';\n";
+        $headVal .= "  toolbar.xmiExport = function() {\n";
+        $headVal .=
+          "    var doc = new diagram.xmi.Handler().xmiExport(this.editor);\n";
+        $headVal .= "    var kw = {\n";
+        $headVal .= "      url:     wikiUrl,\n";
+        $headVal .= "      load:    function(type, data, evt) {\n";
+        $headVal .= "                 dojo.debug(data);\n";
+        $headVal .= "               },\n";
+        $headVal .= "      method:  'POST',\n";
+        $headVal .=
+"      content: {xmi: doc, web: '%WEB%', topicName: topicName, fileName: '$nameVal'}\n";
+        $headVal .= "    };\n";
+        $headVal .= "    dojo.io.bind(kw);\n";
+        $headVal .= "  };\n";
+    }
+
+    $headVal .= "}\n";
+
+    $headVal .= "dojo.addOnLoad(init);\n</script>\n";
+
+    TWiki::Func::addToHEAD( "UmlPlugin::$nameVal", $headVal );
+
+    return $retVal;
 }
 
 sub getFileName {
-  my ($name) = @_;
-  
-  my $ret = sanitize($name);
-  
-  return $ret . ".xml";  
+    my ($name) = @_;
+
+    my $ret = sanitize($name);
+
+    return $ret . ".xml";
 }
 
 sub sanitize {
-  my ($value) = @_;
+    my ($value) = @_;
 
-  my $ret = $value;
-  $ret =~ /\.*([ \w_.\-]+)$/go;
-  $value = $1;
-  
-  # Remove problematic chars
-  $value =~ s/$TWiki::cfg{NameFilter}//goi;
-  
-  # Strip dots and slashes at start
-  # untaint at the same time
-  $value =~ s/^([\.\/\\]*)*(.*?)$/$2/go;
+    my $ret = $value;
+    $ret =~ /\.*([ \w_.\-]+)$/go;
+    $value = $1;
 
-  return $value;
+    # Remove problematic chars
+    $value =~ s/$TWiki::cfg{NameFilter}//goi;
+
+    # Strip dots and slashes at start
+    # untaint at the same time
+    $value =~ s/^([\.\/\\]*)*(.*?)$/$2/go;
+
+    return $value;
 }
 
 sub restSave {
-  #my ($session) = @_;
-  
-  my $wikiName = TWiki::Func::getWikiName();
-  
-  my $xmi = $_[0]->{cgiQuery}->{xmi}[0];
-  my $web = $_[0]->{cgiQuery}->{web}[0];
-  my $topic = $_[0]->{cgiQuery}->{topicName}[0];
-  my $fileName = $_[0]->{cgiQuery}->{fileName}[0];
 
-  $web = sanitize($web);
-  $topic = sanitize($topic);
-  $fileName = getFileName($fileName);
+    #my ($session) = @_;
 
-  my $workArea = TWiki::Func::getWorkArea($pluginName);
+    my $wikiName = TWiki::Func::getWikiName();
 
-  # Temp file in workarea - Filename + 9 digits to avoid race condition 
-  my $tempName = $workArea . '/' . $fileName . int(rand(1000000000));
+    my $xmi      = $_[0]->{cgiQuery}->{xmi}[0];
+    my $web      = $_[0]->{cgiQuery}->{web}[0];
+    my $topic    = $_[0]->{cgiQuery}->{topicName}[0];
+    my $fileName = $_[0]->{cgiQuery}->{fileName}[0];
 
-  # Saving temporary file
-  TWiki::Func::saveFile($tempName, $xmi);
+    $web      = sanitize($web);
+    $topic    = sanitize($topic);
+    $fileName = getFileName($fileName);
 
-  my @stats = stat $tempName;
-  my $fileSize = $stats[7];
-  my $fileDate = $stats[9];
+    my $workArea = TWiki::Func::getWorkArea($pluginName);
 
-  TWiki::Func::saveAttachment($web, $topic, $fileName, { file => $tempName,
-                                                         filedate => $fileDate,
-                                                         filesize => $fileSize,
-                                                         filepath => $fileName,
-                                                         hide => 1
-                                                       });
+    # Temp file in workarea - Filename + 9 digits to avoid race condition
+    my $tempName = $workArea . '/' . $fileName . int( rand(1000000000) );
 
-  # Delete temporary file
-  unlink($tempName) if( $tempName && -e $tempName );
+    # Saving temporary file
+    TWiki::Func::saveFile( $tempName, $xmi );
 
-  return "Attachment $fileName saved";
+    my @stats    = stat $tempName;
+    my $fileSize = $stats[7];
+    my $fileDate = $stats[9];
+
+    TWiki::Func::saveAttachment(
+        $web, $topic,
+        $fileName,
+        {
+            file     => $tempName,
+            filedate => $fileDate,
+            filesize => $fileSize,
+            filepath => $fileName,
+            hide     => 1
+        }
+    );
+
+    # Delete temporary file
+    unlink($tempName) if ( $tempName && -e $tempName );
+
+    return "Attachment $fileName saved";
 }
 
 1;

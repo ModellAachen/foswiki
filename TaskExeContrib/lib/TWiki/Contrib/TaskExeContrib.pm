@@ -20,5 +20,6 @@ use vars qw( $VERSION $RELEASE $SHORTDESCRIPTION );
 
 $VERSION = '$Rev$';
 $RELEASE = '';
-$SHORTDESCRIPTION = 'Provides task executer TWiki application and documentation';
+$SHORTDESCRIPTION =
+  'Provides task executer TWiki application and documentation';
 

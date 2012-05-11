@@ -20,9 +20,9 @@ use Foswiki::Func;
 use Foswiki::Meta;
 use Foswiki::Plugins::TopicDataHelperPlugin;
 
-our $VERSION = '$Rev: 4282 $';
+our $VERSION           = '$Rev: 4282 $';
 our $RELEASE           = '1.0';
-our $SHORTDESCRIPTION = 'Shows the number of topics in a web or site';
+our $SHORTDESCRIPTION  = 'Shows the number of topics in a web or site';
 our $NO_PREFS_IN_TOPIC = 1;
 
 my $topic;
@@ -30,7 +30,6 @@ my $web;
 my $user;
 my $installWeb;
 my $pluginName = 'TopicCountPlugin';
-
 
 =pod
 
@@ -50,7 +49,8 @@ sub initPlugin {
 
     # Plugin correctly initialized
     _debug(
-        "- Foswiki::Plugins::${pluginName}::initPlugin( $inWeb.$inTopic ) is OK");
+        "- Foswiki::Plugins::${pluginName}::initPlugin( $inWeb.$inTopic ) is OK"
+    );
 
     return 1;
 }
@@ -62,10 +62,11 @@ sub initPlugin {
 sub _handleTopicCount {
     my ( $session, $inParams, $inTopic, $inWeb ) = @_;
 
-	_debugData("_handleTopicCount -- topic=$inWeb.$inTopic; params=", $inParams);
-	
-	my $topics = $inParams->{'topic'} || '*';
-    my $webs   = $inParams->{'web'}   || $inWeb   || '';
+    _debugData( "_handleTopicCount -- topic=$inWeb.$inTopic; params=",
+        $inParams );
+
+    my $topics        = $inParams->{'topic'}        || '*';
+    my $webs          = $inParams->{'web'}          || $inWeb || '';
     my $excludeTopics = $inParams->{'excludetopic'} || '';
     my $excludeWebs   = $inParams->{'excludeweb'}   || '';
 
@@ -73,12 +74,14 @@ sub _handleTopicCount {
     my $topicData =
       Foswiki::Plugins::TopicDataHelperPlugin::createTopicData( $webs,
         $excludeWebs, $topics, $excludeTopics );
-	
-    _filterTopicData( $topicData, $inParams ) if Foswiki::Func::isTrue( $inParams->{'permissiononly'} );
-	
-    my $files = Foswiki::Plugins::TopicDataHelperPlugin::getListOfObjectData($topicData);
 
-	return scalar @{$files};
+    _filterTopicData( $topicData, $inParams )
+      if Foswiki::Func::isTrue( $inParams->{'permissiononly'} );
+
+    my $files =
+      Foswiki::Plugins::TopicDataHelperPlugin::getListOfObjectData($topicData);
+
+    return scalar @{$files};
 }
 
 =pod

@@ -12,7 +12,7 @@ package Foswiki::Plugins::TinyMCEImgMapPlugin;
 use strict;
 use warnings;
 
-use Foswiki::Func ();       # The plugins API
+use Foswiki::Func    ();    # The plugins API
 use Foswiki::Plugins ();    # For the API version
 
 # $VERSION is referred to by Foswiki, and is the only global variable that
@@ -35,7 +35,8 @@ our $RELEASE = '2010-04-21';
 
 # Short description of this plugin
 # One line description, is shown in the %SYSTEMWEB%.TextFormattingRules topic:
-our $SHORTDESCRIPTION = 'Foswiki integration (including TinyMCE plugin) of the http://code.google.com/p/imgmap project';
+our $SHORTDESCRIPTION =
+'Foswiki integration (including TinyMCE plugin) of the http://code.google.com/p/imgmap project';
 our $NO_PREFS_IN_TOPIC = 1;
 
 =begin TML

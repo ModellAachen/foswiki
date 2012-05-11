@@ -20,18 +20,18 @@ package Foswiki::Plugins::OrphansPlugin;
 
 use vars qw( $VERSION $RELEASE $SHORTDESCRIPTION );
 
-$VERSION = '$Rev$';
-$RELEASE = '07 Nov 2009';
+$VERSION          = '$Rev$';
+$RELEASE          = '07 Nov 2009';
 $SHORTDESCRIPTION = 'Locate and manage orphaned topics';
 
 sub initPlugin {
 
     # check for Plugins.pm versions
-    if( $Foswiki::Plugins::VERSION < 1.1 ) {
+    if ( $Foswiki::Plugins::VERSION < 1.1 ) {
         die "Require Plugins.pm >= 1.1";
     }
 
-    Foswiki::Func::registerTagHandler('FINDORPHANS', \&_findOrphans);
+    Foswiki::Func::registerTagHandler( 'FINDORPHANS', \&_findOrphans );
 
     return 1;
 }
@@ -41,7 +41,7 @@ sub _findOrphans {
     my ( $session, $params, $topic, $web ) = @_;
     require Foswiki::Plugins::OrphansPlugin::Orphans;
     my $orphans = new Foswiki::Plugins::OrphansPlugin::Orphans( $web, $params );
-    return $orphans->tabulate( $params );
+    return $orphans->tabulate($params);
 }
 
 1;

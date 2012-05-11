@@ -60,9 +60,6 @@ The following units can be converted to each other:
    * weeks &lt;=&gt; days
    * hours &lt;=&gt; minutes
 
-For a further explanation/excuse, read 
-[[http://search.cpan.org/~drolsky/DateTime-0.4304/lib/DateTime.pm#How_Datetime_Math_is_Done][how datetime math is done]].
-
 Time expressions can be specified in any of the following format:
    * 31 Dec 2001 - 23:59 (Foswiki date)
    * 31 Dec 2001

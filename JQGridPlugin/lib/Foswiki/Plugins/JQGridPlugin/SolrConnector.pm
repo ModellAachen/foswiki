@@ -147,7 +147,7 @@ sub restHandleSearch {
 
   my $footer = "\n</rows>";
   my $header = <<"HERE";
-<?xml version='1.0' encoding='utf-8'?>
+<?xml version='1.0' encoding='$Foswiki::cfg{Site}{CharSet}'?>
 <rows>
   <page>$page</page>
   <total>$totalPages</total>

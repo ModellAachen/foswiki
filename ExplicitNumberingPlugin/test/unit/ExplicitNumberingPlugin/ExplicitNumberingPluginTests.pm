@@ -75,7 +75,7 @@ sub doTest {
     Foswiki::Plugins::ExplicitNumberingPlugin::initPlugin( "TestTopic",
         $this->{test_web}, "MyUser", "System" );
     Foswiki::Plugins::ExplicitNumberingPlugin::commonTagsHandler( $source,
-        $this->{test_web}, "TestTopic", $include  );
+        $this->{test_web}, "TestTopic", $include );
 
     if ($assertFalse) {
         $this->assert_str_not_equals( $expected, $source );
@@ -85,9 +85,8 @@ sub doTest {
     }
 }
 
-
 # ########################################################
-# Verify simple numbering numbering 
+# Verify simple numbering numbering
 # ########################################################
 sub test_level1Numbering {
     my $this = shift;
@@ -192,8 +191,9 @@ END_EXPECTED
 
     $this->doTest( $source, $expected, 0 );
 }
+
 # ########################################################
-# Verify simple heading numbering  
+# Verify simple heading numbering
 # ########################################################
 sub test_HeadingNumbering {
     my $this = shift;
@@ -216,7 +216,7 @@ END_EXPECTED
 }
 
 # ########################################################
-# Verify simple heading in diff context  
+# Verify simple heading in diff context
 # ########################################################
 sub test_diff_context {
     my $this = shift;
@@ -240,15 +240,14 @@ END_EXPECTED
 }
 
 # ########################################################
-# Verify Bold heading numbering  
+# Verify Bold heading numbering
 # ########################################################
 sub test_BoldNumbering {
     my $this = shift;
     Foswiki::Func::getContext()->{'view'} = 1;
     $include = 0;
 
-    Foswiki::Func::setPreferencesValue(
-        'EXPLICITNUMBERINGPLUGIN_BOLD', "1" );
+    Foswiki::Func::setPreferencesValue( 'EXPLICITNUMBERINGPLUGIN_BOLD', "1" );
 
     $source = <<END_SOURCE;
 Test ##.
@@ -271,11 +270,10 @@ sub test_AlphaSequenceWrap {
     Foswiki::Func::getContext()->{'view'} = 1;
     $include = 0;
 
-    Foswiki::Func::setPreferencesValue(
-        'EXPLICITNUMBERINGPLUGIN_BOLD', "1" );
+    Foswiki::Func::setPreferencesValue( 'EXPLICITNUMBERINGPLUGIN_BOLD', "1" );
 
-    Foswiki::Func::setPreferencesValue(
-        'EXPLICITNUMBERINGPLUGIN_ALPHASEQ', 'a,b,c,d');
+    Foswiki::Func::setPreferencesValue( 'EXPLICITNUMBERINGPLUGIN_ALPHASEQ',
+        'a,b,c,d' );
 
     $source = <<END_SOURCE;
 Test ##.A
@@ -296,20 +294,18 @@ END_EXPECTED
     $this->doTest( $source, $expected, 0 );
 }
 
-
 # ########################################################
-# Verify alpha numbering   
+# Verify alpha numbering
 # ########################################################
 sub test_Alternate_AlphaSequence {
     my $this = shift;
     Foswiki::Func::getContext()->{'view'} = 1;
     $include = 0;
 
-    Foswiki::Func::setPreferencesValue(
-        'EXPLICITNUMBERINGPLUGIN_BOLD', "1" );
+    Foswiki::Func::setPreferencesValue( 'EXPLICITNUMBERINGPLUGIN_BOLD', "1" );
 
-    Foswiki::Func::setPreferencesValue(
-        'EXPLICITNUMBERINGPLUGIN_ALPHASEQ', 'z,y,x,w');
+    Foswiki::Func::setPreferencesValue( 'EXPLICITNUMBERINGPLUGIN_ALPHASEQ',
+        'z,y,x,w' );
 
     $source = <<END_SOURCE;
 Test ##.A
@@ -324,10 +320,8 @@ END_EXPECTED
     $this->doTest( $source, $expected, 0 );
 }
 
-
-
 # ########################################################
-# Verify disabled if not view or diff   
+# Verify disabled if not view or diff
 # ########################################################
 sub test_disabled_not_view {
     my $this = shift;
@@ -335,11 +329,10 @@ sub test_disabled_not_view {
     Foswiki::Func::getContext()->{'diff'} = 0;
     $include = 0;
 
-    Foswiki::Func::setPreferencesValue(
-        'EXPLICITNUMBERINGPLUGIN_BOLD', "1" );
+    Foswiki::Func::setPreferencesValue( 'EXPLICITNUMBERINGPLUGIN_BOLD', "1" );
 
-    Foswiki::Func::setPreferencesValue(
-        'EXPLICITNUMBERINGPLUGIN_ALPHASEQ', 'z,y,x,w');
+    Foswiki::Func::setPreferencesValue( 'EXPLICITNUMBERINGPLUGIN_ALPHASEQ',
+        'z,y,x,w' );
 
     $source = <<END_SOURCE;
 Test ##.A
@@ -355,7 +348,7 @@ END_EXPECTED
 }
 
 # ########################################################
-# Verify disabled if included topic     
+# Verify disabled if included topic
 # ########################################################
 sub test_disabled_include {
     my $this = shift;
@@ -363,11 +356,10 @@ sub test_disabled_include {
     Foswiki::Func::getContext()->{'diff'} = 0;
     $include = 1;
 
-    Foswiki::Func::setPreferencesValue(
-        'EXPLICITNUMBERINGPLUGIN_BOLD', "1" );
+    Foswiki::Func::setPreferencesValue( 'EXPLICITNUMBERINGPLUGIN_BOLD', "1" );
 
-    Foswiki::Func::setPreferencesValue(
-        'EXPLICITNUMBERINGPLUGIN_ALPHASEQ', 'z,y,x,w');
+    Foswiki::Func::setPreferencesValue( 'EXPLICITNUMBERINGPLUGIN_ALPHASEQ',
+        'z,y,x,w' );
 
     $source = <<END_SOURCE;
 Test ##.A
@@ -381,9 +373,6 @@ END_EXPECTED
 
     $this->doTest( $source, $expected, 0 );
 }
-
-
-
 
 # ####################
 # Utility Functions ##

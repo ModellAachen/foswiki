@@ -1,8 +1,5 @@
-Foswiki::Plugins::FlexWebListPlugin,>=0,perl,Required.
-Foswiki::Plugins::DBCachePlugin,>=0,perl,Required.
-Foswiki::Plugins::TwistyPlugin,>=0,perl,Required.
-Foswiki::Plugins::FilterPlugin,>=0,perl,Required.
-Foswiki::Plugins::GluePlugin,>=0,perl,Required.
-Foswiki::Plugins::FlexFormPlugin,>=0,perl,Required.
-Foswiki::Plugins::JQueryPlugin,>=0,perl,Required.
-Foswiki::Plugins::ZonePlugin,>=0,perl,Optional.
+Foswiki::Plugins::DBCachePlugin,>=4.10,perl,Required.
+Foswiki::Plugins::FilterPlugin,>=2.08,perl,Required; 
+Foswiki::Plugins::FlexFormPlugin,>=2.60,perl,Required.
+Foswiki::Plugins::FlexWebListPlugin,>=1.61,perl,Required.
+Foswiki::Plugins::JQGridPlugin,>=2.0,perl,Required.

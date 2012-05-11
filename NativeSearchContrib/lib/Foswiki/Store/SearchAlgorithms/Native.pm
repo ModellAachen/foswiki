@@ -102,13 +102,10 @@ sub query {
     $resultset->sortResults($options);
 
     #add permissions check
-    $resultset =
-      $this->addACLFilter( $resultset,
-        $options );
+    $resultset = $this->addACLFilter( $resultset, $options );
 
     #add paging if applicable.
-    return $this->addPager( $resultset,
-        $options );
+    return $this->addPager( $resultset, $options );
 }
 
 #ok, for initial validation, naively call the code with a web.

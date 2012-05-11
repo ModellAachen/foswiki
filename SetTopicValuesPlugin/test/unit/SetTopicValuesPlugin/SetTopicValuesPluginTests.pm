@@ -37,59 +37,61 @@ sub NOtear_down {
 }
 
 sub saveValues {
-    my $this = shift;
-    my $topic = shift;
-    my $text = shift;
+    my $this       = shift;
+    my $topic      = shift;
+    my $text       = shift;
     my $settingRef = shift;
-    
-    my $saveHash =         {
-            action              => ['save'],
-            topic => [ $this->{test_web} . '.'.$topic ],
-            %{$settingRef}
-        };
-    if (defined($text)) {
+
+    my $saveHash = {
+        action => ['save'],
+        topic  => [ $this->{test_web} . '.' . $topic ],
+        %{$settingRef}
+    };
+    if ( defined($text) ) {
         $saveHash->{text} = $text;
     }
 
-    my $query = new Unit::Request(
-        $saveHash
-    );
+    my $query = new Unit::Request($saveHash);
     $this->{twiki}->finish();
     $this->{twiki} = new Foswiki( $this->{test_user_login}, $query );
     $this->capture( \&Foswiki::UI::Save::save, $this->{twiki} );
-    my ( $meta, $sText ) = Foswiki::Func::readTopic($this->{test_web}, $topic );
-    if (defined($text)) {
+    my ( $meta, $sText ) =
+      Foswiki::Func::readTopic( $this->{test_web}, $topic );
+    if ( defined($text) ) {
         $this->assert_matches( $text, $sText );
     }
     $this->assert_null( $meta->get('FORM') );
-    foreach my $setKey (keys(%{$settingRef})) {
+    foreach my $setKey ( keys( %{$settingRef} ) ) {
         my $type = 'PREFERENCE';
-        my $key = $setKey;
+        my $key  = $setKey;
 
         $key =~ s/^([Uu]n)?[Ss]et\+(.*)$/$2/;
         my $unset = lc($1);
 
-        if ($key =~ /^(.*)\[(.*)\]$/ ) {
+        if ( $key =~ /^(.*)\[(.*)\]$/ ) {
             $type = uc($1);
-            $key = $2;
+            $key  = $2;
 
-            $type =~ s/S$//;     #remove the trailing S (fields[] == META:FIELD)
+            $type =~ s/S$//;    #remove the trailing S (fields[] == META:FIELD)
         }
-#print STDERR "----$unset ($type)[$key]\n";
 
-        my $ma = $meta->get($type, $key );
-        if ($unset eq 'un') {
+        #print STDERR "----$unset ($type)[$key]\n";
+
+        my $ma = $meta->get( $type, $key );
+        if ( $unset eq 'un' ) {
             $this->assert_null($ma);
-        } else {
+        }
+        else {
             $this->assert_not_null($ma);
             $this->assert_equals( $settingRef->{$setKey}, $ma->{value} );
         }
 
-        if ($type eq 'PREFERENCE') {
+        if ( $type eq 'PREFERENCE' ) {
+
             #TODO: need a new session to force a reload of the preferences :(
             #my $pref = Foswiki::Func::getPreferencesValue($key);
             #$this->assert_equals( $settingRef->{$setKey}, $pref );
-#print STDERR "$key = $pref\n";
+            #print STDERR "$key = $pref\n";
         }
     }
 }
@@ -111,10 +113,8 @@ sub test_SetTopicValuesPluginEnabled {
 # Verifies: ?Set+SOMEPREF=something works
 sub test_set_new_preference_on_new_topic {
     my $this = shift;
-    $this->saveValues( 'DeleteTestSaveScriptTopic',
-            "CORRECT",
-            { 'Set+NEWPREFERENCE' => 'someValue' }
-           );
+    $this->saveValues( 'DeleteTestSaveScriptTopic', "CORRECT",
+        { 'Set+NEWPREFERENCE' => 'someValue' } );
     print STDERR "DONE\n";
 }
 
@@ -125,14 +125,12 @@ sub test_set_preference_on_new_topic {
     my $this = shift;
 
     $this->saveValues(
-            'DeleteTestSaveScriptTopic',
-            "CORRECT\n   * Set NEWPREFERENCE= wrongValue\n bah",
-            {
-                   'Set+NEWPREFERENCE' => 'someValue'
-            }
-           );
+        'DeleteTestSaveScriptTopic',
+        "CORRECT\n   * Set NEWPREFERENCE= wrongValue\n bah",
+        { 'Set+NEWPREFERENCE' => 'someValue' }
+    );
 
-print STDERR "DONE\n";
+    print STDERR "DONE\n";
 }
 
 # ----------------------------------------------------------------------
@@ -145,18 +143,13 @@ sub test_set_new_preference_on_existing_topic {
 
     my $oopsUrl =
       Foswiki::Func::saveTopicText( $this->{test_web},
-        'DeleteTestSaveScriptTopic', $text);
+        'DeleteTestSaveScriptTopic', $text );
     $this->assert_matches( '', $oopsUrl );
 
-    $this->saveValues(
-            'DeleteTestSaveScriptTopic',
-            undef,
-            {
-                   'Set+NEWPREFERENCE' => 'someValue'
-            }
-           );
+    $this->saveValues( 'DeleteTestSaveScriptTopic', undef,
+        { 'Set+NEWPREFERENCE' => 'someValue' } );
 
-print STDERR "DONE\n";
+    print STDERR "DONE\n";
 }
 
 # ----------------------------------------------------------------------
@@ -164,11 +157,9 @@ print STDERR "DONE\n";
 # Verifies: see if setting a FormField will add a field to the topic
 sub test_set_FIELD_on_new_topic {
     my $this = shift;
-    $this->saveValues( 'DeleteTestSaveScriptTopic',
-            "CORRECT",
-            { 'Set+fields[TestField]' => 'someValue' }
-           );
-    
+    $this->saveValues( 'DeleteTestSaveScriptTopic', "CORRECT",
+        { 'Set+fields[TestField]' => 'someValue' } );
+
     print STDERR "DONE\n";
 }
 
@@ -177,31 +168,31 @@ sub test_set_FIELD_on_new_topic {
 # Verifies: makes sure 2 sequential operations don't lose info
 sub test_set_FIELD_and_then_PREF_on_new_topic {
     my $this = shift;
-    
+
     my $text = "CORRECT";
-    $this->saveValues( 'DeleteTestSaveScriptTopic',
-            $text,
-            { 'Set+fields[TestField]' => 'someValue' }
-           );
-    $this->saveValues( 'DeleteTestSaveScriptTopic',
-            undef,
-            { 'Set+preferences[BANANA]' => 'no, we have no bananas' }
-           );
-           
-    my ( $meta, $sText ) = Foswiki::Func::readTopic($this->{test_web}, 'DeleteTestSaveScriptTopic' );
-    if (defined($text)) {
+    $this->saveValues( 'DeleteTestSaveScriptTopic', $text,
+        { 'Set+fields[TestField]' => 'someValue' } );
+    $this->saveValues( 'DeleteTestSaveScriptTopic', undef,
+        { 'Set+preferences[BANANA]' => 'no, we have no bananas' } );
+
+    my ( $meta, $sText ) =
+      Foswiki::Func::readTopic( $this->{test_web},
+        'DeleteTestSaveScriptTopic' );
+    if ( defined($text) ) {
         $this->assert_matches( $text, $sText );
     }
     $this->assert_null( $meta->get('FORM') );
-    my $ma = $meta->get('PREFERENCE', 'BANANA' );
+    my $ma = $meta->get( 'PREFERENCE', 'BANANA' );
     $this->assert_not_null($ma);
     $this->assert_equals( 'no, we have no bananas', $ma->{value} );
- #I _THINK_ this test failes because save removes form fields that are not in the current form (ie, none)
+
+#I _THINK_ this test failes because save removes form fields that are not in the current form (ie, none)
 #but i'm not that sure this is a good thing, just historical
-    $ma = $meta->get('FIELD', 'TestField' );
-#    $this->assert_not_null($ma);
-#    $this->assert_equals( 'someValue', $ma->{value} );
-    
+    $ma = $meta->get( 'FIELD', 'TestField' );
+
+    #    $this->assert_not_null($ma);
+    #    $this->assert_equals( 'someValue', $ma->{value} );
+
     print STDERR "DONE\n";
 }
 
@@ -210,30 +201,28 @@ sub test_set_FIELD_and_then_PREF_on_new_topic {
 # Verifies: makes sure 2 sequential operations don't lose info
 sub test_set_PREF_and_then_PREF_on_new_topic {
     my $this = shift;
-    
+
     my $text = "CORRECT";
-    $this->saveValues( 'DeleteTestSaveScriptTopic',
-            $text,
-            { 'Set+preferences[APPLE]' => 'keep the dentist happy' }
-           );
-    $this->saveValues( 'DeleteTestSaveScriptTopic',
-            undef,
-            { 'Set+preferences[BANANA]' => 'no, we have no bananas' }
-           );
-           
-    my ( $meta, $sText ) = Foswiki::Func::readTopic($this->{test_web}, 'DeleteTestSaveScriptTopic' );
-    if (defined($text)) {
+    $this->saveValues( 'DeleteTestSaveScriptTopic', $text,
+        { 'Set+preferences[APPLE]' => 'keep the dentist happy' } );
+    $this->saveValues( 'DeleteTestSaveScriptTopic', undef,
+        { 'Set+preferences[BANANA]' => 'no, we have no bananas' } );
+
+    my ( $meta, $sText ) =
+      Foswiki::Func::readTopic( $this->{test_web},
+        'DeleteTestSaveScriptTopic' );
+    if ( defined($text) ) {
         $this->assert_matches( $text, $sText );
     }
     $this->assert_null( $meta->get('FORM') );
-    my $ma = $meta->get('PREFERENCE', 'BANANA' );
+    my $ma = $meta->get( 'PREFERENCE', 'BANANA' );
     $this->assert_not_null($ma);
     $this->assert_equals( 'no, we have no bananas', $ma->{value} );
 
-    $ma = $meta->get('PREFERENCE', 'APPLE' );
+    $ma = $meta->get( 'PREFERENCE', 'APPLE' );
     $this->assert_not_null($ma);
     $this->assert_equals( 'keep the dentist happy', $ma->{value} );
-    
+
     print STDERR "DONE\n";
 }
 
@@ -242,58 +231,67 @@ sub test_set_PREF_and_then_PREF_on_new_topic {
 # Verifies: set more than one item in the same topic
 sub test_set_two_PREF_on_new_topic {
     my $this = shift;
-    
+
     my $text = "CORRECT";
-    $this->saveValues( 'DeleteTestSaveScriptTopic',
-            $text,
-            { 'Set+preferences[APPLE]' => 'keep the dentist happy',
-                'Set+preferences[BANANA]' => 'no, we have no bananas'  }
-           );
-           
-    my ( $meta, $sText ) = Foswiki::Func::readTopic($this->{test_web}, 'DeleteTestSaveScriptTopic' );
-    if (defined($text)) {
+    $this->saveValues(
+        'DeleteTestSaveScriptTopic',
+        $text,
+        {
+            'Set+preferences[APPLE]'  => 'keep the dentist happy',
+            'Set+preferences[BANANA]' => 'no, we have no bananas'
+        }
+    );
+
+    my ( $meta, $sText ) =
+      Foswiki::Func::readTopic( $this->{test_web},
+        'DeleteTestSaveScriptTopic' );
+    if ( defined($text) ) {
         $this->assert_matches( $text, $sText );
     }
     $this->assert_null( $meta->get('FORM') );
-    my $ma = $meta->get('PREFERENCE', 'BANANA' );
+    my $ma = $meta->get( 'PREFERENCE', 'BANANA' );
     $this->assert_not_null($ma);
     $this->assert_equals( 'no, we have no bananas', $ma->{value} );
 
-    $ma = $meta->get('PREFERENCE', 'APPLE' );
+    $ma = $meta->get( 'PREFERENCE', 'APPLE' );
     $this->assert_not_null($ma);
     $this->assert_equals( 'keep the dentist happy', $ma->{value} );
-    
+
     print STDERR "DONE\n";
 }
+
 # ----------------------------------------------------------------------
 # Purpose:  create a new topic with a Field set, and then add a preference
 # Verifies: test unsetting a value
 sub test_unset_on_new_topic {
     my $this = shift;
-    
+
     my $text = "CORRECT";
-    $this->saveValues( 'DeleteTestSaveScriptTopic',
-            $text,
-            { 'Set+preferences[APPLE]' => 'keep the dentist happy',
-                'Set+preferences[BANANA]' => 'no, we have no bananas'  }
-           );
-    $this->saveValues( 'DeleteTestSaveScriptTopic',
-            undef,
-            { 'UnSet+preferences[APPLE]' => 'keep the dentist happy'  }
-           );
-           
-    my ( $meta, $sText ) = Foswiki::Func::readTopic($this->{test_web}, 'DeleteTestSaveScriptTopic' );
-    if (defined($text)) {
+    $this->saveValues(
+        'DeleteTestSaveScriptTopic',
+        $text,
+        {
+            'Set+preferences[APPLE]'  => 'keep the dentist happy',
+            'Set+preferences[BANANA]' => 'no, we have no bananas'
+        }
+    );
+    $this->saveValues( 'DeleteTestSaveScriptTopic', undef,
+        { 'UnSet+preferences[APPLE]' => 'keep the dentist happy' } );
+
+    my ( $meta, $sText ) =
+      Foswiki::Func::readTopic( $this->{test_web},
+        'DeleteTestSaveScriptTopic' );
+    if ( defined($text) ) {
         $this->assert_matches( $text, $sText );
     }
     $this->assert_null( $meta->get('FORM') );
-    my $ma = $meta->get('PREFERENCE', 'BANANA' );
+    my $ma = $meta->get( 'PREFERENCE', 'BANANA' );
     $this->assert_not_null($ma);
     $this->assert_equals( 'no, we have no bananas', $ma->{value} );
 
-    $ma = $meta->get('PREFERENCE', 'APPLE' );
+    $ma = $meta->get( 'PREFERENCE', 'APPLE' );
     $this->assert_null($ma);
-    
+
     print STDERR "DONE\n";
 }
 

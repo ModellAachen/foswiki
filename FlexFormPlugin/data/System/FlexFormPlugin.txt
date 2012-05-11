@@ -29,6 +29,7 @@ In addition, !FlexFormPlugin facilitates the extraction of field default values 
 | excludeattr="..." | regular expression field attributes must match to be excluded from the output | undefined |
 | exclude="..." | regular expression fieldnames must match to be excluded from the output | undefined |
 | fields="&lt;fieldname1>, &lt;fieldname2>, ..." | list of formfields to render the interface for | all known formfields |
+| prefix="..." | adds a prefix string to the name while rendering the editor for a formfield |
 | footer="..." | footer string to apped to the output | &lt;empty string> |
 | format="..." | format string to render each formfield with, more info below | =$edit$mandatory= |
 | form="..." | topic name containing the !DataForm definition | form found at the base topic |
@@ -101,6 +102,7 @@ The =format= parameter may contain the following pseudo-variables:
    * =$value=: current value of the formfield; for =+value= formfields this is the _mapped_ value use =$origvalue= to get the original one
    * =$origvalue=: current value of the formfield; for =+value= formfields this is the original _unmapped_ value of the formfield
    * =$values=: list of all allowed values for the formfield as defined in the !DataForm definition
+   * =$origvalues=: list of all allowed values; for =+value= formfields this is the original _unmapped_ value of the formfield
    * =$default=: this is the default value if no value is specified in the topic itself
 
 ---++ Examples
@@ -108,6 +110,7 @@ The =format= parameter may contain the following pseudo-variables:
 <verbatim>
 %RENDERFOREDIT{
   form="%USERSWEB%.UserForm"
+  topic="Sandbox.TestTopic1"
   exclude="Email|Comment|State"
   FirstName_value="Horst"
   LastName_value="Buchholz"
@@ -117,6 +120,7 @@ The =format= parameter may contain the following pseudo-variables:
 
 %RENDERFOREDIT{
   form="%USERSWEB%.UserForm"
+  topic="Sandbox.TestTopic1"
   exclude="Email|Comment|State"
   FirstName_value="Horst"
   LastName_value="Buchholz"
@@ -138,15 +142,19 @@ The =format= parameter may contain the following pseudo-variables:
 
 ---++ Info
 
-Many thanks to the following sponsors for supporting this work:
-   * Acknowledge any sponsors here
+<!--
+   * Set SHORTDESCRIPTION = %$SHORTDESCRIPTION%
+-->
 
 |  Author(s): | Foswiki:MichaelDaum|
-|  Copyright: | &copy; 2009-2011 Michael Daum http://michaeldaumconsulting.com |
+|  Copyright: | &copy; 2009-2012 Michael Daum http://michaeldaumconsulting.com |
 |  License: | [[http://www.gnu.org/licenses/gpl.html][GPL (Gnu General Public License)]] |
 |  Release: | %$RELEASE% |
 |  Version: | %$VERSION% |
 |  Change History: | <!-- versions below in reverse order -->&nbsp; |
+|  24 Feb 2012: | added =$origvalues= to display unmapped values of +values formfields; \
+                  added =prefix= parameter; \
+                  protecting the editor of a formfield by surrounding it with &lt;literal> tags |
 |  25 Aug 2011: | fixed rendering +value formields yet again; added =$origvalue= |
 |  18 Mar 2011: | added autolink param; \
                   fixed getting default values; \

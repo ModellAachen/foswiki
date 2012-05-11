@@ -1,0 +1,55 @@
+%META:TOPICINFO{author="ProjectContributor" comment="reprev" date="1335361593" format="1.1" reprev="1" version="3"}%
+%META:TOPICPARENT{name="TimeTracker"}%
+%{<verbatim class="tml">}%
+%TMPL:INCLUDE{"view"}%
+%{</verbatim>}%
+
+%{<verbatim class="tml">}%
+%TMPL:DEF{"form"}%%TMPL:END%
+%{</verbatim>}%
+
+%{<verbatim class="tml">}%
+%TMPL:DEF{"beforetext"}%<!-- --> 
+<h1>[[%WEB%.%TOPIC%]]</h1>
+
+%RENDERFORDISPLAY{exclude="TopicType|TopicTitle"}%
+
+<noautolink>
+%RENDERMETADATA{
+  "effort" 
+  topic="%BASEWEB%.%BASETOPIC%"
+  fields="Date, From, To, Description"
+  header="<div class='metaDataView timeTrackerView'>$n| *Pos* | *Date* | *From* | *To* | *Description* | *Hours* | *Charge*| *Tax*| $n"
+  format="| $index | $Date | $From | $To | $Description |  $percntTMPL:P{\"hours\"}$percnt |  $percntTMPL:P{\"charge\"}$percnt |  $percntTMPL:P{\"tax\"}$percnt$actions |$n"
+  footer="||||| %MAKETEXT{"Sum"}% |  $percntTMPL:P{\"sumabove\"}$percnt |  $percntTMPL:P{\"sumabove\"}$percnt |  $percntTMPL:P{\"sumabove\"}$percnt |
+||||| %MAKETEXT{"Total"}% |||  <b>&euro;&nbsp;$percntCALC{\"$FORMAT(NUMBER, 2, $EVAL($T(R$ROW(-1):C$COLUMN())+$T(R$ROW(-1):C$COLUMN(-1))))\"}$percnt</b> |
+  </div>"
+  sort="Date"
+}%
+</noautolink>
+
+%NEWMETADATA{"effort" title="Add effort"}%
+%INCLUDE{"%SYSTEMWEB%/JSCalendarContribInline"}%
+
+<style>
+.timeTrackerView tbody tr td:nth-child(2) {
+  white-space:nowrap;
+}
+.effort {
+  margin:0;
+  padding:0;
+  border:0;
+}
+</style>
+
+%TMPL:END%
+%{</verbatim>}%
+
+%{<verbatim class="tml">}%
+%TMPL:DEF{"hours"}%%CALC{"$FORMAT(NUMBER, 2, $TIMEDIFF($TIME($T(R$ROW():C2) - $T(R$ROW():C3)),$TIME($T(R$ROW():C2) - $T(R$ROW():C4)),hour))"}%%TMPL:END%
+
+%TMPL:DEF{"charge"}%%CALC{"$FORMAT(NUMBER, 2, $EVAL($T(R$ROW():C$COLUMN(-1))*%FORMFIELD{"Rate" default="%STDRATE%" alttext="%STDRATE%"}%))"}%%TMPL:END%
+
+%TMPL:DEF{"tax"}%%CALC{"$FORMAT(NUMBER, 2, $EVAL($T(R$ROW():C$COLUMN(-1))*%FORMFIELD{"Tax" default="0" alttext="0}%/100))"}%%TMPL:END%
+
+%TMPL:DEF{"sumabove"}%%CALC{"$FORMAT(NUMBER, 2, $SUM($ABOVE()))"}%%TMPL:END%

@@ -30,8 +30,8 @@
 
 %{ ################################################################################ }%
 %TMPL:DEF{"formend"}%<!-- -->
-  <a class="jqUIDialogButton {icon:'ui-icon-clock', click: function() { $(this).find('form:first').submit(); }}">%MAKETEXT{"Compare"}%</a>
-  <a class="jqUIDialogButton {icon:'ui-icon-cancel', click: function() { $(this).dialog('close'); }}">%MAKETEXT{"Close"}%</a>
+  <a class="jqUIDialogButton jqUIDialogSubmit {icon:'ui-icon-clock'}">%MAKETEXT{"Compare"}%</a>
+  <a class="jqUIDialogButton jqUIDialogClose {icon:'ui-icon-cancel'}">%MAKETEXT{"Close"}%</a>
 </form>%TMPL:END%
 
 %{ ################################################################################ }%

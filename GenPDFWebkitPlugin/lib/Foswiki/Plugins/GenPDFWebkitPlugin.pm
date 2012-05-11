@@ -28,10 +28,19 @@ our $VERSION = '$Rev: 4419 (2009-07-03) $';
 our $RELEASE = '1.00';
 our $SHORTDESCRIPTION = 'Generate PDF using Webkit';
 our $NO_PREFS_IN_TOPIC = 1;
+our $baseTopic;
+our $baseWeb;
+
+use constant DEBUG => 0; # toggle me
+
+###############################################################################
+sub writeDebug {
+  print STDERR "GenPDFWebkitPlugin - $_[0]\n" if DEBUG;
+}
 
 ###############################################################################
 sub initPlugin {
-  my ($topic, $web, $user, $installWeb) = @_;
+  ($baseTopic, $baseWeb) = @_;
 
   if ($Foswiki::Plugins::VERSION < 2.0) {
     Foswiki::Func::writeWarning('Version mismatch between ',
@@ -59,31 +68,83 @@ sub completePageHandler {
   $_[0] =~ s/([\t ]?)[ \t]*<\/?(nop|noautolink)\/?>/$1/gis;
 
   # create temp files
-  my $htmlFile = new File::Temp(SUFFIX => '.html');
-  my $pdfFile = new File::Temp(SUFFIX => '.pdf');
+  my $htmlFile = new File::Temp(SUFFIX => '.html', UNLINK => (DEBUG?0:1));
+  my $errorFile = new File::Temp(SUFFIX => '.log', UNLINK => (DEBUG?0:1));
+  my ($pdfFilePath, $pdfFile) = getFileName($baseWeb, $baseTopic);
 
   # creater html file
   print $htmlFile "$_[0]";
+  #writeDebug("htmlFile=".$_[0]);
 
   # create webkit command
   my $session = $Foswiki::Plugins::SESSION;
   my $pdfCmd = $Foswiki::cfg{GenPDFWebkitPlugin}{WebkitCmd} || 
-    '/usr/local/bin/wkhtmltopdf -q --enable-plugins --outline --print-media-type %INFILE|F% %OUTFILE|F%';
+    "$Foswiki::cfg{DataDir}/../tools/wkhtmltopdf -q --enable-plugins --outline --print-media-type %INFILE|F% %OUTFILE|F%";
   
   # execute
   my ($output, $exit) = Foswiki::Sandbox->sysCommand(
       $pdfCmd, 
-      OUTFILE => $pdfFile->filename,
+      OUTFILE => $pdfFilePath,
       INFILE => $htmlFile->filename,
     );
 
   local $/ = undef;
 
-  if ($exit) {
-    throw Error::Simple("execution of wkhtmltopdf failed ($exit)");
+  my $error = '';
+  if ($exit || DEBUG) {
+    $error = <$errorFile>;
   }
 
-  $_[0] = <$pdfFile>;
+  writeDebug("GenPDFWebkitPlugin - error=$error");
+  writeDebug("GenPDFWebkitPlugin - output=$output");
+
+  if ($exit) {
+    my $html = $_[0];
+    my $line = 1;
+    $html = '00000: '.$html;
+    $html =~ s/\n/"\n".(sprintf "\%05d", $line++).": "/ge;
+    throw Error::Simple("execution of wkhtmltopdf failed ($exit): \n\n$error\n\n$html");
+  }
+
+  my $url = Foswiki::Func::getScriptUrl($baseWeb, $baseTopic, 'viewfile',
+    filename=>$pdfFile,
+    t=>time(),
+  );
+
+  Foswiki::Func::redirectCgiQuery($query, $url);
+}
+
+###############################################################################
+sub getFileName {
+  my ($web, $topic) = @_;
+
+  my $fileName = $topic;
+  $fileName =~ s{[\\/]+$}{};
+  $fileName =~ s!^.*[\\/]!!;
+  $fileName =~ s/$Foswiki::regex{filenameInvalidCharRegex}//go;
+
+  $web =~ s/\./\//g;
+  my $filePath = Foswiki::Func::getPubDir().'/'.$web.'/'.$topic;
+  File::Path::mkpath($filePath);
+
+  $fileName = 'genpdf_'.$fileName.'.pdf';
+  $filePath .= '/'.$fileName;
+
+  return ($filePath, $fileName);
+}
+
+###############################################################################
+sub modifyHeaderHandler {
+  my ($hopts, $request) = @_;
+
+  my $query = Foswiki::Func::getCgiQuery();
+  my $contenttype = $query->param("contenttype") || 'text/html';
+
+  # is this a pdf view?
+  return unless $contenttype eq "application/pdf";
+
+  # add disposition
+  $hopts->{'Content-Disposition'} = "inline;filename=$baseTopic.pdf";
 }
 
 1;

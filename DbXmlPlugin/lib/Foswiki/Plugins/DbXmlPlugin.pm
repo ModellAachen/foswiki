@@ -13,9 +13,8 @@ package Foswiki::Plugins::DbXmlPlugin;
 use Foswiki;
 use Foswiki::Func;
 use Sleepycat::DbXml 'simple';
-use XML::Simple;                # TODO: handle non-existence
-use Text::ParseWords;           # TODO: handle non-existence
-
+use XML::Simple;         # TODO: handle non-existence
+use Text::ParseWords;    # TODO: handle non-existence
 
 # =========================
 use strict;
@@ -25,38 +24,43 @@ use vars qw(
   $DBXMLENV $DBXMLMGR
 );
 
-$VERSION = '$Rev$';
-$RELEASE = '1.1';
+$VERSION           = '$Rev$';
+$RELEASE           = '1.1';
 $NO_PREFS_IN_TOPIC = 1;
-$pluginName  = 'DbXmlPlugin';
-$initialized = 0;
+$pluginName        = 'DbXmlPlugin';
+$initialized       = 0;
 
 # =========================
 sub initPlugin {
     ( $topic, $web, $user, $installWeb ) = @_;
 
     # check for Plugins.pm versions
-    if( $Foswiki::Plugins::VERSION < 1.026 ) {
-        Foswiki::Func::writeWarning( "Version mismatch between $pluginName and Plugins.pm" );
+    if ( $Foswiki::Plugins::VERSION < 1.026 ) {
+        Foswiki::Func::writeWarning(
+            "Version mismatch between $pluginName and Plugins.pm");
         return 0;
     }
 
     # Prepare some vars and configs
-    $debug              = $Foswiki::cfg{Plugins}{DbXmlPlugin}{Debug}    || '0';
+    $debug = $Foswiki::cfg{Plugins}{DbXmlPlugin}{Debug} || '0';
     my $allowRawXMLview = $Foswiki::cfg{Plugins}{DbXmlPlugin}{AllowRaw} || '0';
-    $workingPath = Foswiki::Func::getWorkArea( $pluginName ) || $Foswiki::cfg{DataDir};
-    $workingPath =~ s/(.*?)\/$/$1/; # strip trailing slash if there is one
+    $workingPath = Foswiki::Func::getWorkArea($pluginName)
+      || $Foswiki::cfg{DataDir};
+    $workingPath =~ s/(.*?)\/$/$1/;    # strip trailing slash if there is one
 
     # Register some REST functions for direct querying
-    Foswiki::Func::registerRESTHandler('query',        \&externalQuery);
-    Foswiki::Func::registerRESTHandler('debug_rawxml', \&externalDebugRawXml) if $allowRawXMLview;
-    Foswiki::Func::registerRESTHandler('renew',        \&externalRenewDbXml);
+    Foswiki::Func::registerRESTHandler( 'query',        \&externalQuery );
+    Foswiki::Func::registerRESTHandler( 'debug_rawxml', \&externalDebugRawXml )
+      if $allowRawXMLview;
+    Foswiki::Func::registerRESTHandler( 'renew', \&externalRenewDbXml );
 
     # Register Tags (see also commonTagHandler)
     Foswiki::Func::registerTagHandler( 'DBXMLQUERY', \&doSingleLineQuery );
 
     # Plugin correctly initialized
-    Foswiki::Func::writeDebug( "- Foswiki::Plugins::${pluginName}::initPlugin( $web.$topic ) is OK" ) if $debug;
+    Foswiki::Func::writeDebug(
+        "- Foswiki::Plugins::${pluginName}::initPlugin( $web.$topic ) is OK")
+      if $debug;
 
     return 1;
 }
@@ -67,43 +71,46 @@ sub _doLateInit {
 
     # Get a DbXml Environment ...
     my $counter = 0;
-    my $failed = 0;
+    my $failed  = 0;
     $DBXMLENV = new DbEnv(0);
-    $DBXMLENV->set_cachesize(0, 64 * 1024, 1);
-    $DBXMLENV->set_lk_detect( Db::DB_LOCK_DEFAULT );
-
+    $DBXMLENV->set_cachesize( 0, 64 * 1024, 1 );
+    $DBXMLENV->set_lk_detect(Db::DB_LOCK_DEFAULT);
 
     # Open the Environment and react on errors
     do {
-      if ($failed) {
-        $DBXMLENV->close();
-        $failed = 0;
-      };
-      eval {
-        $failed = $DBXMLENV->open($workingPath, Db::DB_INIT_MPOOL|Db::DB_CREATE|Db::DB_INIT_LOCK|Db::DB_INIT_LOG|Db::DB_INIT_TXN);
-      };
-      if (my $e = catch std::exception) { $failed = 1; };
-      sleep($counter);
-      $counter++;
-    } until( (not $failed) or ($counter>5));
+        if ($failed) {
+            $DBXMLENV->close();
+            $failed = 0;
+        }
+        eval {
+            $failed = $DBXMLENV->open( $workingPath,
+                Db::DB_INIT_MPOOL | Db::DB_CREATE | Db::DB_INIT_LOCK |
+                  Db::DB_INIT_LOG | Db::DB_INIT_TXN );
+        };
+        if ( my $e = catch std::exception ) { $failed = 1; }
+        sleep($counter);
+        $counter++;
+    } until ( ( not $failed ) or ( $counter > 5 ) );
     if ($failed) {
-      Foswiki::Func::writeDebug("- ${pluginName} DBXMLENV->open() failed.");
-      throw Foswiki::OopsException( 'attention',
-                                  def => 'save_error',
-                                  params => "DBXML: Failed opening environment." );
-    };
-
+        Foswiki::Func::writeDebug("- ${pluginName} DBXMLENV->open() failed.");
+        throw Foswiki::OopsException(
+            'attention',
+            def    => 'save_error',
+            params => "DBXML: Failed opening environment."
+        );
+    }
 
     # ... and a XMLManager
-    eval {
-      $DBXMLMGR = new XmlManager($DBXMLENV);
-    };
-    if (my $e = catch XmlException) {
-      Foswiki::Func::writeDebug("- ${pluginName} DBXMLMGR->new() failed. Exiting.");
-      throw Foswiki::OopsException( 'attention',
-                                  def => 'save_error',
-                                  params => "DBXML: Failed opening xml-manager." );
-    };
+    eval { $DBXMLMGR = new XmlManager($DBXMLENV); };
+    if ( my $e = catch XmlException ) {
+        Foswiki::Func::writeDebug(
+            "- ${pluginName} DBXMLMGR->new() failed. Exiting.");
+        throw Foswiki::OopsException(
+            'attention',
+            def    => 'save_error',
+            params => "DBXML: Failed opening xml-manager."
+        );
+    }
 
     $initialized = 1;
     return "";
@@ -111,28 +118,33 @@ sub _doLateInit {
 
 # =========================
 sub commonTagsHandler {
-    Foswiki::Func::writeDebug("- ${pluginName}::commonTagsHandler( $_[2] $_[1] )") if $debug;
+    Foswiki::Func::writeDebug(
+        "- ${pluginName}::commonTagsHandler( $_[2] $_[1] )")
+      if $debug;
 
-    $_[0] =~ s/%DBXMLQUERYSTART{(.*?)}%(.*?)%DBXMLQUERYEND%/&doMultiLineQuery($1,$2)/geos;
+    $_[0] =~
+s/%DBXMLQUERYSTART{(.*?)}%(.*?)%DBXMLQUERYEND%/&doMultiLineQuery($1,$2)/geos;
 
     return "";
 }
 
 # =========================
 sub afterSaveHandler {
-    Foswiki::Func::writeDebug("- ${pluginName}::afterSaveHandler( $_[2] $_[1] )") if $debug;
+    Foswiki::Func::writeDebug(
+        "- ${pluginName}::afterSaveHandler( $_[2] $_[1] )")
+      if $debug;
     my $web = $_[2];
 
-    if ( _checkResponsebilityForWeb( $web ) ) {
+    if ( _checkResponsebilityForWeb($web) ) {
 
-	    # create foswiki container if it is not available
-	    if ( not -e "$workingPath/foswiki.dbxml" ) {
-	      createAllTopics();
-	      return "";
-	    };
+        # create foswiki container if it is not available
+        if ( not -e "$workingPath/foswiki.dbxml" ) {
+            createAllTopics();
+            return "";
+        }
 
-	    updateTopic( $_[0], $_[1], $_[2] );
-	}
+        updateTopic( $_[0], $_[1], $_[2] );
+    }
 
     return "";
 }
@@ -141,65 +153,68 @@ sub afterSaveHandler {
 sub doMultiLineQuery {
 
     my $theAttributes = $_[0];
-    my $theContainer  = Foswiki::Func::extractNameValuePair( $theAttributes, "container" ) || "$workingPath/foswiki.dbxml";
-    my $theQuery      = $_[1] || "";
+    my $theContainer =
+      Foswiki::Func::extractNameValuePair( $theAttributes, "container" )
+      || "$workingPath/foswiki.dbxml";
+    my $theQuery = $_[1] || "";
 
-    $theQuery = Foswiki::Func::expandCommonVariables( $theQuery, $topic, $web, undef );
+    $theQuery =
+      Foswiki::Func::expandCommonVariables( $theQuery, $topic, $web, undef );
 
     return _UTF82SiteCharSet( doQuery( $theQuery, $theContainer ) );
 }
 
 # =========================
 sub doSingleLineQuery {
-	my ($session, $params, $theTopic, $theWeb) = @_;
+    my ( $session, $params, $theTopic, $theWeb ) = @_;
 
-    my $theContainer  = $params->{"container"} || "$workingPath/foswiki.dbxml";
-    my $theQuery      = $params->{"query"} || "";
+    my $theContainer = $params->{"container"} || "$workingPath/foswiki.dbxml";
+    my $theQuery     = $params->{"query"}     || "";
 
     return _UTF82SiteCharSet( doQuery( $theQuery, $theContainer ) );
 }
 
 # =========================
 sub doQuery {
-    Foswiki::Func::writeDebug("- ${pluginName}::doQuery( $_[0], $_[1] )") if $debug;
+    Foswiki::Func::writeDebug("- ${pluginName}::doQuery( $_[0], $_[1] )")
+      if $debug;
 
-    if (not $initialized) { _doLateInit() };
+    if ( not $initialized ) { _doLateInit() }
 
-    my $theQuery      = $_[0];
-    my $theContainer  = $_[1];
-    my $retval = "";
+    my $theQuery     = $_[0];
+    my $theContainer = $_[1];
+    my $retval       = "";
 
     # test for LOCK file
     if ( -e "$theContainer.lock" ) {
-      return "Lock file detected. Query aborted. While DB creation is in progress, no queries allowed.";
-    };
+        return
+"Lock file detected. Query aborted. While DB creation is in progress, no queries allowed.";
+    }
 
     # open a container in the db environment
     my $containerTxn = $DBXMLMGR->createTransaction();
-    my $container = $DBXMLMGR->openContainer($containerTxn, $theContainer);
+    my $container = $DBXMLMGR->openContainer( $containerTxn, $theContainer );
     $containerTxn->commit();
 
     # query the db
     eval {
-      my $qryTnx = $DBXMLMGR->createTransaction();
-      my $results = $DBXMLMGR->query($qryTnx, $theQuery);
-      my $value = new XmlValue();
+        my $qryTnx  = $DBXMLMGR->createTransaction();
+        my $results = $DBXMLMGR->query( $qryTnx, $theQuery );
+        my $value   = new XmlValue();
 
-      while( $results->next($value) ) {
-        $retval .= $value;
-      };
-      $qryTnx->commit();
+        while ( $results->next($value) ) {
+            $retval .= $value;
+        }
+        $qryTnx->commit();
     };
 
     # handle errors
-    if (my $e = catch XmlException)
-    {
+    if ( my $e = catch XmlException ) {
         $retval = "Query $theQuery failed\n";
         $retval .= $e->what() . "\n";
         return $retval;
     }
-    elsif ($@)
-    {
+    elsif ($@) {
         $retval = "Query $theQuery failed\n";
         $retval .= $@;
         return $retval;
@@ -208,16 +223,18 @@ sub doQuery {
     # $DBXMLENV->close;
     # $initialized = 0;
 
-    Foswiki::Func::writeDebug("- ${pluginName}::doQuery retval:\n" . $retval . "\n") if $debug;
+    Foswiki::Func::writeDebug(
+        "- ${pluginName}::doQuery retval:\n" . $retval . "\n" )
+      if $debug;
 
     return $retval;
 }
 
-
 # =========================
 sub updateTopic {
 
-    Foswiki::Func::writeDebug("- ${pluginName}::updateTopic( $_[1], $_[2] )") if $debug;
+    Foswiki::Func::writeDebug("- ${pluginName}::updateTopic( $_[1], $_[2] )")
+      if $debug;
 
     my $theText      = $_[0];
     my $theTopic     = $_[1];
@@ -225,99 +242,120 @@ sub updateTopic {
     my $theContainer = "$workingPath/foswiki.dbxml";
     my $retval       = "";
 
-    if (not $initialized) { _doLateInit() };
+    if ( not $initialized ) { _doLateInit() }
 
     # test for LOCK file
     if ( -e "$theContainer.lock" ) {
         my $text = $theText;
-        throw Foswiki::OopsException( 'attention',
-                                    def => 'save_error',
-                                    web => $theWeb,
-                                    topic => $theTopic,
-                                    params => "DBXML lock file detected. Update failed." );
-    };
+        throw Foswiki::OopsException(
+            'attention',
+            def    => 'save_error',
+            web    => $theWeb,
+            topic  => $theTopic,
+            params => "DBXML lock file detected. Update failed."
+        );
+    }
 
     # open a container in the db environment
     my $containerTxn = $DBXMLMGR->createTransaction();
-    my $container = $DBXMLMGR->openContainer($containerTxn, $theContainer, Db::DB_CREATE);
+    my $container =
+      $DBXMLMGR->openContainer( $containerTxn, $theContainer, Db::DB_CREATE );
     $containerTxn->commit();
 
     eval {
-      #  Get an XmlUpdateContext. Useful from a performance perspective.
-      my $updateContext = $DBXMLMGR->createUpdateContext();
 
-      my $theQuery = "collection('$theContainer')/data[\@topic='$theTopic'][\@web='$theWeb']";
-      my $txn = $DBXMLMGR->createTransaction();
-      my $results = $DBXMLMGR->query($txn, $theQuery);
+        #  Get an XmlUpdateContext. Useful from a performance perspective.
+        my $updateContext = $DBXMLMGR->createUpdateContext();
 
-      my $docExists = $results->size();
-      my ($topicMoved, $movedFromWeb, $movedFromTopic) = _isMoved( $theText, $theTopic, $theWeb );
+        my $theQuery =
+"collection('$theContainer')/data[\@topic='$theTopic'][\@web='$theWeb']";
+        my $txn = $DBXMLMGR->createTransaction();
+        my $results = $DBXMLMGR->query( $txn, $theQuery );
 
-      # new created topic
-      if ( (not $docExists) && (not $topicMoved) ) {
-        Foswiki::Func::writeDebug("- ${pluginName}::updateTopic( new created topic )") if $debug;
-        my $doc = $DBXMLMGR->createDocument();
-        $doc->setContent( generateXML( $theText, $theTopic, $theWeb, 1 ) );
-        $container->putDocument($txn, $doc, $updateContext, DbXml::DBXML_GEN_NAME);
-      };
+        my $docExists = $results->size();
+        my ( $topicMoved, $movedFromWeb, $movedFromTopic ) =
+          _isMoved( $theText, $theTopic, $theWeb );
 
-      # moved topic
-      if ( (not $docExists) && ($topicMoved) ) {
-        Foswiki::Func::writeDebug("- ${pluginName}::updateTopic( moved topic )") if $debug;
+        # new created topic
+        if ( ( not $docExists ) && ( not $topicMoved ) ) {
+            Foswiki::Func::writeDebug(
+                "- ${pluginName}::updateTopic( new created topic )")
+              if $debug;
+            my $doc = $DBXMLMGR->createDocument();
+            $doc->setContent( generateXML( $theText, $theTopic, $theWeb, 1 ) );
+            $container->putDocument( $txn, $doc, $updateContext,
+                DbXml::DBXML_GEN_NAME );
+        }
 
-        # delete topics old location (OL)
-        my $theQueryOL = "collection('$theContainer')/data[\@topic='$movedFromTopic'][\@web='$movedFromWeb']";
-        my $resultsOL = $DBXMLMGR->query($txn, $theQueryOL);
-        my $docOL = $DBXMLMGR->createDocument();
-        $resultsOL->next($docOL);
-        $container->deleteDocument($txn, $docOL, $updateContext);
+        # moved topic
+        if ( ( not $docExists ) && ($topicMoved) ) {
+            Foswiki::Func::writeDebug(
+                "- ${pluginName}::updateTopic( moved topic )")
+              if $debug;
 
-        # create new document
-        my $doc = $DBXMLMGR->createDocument();
-        $doc->setContent( generateXML( $theText, $theTopic, $theWeb, 1 ) );
-        $container->putDocument($txn, $doc, $updateContext, DbXml::DBXML_GEN_NAME);
-       };
+            # delete topics old location (OL)
+            my $theQueryOL =
+"collection('$theContainer')/data[\@topic='$movedFromTopic'][\@web='$movedFromWeb']";
+            my $resultsOL = $DBXMLMGR->query( $txn, $theQueryOL );
+            my $docOL = $DBXMLMGR->createDocument();
+            $resultsOL->next($docOL);
+            $container->deleteDocument( $txn, $docOL, $updateContext );
 
-      # saved existing topic
-      if ( $docExists ) {
-        Foswiki::Func::writeDebug("- ${pluginName}::updateTopic( saved existing topic )") if $debug;
-        # delete old doc
-        my $doc = $DBXMLMGR->createDocument();
-        $results->next($doc);
-        $container->deleteDocument($txn, $doc, $updateContext);
+            # create new document
+            my $doc = $DBXMLMGR->createDocument();
+            $doc->setContent( generateXML( $theText, $theTopic, $theWeb, 1 ) );
+            $container->putDocument( $txn, $doc, $updateContext,
+                DbXml::DBXML_GEN_NAME );
+        }
 
-        # create new document
-        $doc = $DBXMLMGR->createDocument();
-        $doc->setContent( generateXML( $theText, $theTopic, $theWeb, 1 ) );
-        $container->putDocument($txn, $doc, $updateContext, DbXml::DBXML_GEN_NAME);
-      };
+        # saved existing topic
+        if ($docExists) {
+            Foswiki::Func::writeDebug(
+                "- ${pluginName}::updateTopic( saved existing topic )")
+              if $debug;
 
-      $txn->commit();
+            # delete old doc
+            my $doc = $DBXMLMGR->createDocument();
+            $results->next($doc);
+            $container->deleteDocument( $txn, $doc, $updateContext );
+
+            # create new document
+            $doc = $DBXMLMGR->createDocument();
+            $doc->setContent( generateXML( $theText, $theTopic, $theWeb, 1 ) );
+            $container->putDocument( $txn, $doc, $updateContext,
+                DbXml::DBXML_GEN_NAME );
+        }
+
+        $txn->commit();
     };
 
     # error handling
-    if (my $e = catch XmlException)
-    {
+    if ( my $e = catch XmlException ) {
         $retval = "Query failed\n";
         $retval .= $e->what() . "\n";
-        Foswiki::Func::writeDebug("- ${pluginName}::updateTopic - " . $e->what() );
-        throw Foswiki::OopsException( 'attention',
-                                    def => 'save_error',
-                                    params => "DBXML: Failed writing to XML database." );
+        Foswiki::Func::writeDebug(
+            "- ${pluginName}::updateTopic - " . $e->what() );
+        throw Foswiki::OopsException(
+            'attention',
+            def    => 'save_error',
+            params => "DBXML: Failed writing to XML database."
+        );
         return $retval;
     }
-    elsif ($@)
-    {
+    elsif ($@) {
         $retval = "Query failed\n";
         $retval .= $@;
-        Foswiki::Func::writeDebug("- ${pluginName}::updateTopic - " . $@ );
-        throw Foswiki::OopsException( 'attention',
-                                    def => 'save_error',
-                                    params => "DBXML: Failed writing to XML database." );
+        Foswiki::Func::writeDebug( "- ${pluginName}::updateTopic - " . $@ );
+        throw Foswiki::OopsException(
+            'attention',
+            def    => 'save_error',
+            params => "DBXML: Failed writing to XML database."
+        );
         return $retval;
     }
 
     $container->sync();
+
     # $DBXMLENV->close;
     # $initialized = 0;
 
@@ -330,31 +368,33 @@ sub createAllTopics {
     my @webList;
 
     if ( $Foswiki::cfg{Plugins}{DbXmlPlugin}{IncludeWeb} =~ m/^default$/ ) {
-      @webList = Foswiki::Func::getListOfWebs( "user" );
-    } else {
-      my $webs = $Foswiki::cfg{Plugins}{DbXmlPlugin}{IncludeWeb};
-      $webs =~ s/\s+/ /g;
-      @webList = split( /,/, $webs );
+        @webList = Foswiki::Func::getListOfWebs("user");
+    }
+    else {
+        my $webs = $Foswiki::cfg{Plugins}{DbXmlPlugin}{IncludeWeb};
+        $webs =~ s/\s+/ /g;
+        @webList = split( /,/, $webs );
     }
 
-    if (not $initialized) { _doLateInit() };
+    if ( not $initialized ) { _doLateInit() }
 
-    my $theContainer  = "$workingPath/foswiki.dbxml";
-    my $retval = "";
+    my $theContainer = "$workingPath/foswiki.dbxml";
+    my $retval       = "";
 
     # test for / create LOCK file
     if ( -e "$workingPath/foswiki.dbxml.lock" ) {
-      return "Lock file detected. Operation aborted.";
-    } else {
-      open ( FILE, ">>$workingPath/foswiki.dbxml.lock" );
-      print FILE gmtime() . " GMT";
-      close ( FILE );
-    };
-
+        return "Lock file detected. Operation aborted.";
+    }
+    else {
+        open( FILE, ">>$workingPath/foswiki.dbxml.lock" );
+        print FILE gmtime() . " GMT";
+        close(FILE);
+    }
 
     # open a container in the db environment
     my $containerTxn = $DBXMLMGR->createTransaction();
-    my $container = $DBXMLMGR->openContainer($containerTxn, $theContainer, Db::DB_CREATE);
+    my $container =
+      $DBXMLMGR->openContainer( $containerTxn, $theContainer, Db::DB_CREATE );
     $containerTxn->commit();
 
     #  Get an XmlUpdateContext. Useful from a performance perspective.
@@ -364,50 +404,62 @@ sub createAllTopics {
     my $txn = $DBXMLMGR->createTransaction();
 
     eval {
-      WEBLIST: foreach my $thisWebName ( @webList ) {
+        WEBLIST: foreach my $thisWebName (@webList)
+        {
 
-        next unless Foswiki::Func::webExists( $thisWebName );
-        next if ( $thisWebName eq "Trash" );
-        next if ( $thisWebName =~ m/^_.*/ );
+            next unless Foswiki::Func::webExists($thisWebName);
+            next if ( $thisWebName eq "Trash" );
+            next if ( $thisWebName =~ m/^_.*/ );
 
-        my @topicList = Foswiki::Func::getTopicList ( $thisWebName );
-        TOPICLIST: foreach my $thisTopicName ( @topicList ) {
+            my @topicList = Foswiki::Func::getTopicList($thisWebName);
+          TOPICLIST: foreach my $thisTopicName (@topicList) {
 
-          # Extract XML stuff from Foswiki topic
-          my $myXMLDoc = $DBXMLMGR->createDocument();
-          my $text = Foswiki::Func::readTopicText( $thisWebName, $thisTopicName );
-          $myXMLDoc->setContent( generateXML( $text, $thisTopicName, $thisWebName, 1 ) );
-          $container->putDocument($txn, $myXMLDoc, $updateContext, DbXml::DBXML_GEN_NAME);
+                # Extract XML stuff from Foswiki topic
+                my $myXMLDoc = $DBXMLMGR->createDocument();
+                my $text =
+                  Foswiki::Func::readTopicText( $thisWebName, $thisTopicName );
+                $myXMLDoc->setContent(
+                    generateXML( $text, $thisTopicName, $thisWebName, 1 ) );
+                $container->putDocument( $txn, $myXMLDoc, $updateContext,
+                    DbXml::DBXML_GEN_NAME );
+            }
         }
-      }
-      $txn->commit();
+        $txn->commit();
 
-      # start a new transacton for the indices
-      $txn = $DBXMLMGR->createTransaction();
+        # start a new transacton for the indices
+        $txn = $DBXMLMGR->createTransaction();
 
-      # create Indices for common columns
-      $container->addIndex($txn, "", "web", "node-attribute-equality-string");
-      $container->addIndex($txn, "", "topic", "node-attribute-equality-string");
-      $container->addIndex($txn, "", "author", "node-attribute-equality-string");
-      $container->addIndex($txn, "", "name", "node-attribute-presence-none");
-      $container->addIndex($txn, "", "name", "node-attribute-equality-string");
-      $txn->commit();
+        # create Indices for common columns
+        $container->addIndex( $txn, "", "web",
+            "node-attribute-equality-string" );
+        $container->addIndex( $txn, "", "topic",
+            "node-attribute-equality-string" );
+        $container->addIndex( $txn, "", "author",
+            "node-attribute-equality-string" );
+        $container->addIndex( $txn, "", "name",
+            "node-attribute-presence-none" );
+        $container->addIndex( $txn, "", "name",
+            "node-attribute-equality-string" );
+        $txn->commit();
     };
 
-
-    if (my $e = catch XmlException) {
-	    Foswiki::Func::writeDebug("- ${pluginName} " . $e->what());
-        $retval = "DBXML file creation failed. Please delete ruins in data path manually.\n";
+    if ( my $e = catch XmlException ) {
+        Foswiki::Func::writeDebug( "- ${pluginName} " . $e->what() );
+        $retval =
+"DBXML file creation failed. Please delete ruins in data path manually.\n";
         $retval .= $e->what() . "<br />";
         return $retval;
-    } elsif ($@) {
-	   Foswiki::Func::writeDebug("- ${pluginName} " . $@);
-        $retval = "DBXML file creation failed. Please delete ruins in data path manually.\n";
+    }
+    elsif ($@) {
+        Foswiki::Func::writeDebug( "- ${pluginName} " . $@ );
+        $retval =
+"DBXML file creation failed. Please delete ruins in data path manually.\n";
         $retval .= $@;
         return $retval;
     }
 
     $container->sync();
+
     # $DBXMLENV->close;
     # $initialized = 0;
 
@@ -419,10 +471,11 @@ sub createAllTopics {
 
 # =========================
 sub generateXML {
-    Foswiki::Func::writeDebug("- ${pluginName}::generateXML  $_[1] $_[2]") if $debug;
+    Foswiki::Func::writeDebug("- ${pluginName}::generateXML  $_[1] $_[2]")
+      if $debug;
 
     # initize vars
-    my $xmloutput = "";
+    my $xmloutput     = "";
     my $text          = $_[0];
     my $topic         = $_[1];
     my $web           = $_[2];
@@ -430,38 +483,37 @@ sub generateXML {
     my $data          = { 'metadata' => {}, 'tables' => {} };
 
     # extract data
-    my $title       = _processTitle(       $text, $topic, $web );
-    my $metadata    = _processMetaData(    $text, $topic, $web );
+    my $title = _processTitle( $text, $topic, $web );
+    my $metadata = _processMetaData( $text, $topic, $web );
     my $preferences = _processPreferences( $text, $topic, $web );
-    my $tables      = _processTables(      $text, $topic, $web );
+    my $tables = _processTables( $text, $topic, $web );
 
     # build data structure to generate XML
     my $out;
-    $out                          = $data;
-    $out->{'metadata'}            = $metadata;
-    $out->{'preferences'}         = $preferences;
-    $out->{'tables'}              = {};
-    $out->{'tables'}->{'table'}   = $tables;
-    $out->{'web'}                 = $web;
-    $out->{'topic'}               = $topic;
-    $out->{'title'}               = $title;
-    $out->{'version'}             = $VERSION;
+    $out                        = $data;
+    $out->{'metadata'}          = $metadata;
+    $out->{'preferences'}       = $preferences;
+    $out->{'tables'}            = {};
+    $out->{'tables'}->{'table'} = $tables;
+    $out->{'web'}               = $web;
+    $out->{'topic'}             = $topic;
+    $out->{'title'}             = $title;
+    $out->{'version'}           = $VERSION;
+
     # $out->{'date'}                = $metadata->{'topicinfo'}->[0]->{'date'};
     my $page = {};
     $page->{'data'} = $out;
 
     # It seems, no matter what we put into dbxml, we got UTF-8 back
-    $xmloutput = XML::Simple::XMLout(
-        $page,
-        KeepRoot => 1,
-    );
+    $xmloutput = XML::Simple::XMLout( $page, KeepRoot => 1, );
     $out = undef;
 
-    if ( $includePragma ) {
-    	$xmloutput = "<?xml version='1.0' encoding='ISO-8859-1'?>" . $xmloutput;
+    if ($includePragma) {
+        $xmloutput = "<?xml version='1.0' encoding='ISO-8859-1'?>" . $xmloutput;
     }
 
-    Foswiki::Func::writeDebug("- ${pluginName}::generateXML:\n" . $xmloutput) if $debug;
+    Foswiki::Func::writeDebug( "- ${pluginName}::generateXML:\n" . $xmloutput )
+      if $debug;
 
     return $xmloutput;
 }
@@ -482,9 +534,8 @@ sub _processTitle {
         $title =~ s/^\s*\<nop\>//;      # common prefix not needed now
         $title =~ s/%TOPIC%/$topic/;    # common header not needed now
     }
-    return _UTF82SiteCharSet( $title );
+    return _UTF82SiteCharSet($title);
 }
-
 
 sub _processMetaData {
 
@@ -511,27 +562,29 @@ sub _processMetaData {
                 $year, $mon + 1, $mday, $hour, $min, $sec );
         }
 
-        while(my ($key, $value) = each(%$args)) {
-          if (( $key eq "value" ) and ( $value=~m/(\d\d)\s(...)\s(\d\d\d\d)/ )) {
-            my ($day, $month, $year) = ($1, 0, $3);
-            if (lc($2) =~ m/jan/ ) { $month="01"; };
-            if (lc($2) =~ m/feb/ ) { $month="02"; };
-            if (lc($2) =~ m/m.r/ ) { $month="03"; };
-            if (lc($2) =~ m/apr/ ) { $month="04"; };
-            if (lc($2) =~ m/ma./ ) { $month="05"; };
-            if (lc($2) =~ m/jun/ ) { $month="06"; };
-            if (lc($2) =~ m/jul/ ) { $month="07"; };
-            if (lc($2) =~ m/aug/ ) { $month="08"; };
-            if (lc($2) =~ m/sep/ ) { $month="09"; };
-            if (lc($2) =~ m/o.t/ ) { $month="10"; };
-            if (lc($2) =~ m/nov/ ) { $month="11"; };
-            if (lc($2) =~ m/de./ ) { $month="12"; };
-            if ($month != 0) {$args->{'isodate'} = "$year-$month-$day";};
-          };
+        while ( my ( $key, $value ) = each(%$args) ) {
+            if (    ( $key eq "value" )
+                and ( $value =~ m/(\d\d)\s(...)\s(\d\d\d\d)/ ) )
+            {
+                my ( $day, $month, $year ) = ( $1, 0, $3 );
+                if ( lc($2) =~ m/jan/ ) { $month = "01"; }
+                if ( lc($2) =~ m/feb/ ) { $month = "02"; }
+                if ( lc($2) =~ m/m.r/ ) { $month = "03"; }
+                if ( lc($2) =~ m/apr/ ) { $month = "04"; }
+                if ( lc($2) =~ m/ma./ ) { $month = "05"; }
+                if ( lc($2) =~ m/jun/ ) { $month = "06"; }
+                if ( lc($2) =~ m/jul/ ) { $month = "07"; }
+                if ( lc($2) =~ m/aug/ ) { $month = "08"; }
+                if ( lc($2) =~ m/sep/ ) { $month = "09"; }
+                if ( lc($2) =~ m/o.t/ ) { $month = "10"; }
+                if ( lc($2) =~ m/nov/ ) { $month = "11"; }
+                if ( lc($2) =~ m/de./ ) { $month = "12"; }
+                if ( $month != 0 ) { $args->{'isodate'} = "$year-$month-$day"; }
+            }
         }
 
         if ( exists $args->{'author'} ) {
-        	$args->{'author'} =~ s/BaseUserMapping_//;
+            $args->{'author'} =~ s/BaseUserMapping_//;
         }
 
         # unescape quotes and new lines
@@ -548,11 +601,13 @@ sub _processMetaData {
     # if no META:TOPICINFO is given, add an empty template
     # SMELL: beware of TOPICINFO syntax changes
     if ( $text !~ '\s*\%META:TOPICINFO\{.*\}\%' ) {
-      my $args = _args2hash('author="ProjectContributor" date="1970-01-01T00:00:00" format="1.1" version="0"');
-      push @{ $metadata->{"topicinfo"} }, {%$args};
-    };
+        my $args = _args2hash(
+'author="ProjectContributor" date="1970-01-01T00:00:00" format="1.1" version="0"'
+        );
+        push @{ $metadata->{"topicinfo"} }, {%$args};
+    }
 
-    return _UTF82SiteCharSet( $metadata );
+    return _UTF82SiteCharSet($metadata);
 }
 
 sub _processPreferences {
@@ -563,31 +618,35 @@ sub _processPreferences {
     my $web   = $_[2];
     my $text  = $_[0];
 
-    my $key = '';
-    my $value ='';
+    my $key   = '';
+    my $value = '';
     my $type;
 
     #                 1             2           3
     #^(?:\t|   )+\*\s+(Set|Local)\s+(\w+)\s*=\s*(.*)$
 
     foreach my $line ( split( /\r?\n/, $text ) ) {
-        if( $line =~ m/$Foswiki::regex{setVarRegex}/o ) {
-            if( $type ) {
+        if ( $line =~ m/$Foswiki::regex{setVarRegex}/o ) {
+            if ($type) {
                 my $lctype = lc($type);
                 $prefs->{$lctype} = [] if not exists $prefs->{$lctype};
                 my $args;
                 $args->{$key} = [$value];
                 push @{ $prefs->{$lctype} }, {%$args};
             }
-            $type = $1;
-            $key = lc($2);
-            $value = (defined $3) ? $3 : '';
-        } elsif( $type ) {
-            if( $line =~ /^(\s{3}|\t)+\s*[^\s*]/ &&
-                  $line !~ m/$Foswiki::regex{bulletRegex}/o ) {
+            $type  = $1;
+            $key   = lc($2);
+            $value = ( defined $3 ) ? $3 : '';
+        }
+        elsif ($type) {
+            if (   $line =~ /^(\s{3}|\t)+\s*[^\s*]/
+                && $line !~ m/$Foswiki::regex{bulletRegex}/o )
+            {
+
                 # follow up line, extending value
                 $value .= "\n$line";
-            } else {
+            }
+            else {
                 my $lctype = lc($type);
                 $prefs->{$lctype} = [] if not exists $prefs->{$lctype};
                 my $args;
@@ -597,7 +656,7 @@ sub _processPreferences {
             }
         }
     }
-    if( $type ) {
+    if ($type) {
         my $lctype = lc($type);
         $prefs->{$lctype} = [] if not exists $prefs->{$lctype};
         my $args;
@@ -605,7 +664,7 @@ sub _processPreferences {
         push @{ $prefs->{$lctype} }, {%$args};
     }
 
-    return _UTF82SiteCharSet( $prefs );
+    return _UTF82SiteCharSet($prefs);
 }
 
 sub _processTables {
@@ -614,7 +673,9 @@ sub _processTables {
     my $text  = $_[0];
     my $topic = $_[1];
     my $web   = $_[2];
-    Foswiki::Func::writeDebug( "Foswiki::Plugins::${pluginName}::_processTables $web $topic ") if $debug;
+    Foswiki::Func::writeDebug(
+        "Foswiki::Plugins::${pluginName}::_processTables $web $topic ")
+      if $debug;
     my $state  = '';
     my $i      = -1;
     my $row    = -1;
@@ -684,7 +745,7 @@ sub _processTables {
             $state = '';
         }
     }
-    return _UTF82SiteCharSet( $tables );
+    return _UTF82SiteCharSet($tables);
 }
 
 sub _isMoved {
@@ -695,20 +756,22 @@ sub _isMoved {
 
     if ( $theText =~ /\s*\%META:TOPICMOVED\{(.*)\}\%/g ) {
 
-      my $args = _args2hash($1);
-      my ($toWeb, $toTopic) = Foswiki::Func::normalizeWebTopicName( "", $args->{'to'} );
+        my $args = _args2hash($1);
+        my ( $toWeb, $toTopic ) =
+          Foswiki::Func::normalizeWebTopicName( "", $args->{'to'} );
 
-      # due to TWiki:Bugs.Item3491 we have to check if the moved-meta-info concerns this topic
-      if ( $toWeb == $theWeb && $toTopic == $theTopic ) {
+# due to TWiki:Bugs.Item3491 we have to check if the moved-meta-info concerns this topic
+        if ( $toWeb == $theWeb && $toTopic == $theTopic ) {
 
-      	# if the prior place of the topic is empty, this topic might be moved
-      	# SMELL: this assumption is not very "exact"
-        if ( not Foswiki::Func::topicExists( $args->{'from'} ) ) {
-          my ($fromWeb, $fromTopic) = Foswiki::Func::normalizeWebTopicName( "", $args->{'from'} );
-          return ( 1, $fromWeb, $fromTopic );
-        };
-      };
-    };
+           # if the prior place of the topic is empty, this topic might be moved
+           # SMELL: this assumption is not very "exact"
+            if ( not Foswiki::Func::topicExists( $args->{'from'} ) ) {
+                my ( $fromWeb, $fromTopic ) =
+                  Foswiki::Func::normalizeWebTopicName( "", $args->{'from'} );
+                return ( 1, $fromWeb, $fromTopic );
+            }
+        }
+    }
 
     return ( 0, "", "" );
 
@@ -761,14 +824,13 @@ sub _args2hash {
 }
 
 sub _UTF82SiteCharSet {
-    my( $text ) = @_;
+    my ($text) = @_;
     my %regex;
 
     ## copied from Foswiki.pm
     ##
     ## in comparison to original, this function returns $text (not undef)
     ## if no UTF8 detected
-
 
     # 7-bit ASCII only
     $regex{validAsciiStringRegex} = qr/^[\x00-\x7F]+$/o;
@@ -810,83 +872,101 @@ sub _UTF82SiteCharSet {
                     [\x80-\xBF][\x80-\xBF]
                 }xo;
 
-    $regex{validUtf8StringRegex} =
-      qr/^ (?: $regex{validUtf8CharRegex} )+ $/xo;
-
+    $regex{validUtf8StringRegex} = qr/^ (?: $regex{validUtf8CharRegex} )+ $/xo;
 
     # Detect character encoding of the full topic name from URL
-    return $text if( $text =~ $regex{validAsciiStringRegex} );
+    return $text if ( $text =~ $regex{validAsciiStringRegex} );
 
-    Foswiki::Func::writeDebug("- ${pluginName}::_UTF82SiteCharSet: not valid ASCII.") if $debug;
+    Foswiki::Func::writeDebug(
+        "- ${pluginName}::_UTF82SiteCharSet: not valid ASCII.")
+      if $debug;
 
-    # If not UTF-8 - assume in site character set, no conversion required
-    # return $text unless( $text =~ $regex{validUtf8StringRegex} );
-    # Foswiki::Func::writeDebug("Foswiki::Plugins::${pluginName}::_UTF82SiteCharSet: valid UTF-8.");
+# If not UTF-8 - assume in site character set, no conversion required
+# return $text unless( $text =~ $regex{validUtf8StringRegex} );
+# Foswiki::Func::writeDebug("Foswiki::Plugins::${pluginName}::_UTF82SiteCharSet: valid UTF-8.");
 
     # If site charset is already UTF-8, there is no need to convert anything:
     if ( $Foswiki::cfg{Site}{CharSet} =~ /^utf-?8$/i ) {
+
         # warn if using Perl older than 5.8
-        if( $] <  5.008 ) {
-            Foswiki::Func::writeWarning( 'UTF-8 not supported on Perl '.$].
-                                 ' - use Perl 5.8 or higher..' );
+        if ( $] < 5.008 ) {
+            Foswiki::Func::writeWarning( 'UTF-8 not supported on Perl ' 
+                  . $]
+                  . ' - use Perl 5.8 or higher..' );
         }
 
         # SMELL: is this true yet?
-        Foswiki::Func::writeWarning( 'UTF-8 not yet supported as site charset -'.
-                             'Foswiki is likely to have problems' );
+        Foswiki::Func::writeWarning( 'UTF-8 not yet supported as site charset -'
+              . 'Foswiki is likely to have problems' );
         return $text;
     }
 
-    Foswiki::Func::writeDebug("- ${pluginName}::_UTF82SiteCharSet: siteChar is not UTF-8.") if $debug;
+    Foswiki::Func::writeDebug(
+        "- ${pluginName}::_UTF82SiteCharSet: siteChar is not UTF-8.")
+      if $debug;
 
     # Convert into ISO-8859-1 if it is the site charset
     if ( $Foswiki::cfg{Site}{CharSet} =~ /^iso-?8859-?15?$/i ) {
+
         # ISO-8859-1 maps onto first 256 codepoints of Unicode
         # (conversion from 'perldoc perluniintro')
-        Foswiki::Func::writeDebug("- ${pluginName}::_UTF82SiteCharSet: siteChar is iso-8859-1.") if $debug;
+        Foswiki::Func::writeDebug(
+            "- ${pluginName}::_UTF82SiteCharSet: siteChar is iso-8859-1.")
+          if $debug;
         $text =~ s/ ([\xC2\xC3]) ([\x80-\xBF]) /
           chr( ord($1) << 6 & 0xC0 | ord($2) & 0x3F )
             /egx;
-    } else {
+    }
+    else {
+
         # Convert from UTF-8 into some other site charset
-        Foswiki::Func::writeDebug("- ${pluginName}::_UTF82SiteCharSet: converting.") if $debug;
-        if( $] >= 5.008 ) {
+        Foswiki::Func::writeDebug(
+            "- ${pluginName}::_UTF82SiteCharSet: converting.")
+          if $debug;
+        if ( $] >= 5.008 ) {
             require Encode;
             import Encode qw(:fallbacks);
+
             # Map $Foswiki::cfg{Site}{CharSet} into real encoding name
             my $charEncoding =
               Encode::resolve_alias( $Foswiki::cfg{Site}{CharSet} );
-            if( not $charEncoding ) {
-                Foswiki::Func::writeWarning
-                  ( 'Conversion to "'.$Foswiki::cfg{Site}{CharSet}.
-                    '" not supported, or name not recognised - check '.
-                    '"perldoc Encode::Supported"' );
-            } else {
+            if ( not $charEncoding ) {
+                Foswiki::Func::writeWarning( 'Conversion to "'
+                      . $Foswiki::cfg{Site}{CharSet}
+                      . '" not supported, or name not recognised - check '
+                      . '"perldoc Encode::Supported"' );
+            }
+            else {
+
                 # Convert text using Encode:
                 # - first, convert from UTF8 bytes into internal
                 # (UTF-8) characters
-                $text = Encode::decode('utf8', $text);
+                $text = Encode::decode( 'utf8', $text );
+
                 # - then convert into site charset from internal UTF-8,
                 # inserting \x{NNNN} for characters that can't be converted
-                $text =
-                  Encode::encode( $charEncoding, $text,
-                                  &FB_PERLQQ() );
+                $text = Encode::encode( $charEncoding, $text, &FB_PERLQQ() );
             }
-        } else {
+        }
+        else {
             require Unicode::MapUTF8;    # Pre-5.8 Perl versions
             my $charEncoding = $Foswiki::cfg{Site}{CharSet};
-            if( not Unicode::MapUTF8::utf8_supported_charset($charEncoding) ) {
-                Foswiki::Func::writeWarning
-                  ( 'Conversion to "'.$Foswiki::cfg{Site}{CharSet}.
-                    '" not supported, or name not recognised - check '.
-                    '"perldoc Unicode::MapUTF8"' );
-            } else {
+            if ( not Unicode::MapUTF8::utf8_supported_charset($charEncoding) ) {
+                Foswiki::Func::writeWarning( 'Conversion to "'
+                      . $Foswiki::cfg{Site}{CharSet}
+                      . '" not supported, or name not recognised - check '
+                      . '"perldoc Unicode::MapUTF8"' );
+            }
+            else {
+
                 # Convert text
-                $text =
-                  Unicode::MapUTF8::from_utf8({
-                                               -string => $text,
-                                               -charset => $charEncoding
-                                              });
+                $text = Unicode::MapUTF8::from_utf8(
+                    {
+                        -string  => $text,
+                        -charset => $charEncoding
+                    }
+                );
+
                 # FIXME: Check for failed conversion?
             }
         }
@@ -895,42 +975,51 @@ sub _UTF82SiteCharSet {
 }
 
 sub _checkResponsebilityForWeb {
-	my $web = $_[0];
-	my @includedWebs;
-	my $retval = 0;
+    my $web = $_[0];
+    my @includedWebs;
+    my $retval = 0;
 
-	if ( $Foswiki::cfg{Plugins}{DbXmlPlugin}{IncludeWeb} =~ m/^\s*default\s*$/ ) {
-		@includedWebs = Foswiki::Func::getListOfWebs( "user" );
-	} else {
-		$Foswiki::cfg{Plugins}{DbXmlPlugin}{IncludeWeb} =~ s/\s+/ /g;
-		@includedWebs = split( /,/, $Foswiki::cfg{Plugins}{DbXmlPlugin}{IncludeWeb} );
-	}
+    if ( $Foswiki::cfg{Plugins}{DbXmlPlugin}{IncludeWeb} =~ m/^\s*default\s*$/ )
+    {
+        @includedWebs = Foswiki::Func::getListOfWebs("user");
+    }
+    else {
+        $Foswiki::cfg{Plugins}{DbXmlPlugin}{IncludeWeb} =~ s/\s+/ /g;
+        @includedWebs =
+          split( /,/, $Foswiki::cfg{Plugins}{DbXmlPlugin}{IncludeWeb} );
+    }
 
-	foreach my $thisWeb ( @includedWebs ) {
-		$thisWeb =~ s/^\s*//g;
-		$thisWeb =~ s/\s*$//g;
-		if ( $thisWeb eq $web ) {  $retval = 1; }
-	}
+    foreach my $thisWeb (@includedWebs) {
+        $thisWeb =~ s/^\s*//g;
+        $thisWeb =~ s/\s*$//g;
+        if ( $thisWeb eq $web ) { $retval = 1; }
+    }
 
-	my $webs = join( ":", @includedWebs ) if $debug;
-	Foswiki::Func::writeDebug("- ${pluginName}::_checkResponsebilityForWeb: ($webs) $web $retval") if $debug;
+    my $webs = join( ":", @includedWebs ) if $debug;
+    Foswiki::Func::writeDebug(
+        "- ${pluginName}::_checkResponsebilityForWeb: ($webs) $web $retval")
+      if $debug;
 
-	return $retval;
+    return $retval;
 }
 
 sub externalQuery {
 
-    my $cgi = Foswiki::Func::getCgiQuery();
-    my $myContentType = $cgi->param( 'contenttype' ) || 'text/xml';
-    my $myQuery = $cgi->param( 'query' ) || "collection('foswiki.dbxml')/data[\@topic='WebHome'][\@web='Main']";
-    my $myContainer = $cgi->param( 'container' ) || "foswiki.dbxml";
-
+    my $cgi           = Foswiki::Func::getCgiQuery();
+    my $myContentType = $cgi->param('contenttype') || 'text/xml';
+    my $myQuery       = $cgi->param('query')
+      || "collection('foswiki.dbxml')/data[\@topic='WebHome'][\@web='Main']";
+    my $myContainer = $cgi->param('container') || "foswiki.dbxml";
 
     print "Content-Type: " . $myContentType . "\n\n";
     print "<?xml version='1.0' encoding='UTF-8'?>\n";
     my $queryresult = doQuery( $myQuery, $myContainer );
     print $queryresult;
-    Foswiki::Func::writeDebug("- ${pluginName}::externalQuery output (w/o header): \n" . $queryresult . "\n") if $debug;
+    Foswiki::Func::writeDebug(
+            "- ${pluginName}::externalQuery output (w/o header): \n"
+          . $queryresult
+          . "\n" )
+      if $debug;
 
     # SMELL: This is a very untidy behaviour, because we leave
     # the "rest" context opened: $session->leaveContext( 'rest' )
@@ -940,9 +1029,9 @@ sub externalQuery {
 
 sub externalDebugRawXml {
 
-    my $cgi = Foswiki::Func::getCgiQuery();
-    my $myTopic = $cgi->param( 'mytopic' ) || 'WebHome';
-    my $myWeb   = $cgi->param( 'myweb' ) || 'Main';
+    my $cgi     = Foswiki::Func::getCgiQuery();
+    my $myTopic = $cgi->param('mytopic') || 'WebHome';
+    my $myWeb   = $cgi->param('myweb') || 'Main';
     my $myText  = Foswiki::Func::readTopicText( $myWeb, $myTopic );
 
     print "Content-Type: text/xml\n\n";
@@ -958,29 +1047,29 @@ sub unlinkDbXmlFile {
 
     my $retval = "Starting deletion process. <br />";
 
-    opendir(D, $workingPath);
+    opendir( D, $workingPath );
     my @f = readdir(D);
     closedir(D);
 
     foreach my $file (@f) {
-      my $filename = "$workingPath/$file";
+        my $filename = "$workingPath/$file";
 
-      # This is VERY VERY BAD. ;)
-      $filename =~ /(.*)/;
-      $filename = $1;
+        # This is VERY VERY BAD. ;)
+        $filename =~ /(.*)/;
+        $filename = $1;
 
-      if ( $file =~ m/^__db\.\d\d\d/ ) {
-        unlink "$filename";
-        $retval .= "Deleting $file <br />";
-      };
-      if ( $file =~ m/^log\.\d\d\d\d\d\d\d\d\d\d/ ) {
-        unlink "$filename";
-        $retval .= "Deleting $file <br />";
-      };
-      if ( $file =~ m/^foswiki.dbxml.*/ ) {
-        unlink "$filename";
-        $retval .= "Deleting $file <br />";
-      };
+        if ( $file =~ m/^__db\.\d\d\d/ ) {
+            unlink "$filename";
+            $retval .= "Deleting $file <br />";
+        }
+        if ( $file =~ m/^log\.\d\d\d\d\d\d\d\d\d\d/ ) {
+            unlink "$filename";
+            $retval .= "Deleting $file <br />";
+        }
+        if ( $file =~ m/^foswiki.dbxml.*/ ) {
+            unlink "$filename";
+            $retval .= "Deleting $file <br />";
+        }
     }
     return $retval;
 }

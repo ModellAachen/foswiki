@@ -117,6 +117,7 @@ pre {
 /* typography ****************************************************************/
 pre, code, textarea {
   font-family:"Bitstream Vera Sans Mono", "Andale Mono", monospace;
+  line-height:17px; /* a bit less compared to sans-serif */
 }
 pre, textarea {
   line-height:1.3846em;
@@ -133,15 +134,8 @@ pre, textarea {
 p { 
   font-size: 1em; /* 13px */ 
   line-height: 1.3846em; /* 18px */ 
-  margin:1.3846em 0em 0em 0em; 
+  margin:1.3846em 0em;
 }
-
-/* not supported by foswiki 
-p + p {
-  text-indent:1.5em;
-  margin-top:0;
-}
-*/
 
 blockquote {
   border:1px solid #ddd;
@@ -190,19 +184,25 @@ h4 {
   font-size: 1.1538em; /* 15px */ 
   line-height: 1.2em; /* 18px */ 
   margin-top: 1.2em; 
-  margin-bottom: 0em; 
+  margin-bottom: 0;
 }
 h5 { 
-  font-size: 1em; /* 13px */ 
-  line-height: 1.3846em; /* 18px */ 
-  margin: 1.3846em 0; 
+  font-size: 1.0760em; /* 14px */ 
+  line-height: 1.2857em; /* 18px */ 
+  margin-top: 1.2857em;
+  margin-bottom: 0em;
 }
 h6 { 
   font-size: 1em; /* 13px */ 
-  line-height: 1.5em; /* 18px */ 
-  margin: 1.5em 0em 0em; 
+  line-height:1.3846em; /* 18px */
+  margin-top: 1.3846em;
+  margin-bottom: 0em;
 }
-
+h4 + p,
+h5 + p,
+h6 + p { 
+  margin-top: 0; 
+}
 
 h1, h2, h3, h4, h5, h6 {
   font-weight:normal;
@@ -312,24 +312,33 @@ div.foswikiErrorSummary {
 }
 
 /* colors */
-.foswikiYellowFG { color:#ffff00; } .foswikiYellowFG a { color:#dede00; }
-.foswikiOrangeFG { color:#ff6600; } .foswikiOrangeFG a { color:#ff0000; }
-.foswikiRedFG    { color:#ff0000; } .foswikiRedFG a    { color:#ff6600; }
-.foswikiPinkFG   { color:#ff00ff; } .foswikiPinkFG a   { color:#800080; }
-.foswikiPurpleFG { color:#800080; } .foswikiPurpleFG a { color:#ff00ff; }
-.foswikiNavyFG   { color:#000080; } .foswikiNavyFG a   { color:#0000ff; }
-.foswikiBlueFG   { color:#0000ff; } .foswikiBlueFG a   { color:#000080; }
-.foswikiTealFG   { color:#008080; } .foswikiTealFG a   { color:#00c0c0; }
-.foswikiAquaFG   { color:#00ffff; } .foswikiAquaFG a   { color:#008080; }
-.foswikiLimeFG   { color:#00ff00; } .foswikiLimeFG a   { color:#00c400; }
-.foswikiGreenFG  { color:#008000; } .foswikiGreenFG a  { color:#004000; }
-.foswikiOliveFG  { color:#808000; } .foswikiOliveFG a  { color:#047C04; }
-.foswikiMaroonFG { color:#800000; } .foswikiMaroonFG a { color:#cc0000; }
-.foswikiBrownFG  { color:#996633; } .foswikiBrownFG a  { color:#694623; }
-.foswikiBlackFG  { color:#000000; } .foswikiBlackFG a  { color:#000000; }
-.foswikiGrayFG   { color:#808080; } .foswikiGrayFG a   { color:#000000; }
-.foswikiSilverFG { color:#c0c0c0; } .foswikiSilverFG a { color:#808080; }
-.foswikiWhiteFG  { color:#ffffff; } .foswikiWhiteFG a  { color:#c0c0c0; }
+.foswikiYellowFG, .foswikiYellowFG a { color:#ffff00; } 
+.foswikiOrangeFG, .foswikiOrangeFG a { color:#ff6600; } 
+.foswikiRedFG, .foswikiRedFG a { color:#ff0000; } 
+.foswikiPinkFG, .foswikiPinkFG a { color:#ff00ff; } 
+.foswikiPurpleFG, .foswikiPurpleFG a { color:#800080; } 
+.foswikiNavyFG, .foswikiNavyFG a   { color:#000080; } 
+.foswikiBlueFG, .foswikiBlueFG a   { color:#0000ff; } 
+.foswikiTealFG, .foswikiTealFG a   { color:#008080; } 
+.foswikiAquaFG, .foswikiAquaFG a   { color:#00ffff; } 
+.foswikiLimeFG, .foswikiLimeFG a   { color:#00ff00; } 
+.foswikiGreenFG, .foswikiGreenFG a  { color:#008000; } 
+.foswikiOliveFG, .foswikiOliveFG a  { color:#808000; } 
+.foswikiMaroonFG, .foswikiMaroonFG a { color:#800000; } 
+.foswikiBrownFG, .foswikiBrownFG a  { color:#996633; } 
+.foswikiBlackFG, .foswikiBlackFG a  { color:#000000; } 
+.foswikiGrayFG, .foswikiGrayFG a   { color:#808080; } 
+.foswikiSilverFG, .foswikiSilverFG a { color:#c0c0c0; } 
+.foswikiWhiteFG, .foswikiWhiteFG a  { color:#ffffff; } 
+
+.foswikiYellowFG a:hover, .foswikiOrangeFG a:hover, .foswikiRedFG a:hover,
+.foswikiPinkFG a:hover, .foswikiPurpleFG a:hover, .foswikiNavyFG a:hover,
+.foswikiBlueFG a:hover, .foswikiTealFG a:hover, .foswikiAquaFG a:hover,
+.foswikiLimeFG a:hover, .foswikiGreenFG a:hover, .foswikiOliveFG a:hover,
+.foswikiMaroonFG a:hover, .foswikiBrownFG a:hover, .foswikiBlackFG a:hover,
+.foswikiGrayFG a:hover, .foswikiSilverFG a:hover, .foswikiWhiteFG a:hover {
+  color:#fff; 
+}
 
 .foswikiYellowBG { background-color:#ffff00; }
 .foswikiOrangeBG { background-color:#ff6600; } 
@@ -352,7 +361,9 @@ div.foswikiErrorSummary {
 
 /* grid **********************************************************************/
 .showgrid-40x18 {
-  background:transparent url(grid-40x18.png) repeat scroll 0 0 !important;
+  background-image:url(grid-40x18.png) !important;
+  background-repeat:repeat !important;
+  background-position:0 0 !important;
 }
 
 /* DEPRECATED grid: use new foswiki grid definitions below */
@@ -506,6 +517,14 @@ h4 a:hover, h5 a:hover, h6 a:hover {
   border-color:#eee;
   background-color:#fff;
 }
+.foswikiImage.foswikiRight {
+  margin-left:10px;
+  margin-bottom:10px;
+}
+.foswikiImage.foswikiLeft {
+  margin-right:10px;
+  margin-bottom:10px;
+}
 
 .foswikiIndent {
   margin-left:3em;
@@ -571,7 +590,13 @@ h4 a:hover, h5 a:hover, h6 a:hover {
 }
 .foswikiSmallish {
   font-size:0.923em; /* 12px */
-  line-height:1.5;
+  /*line-height:1.5;*/
+}
+
+/* squish it a little more in the sidebar */
+.natSideBar .foswikiSmall,
+.natSideBar .foswikiSmallish {
+  line-height:1em; 
 }
 
 .foswikiFormSteps .foswikiNullTable,
@@ -596,9 +621,7 @@ h4 a:hover, h5 a:hover, h6 a:hover {
   padding:0.1538em 0.5769em 0.1538em 0em;
 }
 
-.foswikiGrayText {
-  color:#8E9195;
-}
+.foswikiGrayText,
 .foswikiGrayText a {
   color:#7B7E81;
 }
@@ -638,7 +661,6 @@ h4 a:hover, h5 a:hover, h6 a:hover {
   width:100%;
 }
 .natSearchRenameContents .foswikiTopRow {
-  white-space:pre;
   text-align:left;
   vertical-align:top;
   padding:5px;
@@ -762,6 +784,9 @@ h4 a:hover, h5 a:hover, h6 a:hover {
   float:left;
   white-space:nowrap;
   text-decoration:none;
+}
+.natTopicActions > .natTopicAction:first-child {
+  margin-left:0;
 }
 .natTopicActions .natMoreActionsMenu ul li .natTopicAction,
 .natTopicActions .natMoreActionsMenu ul li .natTopicAction:hover {
@@ -963,6 +988,14 @@ a.natFeedIcon {
 .foswikiTipMessage a {
   color:#004568;
 }
+.foswikiHelp {
+  margin:1.3076em 0px; /* 17px  0px */
+  padding:1.3846em; /* 18px */
+  border:1px solid;
+  background-color:#DEEBFA;
+  border-color:#A3D9FD;
+  color:#005884;
+}
 
 /* diff */
 .foswikiDiffTable {
@@ -1019,7 +1052,7 @@ td.foswikiDiffChangedText {
 
 /* TOC */
 .foswikiToc {
-  margin:1.3076em 0em 1.3846em;
+  margin:1.3846em 0em;
   padding:0em;
 }
 .foswikiTocTitle {
@@ -1032,7 +1065,7 @@ td.foswikiDiffChangedText {
 .foswikiToc ul {
   list-style:none;
   margin:1.3846em 0em;
-  padding:1.3846em 0em;
+  padding:1.3076em 0em 1.3846em;
   border-top:1px solid #ddd;
   border-left:4px solid #ddd;
 }
@@ -1274,6 +1307,18 @@ h1 .foswikiTopicSummary {
 /* tinymce */
 .mceContentBody {
   margin:0.5em;
+}
+
+a.natScrollTop {
+  text-decoration:none;
+  position:fixed;
+  bottom:1em;
+  right:1em;
+  font-size:120%;
+  font-weight:bold;
+  text-align:center;
+  padding:1px 5px 5px;
+  line-height:1em;
 }
 
 .natBottomActions {
@@ -1549,8 +1594,34 @@ body .natSideBar .natMySideBarRedDot a:hover {
   top:-19em;
   left:-19em;
 }
+.natLogin .foswikiFormSteps {
+  padding-top:3em;
+  padding-bottom:3em;
+}
 .natLogin h2 {
   margin:0px;
+}
+
+.natPoweredBy {
+  text-decoration:none;
+  position:fixed;
+  bottom:1em;
+  right:2em;
+  line-height:35px;
+  padding:5px;
+  color:#444;
+}
+.natPoweredBy:hover {
+  background-color:transparent;
+  color:inherit;
+  text-decoration:underline;
+}
+.natPoweredBy span {
+  width:55px;
+  height:40px;
+  margin-right:0.5em;
+  float:left;
+  overflow:hidden;
 }
 
 /* edit */
@@ -1562,9 +1633,10 @@ body .natSideBar .natMySideBarRedDot a:hover {
   margin:0px;
 }
 .natEditBody .natBodyContents,
+.natEditBody.natBodyBordered .natBodyContents,
 .natEditBody.natBodyFixed .natBodyContents {
-  margin-top:0px;
-  margin-bottom:0px;
+  border:0px;
+  margin:0px;
   padding-top:0px;
   padding-bottom:0px;
   width:auto;
@@ -1858,4 +1930,9 @@ body .natSideBar .natMySideBarRedDot a:hover {
 .natSlideShowBody .slideshowJump input {
   font-size:1em;
   padding:2px;
+}
+
+/* misc */
+.jqLoader {
+  display:none;
 }

@@ -6,7 +6,6 @@
 
 =cut
 
-
 package Foswiki::Plugins::DownloadZipPlugin;
 
 # Always use strict to enforce variable scoping
@@ -16,9 +15,9 @@ use warnings;
 use Foswiki::Func    ();    # The plugins API
 use Foswiki::Plugins ();    # For the API version
 
-our $VERSION = '$Rev: 13286 $';
-our $RELEASE = '1.0.0';
-our $SHORTDESCRIPTION = 'Download all attachments at once in a zip archive.';
+our $VERSION           = '$Rev: 13286 $';
+our $RELEASE           = '1.0.0';
+our $SHORTDESCRIPTION  = 'Download all attachments at once in a zip archive.';
 our $NO_PREFS_IN_TOPIC = 1;
 
 =begin TML
@@ -42,9 +41,9 @@ sub initPlugin {
         return 0;
     }
 
-    Foswiki::Func::registerTagHandler( 'DOWNLOADZIP', \&_DOWNLOADZIP );
+    Foswiki::Func::registerTagHandler( 'DOWNLOADZIP',    \&_DOWNLOADZIP );
     Foswiki::Func::registerTagHandler( 'DOWNLOADWEBZIP', \&_DOWNLOADWEBZIP );
-    Foswiki::Func::registerRESTHandler( 'zip', \&restZip );
+    Foswiki::Func::registerRESTHandler( 'zip',    \&restZip );
     Foswiki::Func::registerRESTHandler( 'webzip', \&restWebZip );
 
     # Plugin correctly initialized
@@ -52,13 +51,16 @@ sub initPlugin {
 }
 
 sub _DOWNLOADZIP {
-    my($session, $params, $theTopic, $theWeb) = @_;
-    return Foswiki::Func::getScriptUrl($pluginName, "zip", "rest", topic=>$theWeb.'.'.$theTopic);
+    my ( $session, $params, $theTopic, $theWeb ) = @_;
+    return Foswiki::Func::getScriptUrl( $pluginName, "zip", "rest",
+        topic => $theWeb . '.' . $theTopic );
 }
 
 sub _DOWNLOADWEBZIP {
-    my($session, $params, $theTopic, $theWeb) = @_;
-    return Foswiki::Func::getScriptUrl($pluginName, "webzip", "rest", topic=>$theWeb.'.WebHome');
+    my ( $session, $params, $theTopic, $theWeb ) = @_;
+    return Foswiki::Func::getScriptUrl( $pluginName, "webzip", "rest",
+        topic => $theWeb . '.WebHome' );
+
     # SMELL: WebHome hardcoded
 }
 
@@ -71,54 +73,56 @@ sub _DOWNLOADWEBZIP {
 sub restZip {
     my ($session) = @_;
 
-    my $filename = Foswiki::Sandbox::untaintUnchecked( $session->{'topicName'} . '.zip' );
+    my $filename =
+      Foswiki::Sandbox::untaintUnchecked( $session->{'topicName'} . '.zip' );
     my $topicName = $session->{'topicName'};
-    my $webName = Foswiki::Sandbox::untaintUnchecked( $session->{'webName'} );
-    my $dotWeb = $webName; $dotWeb =~ s#/#.#g;
-    my $slashWeb = $webName; $slashWeb =~ s#\.#/#g;
+    my $webName   = Foswiki::Sandbox::untaintUnchecked( $session->{'webName'} );
+    my $dotWeb    = $webName;
+    $dotWeb =~ s#/#.#g;
+    my $slashWeb = $webName;
+    $slashWeb =~ s#\.#/#g;
 
-    my $tmpFilename = Foswiki::Func::getWorkArea( $pluginName ) . '/' . $dotWeb . '.' . $filename;
-    my $attachDir = Foswiki::Sandbox::untaintUnchecked( Foswiki::Func::getPubDir() . '/' . $slashWeb . '/' . $topicName . '/' );
+    my $tmpFilename =
+      Foswiki::Func::getWorkArea($pluginName) . '/' . $dotWeb . '.' . $filename;
+    my $attachDir =
+      Foswiki::Sandbox::untaintUnchecked(
+        Foswiki::Func::getPubDir() . '/' . $slashWeb . '/' . $topicName . '/' );
 
     use Archive::Zip qw( :ERROR_CODES :CONSTANTS );
     my $zip = Archive::Zip->new();
 
-
     # read attachment filesnames from topic meta-data
     #
-    my ($meta, $text) = Foswiki::Func::readTopic( $webName, $topicName );
-    my @attachments = $meta->find( 'FILEATTACHMENT' );
+    my ( $meta, $text ) = Foswiki::Func::readTopic( $webName, $topicName );
+    my @attachments = $meta->find('FILEATTACHMENT');
     foreach my $attachment (@attachments) {
-      if( -f $attachDir . $attachment->{name} ) {
-        $zip->addFile( $attachDir . $attachment->{name}, $attachment->{name} );
-      }
+        if ( -f $attachDir . $attachment->{name} ) {
+            $zip->addFile( $attachDir . $attachment->{name},
+                $attachment->{name} );
+        }
     }
-
 
     # write back zip file
     #
-    unless ( $zip->writeToFileNamed( $tmpFilename ) == AZ_OK ) {
-       return "Cannot create zip file. \n\n";
+    unless ( $zip->writeToFileNamed($tmpFilename) == AZ_OK ) {
+        return "Cannot create zip file. \n\n";
     }
-
 
     # set http headers
     #
     print "Content-type: application/zip\n";
     print "Content-Disposition: attachment; filename=\"$filename\"\n\n";
 
-
     # read tmp zip file and transfer to browser
     #
     my $buffer;
-    open( ZIP, $tmpFilename);
-    print $buffer while( read( ZIP, $buffer, 16384 ) );
-    close( ZIP );
-    unlink( $tmpFilename );
+    open( ZIP, $tmpFilename );
+    print $buffer while ( read( ZIP, $buffer, 16384 ) );
+    close(ZIP);
+    unlink($tmpFilename);
 
     return 1;
 }
-
 
 =pod
 
@@ -130,52 +134,55 @@ sub restWebZip {
     my ($session) = @_;
 
     my $topicName = $session->{'topicName'};
-    my $webName = Foswiki::Sandbox::untaintUnchecked( $session->{'webName'} );
-    my $dotWeb = $webName; $dotWeb =~ s#/#.#g;
-    my $slashWeb = $webName; $slashWeb =~ s#\.#/#g;
+    my $webName   = Foswiki::Sandbox::untaintUnchecked( $session->{'webName'} );
+    my $dotWeb    = $webName;
+    $dotWeb =~ s#/#.#g;
+    my $slashWeb = $webName;
+    $slashWeb =~ s#\.#/#g;
     my $filename = $dotWeb . '.zip';
 
-    my $tmpFilename = Foswiki::Func::getWorkArea( $pluginName ) . '/' . $dotWeb . '.' . $filename;
+    my $tmpFilename =
+      Foswiki::Func::getWorkArea($pluginName) . '/' . $dotWeb . '.' . $filename;
     my $webDir = Foswiki::Func::getPubDir() . '/' . $slashWeb . '/';
 
     use Archive::Zip qw( :ERROR_CODES :CONSTANTS );
     my $zip = Archive::Zip->new();
 
-
-    # cycle through topiclist and read attachment filesnames from topic meta-data
-    #
-    my @topicList = Foswiki::Func::getTopicList( $webName );
+   # cycle through topiclist and read attachment filesnames from topic meta-data
+   #
+    my @topicList = Foswiki::Func::getTopicList($webName);
     foreach my $currentTopic (@topicList) {
-      my ($meta, $text) = Foswiki::Func::readTopic( $webName, $currentTopic );
-      my @attachments = $meta->find( 'FILEATTACHMENT' );
-      foreach my $attachment (@attachments) {
-        if( -f $webDir . $currentTopic . '/' . $attachment->{name} ) {
-          $zip->addFile( $webDir . $currentTopic . '/' . $attachment->{name}, $currentTopic . '/' . $attachment->{name} );
+        my ( $meta, $text ) =
+          Foswiki::Func::readTopic( $webName, $currentTopic );
+        my @attachments = $meta->find('FILEATTACHMENT');
+        foreach my $attachment (@attachments) {
+            if ( -f $webDir . $currentTopic . '/' . $attachment->{name} ) {
+                $zip->addFile(
+                    $webDir . $currentTopic . '/' . $attachment->{name},
+                    $currentTopic . '/' . $attachment->{name}
+                );
+            }
         }
-      }
     }
-
 
     # write back zip file
     #
-    unless ( $zip->writeToFileNamed( $tmpFilename ) == AZ_OK ) {
-       return "Cannot create zip file. \n\n";
+    unless ( $zip->writeToFileNamed($tmpFilename) == AZ_OK ) {
+        return "Cannot create zip file. \n\n";
     }
-
 
     # set http headers
     #
     print "Content-type: application/zip\n";
     print "Content-Disposition: attachment; filename=\"$filename\"\n\n";
 
-
     # read tmp zip file and transfer to browser
     #
     my $buffer;
-    open( ZIP, $tmpFilename);
-    print $buffer while( read( ZIP, $buffer, 16384 ) );
-    close( ZIP );
-    unlink( $tmpFilename );
+    open( ZIP, $tmpFilename );
+    print $buffer while ( read( ZIP, $buffer, 16384 ) );
+    close(ZIP);
+    unlink($tmpFilename);
 
     return 1;
 }

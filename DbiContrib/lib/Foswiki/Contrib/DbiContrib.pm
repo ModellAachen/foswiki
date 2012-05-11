@@ -41,18 +41,21 @@ $SHORTDESCRIPTION =
 sub new {
     my ( $class, $options ) = @_;
 
-   my $this = bless( {}, $class );
+    my $this = bless( {}, $class );
 
-    $this->{dsn}          = $options->{dsn} || $Foswiki::cfg{DbiContrib}{DBI_dsn};
-    $this->{dsn_user}     = $options->{dsn_user} || $Foswiki::cfg{DbiContrib}{DBI_username};
-    $this->{dsn_password} = $options->{dsn_password} || $Foswiki::cfg{DbiContrib}{DBI_password};
-    
-    $options->{AutoCommit} = 0 if ($this->{dsn} =~ /:mysql:/);
+    $this->{dsn} = $options->{dsn} || $Foswiki::cfg{DbiContrib}{DBI_dsn};
+    $this->{dsn_user} = $options->{dsn_user}
+      || $Foswiki::cfg{DbiContrib}{DBI_username};
+    $this->{dsn_password} = $options->{dsn_password}
+      || $Foswiki::cfg{DbiContrib}{DBI_password};
+
+    $options->{AutoCommit} = 0 if ( $this->{dsn} =~ /:mysql:/ );
     $options->{RaiseError} = 1;
-  #  $options->{Profile} = 5;       #will output scads of profiling into your error log
-    
-    $this->{dsn_options}  = $options;
-    $this->{Results} = {};
+
+#  $options->{Profile} = 5;       #will output scads of profiling into your error log
+
+    $this->{dsn_options} = $options;
+    $this->{Results}     = {};
 
     return $this;
 }
@@ -72,7 +75,7 @@ sub finish {
     my $this = shift;
     $this->disconnect();
     undef $this->{DB};
-    
+
     $this->{Results} = {};
     undef $this->{Results};
 
@@ -91,16 +94,13 @@ used internally, and can be used to get direct access to DBI
 sub connect {
     my $this = shift;
 
-    return $this->{DB} if (defined($this->{DB}));
+    return $this->{DB} if ( defined( $this->{DB} ) );
 
     $this->{DB} = DBI->connect_cached(
-                    $this->{dsn}, 
-                    $this->{dsn_user}, 
-                    $this->{dsn_password}, 
-                    $this->{dsn_options}
-                );
-    if (!$this->{DB})
-    {
+        $this->{dsn},          $this->{dsn_user},
+        $this->{dsn_password}, $this->{dsn_options}
+    );
+    if ( !$this->{DB} ) {
         print STDERR "Cannot connect: $DBI::errstr \n\n"
           . join( '___',
             ( $this->{dsn}, $this->{dsn_user}, $this->{dsn_password} ) );
@@ -151,14 +151,15 @@ sub dbSelect {
 
         #use Data::Dumper;
         #    print STDERR "cached: ".Dumper($hash_ref)."\n";
-#return  $array_ref;
+        #return  $array_ref;
 
         $this->{Results}{$key} = $array_ref
           if ( defined( $array_ref->[0][0] ) );
     }
     catch Error::Simple with {
         $this->{error} = $!;
-        print STDERR "            ERROR: fetch_select($key) : $! : (";# . $dbh->errstr . ')';
+        print STDERR "            ERROR: fetch_select($key) : $! : ("
+          ;    # . $dbh->errstr . ')';
 
         #$this->{session}->writeWarning("ERROR: fetch_select($key) : $!");
         my @array = ();
@@ -174,8 +175,9 @@ sub select {
     my @params = @_;
 
     ASSERT($query);
-    #sorry, not all select statements have params.... select name from grouplist....
-    #ASSERT(@params);
+
+#sorry, not all select statements have params.... select name from grouplist....
+#ASSERT(@params);
 
     my $key = "$query : " . join( '-', @params );
 
@@ -188,18 +190,20 @@ sub select {
     try {
         my $sth = $dbh->prepare($query);
         $sth->execute(@params);
-	#return a ref to an array containing refs to hashes
-        my $array_ref = $sth->fetchall_arrayref({});
+
+        #return a ref to an array containing refs to hashes
+        my $array_ref = $sth->fetchall_arrayref( {} );
 
         #use Data::Dumper;
         #print STDERR "cached: ".Dumper($array_ref)."\n";
-#return $array_ref;
+        #return $array_ref;
 
         $this->{Results}{$key} = $array_ref
           if ( defined( $array_ref->[0] ) );
     }
     catch Error::Simple with {
         $this->{error} = $!;
+
         #print STDERR "            ERROR: fetch_select($key) : $! : ("
         #   . $dbh->err .' : '. $dbh->errstr . ')';
 
@@ -226,7 +230,8 @@ sub dbInsert {
     catch Error::Simple with {
         $this->{error} = $!;
         my $key = "$query : " . join( '-', @params );
-        print STDERR "            ERROR: do($key) : $! : (";# . $dbh->errstr . ')';
+        print STDERR
+          "            ERROR: do($key) : $! : (";    # . $dbh->errstr . ')';
 
         #$this->{session}->writeWarning("ERROR: do($key) : $!");
     };
@@ -234,7 +239,7 @@ sub dbInsert {
 }
 
 sub dbDelete {
-    return dbInsert(@_); 
+    return dbInsert(@_);
 }
 
 1;

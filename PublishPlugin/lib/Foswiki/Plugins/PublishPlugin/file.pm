@@ -19,23 +19,23 @@ package Foswiki::Plugins::PublishPlugin::file;
 use strict;
 
 use Foswiki::Plugins::PublishPlugin::BackEnd;
-our @ISA = ( 'Foswiki::Plugins::PublishPlugin::BackEnd' );
+our @ISA = ('Foswiki::Plugins::PublishPlugin::BackEnd');
 
 use File::Copy ();
 use File::Path ();
 
 sub new {
     my $class = shift;
-    my $this = $class->SUPER::new(@_);
+    my $this  = $class->SUPER::new(@_);
 
     my $oldmask = umask( oct(777) - $Foswiki::cfg{RCS}{dirPermission} );
     $this->{params}->{outfile} ||= 'file';
 
-    if (-e "$this->{path}/$this->{params}->{outfile}") {
-	File::Path::rmtree("$this->{path}/$this->{params}->{outfile}");
+    if ( -e "$this->{path}/$this->{params}->{outfile}" ) {
+        File::Path::rmtree("$this->{path}/$this->{params}->{outfile}");
     }
-    eval { File::Path::mkpath($this->{path}); };
-    umask( $oldmask );
+    eval { File::Path::mkpath( $this->{path} ); };
+    umask($oldmask);
     die $@ if $@;
 
     return $this;
@@ -44,16 +44,18 @@ sub new {
 sub param_schema {
     my $class = shift;
     return {
-	outfile => {
-	    default => 'file',
-	    validator => \&Foswiki::Plugins::PublishPlugin::Publisher::validateFilename
-	},
-	googlefile  => {
-	    default => '',
-	    validator => \&Foswiki::Plugins::PublishPlugin::Publisher::validateFilenameList
+        outfile => {
+            default => 'file',
+            validator =>
+              \&Foswiki::Plugins::PublishPlugin::Publisher::validateFilename
         },
-	defaultpage => { default => 'WebHome' },
-	%{$class->SUPER::param_schema}
+        googlefile => {
+            default => '',
+            validator =>
+              \&Foswiki::Plugins::PublishPlugin::Publisher::validateFilenameList
+        },
+        defaultpage => { default => 'WebHome' },
+        %{ $class->SUPER::param_schema }
     };
 }
 
@@ -63,7 +65,7 @@ sub addDirectory {
     my $oldmask = umask( oct(777) - $Foswiki::cfg{RCS}{dirPermission} );
     eval { File::Path::mkpath("$this->{path}$this->{params}->{outfile}/$name") };
     $this->{logger}->logError($@) if $@;
-    umask( $oldmask );
+    umask($oldmask);
     push( @{ $this->{dirs} }, $name );
 }
 
@@ -72,8 +74,8 @@ sub addString {
 
     my $fh;
     my $d = $file;
-    if ($d =~ m#(.*)/[^/]*$#) {
-	File::Path::mkpath("$this->{path}$this->{params}->{outfile}/$1");
+    if ( $d =~ m#(.*)/[^/]*$# ) {
+        File::Path::mkpath("$this->{path}$this->{params}->{outfile}/$1");
     }
     if ( open( $fh, '>', "$this->{path}$this->{params}->{outfile}/$file" ) ) {
         binmode($fh);
@@ -89,13 +91,14 @@ sub addString {
         my $topic = $1;
         push( @{ $this->{urls} }, $file );
 
-	unless ( $topic eq 'default' || $topic eq 'index' ) {
-	    # write link from index.html to actual topic
-	    my $link = "<a href='$file'>$file</a><br>";
-	    $this->_catString( $link, 'default.htm' );
-	    $this->_catString( $link, 'index.html' );
-	    $this->{logger}->logInfo($topic, '(default.htm, index.html)');
-	}
+        unless ( $topic eq 'default' || $topic eq 'index' ) {
+
+            # write link from index.html to actual topic
+            my $link = "<a href='$file'>$file</a><br>";
+            $this->_catString( $link, 'default.htm' );
+            $this->_catString( $link, 'index.html' );
+            $this->{logger}->logInfo( $topic, '(default.htm, index.html)' );
+        }
     }
 }
 
@@ -105,13 +108,14 @@ sub _catString {
     my $data;
     my $fh;
     if ( open( $fh, '<', "$this->{path}$this->{params}->{outfile}/$file" ) ) {
-	local $/ = undef;
-	$data = <$fh> . "\n" . $string;
-	close($fh);
-    } else {
-	$data = $string;
+        local $/ = undef;
+        $data = <$fh> . "\n" . $string;
+        close($fh);
     }
-    $this->addString($data, $file);
+    else {
+        $data = $string;
+    }
+    $this->addString( $data, $file );
 }
 
 sub addFile {
@@ -131,7 +135,7 @@ sub close {
     # write sitemap.xml
     my $sitemap = $this->_createSitemap( \@{ $this->{urls} } );
     $this->addString( $sitemap, 'sitemap.xml' );
-    $this->{logger}->logInfo('', 'Published sitemap.xml');
+    $this->{logger}->logInfo( '', 'Published sitemap.xml' );
 
     # write google verification files (comma seperated list)
     if ( $this->{params}->{googlefile} ) {
@@ -142,7 +146,7 @@ sub close {
               . $file
               . '</title><body>just for google</body></html>';
             $this->addString( $simplehtml, $file );
-            $this->{logger}->logInfo('', 'Published googlefile : ' . $file);
+            $this->{logger}->logInfo( '', 'Published googlefile : ' . $file );
         }
     }
 

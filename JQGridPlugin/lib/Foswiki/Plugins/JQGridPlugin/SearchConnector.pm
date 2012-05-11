@@ -160,7 +160,7 @@ sub search {
       <total>\$numberofpages</total>
       <records>\$percntCALC{\$EVAL(\$numberofpages * \$pagesize)}\$percnt</records>\$n"
   footer="\$n</rows>"
-  header="<?xml version='1.0' encoding='utf-8'?><rows>
+  header="<?xml version='1.0' encoding='$Foswiki::cfg{Site}{CharSet}'?><rows>
   <page>\$currentpage</page><total>\$numberofpages</total><records>\$percntCALC{\$EVAL(\$numberofpages * \$pagesize)}\$percnt</records>\$n"
   format="<row id='\$web.\$topic'>
 HERE

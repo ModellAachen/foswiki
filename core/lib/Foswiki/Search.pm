@@ -666,10 +666,13 @@ sub formatResults {
           $this->formatCommon( $nextpagebutton, \%pager_formatting );
         $pager_formatting{'nextbutton'} = sub { return $nextpagebutton };
 
-        my $pager_control = $params->{pagerformat}
-          || $session->templates->expandTemplate('SEARCH:pager');
-        $pager_control =
-          $this->formatCommon( $pager_control, \%pager_formatting );
+        my $pager_control = '';
+        if ( $numberofpages > 1 ) {
+            $pager_control = $params->{pagerformat}
+              || $session->templates->expandTemplate('SEARCH:pager');
+            $pager_control =
+              $this->formatCommon( $pager_control, \%pager_formatting );
+        }
         $pager_formatting{'pager'} = sub { return $pager_control; };
     }
 
@@ -779,6 +782,22 @@ sub formatResults {
                 else {
                     @multipleHitLines =
                       reverse grep { /$pattern/i } split( /[\n\r]+/, $text );
+                }
+            }
+
+            # Apply heading offset - posibly to each hit result independently
+            if (   $params->{headingoffset}
+                && $params->{headingoffset} =~ /^([-+]?\d+)$/
+                && $1 != 0 )
+            {
+                my ( $off, $noff ) = ( 0 + $1, 0 - $1 );
+                if ( scalar(@multipleHitLines) ) {
+                    @multipleHitLines = map {
+                        $_ =~ "<ho off=\"$off\">\n$text\n<ho off=\"$noff\"/>"
+                    } @multipleHitLines;
+                }
+                else {
+                    $text = "<ho off=\"$off\">\n$text\n<ho off=\"$noff\"/>";
                 }
             }
         }
@@ -1072,10 +1091,11 @@ sub formatResults {
         &$callback( $cbdata, $footer );
     }
 
-    return ( $ntopics,
-        ( ( not defined( $params->{_callback} ) ) and ( $nhits >= 0 ) )
-        ? join( '', @$cbdata )
-        : '' );
+    my $result = '';
+    if ( !defined $params->{_callback} && $nhits >= 0 ) {
+        $result = join( '', @$cbdata );
+    }
+    return ( $ntopics, $result );
 }
 
 sub formatCommon {

@@ -112,7 +112,8 @@ sub resthandleAdd {
 
     # check preconditions
     #
-    my ( $status, $message ) = _checkParameter( $webtopic, $type, $name, $item );
+    my ( $status, $message ) =
+      _checkParameter( $webtopic, $type, $name, $item );
     unless ( $status == 200 ) {
         $response->header( -status => $status, -type => 'text/plain' );
         $response->print($message);
@@ -147,7 +148,8 @@ sub resthandleAdd {
     $field->{value} = $list;
     $meta->putKeyed( $type, $field );
     try {
-        Foswiki::Func::saveTopic( $web, $topic, $meta, $text ) unless ( $itemExists );
+        Foswiki::Func::saveTopic( $web, $topic, $meta, $text )
+          unless ($itemExists);
     }
     catch Error::Simple with {
         my $e = $DEBUG ? shift : "";
@@ -171,7 +173,6 @@ sub resthandleRemove {
     my $delete_candidate = $query->{param}->{item}[0] || "";
     my $sort             = $query->{param}->{sort}[0] || 0;
     if ( $sort =~ m/off/i ) { $sort = 0; }
-
 
     # check preconditions
     #

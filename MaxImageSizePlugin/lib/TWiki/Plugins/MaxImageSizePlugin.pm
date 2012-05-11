@@ -13,7 +13,7 @@
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details, published at 
+# GNU General Public License for more details, published at
 # http://www.gnu.org/copyleft/gpl.html
 #
 # =========================
@@ -28,75 +28,76 @@ package TWiki::Plugins::MaxImageSizePlugin;
 
 # =========================
 use vars qw(
-        $web $topic $user $installWeb $VERSION $pluginName
-        $debug $geometryString $patternMatch
-    );
+  $web $topic $user $installWeb $VERSION $pluginName
+  $debug $geometryString $patternMatch
+);
 
-$VERSION = '1.010';
-$pluginName = 'MaxImageSizePlugin';  # Name of this Plugin
+$VERSION    = '1.010';
+$pluginName = 'MaxImageSizePlugin';    # Name of this Plugin
 
 # =========================
-sub initPlugin
-{
+sub initPlugin {
     ( $topic, $web, $user, $installWeb ) = @_;
 
     # check for Plugins.pm versions
-    if( $TWiki::Plugins::VERSION < 1 ) {
-        TWiki::Func::writeWarning( "Version mismatch between $pluginName and Plugins.pm" );
+    if ( $TWiki::Plugins::VERSION < 1 ) {
+        TWiki::Func::writeWarning(
+            "Version mismatch between $pluginName and Plugins.pm");
         return 0;
     }
 
     # Get plugin debug flag
-    $debug = TWiki::Func::getPreferencesFlag( "\U$pluginName\E_DEBUG" );
+    $debug = TWiki::Func::getPreferencesFlag("\U$pluginName\E_DEBUG");
 
-    # Get plugin preferences, the variable defined by: 
+    # Get plugin preferences, the variable defined by:
     # i.e. http://studio.imagemagick.org/www/Magick++/Geometry.html
-    $geometryString = &TWiki::Prefs::getPreferencesValue( "RESIZE_GEOMETRY" ) || "x480>";
+    $geometryString = &TWiki::Prefs::getPreferencesValue("RESIZE_GEOMETRY")
+      || "x480>";
 
-    #$patternMatch = &TWiki::Prefs::getPreferencesValue( "PATTERN_MATCH" ) || "jpg";
+#$patternMatch = &TWiki::Prefs::getPreferencesValue( "PATTERN_MATCH" ) || "jpg";
 
     # Plugin correctly initialized
-    writeDebug( "- TWiki::Plugins::${pluginName}::initPlugin( $web.$topic ) is OK");
+    writeDebug(
+        "- TWiki::Plugins::${pluginName}::initPlugin( $web.$topic ) is OK");
     return 1;
 }
 
 # =========================
-sub beforeAttachmentSaveHandler
-{
+sub beforeAttachmentSaveHandler {
 ### my ( $attachmentAttr, $topic, $web ) = @_;   # do not uncomment, use $_[0], $_[1]... instead
     my $attachmentAttr = $_[0];
-    my $topic = $_[1];
-    my $web = $_[2];
+    my $topic          = $_[1];
+    my $web            = $_[2];
 
-    writeDebug( "- ${pluginName}::beforeSaveHandler( $_[2].$_[1])");
+    writeDebug("- ${pluginName}::beforeSaveHandler( $_[2].$_[1])");
     writeDebug("attributes: $attachmentAttr");
-    foreach my $attribute (keys %$attachmentAttr) {
-       writeDebug("$attribute = ". $attachmentAttr->{$attribute});
+    foreach my $attribute ( keys %$attachmentAttr ) {
+        writeDebug( "$attribute = " . $attachmentAttr->{$attribute} );
     }
 
     my $attachmentName = $attachmentAttr->{"attachment"};
     writeDebug("Hmm. Got a $attachmentName");
 
-    unless (
-            ($attachmentName =~ m/.jpg$/) ||
-            ($attachmentName =~ m/.JPG$/)
-           )
+    unless ( ( $attachmentName =~ m/.jpg$/ )
+        || ( $attachmentName =~ m/.JPG$/ ) )
     {
-      writeDebug("Not resizing - this does not end in jpg or JPG\n");
-      return;
+        writeDebug("Not resizing - this does not end in jpg or JPG\n");
+        return;
     }
-   
+
     writeDebug("Resizing $attachmentName");
     eval {
-       my $errors = resize($attachmentAttr->{"tmpFilename"}, $geometryString);
-       TWiki::Func::writeWarning("$web.$topic ".$attachmentAttr->{"user"}." ".$errors);
+        my $errors =
+          resize( $attachmentAttr->{"tmpFilename"}, $geometryString );
+        TWiki::Func::writeWarning(
+            "$web.$topic " . $attachmentAttr->{"user"} . " " . $errors );
     };
     TWiki::Func::writeWarning("$! $@") if ($@);
 
     # Now, how do I give the user an error?
     $attachmentAttr->{"comment"} .= "Resized by $pluginName";
 
-    # This handler is called by TWiki::Store::saveAttachment just before the save action.
+# This handler is called by TWiki::Store::saveAttachment just before the save action.
 
 }
 
@@ -106,18 +107,18 @@ sub writeDebug {
 }
 
 sub resize {
-    my ($filename, $geometry) = @_;
+    my ( $filename, $geometry ) = @_;
     my $errors = "";
     use Image::Magick;
-    my($image, $x);
+    my ( $image, $x );
     $image = Image::Magick->new;
-    $x = $image->Read($filename);
+    $x     = $image->Read($filename);
     $errors .= $x;
-	return $x if ($x);
-    $x = $image->Resize(geometry=>$geometry);
-	return $x if ($x);
+    return $x if ($x);
+    $x = $image->Resize( geometry => $geometry );
+    return $x if ($x);
     $x = $image->Write($filename);
-	return $x if ($x);
+    return $x if ($x);
     return $errors;
 }
 

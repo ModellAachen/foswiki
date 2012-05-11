@@ -1,4 +1,4 @@
-%META:TOPICINFO{author="ProjectContributor" comment="reprev" date="1320868829" format="1.1" reprev="5" version="5"}%
+%META:TOPICINFO{author="micha" comment="reprev" date="1334852425" format="1.1" reprev="7" version="7"}%
 %META:TOPICPARENT{name="TopicFunction"}%
 %TOC{depth="2"}%
 
@@ -22,7 +22,7 @@
   depth="2"
   filter="TopicType=~'\bBlogEntry\b' AND State != 'unpublished'"
   header="<div class='blogSideBarSection'>
-    <h2 >%IF{"defined CAT and '%CAT%' !=''"
+    <h2 >%IF{"defined CAT and '%CAT%' !='' and '%CAT%' != 'TopCategory'"
            then="%MAKETEXT{"[_1] categories" args="%CATINFO{cat="%CAT%" format="$title"}%"}%"
            else="%MAKETEXT{"Categories"}%"
         }%</h2>

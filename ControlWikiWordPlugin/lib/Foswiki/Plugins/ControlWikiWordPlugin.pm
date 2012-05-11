@@ -191,6 +191,7 @@ sub preRenderingHandler {
         # Need to put back everything in the reverse order that it was removed.
         $renderer->_putBackProtected( \$_[0], 'htmllink', $removedProtected );
         $renderer->_putBackProtected( \$_[0], 'wikilink', $removedProtected );
+
         # put back everything that was removed
         if ($@) {
             Foswiki::putBackBlocks( \$_[0], $removedTextareas, 'noautolink',

@@ -594,16 +594,6 @@ sub test_NoUserAddToNewGroupCreate {
     my $this = shift;
     my $ret;
 
-    $ret = $this->registerUserExceptionFwk( 'asdf', 'Asdf', 'Poiu',
-        'asdf@example.com' );
-    $this->assert_null( $ret, "Simple rego should work" );
-    $ret = $this->registerUserExceptionTwk( 'qwer', 'Qwer', 'Poiu',
-        'qwer@example.com' );
-    $this->assert_null( $ret, "Simple rego should work" );
-    $ret = $this->registerUserExceptionFwk( 'zxcv', 'Zxcv', 'Poiu',
-        'zxcv@example.com' );
-    $this->assert_null( $ret, "Simple rego should work" );
-
     $ret = $this->addUserToGroup(
         {
             'username'  => [],
@@ -613,14 +603,9 @@ sub test_NoUserAddToNewGroupCreate {
         }
     );
 
-   #$this->assert_not_null( $ret, "no users in list of users to add to group" );
-
     #SMELL: TopicUserMapping specific - we don't refresh Groups cache :(
     $this->assert(
         Foswiki::Func::topicExists( $this->{users_web}, "NewGroup" ) );
-    $this->assert( !Foswiki::Func::isGroupMember( "NewGroup", "AsdfPoiu" ) );
-    $this->assert( !Foswiki::Func::isGroupMember( "NewGroup", "QwerPoiu" ) );
-    $this->assert( !Foswiki::Func::isGroupMember( "NewGroup", "ZxcvPoiu" ) );
 
     #need to reload to force Foswiki to reparse Groups :(
     my $q = $this->{request};
@@ -632,9 +617,42 @@ sub test_NoUserAddToNewGroupCreate {
     # If not running as admin, current user is automatically added to the group.
     $this->assert(
         Foswiki::Func::isGroupMember( "NewGroup", $this->{session}->{user} ) );
-    $this->assert( !Foswiki::Func::isGroupMember( "NewGroup", "AsdfPoiu" ) );
-    $this->assert( !Foswiki::Func::isGroupMember( "NewGroup", "QwerPoiu" ) );
-    $this->assert( !Foswiki::Func::isGroupMember( "NewGroup", "ZxcvPoiu" ) );
+
+    return;
+}
+
+sub test_NoUserAddToNewGroupCreateAsAdmin {
+    my $this = shift;
+    my $ret;
+
+    my $query = $this->{request};
+    $this->createNewFoswikiSession( $Foswiki::cfg{AdminUserWikiName}, $query );
+
+    $ret = $this->addUserToGroup(
+        {
+            'username'  => [],
+            'groupname' => ['NewGroup'],
+            'create'    => [1],
+            'action'    => ['addUserToGroup']
+        }
+    );
+
+    #SMELL: TopicUserMapping specific - we don't refresh Groups cache :(
+    $this->assert(
+        Foswiki::Func::topicExists( $this->{users_web}, "NewGroup" ) );
+
+    #need to reload to force Foswiki to reparse Groups :(
+    $this->createNewFoswikiSession( undef, $query );
+
+    $this->assert(
+        Foswiki::Func::topicExists( $this->{users_web}, "NewGroup" ) );
+
+    # If running as admin, no user is automatically added to the group.
+    $this->assert(
+        !Foswiki::Func::isGroupMember(
+            "NewGroup", $Foswiki::cfg{AdminUserWikiName}
+        )
+    );
 
     return;
 }
@@ -806,7 +824,7 @@ EOM
     );
 
     $query->path_info("/$this->{test_web}/$regTopic");
-    $this->createNewFoswikiSession( $Foswiki::cfg{SuperAdminGroup}, $query );
+    $this->createNewFoswikiSession( $Foswiki::cfg{AdminUserWikiName}, $query );
     $this->{session}->net->setMailHandler( \&FoswikiFnTestCase::sentMail );
     $this->{session}->{topicName} = $regTopic;
     $this->{session}->{webName}   = $this->{test_web};
@@ -870,7 +888,7 @@ EOM
     );
 
     $query->path_info("/$this->{test_web}/$regTopic");
-    $this->createNewFoswikiSession( $Foswiki::cfg{SuperAdminGroup}, $query );
+    $this->createNewFoswikiSession( $Foswiki::cfg{AdminUserWikiName}, $query );
     $this->{session}->net->setMailHandler( \&FoswikiFnTestCase::sentMail );
     $this->{session}->{topicName} = $regTopic;
     $this->{session}->{webName}   = $this->{test_web};
@@ -985,6 +1003,8 @@ sub test_createDefaultWeb {
         }
     );
     $query->path_info("/$this->{test_web}/Arbitrary");
+
+    # SMELL: Test fails unless the "user" is the AdminGroup.
     $this->createNewFoswikiSession( $Foswiki::cfg{SuperAdminGroup}, $query );
     $this->{session}->net->setMailHandler( \&FoswikiFnTestCase::sentMail );
     $this->{session}->{topicName} = 'Arbitrary';
@@ -1018,7 +1038,7 @@ sub test_createDefaultWeb {
 
     #check that the settings we created with happened.
     $this->assert( $this->{session}->webExists($newWeb) );
-    my $webObject = Foswiki::Meta->new( $this->{session}, $newWeb );
+    my $webObject = $this->getWebObject($newWeb);
     $this->assert_equals( 'fuchsia', $webObject->getPreference('WEBBGCOLOR') );
     $this->assert_equals( 'on',      $webObject->getPreference('SITEMAPLIST') );
     $webObject->finish();
@@ -1070,7 +1090,8 @@ TEXT
 
     my $query = Unit::Request->new(
         {
-            'action' => ['saveSettings'],
+            'action'      => ['saveSettings'],
+            'action_save' => ['x'],
             'text' =>
 "Ignore this line\n   * Set NEWSET = new set\n   * Local NEWLOCAL = new local\nIgnore that line",
             'originalrev' => 1
@@ -1100,6 +1121,9 @@ TEXT
         $this->{session}->{prefs}->getPreference('NEWSET') );
     $this->assert_equals( "new local",
         $this->{session}->{prefs}->getPreference('NEWLOCAL') );
+    my ( $tdate, $tuser, $trev, $tcomment ) =
+      Foswiki::Func::getRevisionInfo( $this->{test_web}, 'SaveSettings' );
+    $this->assert_equals( 2, $trev );
 
     return;
 }
@@ -1125,7 +1149,8 @@ TEXT
 
     my $query = Unit::Request->new(
         {
-            'action' => ['saveSettings'],
+            'action'      => ['saveSettings'],
+            'action_save' => ['Save'],
             'text' =>
 "Ignore this line\n   * Set NEWSET = new set\n   * Local NEWLOCAL = new local\n   * Set ALLOWTOPICCHANGE = $this->{test_user_wikiname}\nIgnore that line",
             'originalrev' => 1
@@ -1154,6 +1179,129 @@ TEXT
         $this->{session}->{prefs}->getPreference('METALOCAL') );
     $this->assert_null( $this->{session}->{prefs}->getPreference('NEWSET') );
     $this->assert_null( $this->{session}->{prefs}->getPreference('NEWLOCAL') );
+    my ( $tdate, $tuser, $trev, $tcomment ) =
+      Foswiki::Func::getRevisionInfo( $this->{test_web}, 'SaveSettings' );
+    $this->assert_equals( 1, $trev );
+
+    return;
+}
+
+sub test_saveSettings_cancel {
+    my $this = shift;
+
+    # Create a test topic
+    my ($testTopic) =
+      Foswiki::Func::readTopic( $this->{test_web}, "SaveSettings" );
+    $testTopic->text( <<'TEXT');
+Philosophers, philosophers, everywhere,
+   * Set TEXTSET = text set
+   * Local TEXTLOCAL = text local
+But never a one who thinks
+%META:PREFERENCE{name="METASET" type="Set" value="meta set"}%
+%META:PREFERENCE{name="METALOCAL" type="Local" value="meta local"}%
+TEXT
+    $testTopic->save();
+    $testTopic->finish();
+
+    my $query = Unit::Request->new(
+        {
+            'action'        => ['saveSettings'],
+            'action_cancel' => ['Cancel'],
+            'text' =>
+"Ignore this line\n   * Set NEWSET = new set\n   * Local NEWLOCAL = new local\nIgnore that line",
+            'originalrev' => 1
+        }
+    );
+    $query->path_info("/$this->{test_web}/SaveSettings");
+    $this->createNewFoswikiSession( $this->{test_user_login}, $query );
+    try {
+        my ( $stdout, $stderr, $result ) =
+          $this->captureWithKey( manage => $MAN_UI_FN, $this->{session} );
+    }
+    catch Error::Simple with {
+        my $e = shift;
+        $this->assert( 0, $e );
+    };
+
+    $query = Unit::Request->new( {} );
+    $query->path_info("/$this->{test_web}/SaveSettings");
+    $this->createNewFoswikiSession( $this->{test_user_login}, $query );
+    $this->assert_equals( "text set",
+        $this->{session}->{prefs}->getPreference('TEXTSET') );
+    $this->assert_equals( "text local",
+        $this->{session}->{prefs}->getPreference('TEXTLOCAL') );
+    $this->assert_null( $this->{session}->{prefs}->getPreference('NEWSET') );
+    $this->assert_null( $this->{session}->{prefs}->getPreference('NEWLOCAL') );
+    $this->assert_equals( "meta set",
+        $this->{session}->{prefs}->getPreference('METASET') );
+    $this->assert_equals( "meta local",
+        $this->{session}->{prefs}->getPreference('METALOCAL') );
+    my ( $tdate, $tuser, $trev, $tcomment ) =
+      Foswiki::Func::getRevisionInfo( $this->{test_web}, 'SaveSettings' );
+    $this->assert_equals( 1, $trev );
+
+    return;
+}
+
+sub test_saveSettings_invalid {
+    my $this = shift;
+
+    # Create a test topic
+    my ($testTopic) =
+      Foswiki::Func::readTopic( $this->{test_web}, "SaveSettings" );
+    $testTopic->text( <<'TEXT');
+Philosophers, philosophers, everywhere,
+   * Set TEXTSET = text set
+   * Local TEXTLOCAL = text local
+But never a one who thinks
+%META:PREFERENCE{name="METASET" type="Set" value="meta set"}%
+%META:PREFERENCE{name="METALOCAL" type="Local" value="meta local"}%
+TEXT
+    $testTopic->save();
+    $testTopic->finish();
+
+    my $query = Unit::Request->new(
+        {
+            'action'      => ['saveSettings'],
+            'action_save' => [''],
+            'text' =>
+"Ignore this line\n   * Set NEWSET = new set\n   * Local NEWLOCAL = new local\nIgnore that line",
+            'originalrev' => 1
+        }
+    );
+    $query->path_info("/$this->{test_web}/SaveSettings");
+    $this->createNewFoswikiSession( $this->{test_user_login}, $query );
+    try {
+        my ( $stdout, $stderr, $result ) =
+          $this->captureWithKey( manage => $MAN_UI_FN, $this->{session} );
+    }
+    catch Error::Simple with {
+        my $e = shift;
+        $this->assert( 0, $e );
+    }
+    catch Foswiki::OopsException with {
+        my $e = shift;
+        $this->assert_str_equals( "attention", $e->{template},
+            $e->stringify() );
+        $this->assert_str_equals( "invalid_field", $e->{def}, $e->stringify() );
+    };
+
+    $query = Unit::Request->new( {} );
+    $query->path_info("/$this->{test_web}/SaveSettings");
+    $this->createNewFoswikiSession( $this->{test_user_login}, $query );
+    $this->assert_equals( "text set",
+        $this->{session}->{prefs}->getPreference('TEXTSET') );
+    $this->assert_equals( "text local",
+        $this->{session}->{prefs}->getPreference('TEXTLOCAL') );
+    $this->assert_null( $this->{session}->{prefs}->getPreference('NEWSET') );
+    $this->assert_null( $this->{session}->{prefs}->getPreference('NEWLOCAL') );
+    $this->assert_equals( "meta set",
+        $this->{session}->{prefs}->getPreference('METASET') );
+    $this->assert_equals( "meta local",
+        $this->{session}->{prefs}->getPreference('METALOCAL') );
+    my ( $tdate, $tuser, $trev, $tcomment ) =
+      Foswiki::Func::getRevisionInfo( $this->{test_web}, 'SaveSettings' );
+    $this->assert_equals( 1, $trev );
 
     return;
 }
@@ -1179,6 +1327,8 @@ sub test_createEmptyWeb {
         }
     );
     $query->path_info("/$this->{test_web}/Arbitrary");
+
+    # SMELL: Test fails unless the "user" is the AdminGroup.
     $this->createNewFoswikiSession( $Foswiki::cfg{SuperAdminGroup}, $query );
     $this->{session}->net->setMailHandler( \&FoswikiFnTestCase::sentMail );
     $this->{session}->{topicName} = 'Arbitrary';
@@ -1212,7 +1362,7 @@ sub test_createEmptyWeb {
 
     #check that the settings we created with happened.
     $this->assert( $this->{session}->webExists($newWeb) );
-    my $webObject = Foswiki::Meta->new( $this->{session}, $newWeb );
+    my $webObject = $this->getWebObject($newWeb);
     $this->assert_equals( 'fuchsia', $webObject->getPreference('WEBBGCOLOR') );
     $this->assert_equals( 'somenewskin,another',
         $webObject->getPreference('SKIN') );

@@ -10,7 +10,7 @@
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details, published at 
+# GNU General Public License for more details, published at
 # http://www.gnu.org/copyleft/gpl.html
 #
 # Plugin to cache permission information in a simple cache file that
@@ -24,9 +24,9 @@ package TWiki::Plugins::WebDAVPlugin;
 use strict;
 
 use vars qw(
-            $web $topic $user $installWeb $VERSION $RELEASE
-            $permDB
-           );
+  $web $topic $user $installWeb $VERSION $RELEASE
+  $permDB
+);
 
 $VERSION = '$Rev$';
 $RELEASE = 'TWiki-4';
@@ -40,24 +40,25 @@ sub initPlugin {
 
     if ($pdb) {
         eval 'use TWiki::Plugins::WebDAVPlugin::Permissions';
-        if ( $@ ) {
-            TWiki::Func::writeWarning( $@ );
-            print STDERR $@; # print to webserver log file
-        } else {
-            $permDB = new TWiki::Plugins::WebDAVPlugin::Permissions( $pdb );
+        if ($@) {
+            TWiki::Func::writeWarning($@);
+            print STDERR $@;    # print to webserver log file
         }
-    } else {
-        my $mess =
-          "{Plugins}{WebDAVPlugin}{DAVLockDB} is not defined";
+        else {
+            $permDB = new TWiki::Plugins::WebDAVPlugin::Permissions($pdb);
+        }
+    }
+    else {
+        my $mess = "{Plugins}{WebDAVPlugin}{DAVLockDB} is not defined";
 
         TWiki::Func::writeWarning($mess);
         print STDERR "$mess\n";
         return 0;
     }
 
-    unless( $permDB ) {
+    unless ($permDB) {
         my $mess = "$pluginName: failed to initialise";
-        TWiki::Func::writeWarning( $mess );
+        TWiki::Func::writeWarning($mess);
         print STDERR "$mess\n";
         return 0;
     }
@@ -68,14 +69,12 @@ sub initPlugin {
 sub beforeSaveHandler {
     my ( $text, $topic, $web ) = @_;
 
-    return unless( $permDB );
+    return unless ($permDB);
 
-    eval {
-        $permDB->processText( $web, $topic, $text );
-    };
+    eval { $permDB->processText( $web, $topic, $text ); };
 
-    if ( $@ ) {
-        TWiki::Func::writeWarning( "$pluginName: $@" );
+    if ($@) {
+        TWiki::Func::writeWarning("$pluginName: $@");
         print STDERR "$pluginName: $@\n";
     }
 }

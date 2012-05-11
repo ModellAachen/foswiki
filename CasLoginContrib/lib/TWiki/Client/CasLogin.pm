@@ -43,36 +43,37 @@ use Assert;
 use TWiki::Client;
 use AuthCAS;
 
-@TWiki::Client::CasLogin::ISA = ( 'TWiki::Client' );
+@TWiki::Client::CasLogin::ISA = ('TWiki::Client');
 
 sub new {
-    my( $class, $session ) = @_;
+    my ( $class, $session ) = @_;
 
     my $this = bless( $class->SUPER::new($session), $class );
 
-    $session->enterContext( 'can_login' );
+    $session->enterContext('can_login');
     return $this;
 }
 
 # Triggered on auth fail : redirects to the login script which in turn will go to CAS
 sub forceAuthentication {
-    my $this = shift;
+    my $this  = shift;
     my $twiki = $this->{twiki};
 
-#    TWiki::Client::_trace($this, "CasLogin::forceAuthentication()");
+    #    TWiki::Client::_trace($this, "CasLogin::forceAuthentication()");
 
-    unless( $twiki->inContext( 'authenticated' )) {
+    unless ( $twiki->inContext('authenticated') ) {
         my $query = $twiki->{cgiQuery};
+
         # Redirect with passthrough so we don't lose the original query params
         my $twiki = $this->{twiki};
         my $topic = $twiki->{topicName};
-        my $web = $twiki->{webName};
+        my $web   = $twiki->{webName};
 
-	# simple URL of the login script (not using loginUrl() to not provide additional args not necessary when calling redirect and not real redirect)
-        my $url = $twiki->getScriptUrl( 0, 'login', $web, $topic);
-        $query->param( -name=>'origurl', -value=>$ENV{REQUEST_URI} );
+# simple URL of the login script (not using loginUrl() to not provide additional args not necessary when calling redirect and not real redirect)
+        my $url = $twiki->getScriptUrl( 0, 'login', $web, $topic );
+        $query->param( -name => 'origurl', -value => $ENV{REQUEST_URI} );
 
-	# redirect to the login script by asking it to transfer to origurl one authenticated successfully
+# redirect to the login script by asking it to transfer to origurl one authenticated successfully
         $twiki->redirect( $url, 1 );
         return 1;
     }
@@ -83,15 +84,15 @@ sub forceAuthentication {
 sub loginUrl {
     my $this = shift;
 
-#    TWiki::Client::_trace($this, "CasLogin::loginUrl()");
+    #    TWiki::Client::_trace($this, "CasLogin::loginUrl()");
 
     my $twiki = $this->{twiki};
     my $topic = $twiki->{topicName};
-    my $web = $twiki->{webName};
+    my $web   = $twiki->{webName};
 
-    # generate a link to the login script with origurl param to return to the same place (view normally)
+# generate a link to the login script with origurl param to return to the same place (view normally)
     return $twiki->getScriptUrl( 0, 'login', $web, $topic,
-                                 origurl => $ENV{REQUEST_URI} );
+        origurl => $ENV{REQUEST_URI} );
 }
 
 =pod
@@ -115,28 +116,29 @@ the trip to the CAS server, by using the 'my_orig' session variable.
 =cut
 
 sub login {
-    my( $this, $query, $twikiSession ) = @_;
+    my ( $this, $query, $twikiSession ) = @_;
 
-#    TWiki::Client::_trace($this, "CasLogin::login()");
+    #    TWiki::Client::_trace($this, "CasLogin::login()");
 
     my $twiki = $this->{twiki};
 
     my $casUrl = $TWiki::cfg{CAS}{casUrl};
     my $CAFile = $TWiki::cfg{CAS}{CAFile};
-    my $cas = new AuthCAS(casUrl => $casUrl,
-                          CAFile => $CAFile
-                         );
-    
-    my $url = $query->url();
-    my $origurl = $query->param( 'origurl' );
-    my $app_url = $TWiki::cfg{DefaultUrlHost};
-    my $remember = $query->param( 'remember' );
+    my $cas    = new AuthCAS(
+        casUrl => $casUrl,
+        CAFile => $CAFile
+    );
 
-    # this is a param provided by CAS server to the app it redirects to upon succesfull login
-    my $ticket = $query->param( 'ticket' );
+    my $url      = $query->url();
+    my $origurl  = $query->param('origurl');
+    my $app_url  = $TWiki::cfg{DefaultUrlHost};
+    my $remember = $query->param('remember');
+
+# this is a param provided by CAS server to the app it redirects to upon succesfull login
+    my $ticket = $query->param('ticket');
 
     # Eat these so there's no risk of accidental passthrough
-    $query->delete('origurl', 'ticket');
+    $query->delete( 'origurl', 'ticket' );
 
     my $cgisession = $this->{_cgisession};
 
@@ -144,55 +146,60 @@ sub login {
 
     my $error = '';
 
-    if( $ticket ) {
+    if ($ticket) {
 
-	# now we've been redirected here by the CAS server
+        # now we've been redirected here by the CAS server
 
-	#TWiki::Client::_trace($this, "CasLogin::login : we have a ticket : $ticket");
+  #TWiki::Client::_trace($this, "CasLogin::login : we have a ticket : $ticket");
 
-	# retrieve the original orig_url that had been passed to the login script
-        $origurl = $cgisession->param( 'my_orig' );
-        $cgisession->clear(['my_orig']);
+       # retrieve the original orig_url that had been passed to the login script
+        $origurl = $cgisession->param('my_orig');
+        $cgisession->clear( ['my_orig'] );
 
-	# validate the ticket with our login URL
-        my $loginName = $cas->validateST($url, $ticket);
+        # validate the ticket with our login URL
+        my $loginName = $cas->validateST( $url, $ticket );
 
-	# if validation is successfull, we have the login name
-        if( $loginName ) {
+        # if validation is successfull, we have the login name
+        if ($loginName) {
+
 #	    TWiki::Client::_trace($this, "CasLogin::login : we have a login : $loginName");
 
-	    # notifiy parent class that user is logged-in
-            $this->userLoggedIn( $loginName );
+            # notifiy parent class that user is logged-in
+            $this->userLoggedIn($loginName);
 
             #SUCCESS our user is authenticated..
 
             # Redirect with passthrough
-	    # get back to where authentication was requested
-            $twikiSession->redirect($origurl, 1 );
+            # get back to where authentication was requested
+            $twikiSession->redirect( $origurl, 1 );
             return;
         }
-	else
-	{
-	    # autherwise, authentication was refused
-	    printf STDERR "Error: %s\n", &AuthCAS::get_errors();
-	    # would need some kind of banner in case of unsuccesfull auth (reuse templatelogin)
-	    exit 0;
-	}
-    } else {
-	# initially called by explicit login script or forceauthentication() pseudo redirect
+        else {
 
-	# save previous origurl into my_orig in the session to b able to retrieve it when coming back from CAS server's login screen
-	$cgisession->param( 'my_orig', $origurl ) if $cgisession;
+            # autherwise, authentication was refused
+            printf STDERR "Error: %s\n", &AuthCAS::get_errors();
 
-	###
-	### Redirect the User for login at CAS server
-	###
+# would need some kind of banner in case of unsuccesfull auth (reuse templatelogin)
+            exit 0;
+        }
+    }
+    else {
 
-	# Redirect the server so that we get back to login afterwards and be able to consume the ticket parameter
-	my $login_url = $cas->getServerLoginURL($url);
-	# real redirect
-	print "Location: $login_url\n\n";
-	exit 0;
+# initially called by explicit login script or forceauthentication() pseudo redirect
+
+# save previous origurl into my_orig in the session to b able to retrieve it when coming back from CAS server's login screen
+        $cgisession->param( 'my_orig', $origurl ) if $cgisession;
+
+        ###
+        ### Redirect the User for login at CAS server
+        ###
+
+# Redirect the server so that we get back to login afterwards and be able to consume the ticket parameter
+        my $login_url = $cas->getServerLoginURL($url);
+
+        # real redirect
+        print "Location: $login_url\n\n";
+        exit 0;
     }
 }
 

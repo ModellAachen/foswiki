@@ -20,7 +20,6 @@
 
 =cut
 
-
 package Foswiki::Plugins::WordPressPlugin;
 
 use strict;
@@ -28,8 +27,8 @@ use strict;
 require Foswiki::Func;       # The plugins API
 require Foswiki::Plugins;    # For the API version
 
-our $VERSION = '$Rev: 3193 $';
-our $RELEASE = '$Date: 2009-03-20 03:32:09 +1100 (Fri, 20 Mar 2009) $';
+our $VERSION          = '$Rev: 3193 $';
+our $RELEASE          = '$Date: 2009-03-20 03:32:09 +1100 (Fri, 20 Mar 2009) $';
 our $SHORTDESCRIPTION = 'post a topic to your WordPress blog';
 our $NO_PREFS_IN_TOPIC = 1;
 
@@ -69,7 +68,7 @@ sub initPlugin {
         return 0;
     }
 
-#    Foswiki::Func::registerTagHandler( 'EXAMPLETAG', \&_EXAMPLETAG );
+    #    Foswiki::Func::registerTagHandler( 'EXAMPLETAG', \&_EXAMPLETAG );
     Foswiki::Func::registerRESTHandler( 'post', \&postTopic );
 
     # Plugin correctly initialized
@@ -106,44 +105,51 @@ supported post values are
 =cut
 
 sub postTopic {
-   my ($session) = @_;
+    my ($session) = @_;
 
-   use WordPress::Post;
+    use WordPress::Post;
 
-   my $o= WordPress::Post->new ({ 
-      proxy => $Foswiki::cfg{WordPressPlugin}{Host},
-      username => $Foswiki::cfg{WordPressPlugin}{User},
-      password => $Foswiki::cfg{WordPressPlugin}{Password}
-   });
-   
-   my $reqTopic = Foswiki::Func::getRequestObject()->param('topic');
-   my ($web, $topic) = Foswiki::Func::normalizeWebTopicName( undef, $reqTopic );
-   my ($meta, $text ) = Foswiki::Func::readTopic( $web, $topic );
-   
-   my $title = "$web $topic";
-   if ($text =~ /^\s*---\+*/m) {
-      $text =~ s/^\s*---\+*(.*)\n//m;
-      $title = $1;
-      $title =~ s/^[!\s]*//;
-      $title = Foswiki::Func::expandCommonVariables( $title, $topic, $web, $meta );
-   }
-   
-   #remove commented out html..
-   $text =~ s/<!--.*?-->//gs;
-   
-   my $renderedText = Foswiki::Func::expandCommonVariables( $text, $topic, $web, $meta );
-   my $html = Foswiki::Func::renderText($renderedText, $web, $topic);
+    my $o = WordPress::Post->new(
+        {
+            proxy    => $Foswiki::cfg{WordPressPlugin}{Host},
+            username => $Foswiki::cfg{WordPressPlugin}{User},
+            password => $Foswiki::cfg{WordPressPlugin}{Password}
+        }
+    );
 
-   my $id = $o->post({
-      title => $title,
-      description => $html,      
-   });
-   
-   if ($id eq 0) {
-      return "Error posting to blog, see error log for more information";
-   }
-   
-   return 'topic posted: '.$id;
+    my $reqTopic = Foswiki::Func::getRequestObject()->param('topic');
+    my ( $web, $topic ) =
+      Foswiki::Func::normalizeWebTopicName( undef, $reqTopic );
+    my ( $meta, $text ) = Foswiki::Func::readTopic( $web, $topic );
+
+    my $title = "$web $topic";
+    if ( $text =~ /^\s*---\+*/m ) {
+        $text =~ s/^\s*---\+*(.*)\n//m;
+        $title = $1;
+        $title =~ s/^[!\s]*//;
+        $title =
+          Foswiki::Func::expandCommonVariables( $title, $topic, $web, $meta );
+    }
+
+    #remove commented out html..
+    $text =~ s/<!--.*?-->//gs;
+
+    my $renderedText =
+      Foswiki::Func::expandCommonVariables( $text, $topic, $web, $meta );
+    my $html = Foswiki::Func::renderText( $renderedText, $web, $topic );
+
+    my $id = $o->post(
+        {
+            title       => $title,
+            description => $html,
+        }
+    );
+
+    if ( $id eq 0 ) {
+        return "Error posting to blog, see error log for more information";
+    }
+
+    return 'topic posted: ' . $id;
 }
 
 1;

@@ -27,6 +27,7 @@ Aims to provide an alternative to:
 |  Release: | %$RELEASE% |
 |  Version: | %$VERSION% |
 |  Change&nbsp;History: | <!-- versions below in reverse order -->&nbsp; |
+|  31 Jan 2011 (0.3) | Foswikitask:Item11485 - rename formatbranch -> branchformat; fix tragic branch/header format bug |
 |  04 Nov 2010 (0.1) | Foswikitask:Item9874 - Initial version |
 |  Home: | http://foswiki.org/Extensions/%TOPIC% |
 |  Support: | http://foswiki.org/Support/%TOPIC% |

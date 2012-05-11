@@ -2,6 +2,9 @@
 data/Main/AntiWikiSpamBypassGroup.txt 0644 Documentation
 data/System/AntiWikiSpamPlugin.txt 0644 Documentation
 data/System/AntiWikiSpamLocalList.txt 0644 Documentation
+data/System/AntiWikiSpamRegistrationWhiteList.txt 0644 Documentation
+data/System/AntiWikiSpamRegistrationBlackList.txt 0644 Documentation
 data/Sandbox/AntiWikiSpamTestTopic.txt 0644 Documentation
 lib/Foswiki/Plugins/AntiWikiSpamPlugin.pm 0644 Perl module
+lib/Foswiki/Plugins/AntiWikiSpamPlugin/Core.pm 0644 Perl module
 lib/Foswiki/Plugins/AntiWikiSpamPlugin/Config.spec 0644 Settings

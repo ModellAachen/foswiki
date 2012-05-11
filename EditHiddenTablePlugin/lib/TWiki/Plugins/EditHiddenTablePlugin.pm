@@ -12,14 +12,14 @@
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details, published at 
+# GNU General Public License for more details, published at
 # http://www.gnu.org/copyleft/gpl.html
 #
 # =========================
 #
 # Enhancements/Bugs
 # 1.Need to give same flexibilities as in EditTablerowPlugin in terms of config
-# Do we need to differentiate between changerows and addrows? Also, if no 
+# Do we need to differentiate between changerows and addrows? Also, if no
 # adding of rows is allowed, there should also be no copy/delete button?
 # 2. No handling of footer yet
 # 3. Need to differntiate between update and add
@@ -32,78 +32,80 @@ use strict;
 
 # =========================
 use vars qw(
-        $web $topic $user $installWeb $VERSION $RELEASE $debug $pluginName
-        $prefsInitialized $prefCHANGEROWS $prefEDITBUTTON $prefEDITLINK
-    );
+  $web $topic $user $installWeb $VERSION $RELEASE $debug $pluginName
+  $prefsInitialized $prefCHANGEROWS $prefEDITBUTTON $prefEDITLINK
+);
 
-$VERSION = '$Rev: 0$';
-$RELEASE = 'Dakar';
-$pluginName = 'EditHiddenTablePlugin';  # Name of this Plugin
-$prefsInitialized  = 0;
+$VERSION          = '$Rev: 0$';
+$RELEASE          = 'Dakar';
+$pluginName       = 'EditHiddenTablePlugin';    # Name of this Plugin
+$prefsInitialized = 0;
 
 use TWiki::Form;
 
 # =========================
-sub initPlugin
-{
+sub initPlugin {
     ( $topic, $web, $user, $installWeb ) = @_;
 
     # check for Plugins.pm versions
-    if( $TWiki::Plugins::VERSION < 1.1 ) {
-        TWiki::Func::writeWarning( "This version of $pluginName works only with TWiki 4 and greater." );
+    if ( $TWiki::Plugins::VERSION < 1.1 ) {
+        TWiki::Func::writeWarning(
+            "This version of $pluginName works only with TWiki 4 and greater.");
         return 0;
     }
 
     # Get plugin debug flag
-    $debug = &TWiki::Func::getPreferencesFlag( "\U$pluginName\E_DEBUG" );
+    $debug = &TWiki::Func::getPreferencesFlag("\U$pluginName\E_DEBUG");
 
     $prefsInitialized = 0;
 
-# TW: disabled until migrated
-#    TWiki::Func::registerTagHandler( 'METATABLESEARCH', \&searchWeb,
-#                                     'context-free' );
+    # TW: disabled until migrated
+    #    TWiki::Func::registerTagHandler( 'METATABLESEARCH', \&searchWeb,
+    #                                     'context-free' );
     TWiki::Func::registerTagHandler( 'EDITHIDDENTABLE', \&handler,
-                                     'context-free' );
+        'context-free' );
 
     # Plugin correctly initialized
-    &TWiki::Func::writeDebug( "- ${pluginName}::initPlugin( $web.$topic ) is OK" ) if $debug;
+    &TWiki::Func::writeDebug("- ${pluginName}::initPlugin( $web.$topic ) is OK")
+      if $debug;
 
     return 1;
 }
 
 sub handler {
 
-  unless( $prefsInitialized ) {
-    my $cgi = TWiki::Func::getCgiQuery();
-    return unless $cgi;
+    unless ($prefsInitialized) {
+        my $cgi = TWiki::Func::getCgiQuery();
+        return unless $cgi;
 
-    $prefCHANGEROWS = 
-      &TWiki::Func::getPreferencesValue("CHANGEROWS") ||
-      &TWiki::Func::getPreferencesValue("EDITMETATABLEROWPLUGIN_CHANGEROWS") ||
-      'on';
-    $prefEDITBUTTON =
-      &TWiki::Func::getPreferencesValue("EDITBUTTON") ||
-      &TWiki::Func::getPreferencesValue("EDITMETATABLEROWPLUGIN_EDITBUTTON") ||
-      'Edit table';
-    $prefEDITLINK =
-      &TWiki::Func::getPreferencesValue("EDITLINK") ||
-      &TWiki::Func::getPreferencesValue("EDITMETATABLEROWPLUGIN_EDITLINK") ||
-      '';
+        $prefCHANGEROWS = &TWiki::Func::getPreferencesValue("CHANGEROWS")
+          || &TWiki::Func::getPreferencesValue(
+            "EDITMETATABLEROWPLUGIN_CHANGEROWS")
+          || 'on';
+        $prefEDITBUTTON = &TWiki::Func::getPreferencesValue("EDITBUTTON")
+          || &TWiki::Func::getPreferencesValue(
+            "EDITMETATABLEROWPLUGIN_EDITBUTTON")
+          || 'Edit table';
+        $prefEDITLINK = &TWiki::Func::getPreferencesValue("EDITLINK")
+          || &TWiki::Func::getPreferencesValue(
+            "EDITMETATABLEROWPLUGIN_EDITLINK")
+          || '';
 
-    $TWiki::Plugins::EditHiddenTablePlugin::prefsInitialized = 1;
-  }
+        $TWiki::Plugins::EditHiddenTablePlugin::prefsInitialized = 1;
+    }
 
-  # on-demand inclusion
-  eval 'use TWiki::Plugins::EditHiddenTablePlugin::Edit';
-  die $@ if $@;
-  TWiki::Plugins::EditHiddenTablePlugin::Edit::handleEditTableTag( @_ );
+    # on-demand inclusion
+    eval 'use TWiki::Plugins::EditHiddenTablePlugin::Edit';
+    die $@ if $@;
+    TWiki::Plugins::EditHiddenTablePlugin::Edit::handleEditTableTag(@_);
 }
 
 sub searchWeb {
-  # on-demand inclusion
-  eval 'use TWiki::Plugins::EditHiddenTablePlugin::Search';
-  die $@ if $@;
-  TWiki::Plugins::EditHiddenTablePlugin::Search::handleTableSearchWeb( @_ );
+
+    # on-demand inclusion
+    eval 'use TWiki::Plugins::EditHiddenTablePlugin::Search';
+    die $@ if $@;
+    TWiki::Plugins::EditHiddenTablePlugin::Search::handleTableSearchWeb(@_);
 }
 
 1;

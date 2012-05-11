@@ -18,7 +18,7 @@ package Foswiki::Plugins::TopicInteractionPlugin::Action::CreateLinks;
 use strict;
 use warnings;
 use Error qw( :try );
-use Foswiki::Plugins::DBCachePlugin ();
+use Foswiki::Func ();
 use Foswiki::Plugins::TopicInteractionPlugin::Core ();
 use constant DRY => 0; # toggle me
 
@@ -32,7 +32,11 @@ sub handle {
   my $id = $params->{id};
 
   # disable dbcache handler during loop
-  Foswiki::Plugins::DBCachePlugin::disableRenameHandler();
+  my $dbCacheEnabled = Foswiki::Func::getContext()->{DBCachePluginEnabled};
+  if ($dbCacheEnabled) {
+    require Foswiki::Plugins::DBCachePlugin;
+    Foswiki::Plugins::DBCachePlugin::disableRenameHandler();
+  }
 
   my $error;
   foreach my $fileName (@fileNames) {
@@ -67,11 +71,13 @@ sub handle {
     last if $error;
   }
 
-  # enabling dbcache handlers again
-  Foswiki::Plugins::DBCachePlugin::enableRenameHandler();
+  if ($dbCacheEnabled) {
+    # enabling dbcache handlers again
+    Foswiki::Plugins::DBCachePlugin::enableRenameHandler();
 
-  # manually update this topic
-  Foswiki::Plugins::DBCachePlugin::loadTopic($web, $topic);
+    # manually update this topic
+    Foswiki::Plugins::DBCachePlugin::loadTopic($web, $topic);
+  }
 
   if ($error) {
     Foswiki::Plugins::TopicInteractionPlugin::Core::printJSONRPC($response, 1, $error, $id);

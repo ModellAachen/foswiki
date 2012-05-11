@@ -1,0 +1,111 @@
+---+!! <nop>DateTime Contrib
+This topic is primarily meant for Foswiki developers.
+
+%TOC%
+
+---++ Introduction
+<noautolink>
+DateTime Contrib enables the use of the data type =datetime= in data forms. Under the hood it uses the extensive [[http://datetime.perl.org/][DateTime]] libraries, including:
+   * [[http://search.cpan.org/~drolsky/DateTime-0.74/lib/DateTime.pm][DateTime]]
+   * =DateTime::Format::Strptime=
+   * =DateTime::Locale=
+   * =DateTime::Timezone=
+   
+DateTime Contrib adds the field definition =Datetime= to =/lib/Foswiki/Forms/=
+</noautolink>
+
+
+---++ Usage
+---+++ Working with dates
+   * Date-time strings are parsed as dates as long as they adhere to one of the input formats (see below). 
+      * The format is similar to [[http://www.w3.org/TR/NOTE-datetime][W3C Date and Time Formats]], but without the string delimiters. For example: =2012-05-31 19:59:59=. 
+   * Dates are rendered in local time and formatted according to Configure setting ={<nop>DefaultDateTimeFormat}=.
+   * Times are in UTC and can have a time zone offset specified, either an offset number or a time zone name.
+      * A time zone offset number is relative to UTC, in the form of a sign character (+/-) followed by a four digit time providing hours and minutes of the offset; no colon is used.
+      * A time zone name is one of the [[http://en.wikipedia.org/wiki/List_of_tz_database_time_zones][Olson Time Zone names]].
+
+
+---+++ Supported input formats
+| Simplest                             | =2012-05-05 15:28:37= | UTC time is assumed |
+| Time zone offset (number)            | =2012-05-05 15:28:37 -0500= | Offset should not include Daylight Savings |
+| Time zone name                       | =2012-05-05 15:28:37 America/Nassau= | One of the [[http://en.wikipedia.org/wiki/List_of_tz_database_time_zones][Olson Time Zone names]]. Offset will be calculated automatically. |
+| Time zone offset plus time zone name | =2012-05-05 15:28:37 -0500 America/Nassau= | Probably redundant format |
+
+
+---+++ Supported output formats
+Dates are rendered according to Configure setting ={<nop>DefaultDateTimeFormat}=, which may contain tokens shown in the table below.
+<noautolink>
+| *Token* | *Rendering* |
+| =%a= | The abbreviated weekday name. |
+| =%A= | The full weekday name. |
+| =%b= | The abbreviated month name. |
+| =%B= | The full month name. |
+| =%c= | The default datetime format for the object's locale. |
+| =%C= | The century number (year/100) as a 2-digit integer. |
+| =%d= | The day of the month as a decimal number (range 01 to 31). |
+| =%D= | Equivalent to =%m/%d/%y=. This is not a good standard format if you want folks from both the United States and the rest of the world to understand the date! |
+| =%e= | Like =%d=, the day of the month as a decimal number, but a leading zero is replaced by a space. |
+| =%F= | Equivalent to =%Y-%m-%d= (the ISO 8601 date format) |
+| =%G= | The ISO 8601 year with century as a decimal number. The 4-digit year corresponding to the ISO week number (see =%V=). This has the same format and value as =%Y=, except that if the ISO week number belongs to the previous or next year, that year is used instead. (TZ) |
+| =%g= | Like =%G=, but without century, i.e., with a 2-digit year (00-99). |
+| =%h= | Equivalent to =%b=. |
+| =%H= | The hour as a decimal number using a 24-hour clock (range 00 to 23). |
+| =%I= | The hour as a decimal number using a 12-hour clock (range 01 to 12). |
+| =%j= | The day of the year as a decimal number (range 001 to 366). |
+| =%k= | The hour (24-hour clock) as a decimal number (range 0 to 23); single digits are preceded by a blank. (See also =%H=.) |
+| =%l= | The hour (12-hour clock) as a decimal number (range 1 to 12); single digits are preceded by a blank. (See also =%I=.) |
+| =%m= | The month as a decimal number (range 01 to 12). |
+| =%M= | The minute as a decimal number (range 00 to 59). |
+| =%n= | A newline character. |
+| =%N= | The fractional seconds digits - <span class='foswikiAlert'>not supported</span>. |
+| =%p= | Either 'AM' or 'PM' according to the given time value, or the corresponding strings for the current locale. Noon is treated as 'pm' and midnight as 'am'. |
+| =%P= | Like =%p= but in lowercase: 'am' or 'pm' or a corresponding string for the current locale. |
+| =%r= | The time in a.m. or p.m. notation. In the POSIX locale this is equivalent to ='%I:%M:%S %p'=. |
+| =%R= | The time in 24-hour notation (=%H:%M=). (SU) For a version including the seconds, see =%T= below. |
+| =%s= | The number of seconds since the epoch. |
+| =%S= | The second as a decimal number (range 00 to 61). |
+| =%t= | A tab character. |
+| =%T= | The time in 24-hour notation (=%H:%M:%S=). |
+| =%u= | The day of the week as a decimal, range 1 to 7, Monday being 1. See also =%w=. |
+| =%U= | The week number of the current year as a decimal number, range 00 to 53, starting with the first Sunday as the first day of week 01. See also =%V= and =%W=. |
+| =%V= | The ISO 8601:1988 week number of the current year as a decimal number, range 01 to 53, where week 1 is the first week that has at least 4 days in the current year, and with Monday as the first day of the week. See also =%U= and =%W=. |
+| =%w= | The day of the week as a decimal, range 0 to 6, Sunday being 0. See also =%u=. |
+| =%W= | The week number of the current year as a decimal number, range 00 to 53, starting with the first Monday as the first day of week 01. |
+| =%x= | The default date format for the object's locale. |
+| =%X= | The default time format for the object's locale. |
+| =%y= | The year as a decimal number without a century (range 00 to 99). |
+| =%Y= | The year as a decimal number including the century. |
+| =%z= | The time-zone as hour offset from UTC. Required to emit RFC822-conformant dates (using ="%a, %d %b %Y %H:%M:%S %z"=). |
+| =%Z= | The time zone or name or abbreviation. |
+| =%%= | A literal ='%'= character. |
+</noautolink>
+Overview copied from [[http://search.cpan.org/~drolsky/DateTime-0.74/lib/DateTime.pm][DateTime]].
+
+
+---+++ Data form template
+In a data form, specify =datetime= as type. For instance:
+<verbatim>
+| *Name* | *Type*   | *Size* |
+| Name   | text     | 100    |
+| Date   | datetime | 35     |
+</verbatim>
+
+
+---++ Installation Instructions
+%$INSTALL_INSTRUCTIONS%
+
+
+---++ Contrib Info
+|  Contrib Author: | Foswiki:Main.ArthurClemens |
+|  Copyright: | &copy; 2012 Arthur Clemens and Foswiki Contributors | 
+|  License: | GPL ([[http://www.gnu.org/copyleft/gpl.html][GNU General Public License]]) |
+|  Version: | %$VERSION% |
+|  Release: | %$RELEASE% |
+|  Change History: | <!-- versions below in reverse order -->&nbsp; |
+|  06 May 2012 | 1.0 Arthur Clemens First release |
+|  CPAN Dependencies: | none |
+|  Other Dependencies: | none |
+|  Perl Version: | 5.005 |
+|  License: | GPL ([[http://www.gnu.org/copyleft/gpl.html][GNU General Public License]]) |
+|  Plugin Home: | http://foswiki.org/Extensions/%TOPIC% |
+|  Support: | http://foswiki.org/Support/%TOPIC% |

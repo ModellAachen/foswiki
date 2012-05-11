@@ -15,7 +15,7 @@ sub TRYME {
       Foswiki::Func::getPreferencesValue('REQUIRED_EXTENSIONS');
     if ($reqd_extensions) {
 
-	# Check if the required extensions are available on this install of Foswiki
+     # Check if the required extensions are available on this install of Foswiki
         my @extensions = split( /, */, $reqd_extensions );
         if ( scalar @extensions gt 0 ) {
             foreach my $extension (@extensions) {
@@ -30,7 +30,7 @@ sub TRYME {
 "\n<div class='foswikiAlert'>Required extension \'$extension\' is not installed/enabled</div>\n\n";
                     }
 
-		    # If a Contrib/AddOn is referenced check that there is a topic in the %SYSTEMWEB% with the same name
+# If a Contrib/AddOn is referenced check that there is a topic in the %SYSTEMWEB% with the same name
                 }
                 elsif ( $extension =~ /Contrib|AddOn/mi ) {
                     unless (
@@ -47,7 +47,7 @@ sub TRYME {
         }
     }
 
-    # If $return_text is defined, disable the test button as it will not work on this install of Foswiki
+# If $return_text is defined, disable the test button as it will not work on this install of Foswiki
     if ($return_text) {
         Foswiki::Func::writeWarning($return_text);
         $return_text .=
@@ -95,7 +95,7 @@ sub doTRYME {
         Foswiki::Meta->new( $session, $targetWeb )
           ->populateNewWeb( '_empty', {} );
 
-	# Add a default WebHome topic which will list all applications in this new web
+  # Add a default WebHome topic which will list all applications in this new web
         ( $meta, $text ) = ( '', '' );
         $text .=
           '---+!! Welcome to your personal playpen web for testing Web Apps';
@@ -126,19 +126,19 @@ sub doTRYME {
         }
         else {
 
-	    # Copy the default UserCommentsTemplate topic to the playpen
-	    #my ($meta, $text) = Foswiki::Func::readTopic('System', $user_comments_template);
+# Copy the default UserCommentsTemplate topic to the playpen
+#my ($meta, $text) = Foswiki::Func::readTopic('System', $user_comments_template);
             $comment_topics[0] =~ s/Template//g;
             $text =
 "\n<verbatim>\n%TMPL:INCLUDE{\"$comment_topics[0]\"}%\n</verbatim>\n";
 
-	    # Must drop the 'Template'  when adding include to the UserCommentsTemplate
+     # Must drop the 'Template'  when adding include to the UserCommentsTemplate
             Foswiki::Func::saveTopic( $targetWeb, $user_comments_template,
                 $meta, $text, { dontlog => 1, minor => 1 } );
         }
     }
 
-    # Find out what is the landing page for the wiki app (Assuming its the first one)
+# Find out what is the landing page for the wiki app (Assuming its the first one)
     my $app_landing_topic = $topics[0];
     foreach $topic (@topics) {
         unless ( Foswiki::Func::topicExists( $web, $topic ) ) {

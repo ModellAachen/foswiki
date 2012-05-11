@@ -1,189 +1,146 @@
-# Plugin for Foswiki - The Free and Open Source Wiki, http://foswiki.org/
-#
-# Copyright (C) 2004-2006 Peter Thoeny, peter@thoeny.org
-# Copyright (C) 2009-2011 Foswiki Contributors
-#
-# For licensing info read LICENSE file in the Foswiki root.
-# This program is free software; you can redistribute it and/or
-# modify it under the terms of the GNU General Public License
-# as published by the Free Software Foundation; either version 2
-# of the License, or (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details, published at
-# http://www.gnu.org/copyleft/gpl.html
-#
-# As per the GPL, removal of this notice is prohibited.
-
-# =========================
+# See bottom of file for license and copyright information
 package Foswiki::Plugins::VarCachePlugin;
+use strict;
+use Assert;
 
-# =========================
-use vars qw(
-  $VERSION $RELEASE $pluginName
-  $debug $paramMsg $NO_PREFS_IN_TOPIC
-);
+our $VERSION           = '$Rev$';
+our $RELEASE           = '1.2';
+our $NO_PREFS_IN_TOPIC = 1;
+our $SHORTDESCRIPTION =
+"Caches the results of expanding macros in selected topics for improved server performance";
 
-# This should always be $Rev$ so that Foswiki can determine the checked-in
-# status of the plugin. It is used by the build automation tools, so
-# you should leave it alone.
-$VERSION = '$Rev$';
+our $MARKER    = "%--\001VARCACHE:";
+our $ENDMARKER = "\001--%";
+our $monkied;
+our @requires;
 
-# This is a free-form string you can use to "name" your own plugin version.
-# It is *not* used by the build automation tools, but is reported as part
-# of the version number in PLUGINDESCRIPTIONS.
-$RELEASE = '1.1';
-
-$pluginName = 'VarCachePlugin';    # Name of this Plugin
-
-$NO_PREFS_IN_TOPIC = 1;
-
-our $installWeb;
-
-# =========================
 sub initPlugin {
-    my ( $topic, $web, $user, $iw ) = @_;
-    $installWeb = $iw;
-
-    # Get plugin debug flag
-    $debug = Foswiki::Func::getPreferencesFlag("VARCACHEPLUGIN_DEBUG");
-
-    # Plugin correctly initialized
-    Foswiki::Func::writeDebug(
-        "- Foswiki::Plugins::${pluginName}::initPlugin( $web.$topic ) is OK")
-      if $debug;
+    my ( $topic, $web ) = @_;
     return 1;
 }
 
-# =========================
+# Use the beforeCommonTagsHandler because we may want to blow away the entire topic text
 sub beforeCommonTagsHandler {
-### my ( $text, $topic, $web ) = @_;   # do not uncomment, use $_[0], $_[1]... instead
-
-    Foswiki::Func::writeDebug(
-        "- ${pluginName}::beforeCommonTagsHandler( $_[2].$_[1] )")
-      if $debug;
+    my ( $text, $topic, $web ) = @_;
 
     return unless ( $_[0] =~ /%VARCACHE/ );
 
-    $_[0] =~ s/%VARCACHE{(.*?)}%/_handleVarCache( $_[2], $_[1], $1 )/ge;
+    $_[0] =~ s/%VARCACHE(?:{(.*?)})?%/_VARCACHE( $web, $topic, $1 )/es;
 
-    $_[0] =~ s/^.*(%--VARCACHE\:read\:.*?--%).*$/$1/os
-      ;    # remove all text if "read cache"
+  # if "read", replace *all* text with marker, as we are going to load the cache
+    if ( $_[0] =~ /(${MARKER}read\@.*?$ENDMARKER)/o ) {
+        $_[0] = $1;
+    }
+    elsif ( $_[0] =~ /(${MARKER}save.*?$ENDMARKER)/o ) {
+
+        # monkey-patch Foswiki::addToZone so we can reap the zones
+        my ( $this, $zone, $id, $data, $requires ) = @_;
+        no warnings 'redefine';
+        $monkied            = \&Foswiki::addToZone;
+        @requires           = ();
+        *Foswiki::addToZone = sub {
+            my @req = @_;
+            shift @req;
+            push( @requires, \@req );
+            &$monkied(@_);
+        };
+        use warnings 'redefine';
+    }
 }
 
-# =========================
 sub afterCommonTagsHandler {
-### my ( $text, $topic, $web ) = @_;   # do not uncomment, use $_[0], $_[1]... instead
 
-    Foswiki::Func::writeDebug(
-        "- ${pluginName}::afterCommonTagsHandler( $_[2].$_[1] )")
-      if $debug;
+    #my ( $text, $topic, $web, $meta ) = @_;
 
-    return unless ( $_[0] =~ /%--VARCACHE\:/ );
+    return unless ( $_[0] =~ /%--\001VARCACHE\:/ );
 
-    if ( $_[0] =~ /%--VARCACHE\:([a-z]+)\:?(.*?)--%/ ) {
-        my $save = ( $1 eq "save" );
-        my $age = $2 || 0;
-        my $cacheFilename = _cacheFileName( $_[2], $_[1], $save );
+    if ( $_[0] =~ /${MARKER}(read\@\d+|save):(.*?)$ENDMARKER/ ) {
+        my $session = $Foswiki::Plugins::SESSION;
+        my ( $act, $tag ) = ( $1, $2 );
+        my ( $web, $topic ) = ( $_[2], $_[1] );
+        my $cacheFilename = _cacheFileName( $web, $topic );
 
-        if ($save) {
+        if ( $act eq 'save' ) {
+
+            ASSERT($monkied) if DEBUG;
+
+            no warnings 'redefine';
+            *Foswiki::addToZone = $monkied;
+            use warnings 'redefine';
 
             # update cache
             Foswiki::Func::saveFile( $cacheFilename, $_[0] );
-            $msg = _formatMsg( $_[2], $_[1] );
-            $_[0] =~ s/%--VARCACHE\:.*?--%/$msg/go;
+            my $msg = _formatMsg( $web, $topic, $tag );
+            $_[0] =~ s/$MARKER.*?$ENDMARKER/$msg/g;
 
+            require Data::Dumper;
+            $Data::Dumper::Indent = 0;
+            Foswiki::Func::saveFile( "${cacheFilename}_head",
+                Data::Dumper->Dump( [ \@requires ], ['r'] ) );
         }
         else {
 
             # read cache
+            ( $act, my $age ) = split( '@', $act );
             my $text = Foswiki::Func::readFile($cacheFilename);
-            $msg = _formatMsg( $_[2], $_[1] );
+            my $msg = _formatMsg( $web, $topic, $tag );
             $msg  =~ s/\$age/_formatAge($age)/geo;
-            $text =~ s/%--VARCACHE.*?--%/$msg/go;
-            $_[0] = $text;
+            $text =~ s/$MARKER.*?$ENDMARKER/$msg/go;
+            $_[0] =~ s/$MARKER.*?$ENDMARKER/$text/o;
+            $cacheFilename .= "_head";
+            $text = Foswiki::Func::readFile($cacheFilename);
+            $text =~ /^(.*)$/s;
+            my $r;
+            eval $1;
+
+            foreach my $require (@$r) {
+                Foswiki::Func::addToZone(@$require);
+            }
         }
     }
 }
 
-# =========================
-sub _formatMsg {
-    my ( $theWeb, $theTopic ) = @_;
-
-    my $msg = $paramMsg;    # FIXME: Global variable not reliable in mod_perl
-    $msg =~ s|<nop>||go;
-    $msg =~
-      s|\$link|%SCRIPTURL%/view%SCRIPTSUFFIX%/%WEB%/%TOPIC%?varcache=refresh|go;
-    $msg =~ s|%ATTACHURL%|%PUBURL%/$installWeb/$pluginName|go;
-    $msg =~ s|%ATTACHURLPATH%|%PUBURLPATH%/$installWeb/$pluginName|go;
-    $msg = Foswiki::Func::expandCommonVariables( $msg, $theTopic, $theWeb );
-    return $msg;
-}
-
-# =========================
-sub _formatAge {
-    my ($age) = @_;
-
-    my $unit = "hours";
-    if ( $age > 24 ) {
-        $age /= 24;
-        $unit = "days";
-    }
-    elsif ( $age < 1 ) {
-        $age *= 60;
-        $unit = "min";
-    }
-    if ( $age >= 3 ) {
-        $age = int($age);
-        return "$age $unit";
-    }
-    return sprintf( "%1.1f $unit", $age );
-}
-
-# =========================
-sub _handleVarCache {
+sub _VARCACHE {
     my ( $theWeb, $theTopic, $theArgs ) = @_;
+    my $attrs = new Foswiki::Attrs($theArgs);
 
     my $query  = Foswiki::Func::getCgiQuery();
     my $action = "check";
     if ($query) {
-        my $tmp = $query->param('varcache') || "";
-        if ( $tmp eq "refresh" ) {
-            $action = "refresh";
-        }
-        else {
-            $action = "" if ( grep { !/^refresh$/ } $query->param );
+        my $tmp = $query->param('varcache');
+        if ( defined $tmp ) {
+            $action = ( $tmp eq "refresh" ) ? "refresh" : "";
         }
     }
 
     if ( $action eq "check" ) {
+
+        # Default action if ?varcache= is not given
         my $filename = _cacheFileName( $theWeb, $theTopic, 0 );
         if ( -e $filename ) {
-            my $now = time();
-            my $cacheTime = ( stat $filename )[9] || 10000000000;
+            my $now       = time();
+            my $cacheTime = ( stat $filename )[9];
 
-            # CODE_SMELL: Assume file system for topics
+            # SMELL: Assumes file system store for topics
             $filename = Foswiki::Func::getDataDir() . "/$theWeb/$theTopic.txt";
             my $topicTime = ( stat $filename )[9] || 10000000000;
             my $refresh =
-                 Foswiki::Func::extractNameValuePair( $theArgs, "refresh" )
+                 $attrs->{_DEFAULT}
+              || $attrs->{"refresh"}
               || Foswiki::Func::getPreferencesValue("VARCACHEPLUGIN_REFRESH")
               || 24;
-            $refresh *= 3600;
+            $refresh *= 3600;    # hours to seconds
             if (   ( ( $refresh == 0 ) || ( $cacheTime >= $now - $refresh ) )
                 && ( $cacheTime >= $topicTime ) )
             {
 
-                # add marker for afterCommonTagsHandler to read cached file
-                $paramMsg =
-                  Foswiki::Func::extractNameValuePair( $theArgs, "cachemsg" )
+                # add marker to signal completePageHandler to read from cache
+                my $paramMsg = $attrs->{"cachemsg"}
                   || Foswiki::Func::getPreferencesValue(
                     "VARCACHEPLUGIN_CACHEMSG")
-                  || 'This topic was cached $age ago ([[$link][refresh]])';
-                $cacheTime = sprintf( "%1.6f", ( $now - $cacheTime ) / 3600 );
-                return "%--VARCACHE\:read:$cacheTime--%";
+                  || 'This topic was cached $age ago ([<nop>[$link][refresh]])';
+                $cacheTime = $now - $cacheTime;
+                return "${MARKER}read\@$cacheTime:$paramMsg$ENDMARKER";
             }
         }
         $action = "refresh";
@@ -191,25 +148,72 @@ sub _handleVarCache {
 
     if ( $action eq "refresh" ) {
 
-        # add marker for afterCommonTagsHandler to refresh cache file
-        $paramMsg =
-             Foswiki::Func::extractNameValuePair( $theArgs, "updatemsg" )
+        # add marker to signal completePageHandler to refresh cache
+        my $paramMsg =
+             $attrs->{"updatemsg"}
           || Foswiki::Func::getPreferencesValue("VARCACHEPLUGIN_UPDATEMSG")
-          || 'This topic is now cached ([[$link][refresh]])';
-        return "%--VARCACHE\:save--%";
+          || 'This topic is now cached ([<nop>[$link][refresh]])';
+        return "${MARKER}save:$paramMsg$ENDMARKER";
     }
 
     # else normal uncached processing
     return "";
 }
 
-# =========================
-sub _cacheFileName {
-    my ( $web, $topic, $mkDir ) = @_;
+sub _formatAge {
+    my ($s) = @_;
+    my @parts;
 
-    my $dir = Foswiki::Func::getWorkArea($pluginName);
-    return "$dir/$web\_$topic.txt";
+    my $h = int( $s / 3600 );
+    push( @parts, $h );
+    $s %= 3600;
+    my $m = int( $s / 60 );
+    push( @parts, $m );
+    $s %= 60;
+    push( @parts, $s );
+
+    return join( ':', map { sprintf( '%02d', $_ ) } @parts );
 }
 
-# =========================
+sub _formatMsg {
+    my ( $theWeb, $theTopic, $msg ) = @_;
+
+    $msg =~ s|\$link|%SCRIPTURL{view}%/%WEB%/%TOPIC%?varcache=refresh|g;
+    $msg =~ s|%ATTACHURL%|%PUBURL%/%SYSTEMWEB%/VarCachePlugin|g;
+    $msg =~ s|%ATTACHURLPATH%|%PUBURLPATH%/%SYSTEMWEB%/VarCachePlugin|g;
+    $msg =~ s|<nop>||g;
+    $msg = Foswiki::Func::decodeFormatTokens($msg);
+    $msg = Foswiki::Func::expandCommonVariables( $msg, $theTopic, $theWeb );
+    $msg = Foswiki::Func::renderText( $msg, $theWeb, $theTopic );
+    return $msg;
+}
+
+sub _cacheFileName {
+    my ( $web, $topic ) = @_;
+
+    my $dir = Foswiki::Func::getWorkArea('VarCachePlugin');
+    return "$dir/$web\_$topic";
+}
+
 1;
+__END__
+Plugin for Foswiki - The Free and Open Source Wiki, http://foswiki.org/
+
+Design and original TWiki implementation by Peter Thoeny
+
+Copyright (C) 2004-2007 Peter Thoeny, peter@thoeny.org
+Copyright (C) 2009-2012 Foswiki Contributors
+
+For licensing info read LICENSE file in the Foswiki root.
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details, published at
+http://www.gnu.org/copyleft/gpl.html
+
+As per the GPL, removal of this notice is prohibited.

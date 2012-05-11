@@ -1,70 +1,10 @@
 /*****************************************************************************
  * styles for the BibtexPlugin
  */
-.bibtex {
-  background:#eeeeee; 
-  border:1px solid #aaaaaa; 
-  text-align:left; 
-  padding:5px;
-}
-.bibtex dl {
-  margin-left:25px;
-  margin-right:25px;
-}
-.bibtex dt a,
-.bibtex dt {
-  color:#003366;
-  font-weight:normal;
-}
-.bibtex dd {
-  margin-left:0px;
-  margin-top:5px;
-  margin-bottom:5px;
-}
-.bibsearch {
-  border:1px solid #aaaaaa; 
-  width:100%;
-  margin-bottom:5px;
-}
-.bibsearch h2 {
-  margin:0px;
-}
-.bibsearch th {
-  color:#444444;
-  font:bold small arial,sans-serif;
-  background:#eeeeee;
-  border-bottom:1px solid #aaaaaa;
-  text-align:left;
-  padding-left:5px;
-  padding-right:5px;
-  padding-top:1px;
-}
-.bibsearch td {
-  padding-left:5px;
-  padding-right:5px;
-  padding-bottom:2px;
-}
-.biboptions td {
-  padding-top:5px;
-  padding-left:0px;
-  padding-right:5px;
-}
 .bibcomment,
 .bibkeywords,
 .bibabstract {
-  padding-top:10px;
-  padding-left:30px;
-  padding-right:30px;
-  padding-bottom:10px;
-  text-align:justify;
-}
-
-.bibsearch .submit {
-  color:green;
-}
-
-.bibsearch .reset {
-  color:blue;
+  padding:1em 0em;
 }
 
 .bibtoggle {

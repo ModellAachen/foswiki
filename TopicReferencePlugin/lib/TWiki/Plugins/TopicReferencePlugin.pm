@@ -12,7 +12,7 @@
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details, published at 
+# GNU General Public License for more details, published at
 # http://www.gnu.org/copyleft/gpl.html
 #
 # =========================
@@ -29,15 +29,14 @@
 #   insidePREHandler     ( $text )
 #   endRenderingHandler  ( $text )
 #
-# initPlugin is required, all other are optional. 
+# initPlugin is required, all other are optional.
 # For increased performance, all handlers except initPlugin are
 # disabled. To enable a handler remove the leading DISABLE_ from
 # the function name.
-# 
+#
 # NOTE: To interact with TWiki use the official TWiki functions
 # in the &TWiki::Func module. Do not reference any functions or
 # variables elsewhere in TWiki!!
-
 
 # =========================
 package TWiki::Plugins::TopicReferencePlugin;
@@ -47,38 +46,41 @@ use strict;
 # =========================
 use vars qw( $VERSION $RELEASE $debug $pluginName );
 
-$VERSION = '1.001';
-$RELEASE = 'Dakar';
-$pluginName= 'TopicReferencePlugin';
+$VERSION    = '1.001';
+$RELEASE    = 'Dakar';
+$pluginName = 'TopicReferencePlugin';
 
 # =========================
-sub initPlugin
-{
+sub initPlugin {
     my ( $topic, $web, $user, $installWeb ) = @_;
 
     # check for Plugins.pm versions
-    if( $TWiki::Plugins::VERSION < 1 ) {
-        &TWiki::Func::writeWarning( "Version mismatch between TopicReferencePlugin and Plugins.pm" );
+    if ( $TWiki::Plugins::VERSION < 1 ) {
+        &TWiki::Func::writeWarning(
+            "Version mismatch between TopicReferencePlugin and Plugins.pm");
         return 0;
     }
 
-    # Get plugin preferences, the variable defined by:          * Set EXAMPLE = ...
-    # $exampleCfgVar = &TWiki::Prefs::getPreferencesValue( "EMPTYPLUGIN_EXAMPLE" ) || "default";
+# Get plugin preferences, the variable defined by:          * Set EXAMPLE = ...
+# $exampleCfgVar = &TWiki::Prefs::getPreferencesValue( "EMPTYPLUGIN_EXAMPLE" ) || "default";
 
     # Get plugin debug flag
-    $debug = &TWiki::Func::getPreferencesFlag( "TOPICREFERENCEPLUGIN_DEBUG" );
+    $debug = &TWiki::Func::getPreferencesFlag("TOPICREFERENCEPLUGIN_DEBUG");
 
     # Plugin correctly initialized
-    &TWiki::Func::writeDebug( "- TWiki::Plugins::TopicReferencePlugin::initPlugin( $web.$topic ) is OK" ) if $debug;
+    &TWiki::Func::writeDebug(
+"- TWiki::Plugins::TopicReferencePlugin::initPlugin( $web.$topic ) is OK"
+    ) if $debug;
     return 1;
 }
 
 # =========================
-sub commonTagsHandler
-{
+sub commonTagsHandler {
 ### my ( $text, $topic, $web ) = @_;   # do not uncomment, use $_[0], $_[1]... instead
 
-    &TWiki::Func::writeDebug( "- ${pluginName}::commonTagsHandler( $_[2].$_[1] )" ) if $debug;
+    &TWiki::Func::writeDebug(
+        "- ${pluginName}::commonTagsHandler( $_[2].$_[1] )")
+      if $debug;
 
     # This is the place to define customized tags and variables
     # Called by sub handleCommonTags, after %INCLUDE:"..."%
@@ -87,35 +89,32 @@ sub commonTagsHandler
     $_[0] =~ s/%TOPICREFERENCELIST{(.*?)}%/&handleTopicRefList($_[2], $1)/ge;
 
 }
+
 # =========================
-sub handleTopicRefList
-{
+sub handleTopicRefList {
     my $currweb = shift;
-    my $tag = shift;
-    my $type = "orphans";
-    my $web = $currweb;
+    my $tag     = shift;
+    my $type    = "orphans";
+    my $web     = $currweb;
     my %params;
     my $out = "";
     my $key;
     my $topic;
 
-    %params = TWiki::Func::extractParameters( $tag );
+    %params = TWiki::Func::extractParameters($tag);
 
-    if(exists($params{_DEFAULT}))
-    {
-        $type = $params{_DEFAULT}; 
+    if ( exists( $params{_DEFAULT} ) ) {
+        $type = $params{_DEFAULT};
     }
 
     $type =~ s/['"]//g;
 
-    if(exists($params{web}))
-    {
+    if ( exists( $params{web} ) ) {
         $web = $params{web};
     }
     $web =~ s/['"]//g;
 
-    if(!TWiki::Func::webExists($web))
-    {
+    if ( !TWiki::Func::webExists($web) ) {
         $out = "Web does not exist. Can't create reference list.";
         return $out;
     }
@@ -125,22 +124,17 @@ sub handleTopicRefList
     my %topicrefs;
 
     # init the reference counts
-    foreach $topic (@topics)
-    {
+    foreach $topic (@topics) {
         $topicrefs{$topic} = 0;
     }
 
     # count the references
-    foreach $topic (@topics)
-    {
-        my $topictext = TWiki::Func::readTopicText($web, $topic, "", 1);
+    foreach $topic (@topics) {
+        my $topictext = TWiki::Func::readTopicText( $web, $topic, "", 1 );
 
-        foreach $key (keys(%topicrefs))
-        {
-            if($key ne $topic)
-            {
-                if($topictext =~ /$key/gs)
-                {
+        foreach $key ( keys(%topicrefs) ) {
+            if ( $key ne $topic ) {
+                if ( $topictext =~ /$key/gs ) {
                     $topicrefs{$key} += 1;
                 }
             }
@@ -148,47 +142,36 @@ sub handleTopicRefList
     }
 
     my $text = 'return "   * [[$key]] ($topicrefs{$key})\n"';
-    if($web ne $currweb)
-    {
+    if ( $web ne $currweb ) {
         $text = 'return "   * [[$web.$key]] ($topicrefs{$key})\n"';
     }
 
     # print the results
-    if($type eq "all")
-    {
-        foreach $key (keys(%topicrefs))
-        {
-             $out .=  eval $text ;
+    if ( $type eq "all" ) {
+        foreach $key ( keys(%topicrefs) ) {
+            $out .= eval $text;
         }
     }
-    elsif($type eq "orphans")
-    {
-        foreach $key (keys(%topicrefs))
-        {
-            if($topicrefs{$key} == 0)
-            {
-                 $out .=  eval $text ;
+    elsif ( $type eq "orphans" ) {
+        foreach $key ( keys(%topicrefs) ) {
+            if ( $topicrefs{$key} == 0 ) {
+                $out .= eval $text;
             }
         }
     }
-    elsif($type eq "hasref")
-    {
-        foreach $key (keys(%topicrefs))
-        {
-            if($topicrefs{$key} > 0)
-            {
-                 $out .=  eval $text ;
+    elsif ( $type eq "hasref" ) {
+        foreach $key ( keys(%topicrefs) ) {
+            if ( $topicrefs{$key} > 0 ) {
+                $out .= eval $text;
             }
         }
     }
-    else
-    {
+    else {
         $out = "Unsupported type: '$type'\n";
     }
 
     return $out;
 }
-
 
 # =========================
 1;

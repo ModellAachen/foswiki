@@ -1,0 +1,35 @@
+.metaDataView table {
+  margin-right:60px;
+  position:relative;
+  cursor:pointer;
+}
+.metaDataView tr.hover td {
+  background: #F4F4F4;
+}
+/*
+.metaDataView tr.selected td {
+  background:#f2f7ff;
+}
+*/
+.metaDataActions {
+  display:none;
+  position:absolute;
+  right:-63px;
+  margin-top:-10px;
+  padding:5px;
+}
+.metaDataActions a {
+  padding:5px;
+  display:block;
+  float:left;
+  vertical-align:middle;
+}
+#metaDataForm tr.name {
+  display:none;
+}
+.ui-dialog .metaDataEdit.foswikiFormSteps {
+  padding:0;
+  margin:0;
+  border:0;
+  background:transparent;
+}

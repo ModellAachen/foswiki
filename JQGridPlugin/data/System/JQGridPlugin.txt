@@ -1,4 +1,4 @@
-%META:TOPICINFO{author="ProjectContributor" comment="save topic" date="1290553816" format="1.1" reprev="3" version="3"}%
+%META:TOPICINFO{author="ProjectContributor" comment="save topic" date="1290553816" format="1.1" version="3"}%
 ---+ %TOPIC%
 
 %STARTSECTION{"summary"}%
@@ -6,7 +6,7 @@ jqGrid is an Ajax-enabled !JavaScript control that provides solutions for
 representing and manipulating tabular data on the web. Since the grid is a
 client-side solution loading data dynamically through Ajax callbacks, it can be
 integrated with any server-side technology, including PHP, ASP, Java Servlets,
-JSP, !ColdFusion, and Perl. For more read the [[%PUBURLPATH%/%SYSTEMWEB%/JQGridPlugin/jqgriddocs/][jqgriddocs]].
+JSP, !ColdFusion, and Perl.
 See also the [[http://www.trirand.com/jqgridwiki/doku.php?id=wiki:jqgriddocs][jqgrid wiki]] for up-to-date documentation.
 %ENDSECTION{"summary"}%
 
@@ -14,7 +14,7 @@ See also the [[http://www.trirand.com/jqgridwiki/doku.php?id=wiki:jqgriddocs][jq
 
 Homepage: http://www.trirand.com/blog/ %BR%
 Author(s): Tony Tomov %BR%
-Version: 4.0.0
+Version: 4.1.2
 
 ---++ Syntax
 =%<nop>GRID{"&lt;query>" form="..." }%=
@@ -23,9 +23,9 @@ render a grid of topics matching the given query
 
 | *Parameter* | *Description* | *Default* |
 | =query= | search query | searching for topics that have the named =form= attached to it |
-| =web= | web where o start the query | BASEWEB |
+| =web= | web where to start the query | BASEWEB |
 | =form= | !DataForm definition which describes the columns of the grid | |
-| =columns= | name of columbns to display; these are the formfield names as specified in the !DataForm definition in the specified =form=; there is a list of special column names that are remapped to topic properties (see below) | all columns in the !DataForm |
+| =columns= | name of columns to display; these are the formfield names as specified in the !DataForm definition in the specified =form=; there is a list of special column names that are remapped to topic properties (see below) | all columns in the !DataForm |
 | =include= | regluar expression columns/formfields must match to be included in the grid model | |
 | =exclude= | regluar expression columns/formfields must NOT match to be included in the grid model | |
 | =rows= | number of rows to display in the grid per page | 20 |
@@ -48,13 +48,13 @@ render a grid of topics matching the given query
 | =colname_width= | (per column option) width of this column in pixel | |
 | =colname_search= | (per column option) toggle on/off if this column is searchable or not | on (off for image columns) |
 | =colname_formatter= | (per column option) specifies one of the standard formatters of jqgrid to be used for this column | formats cell values as is |
-| =colname_formatoptions= | (per column option) additional parameters to be bassed over to the column formatter; see the docu of the formater which these are; this is a list of json objects specified as key:value pairs, comma separated.  | none |
-| =colname_format= | (per column option) specifies a template to be used when formating the a cell of this column; the format string may contain the variables: \
+| =colname_formatoptions= | (per column option) additional parameters to be passed over to the column formatter; see the docu of the formatter which these are; this is a list of json objects specified as key:value pairs, comma separated.  | none |
+| =colname_format= | (per column option) specifies a template to be used when formatting the a cell of this column; the format string may contain the variables: \
   <ul> \
      <li> =${id}=: the id of the row, most often the web.topic name </li> \
      <li> =${value}=: the value of the current cell</li> \
      <li> =${key}=: some custom key as specified in the =colname_formatoptions</li> \
-  </ul> Furthermore the format string may contain any formating features of %SYSTEMWEB%.JQueryTmpl | |
+  </ul> Furthermore the format string may contain any formatting features of %SYSTEMWEB%.JQueryTmpl | |
 | =colname_hidden= | (per column option) boolean value; if set the column will be hidden | on |
 | =id= | id of the grid | Any relevant name |
 | =connector= | connector ID or a topic name; a grid connector is responsible to interact with the jQGrid widget. \
@@ -80,7 +80,7 @@ parameter to %GRID and are mapped to the actual property as follows:
 When [[Foswiki:Extensions/FlexFormPlugin][FlexFormPlugin]] is installed, each cell is rendered using
 =%RENDERFORDISPLAY= expression.
 
-When [[Foswiki:Extesions/ImagePlugin][ImagePlugin]] is installed, each Image/Photo cell is renderd using an
+When [[Foswiki:Extesions/ImagePlugin][ImagePlugin]] is installed, each Image/Photo cell is rendered using an
 =%IMAGE= expression to render thumbnails.
 
 ---++ Examples
@@ -144,6 +144,10 @@ If guests are to make use of %TOPIC% without being logged in, remove the =rest= 
 %$INSTALL_INSTRUCTIONS%
 
 ---++ Plugin Info
+<!--
+   * Set SHORTDESCRIPTION = %$SHORTDESCRIPTION%
+-->
+
 |  Author(s): | Michael Daum |
 |  Copyright: | 2009-2011 Michael Daum http://michaeldaumconsulting.com |
 |  License: | GPL |
@@ -158,7 +162,7 @@ If guests are to make use of %TOPIC% without being logged in, remove the =rest= 
                          added =rownumwidth=, =colname_formatter=, =colname_format=, =colname_formatoptions=, =colname_hidden=; \
                          adding styling to sorted columns; \
                          made recoding query parameters from utf8 to site charset depending on the foswiki api version; \
-                         added new =tmpl= formatter based on %SYSTEMWEB%.JQueryTmpl to be used by the new formating code; \
+                         added new =tmpl= formatter based on %SYSTEMWEB%.JQueryTmpl to be used by the new formatting code; \
                          fixed property map for SEARCH backend (Foswiki:Main/PaulHarvey) |
 |  13 Jun 2011: | (0.9.0) restructured plugin to support arbitrary Connectors; \
                          upgraded to jqgrid-4.0.0; \

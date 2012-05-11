@@ -5,8 +5,8 @@ use Foswiki::Plugins::JQueryPlugin::Plugins ();
 use Foswiki::Contrib::JSTreeContrib::JSTREE ();
 
 sub initPlugin {
-    Foswiki::Plugins::JQueryPlugin::registerPlugin(
-	'JSTree', 'Foswiki::Contrib::JSTreeContrib::JSTREE');
+    Foswiki::Plugins::JQueryPlugin::registerPlugin( 'JSTree',
+        'Foswiki::Contrib::JSTreeContrib::JSTREE' );
     Foswiki::Plugins::JQueryPlugin::createPlugin('JSTree');
 }
 

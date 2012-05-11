@@ -1,5 +1,5 @@
 #!/bin/sh
-# Copyright (C) 2005 Michael Daum <micha@nats.informatik.uni-hamburg.de>
+# Copyright (C) 2005,2009 Michael Daum http://michaeldaumconsulting.com
 #  
 # This file is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License

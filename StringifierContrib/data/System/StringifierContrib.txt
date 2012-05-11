@@ -135,10 +135,11 @@ See Foswiki:Tasks/StringifierContrib for currently open tasks.
 -->
 
 |  Author(s): | Foswiki:Main.MarkusHesse, Foswiki:Main.SvenDowideit, Foswiki:Main.MichaelDaum & Foswiki:Main.AndrewJones |
-|  Copyright: | &copy; 2007, Foswiki:Main.MarkusHesse; &copy; 2009-2011, Foswiki Contributors |
+|  Copyright: | &copy; 2007, Foswiki:Main.MarkusHesse; &copy; 2009-2012, Foswiki Contributors |
 |  Release: | %$RELEASE% |
 |  Version: | %$VERSION% |
 |  Change History: | <!-- versions below in reverse order -->&nbsp; |
+|  07 May 2012: | (2.20) added configuration parameter to specify the encoding of the output of each external helper in use |
 |  17 Oct 2011: | (2.10) using wvText instead of wvHtml now; encoding stringified files to the site's charset now; fixed unit tests to use utf8 exclusively |
 |  05 Sep 2011: | (2.00) added <nop>OpenDocument serializer; removed dependency left-over on Text::Iconv; added dependency on odt2txt; fixed defaults for wv serializer  |
 |  01 Dec 2010: | (1.20) moved core from !StringifierContrib to Stringifier not to disturb =configure= |

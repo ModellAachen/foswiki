@@ -1,13 +1,14 @@
 # Test for DOC_wv.pm
 package Doc_wvTests;
-use FoswikiFnTestCase;
-our @ISA = qw( FoswikiFnTestCase );
+use StringifierTest;
+our @ISA = qw( StringifierTest );
 
 use strict;
+use utf8;
 
+use Encode ();
 use Foswiki::Contrib::Stringifier::Base();
 use Foswiki::Contrib::Stringifier();
-use utf8;
 
 sub set_up {
         my $this = shift;
@@ -63,7 +64,7 @@ sub test_SpecialCharacters {
 
     my $text  = $stringifier->stringForFile($this->{attachmentDir}.'Simple_example.doc');
 
-    $this->assert(($text =~ m/Größer/)==1, "Text Größer not found.");
+    $this->assert_matches($this->encode('Größer'), $text, "Text Größer not found.");
 }
 
 1;

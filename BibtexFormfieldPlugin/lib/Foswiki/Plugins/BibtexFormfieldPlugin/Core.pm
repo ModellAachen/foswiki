@@ -19,169 +19,203 @@ use Foswiki::Plugins ();    # For the API version
 use Foswiki::Form();
 use Text::BibTeX();         # library for parsing bibtex files
 use Data::Dumper;           # library for debugging
-use List::MoreUtils qw(uniq);
 
 # How to debug:
-#    print STDERR "MESSAGE: SCRIPT CALLED!!!";
+#    writeDebug("MESSAGE: SCRIPT CALLED!!!";
 # writeDebug("This debug message goes to working/logs/debug.log");
 
-sub TRACE { 1 }
+sub TRACE     { 0 }
+sub TRACESAVE { 0 }
 
 sub beforeSaveHandler {
     my ( $text, $topic, $web, $topicObject ) = @_;
     my $formData = $topicObject->get('FORM');
-    my %newBibtexCodeStringHash;
-    my %oldBibtexCodeStringHash;
-    my %bibtexFormFieldHash;
-    my %finalHash;
 
     if ( defined $formData and $formData->{name} ) {
         my ( $formWeb, $formTopic ) =
           Foswiki::Func::normalizeWebTopicName( $web, $formData->{name} );
         my $formDef = Foswiki::Form->new( $Foswiki::Plugins::SESSION, $formWeb,
             $formTopic );
-        my ( $bibtexCodeFieldName, @bibtexFieldNames ) =
-          getBibtexFieldNames($formDef);
 
-        my $bibtexCodeString;
-        if ($bibtexCodeFieldName) {
-            writeDebug("Found bibtexCode field!") if TRACE;
+        if ($formDef) {
+            my ( $bibtexCodeFieldName, @bibtexFieldNames ) =
+              getBibtexFieldNames($formDef);
 
-            #~ my $field = $topicObject->get( 'FIELD', $bibtexCodeFieldName );
-            #~ ASSERT( exists $field->{value} and $field->{value} ) if DEBUG;
-            #~ $bibtexCodeString = $field->{value};
-            #~ writeDebug($bibtexCodeString) if TRACE;
-
-            ### parse new bibtexCodeString to Hash
-            %newBibtexCodeStringHash =
-              parseBibtexCodeStringToHash( $topicObject, $bibtexCodeFieldName );
-
-            ### write bibtex form fields to Hash
-            %bibtexFormFieldHash =
-              writeBibtexFieldsToHash( $topicObject, @bibtexFieldNames );
-
-            ### parse old bibtexCodeString to Hash if it exists
-            my ( $topicObjectOld, $textOld, $bibtexCodeStringOld );
-            if ( Foswiki::Func::topicExists( $web, $topic ) ) {
-                my ( $topicObjectOld, $textOld ) =
+            if ($bibtexCodeFieldName) {
+                my ($origTopicObject) =
                   Foswiki::Func::readTopic( $web, $topic );
-                my $formDataOld = $topicObjectOld->get('FORM');
+                my %origData = writeBibtexFieldsToHash( $origTopicObject,
+                    @bibtexFieldNames );
+                my %currentData =
+                  writeBibtexFieldsToHash( $topicObject, @bibtexFieldNames );
+                my $origString =
+                  $origTopicObject->get( 'FIELD', $bibtexCodeFieldName );
+                my $currentString =
+                  $topicObject->get( 'FIELD', $bibtexCodeFieldName );
+                my $type = getBibtexType( $topicObject, $formDef );
+                my $key = getBibtexKey($topicObject);
+                my $finalString;
 
-                my ( $formWebOld, $formTopicOld ) =
-                  Foswiki::Func::normalizeWebTopicName( $web,
-                    $formDataOld->{name} );
-                my $formDefOld =
-                  Foswiki::Form->new( $Foswiki::Plugins::SESSION, $formWebOld,
-                    $formTopicOld );
-                my ( $bibtexCodeFieldNameOld, @bibtexFieldNames ) =
-                  getBibtexFieldNames($formDefOld);
+                writeDebug("Found bibtexCode field!") if TRACE;
+                $origString = $origString->{value} if defined $origString;
+                $currentString = $currentString->{value}
+                  if defined $currentString;
 
-                if ($bibtexCodeFieldNameOld) {
-
-             #~ my $bibtexCodeString =
-             #~ getBibtexCodeString( $topicObjectOld, $bibtexCodeFieldNameOld );
-
-#~ ASSERT( exists ( $topicObjectOld ) and defined( $topicObjectOld ) ) if DEBUG;
-                    %oldBibtexCodeStringHash =
-                      parseBibtexCodeStringToHash( $topicObjectOld,
-                        $bibtexCodeFieldNameOld );
-
-                    %finalHash = mergeHashes( \%newBibtexCodeStringHash,
-                        \%oldBibtexCodeStringHash, \%bibtexFormFieldHash );
-                }
-            }
-            else {
-                ### merge hashes
-                %oldBibtexCodeStringHash =
-                  ();    # dummy hash because old topic didn't exist
-                %finalHash = mergeHashes( \%newBibtexCodeStringHash,
-                    \%oldBibtexCodeStringHash, \%bibtexFormFieldHash );
-            }
-
-            my $finalBibtexStringCode =
-              createNewBibtexCodeString( \%finalHash );
-
-            $topicObject =
-              resetBibtexFormFields( $finalBibtexStringCode, $topicObject,
-                @bibtexFieldNames );
-
-            $topicObject =
-              parseBibtexCodeToFields( $finalBibtexStringCode, $topicObject,
-                @bibtexFieldNames );
-
-            $topicObject->putKeyed(
-                'FIELD',
+                $origString    =~ s/[\r\n]+/\n/g;
+                $currentString =~ s/[\r\n]+/\n/g;
+                ### new currentString has changed? parse it
+                if ( ( defined $origString ? $origString : '' ) ne
+                    ( defined $currentString ? $currentString : '' ) )
                 {
-                    name  => $bibtexCodeFieldName,
-                    value => $finalBibtexStringCode
+                    my %currentStringData = parseStringToHash($currentString);
+
+                    writeDebug( "Different strings, was: \n'"
+                          . ( $origString || '' ) . '\'/'
+                          . length( $origString || '' )
+                          . ", now: \n'"
+                          . ( $currentString || '' ) . '\'/'
+                          . ( length( $currentString || '' ) ) . "\n"
+                          . Data::Dumper->Dump( [ \%currentStringData ] ) )
+                      if TRACESAVE;
+                    if ( scalar( keys %currentStringData ) ) {
+                        $finalString = createNewStringFromData(
+                            type => $type,
+                            key  => $key,
+                            %currentStringData
+                        );
+                    }
+                    else {
+                        $finalString = '';
+                    }
                 }
-            );
+                else {
+                    delete $origData{key};
+                    delete $origData{type};
+                    delete $currentData{key};
+                    delete $currentData{type};
+                    my $ncurrent = scalar( keys %currentData );
+                    my $norig    = scalar( keys %origData );
+                    if ( $ncurrent != $norig ) {
+                        writeDebug(
+                            "Different No. keys, was $norig, now $ncurrent: "
+                              . Data::Dumper->Dump( [ \%origData ] ) . ' vs '
+                              . Data::Dumper->Dump( [ \%currentData ] ) )
+                          if TRACESAVE;
+                        $finalString = createNewStringFromData(
+                            type => $type,
+                            key  => $key,
+                            %currentData
+                        );
+                    }
+                    else {
+                        my @origKeys = keys %origData;
+
+                        while ( !$finalString && scalar(@origKeys) ) {
+                            my $origKey      = pop(@origKeys);
+                            my $origValue    = $origData{$origKey};
+                            my $currentValue = $currentData{$origKey};
+
+                            if ( ( defined $origValue ? $origValue : '' ) ne
+                                ( defined $currentValue ? $currentValue : '' ) )
+                            {
+                                writeDebug(
+"Different key, $origKey => was:\n'$origValue', now:\n'$currentValue'\n"
+                                ) if TRACESAVE;
+                                $finalString = createNewStringFromData(
+                                    type => $type,
+                                    key  => $key,
+                                    %currentData
+                                );
+                            }
+                        }
+                    }
+                }
+
+                if ( defined $finalString ) {
+                    require Encode if TRACESAVE;
+                    writeDebug( "FINAL, was:\n'"
+                          . ( Encode::encode( 'utf8', $origString ) || 'undef' )
+                          . "', now:\n'"
+                          . ( Encode::encode( 'utf8', $finalString ) ) . "', "
+                          . length( $origString || '' ) . '/'
+                          . length($finalString)
+                          . "\n" )
+                      if TRACESAVE;
+                    my %finalData = parseStringToHash($finalString);
+                    foreach my $field (@bibtexFieldNames) {
+                        if ( defined $finalData{$field} ) {
+                            writeDebug(
+                                "PUTTING $field = "
+                                  . (
+                                    defined $finalData{$field}
+                                    ? $finalData{$field}
+                                    : 'undef'
+                                  )
+                                  . "\n"
+                            ) if TRACESAVE;
+                        }
+                        $topicObject->putKeyed(
+                            'FIELD',
+                            {
+                                name => $field,
+
+                     #value => Encode::encode('utf8', $finalData{$field} || ''),
+                                value => $finalData{$field},
+                                title => $field
+                            },
+                        );
+                    }
+                    $topicObject->putKeyed(
+                        'FIELD',
+                        {
+                            name  => $bibtexCodeFieldName,
+                            title => $bibtexCodeFieldName,
+
+                            #value => Encode::encode('utf8', $finalString)
+                            value => $finalString
+                        },
+                    );
+                }
+            }
         }
     }
     else {
-        writeDebug("No bibtex fields detected in '$web.$topic'");
+        writeDebug("No bibtex fields detected in '$web.$topic'") if TRACESAVE;
     }
 
     return;
 }
 
-sub mergeHashes {
-    my ( $newBibtexCodeStringHash, $oldBibtexCodeStringHash,
-        $bibtexFormFieldHash )
-      = @_;
-    my $mergedHash;
-    my $field;
-    my $fieldValue;
-    my @allHashKeys;
+sub getBibtexType {
+    my ( $topicObj, $formDef ) = @_;
+    ASSERT($topicObj);
+    ASSERT($formDef);
+    my $type = $formDef->get( 'FIELD', 'Type' );
 
-    @allHashKeys = (
-        ( keys %$newBibtexCodeStringHash ),
-        ( keys %$oldBibtexCodeStringHash ),
-        ( keys %$bibtexFormFieldHash )
-    );
-
-    @allHashKeys = uniq(@allHashKeys);
-
-    $mergedHash = $newBibtexCodeStringHash;
-
-    foreach my $key (@allHashKeys) {
-        if ( $key ne 'key' and $key ne 'type' )
-        {    # we don't want to edit the bibtex fields 'key' or 'type'
-            if
-              ( # if value exists and is the same in both bibtexCodeStrings overwrite with value of fields
-                exists( $mergedHash->{$key} )
-                and exists( $oldBibtexCodeStringHash->{$key} )
-                and ( $mergedHash->{$key} eq $oldBibtexCodeStringHash->{$key} )
-              )
-            {
-
-#~ if( exists($bibtexFormFieldHash->{$key}) and not ($bibtexFormFieldHash->{$key} eq "") ){
-                if ( exists( $bibtexFormFieldHash->{$key} ) ) {
-                    $mergedHash->{$key} = $bibtexFormFieldHash->{$key};
-                }
-                elsif ( not exists( $bibtexFormFieldHash->{$key} ) ) {
-                    delete $mergedHash
-                      ->{$key};    # remove field if the form field is empty
-                }
-            }
-
-            if
-              ( # if value does *not* exists in both bibtexCodeStrings and exists the field-value overwrite add value of fields
-                not exists( $mergedHash->{$key} )
-                and not exists( $oldBibtexCodeStringHash->{$key} )
-                and exists( $bibtexFormFieldHash->{$key} )
-              )
-            {
-                $mergedHash->{$key} = $bibtexFormFieldHash->{$key};
-            }
-        }
+    $type = $type->{value} if $type;
+    if ( !$type ) {
+        $type = $formDef->topic();
+        $type =~ s/Form$//g;
+        $type = lc($type);
     }
 
-    return %$mergedHash;
+    return $type;
 }
 
-sub createNewBibtexCodeString {
-    my ($mergedHash) = @_;
+sub getBibtexKey {
+    my ( $topicObj, $formDef ) = @_;
+    my $key = $topicObj->get( 'FIELD', 'key' );
+
+    $key = $key->{value} if $key;
+    if ( !$key ) {
+        $key = $topicObj->topic();
+    }
+
+    return $key;
+}
+
+sub createNewStringFromData {
+    my (%data) = @_;
     my $bibtexCodeString;
     my $field;
     my $fieldValue;
@@ -189,82 +223,75 @@ sub createNewBibtexCodeString {
     my $currentKey;
     writeDebug("Creating bibtexCodeString from bibtex atom fields!") if TRACE;
 
-    my $entryType = $mergedHash->{'type'};
-    my $entryKey  = $mergedHash->{'key'};
+    my $entryType = $data{'type'};
+    my $entryKey  = $data{'key'};
 
     $bibtexCodeString = "\@$entryType\{$entryKey,\n";
-    foreach $key ( keys %$mergedHash ) {
-        if ( ( $key ne 'type' ) and ( $key ne 'key' ) ) {
-            $currentKey = $key;
-            $fieldValue = $mergedHash->{$key};
-            $bibtexCodeString =
-              "$bibtexCodeString	$currentKey = \{$fieldValue\},\n";
-        }
-    }
-    $bibtexCodeString = "$bibtexCodeString \}";
+    delete $data{key};
+    delete $data{type};
+    $bibtexCodeString .=
+      join( ",\n", map { "    $_ = {$data{$_}}" } keys %data );
+    $bibtexCodeString .= "\n}";
 
     writeDebug("Value of \$bibtexCodeString:\n $bibtexCodeString");
 
     return $bibtexCodeString;
 }
 
-sub parseBibtexCodeStringToHash {
-    my ( $topicObject, $bibtexCodeFieldName ) = @_;
+sub parseStringToHash {
+    my ($bibtexCodeString) = @_;
+
+    my %parsedFields = ();
 
     #~ ASSERT( exists $topicObject and defined( $topicObject ) ) if DEBUG;
     #~ ASSERT( exists $bibtexCodeFieldName and $bibtexCodeFieldName ) if DEBUG;
     #~ ASSERT( exists $bibtexFieldNames and $bibtexFieldNames ) if DEBUG;
-    my $bibtexCodeString =
-      getBibtexCodeString( $topicObject, $bibtexCodeFieldName );
+    #my $bibtexCodeString =
+    #  getBibtexCodeString( $topicObject, $bibtexCodeFieldName );
 
     #~ ASSERT( exists $bibtexCodeString and $bibtexCodeString ) if DEBUG;
 
-    my $entry = Text::BibTeX::Entry->new();
-    my @fieldList;
-    my $fieldValue;
-    my $fieldName;
-    my $type;
-    my $key;
-    my %parsedFields = ();
+    if ($bibtexCodeString) {
+        my $entry = Text::BibTeX::Entry->new();
+        my @fieldList;
+        my $fieldValue;
+        my $fieldName;
+        my $type;
+        my $key;
 
-    writeDebug("In detection loop, got code string: '$bibtexCodeString'")
-      if TRACE;
-
-    $entry->parse_s($bibtexCodeString);
-
-    if ( $entry->parse_ok ) {
-        writeDebug("bibtexCodeString parsed correctly.") if TRACE;
-    }
-    else {
-        writeDebug("bibtexCodeString parsed *incorrectly*.") if TRACE;
-    }
-    @fieldList = $entry->fieldlist;
-    foreach my $fieldName (@fieldList) {
-
-        #~ writeDebug( "Processing bibtex field '$fieldName' -> "
-        #~ . $entry->get($fieldName) ) if TRACE;
-
-        #~ writeDebug("Parsed field in bibtexForm!!!") if TRACE;
-        my $fieldValue = $entry->get($fieldName);
-
-        # DOI fields often contain an annoying DOI: prefix on the
-        # value. Perhaps there's a good reason for this (Eg. non-DOI
-        # things going into DOI fields), so double-check that RHS
-        # of this junk looks roughly as if it could be a DOI.
-        if ( lc($fieldName) eq 'doi' ) {
-            if ( $fieldValue =~ /^doi:\s*(\d+\..*)$/i ) {
-                $fieldValue = $1;
-            }
-        }
-
-        $parsedFields{$fieldName} = $fieldValue;
-        writeDebug(
-            "The hash field '$fieldName' of '\%parsedFields' has the value: "
-              . $parsedFields{$fieldName} )
+        writeDebug("In detection loop, got code string: '$bibtexCodeString'")
           if TRACE;
+
+        $entry->parse_s($bibtexCodeString);
+
+        if ( $entry->parse_ok ) {
+            writeDebug("bibtexCodeString parsed correctly.") if TRACE;
+        }
+        else {
+            writeDebug("bibtexCodeString parsed *incorrectly*.") if TRACE;
+        }
+        @fieldList = $entry->fieldlist;
+        foreach my $fieldName (@fieldList) {
+
+            my $fieldValue = $entry->get($fieldName);
+
+            # DOI fields often contain an annoying DOI: prefix on the
+            # value. Perhaps there's a good reason for this (Eg. non-DOI
+            # things going into DOI fields), so double-check that RHS
+            # of this junk looks roughly as if it could be a DOI.
+            if ( $fieldName && lc($fieldName) eq 'doi' ) {
+                $fieldValue =~ s/^doi:\s*(\d+\..*)$/$1/ig if $fieldValue;
+            }
+
+            $parsedFields{$fieldName} = $fieldValue;
+            writeDebug(
+"The hash field '$fieldName' of '\%parsedFields' has the value: "
+                  . $parsedFields{$fieldName} )
+              if TRACE;
+        }
+        $parsedFields{'type'} = $entry->type;
+        $parsedFields{'key'}  = $entry->key;
     }
-    $parsedFields{'type'} = $entry->type;
-    $parsedFields{'key'}  = $entry->key;
 
     return %parsedFields;
 }
@@ -325,91 +352,34 @@ sub createBibtexCodeString {
     return $bibtexCodeString;
 }
 
-sub resetBibtexFormFields {
-    my ( $bibtexCodeString, $topicObject, @bibtexFieldNames ) = @_;
-
-    foreach my $fieldName (@bibtexFieldNames) {
-        $topicObject->putKeyed( 'FIELD', { name => $fieldName, value => "" } );
-    }
-    return $topicObject;
-}
-
-sub parseBibtexCodeToFields {
-    my ( $bibtexCodeString, $topicObject, @bibtexFieldNames ) = @_;
-    my $entry = Text::BibTeX::Entry->new();
-    my @fieldList;
-    my $fieldValue;
-    my $fieldName;
-    my $type;
-    my $key;
-
-    writeDebug("In detection loop, got code string: '$bibtexCodeString'")
-      if TRACE;
-
-    $entry->parse_s($bibtexCodeString);
-    @fieldList = $entry->fieldlist;
-    foreach my $fieldName (@fieldList) {
-
-        #~ writeDebug( "Processing bibtex field '$fieldName' -> "
-        #~ . $entry->get($fieldName) )
-        #~ if TRACE;
-
-        if ( grep { $_ eq $fieldName } @bibtexFieldNames ) {
-
-            #~ writeDebug("Parsed field in bibtexForm!!!") if TRACE;
-            my $fieldValue = $entry->get($fieldName);
-
-            # DOI fields often contain an annoying DOI: prefix on the
-            # value. Perhaps there's a good reason for this (Eg. non-DOI
-            # things going into DOI fields), so double-check that RHS
-            # of this junk looks roughly as if it could be a DOI.
-            if ( lc($fieldName) eq 'doi' ) {
-                if ( $fieldValue =~ /^doi:\s*(\d+\..*)$/i ) {
-                    $fieldValue = $1;
-                }
-            }
-
-            #~ writeDebug("Putting '$fieldName': '$fieldValue'") if TRACE;
-            $topicObject->putKeyed( 'FIELD',
-                { name => $fieldName, value => $fieldValue } );
-        }
-    }
-
-    return $topicObject;
-}
-
 sub getBibtexFieldNames {
     my ($formDef) = @_;
     my ( $bibtexCodeFieldName, @bibtexFieldNames );
 
-    if ($formDef) {
-        ASSERT( $formDef->can('getFields') ) if DEBUG;
-        ASSERT( ref( $formDef->getFields ) eq 'ARRAY' ) if DEBUG;
-        ASSERT( scalar( @{ $formDef->getFields } ) ) if DEBUG;
-        ASSERT( scalar( @{ $formDef->getFields } ) ) if DEBUG;
-        my $fields = $formDef->getFields();
+    ASSERT( $formDef->can('getFields') ) if DEBUG;
+    my $fields = $formDef->getFields();
+    ASSERT( ref($fields) eq 'ARRAY' ) if DEBUG;
+    ASSERT( scalar( @{$fields} ) ) if DEBUG;
 
-        if ( $fields and ref($fields) eq 'ARRAY' and scalar( @{$fields} ) )
-        {    # form definition found, if not the formfields aren't indexed
-            writeDebug("Got form field definitions!") if TRACE;
-            foreach my $fieldDef ( @{ $formDef->getFields() } ) {
-                writeDebug("Start 1") if TRACE;
-                if ( $fieldDef->{type} and $fieldDef->{name} ) {
+    if ( $fields and ref($fields) eq 'ARRAY' and scalar( @{$fields} ) )
+    {    # form definition found, if not the formfields aren't indexed
+        writeDebug("Got form field definitions!") if TRACE;
+        foreach my $fieldDef ( @{$fields} ) {
+            writeDebug("Start 1") if TRACE;
+            if ( $fieldDef->{type} and $fieldDef->{name} ) {
+                writeDebug("Start 2: $fieldDef->{type} is $fieldDef->{name}")
+                  if TRACE;
+                if ( $fieldDef->{type} =~ /^bibtex\+code\b/ ) {
                     writeDebug(
-                        "Start 2: $fieldDef->{type} is $fieldDef->{name}")
-                      if TRACE;
-                    if ( $fieldDef->{type} =~ /^bibtex\+code\b/ ) {
-                        writeDebug(
 "In bibtexCode IF-clause, got type $fieldDef->{type} in $fieldDef->{name}"
-                        ) if TRACE;
-                        $bibtexCodeFieldName = $fieldDef->{name};
-                    }
-                    elsif ( $fieldDef->{type} =~ /^bibtex\b/ ) {
-                        writeDebug(
+                    ) if TRACE;
+                    $bibtexCodeFieldName = $fieldDef->{name};
+                }
+                elsif ( $fieldDef->{type} =~ /^bibtex\b/ ) {
+                    writeDebug(
 "In bibtex IF-clause, got type $fieldDef->{type} in $fieldDef->{name}"
-                        ) if TRACE;
-                        push( @bibtexFieldNames, $fieldDef->{name} );
-                    }
+                    ) if TRACE;
+                    push( @bibtexFieldNames, $fieldDef->{name} );
                 }
             }
         }
@@ -422,6 +392,8 @@ sub writeDebug {
     my ($message) = @_;
 
     Foswiki::Func::writeDebug( 'BibtexFormfieldsPlugin: ' . $message );
+
+    return;
 }
 
 1;
@@ -429,7 +401,7 @@ sub writeDebug {
 __END__
 Foswiki - The Free and Open Source Wiki, http://foswiki.org/
 
-Copyright (C) 2011-2011 Foswiki Contributors. Foswiki Contributors
+Copyright (C) 2011-2012 Foswiki Contributors. Foswiki Contributors
 are listed in the AUTHORS file in the root of this distribution.
 NOTE: Please extend that file, not this notice.
 

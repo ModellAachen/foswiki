@@ -1,6 +1,5 @@
 data/System/TopicNameValidationPlugin.txt 0644
 lib/Foswiki/Plugins/TopicNameValidationPlugin.pm 0644
 pub/System/TopicNameValidationPlugin/schenck_logo.gif 0644
-pub/System/TopicNameValidationPlugin/wikiringlogo40x40.png 0644
 templates/oopstopicname.nat.tmpl 0644
 templates/oopstopicname.tmpl 0644

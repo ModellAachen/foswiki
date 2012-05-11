@@ -33,9 +33,9 @@ use strict;
 
 # $VERSION is referred to by Foswiki, and is the only global variable that
 # *must* exist in this package.
-use vars qw( $VERSION $RELEASE $SHORTDESCRIPTION $debug 
-             $pluginName $NO_PREFS_IN_TOPIC
-           );
+use vars qw( $VERSION $RELEASE $SHORTDESCRIPTION $debug
+  $pluginName $NO_PREFS_IN_TOPIC
+);
 
 # This should always be $Rev: 12445$ so that TWiki can determine the checked-in
 # status of the plugin. It is used by the build automation tools, so
@@ -49,7 +49,8 @@ $RELEASE = '1.4';
 
 # Short description of this plugin
 # One line description, is shown in the %SYSTEMWEB%.TextFormattingRules topic:
-$SHORTDESCRIPTION = 'Meeting Bingo Plugin is a business game to enhance attention at meetings.';
+$SHORTDESCRIPTION =
+  'Meeting Bingo Plugin is a business game to enhance attention at meetings.';
 
 # You must set $NO_PREFS_IN_TOPIC to 0 if you want your plugin to use preferences
 # stored in the plugin topic. This default is required for compatibility with
@@ -96,11 +97,12 @@ FOOBARSOMETHING. This avoids namespace issues.
 =cut
 
 sub initPlugin {
-    my( $topic, $web, $user, $installWeb ) = @_;
+    my ( $topic, $web, $user, $installWeb ) = @_;
 
     # check for Plugins.pm versions
-    if( $Foswiki::Plugins::VERSION < 1.026 ) {
-        Foswiki::Func::writeWarning( "Version mismatch between $pluginName and Plugins.pm" );
+    if ( $Foswiki::Plugins::VERSION < 1.026 ) {
+        Foswiki::Func::writeWarning(
+            "Version mismatch between $pluginName and Plugins.pm");
         return 0;
     }
 
@@ -114,7 +116,8 @@ sub initPlugin {
 }
 
 sub _MEETINGBINGO {
-    my($session, $params, $theTopic, $theWeb) = @_;
+    my ( $session, $params, $theTopic, $theWeb ) = @_;
+
     # $session  - a reference to the TWiki session object (if you don't know
     #             what this is, just ignore it)
     # $params=  - a reference to a Foswiki::Attrs object containing parameters.
@@ -129,41 +132,55 @@ sub _MEETINGBINGO {
     # $params->{_DEFAULT} will be 'hamburger'
     # $params->{sideorder} will be 'onions'
 
-    Foswiki::Func::addToHEAD("MEETINGBINGO","
+    Foswiki::Func::addToHEAD(
+        "MEETINGBINGO", "
 <script type=\"text/javascript\"><!--
     function toggleBgColor( elem ) {
         var newstyle = elem.style;
         newstyle.backgroundColor = newstyle.backgroundColor? \"\":\"#FFFF00\";
     }//-->
 </script>
-");
-    
-    my $bingoWordList = Foswiki::Func::getPreferencesValue('MEETINGBINGOPLUGIN_MEETINGBINGOWORDS');
-    my $freeSpace = TWiki::Func::getPreferencesValue('MEETINGBINGOPLUGIN_MEETINGBINGOFREESPACE');
-    my @bingoArray = split(',',$bingoWordList);
-    
+"
+    );
+
+    my $bingoWordList = Foswiki::Func::getPreferencesValue(
+        'MEETINGBINGOPLUGIN_MEETINGBINGOWORDS');
+    my $freeSpace = TWiki::Func::getPreferencesValue(
+        'MEETINGBINGOPLUGIN_MEETINGBINGOFREESPACE');
+    my @bingoArray = split( ',', $bingoWordList );
+
     use List::Util qw(shuffle);
     @bingoArray = shuffle(@bingoArray);
 
-    my $bingoCard = "<table width=\"90%\" cellspacing=\"0\" cellpadding=\"0\" class=\"foswikiTable\" rules=\"all\" border=\"1\">\n";
-    
-    for (my $row = 0; $row < 5; $row++) {
+    my $bingoCard =
+"<table width=\"90%\" cellspacing=\"0\" cellpadding=\"0\" class=\"foswikiTable\" rules=\"all\" border=\"1\">\n";
+
+    for ( my $row = 0 ; $row < 5 ; $row++ ) {
         $bingoCard .= "<tr>\n";
-        for (my $column = 0; $column < 5; $column++) {
-            my $bingoWord = $bingoArray[$column * 5 + $row];
-            $bingoWord = $freeSpace if defined $freeSpace && $freeSpace ne '' && $row == 2 && $column == 2;
+        for ( my $column = 0 ; $column < 5 ; $column++ ) {
+            my $bingoWord = $bingoArray[ $column * 5 + $row ];
+            $bingoWord = $freeSpace
+              if defined $freeSpace
+                  && $freeSpace ne ''
+                  && $row == 2
+                  && $column == 2;
 
             $bingoWord =~ s/^\s+//;
-	        $bingoWord =~ s/\s+$//;
-            $bingoCard .= sprintf("<td width=\"20%%\" bgcolor=\"#fcfcfc\" align=\"center\" valign=\"center\" style=\"height: 6em;\"  onclick=\"javascript:toggleBgColor( this );\">%s</td>", join "<br>", split /\s/, $bingoWord);
+            $bingoWord =~ s/\s+$//;
+            $bingoCard .= sprintf(
+"<td width=\"20%%\" bgcolor=\"#fcfcfc\" align=\"center\" valign=\"center\" style=\"height: 6em;\"  onclick=\"javascript:toggleBgColor( this );\">%s</td>",
+                join "<br>",
+                split /\s/,
+                $bingoWord
+            );
         }
         $bingoCard .= "\n</tr>\n";
     }
-    
+
     $bingoCard .= "</table>\n";
-    
+
     return $bingoCard;
-    
+
 }
 
 1;

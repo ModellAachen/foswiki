@@ -1,0 +1,7 @@
+%META:TOPICINFO{author="TestUser" date="1334568837" format="1.1" version="2"}%
+%META:TOPICPARENT{name="RemoveTrashPlugin"}%
+---+!! Testing !RemoveTrashPlugin 
+
+%REMOVETRASH%
+
+__Related:__ %SYSTEMWEB%.RemoveTrashPlugin

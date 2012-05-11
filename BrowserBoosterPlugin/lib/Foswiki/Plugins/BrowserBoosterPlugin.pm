@@ -16,25 +16,28 @@ package Foswiki::Plugins::BrowserBoosterPlugin;
 
 use strict;
 
-require Foswiki::Func;    # The plugins API
-require Foswiki::Plugins; # For the API version
+require Foswiki::Func;       # The plugins API
+require Foswiki::Plugins;    # For the API version
 
-use vars qw( $VERSION $RELEASE $SHORTDESCRIPTION $pluginName $NO_PREFS_IN_TOPIC );
+use vars
+  qw( $VERSION $RELEASE $SHORTDESCRIPTION $pluginName $NO_PREFS_IN_TOPIC );
 
 $VERSION = '$Rev$';
 $RELEASE = '2008-12-27';
-$SHORTDESCRIPTION = 'Embeds js and css files into the page to reduce the number of http objects.';
+$SHORTDESCRIPTION =
+  'Embeds js and css files into the page to reduce the number of http objects.';
 $NO_PREFS_IN_TOPIC = 1;
-$pluginName = 'BrowserBoosterPlugin';
+$pluginName        = 'BrowserBoosterPlugin';
 
-use constant DEBUG => 0; # toggle me
+use constant DEBUG => 0;     # toggle me
 
 sub initPlugin {
-    my( $topic, $web, $user, $installWeb ) = @_;
+    my ( $topic, $web, $user, $installWeb ) = @_;
 
     # check for Plugins.pm versions
-    if( $Foswiki::Plugins::VERSION < 1.2 ) {
-        Foswiki::Func::writeWarning( "Version mismatch between $pluginName and Plugins.pm" );
+    if ( $Foswiki::Plugins::VERSION < 1.2 ) {
+        Foswiki::Func::writeWarning(
+            "Version mismatch between $pluginName and Plugins.pm");
         return 0;
     }
 
@@ -43,20 +46,26 @@ sub initPlugin {
 }
 
 sub completePageHandler {
+
     #my ( $text, $header ) = @_;
 
-    Foswiki::Func::writeDebug( "- ${pluginName}::completePageHandler()" ) if DEBUG;
+    Foswiki::Func::writeDebug("- ${pluginName}::completePageHandler()")
+      if DEBUG;
 
     # import javascript
-    $_[0] =~ s/(<script\s+type=.text\/javascript.\s+src=[^>]+><\/script>)/&importJavascript($1)/gei;
+    $_[0] =~
+s/(<script\s+type=.text\/javascript.\s+src=[^>]+><\/script>)/&importJavascript($1)/gei;
 
     # import css via <link>
     my $prefix = '<style type="text/css"><!-- ' . "\n";
-    my $suffix  = "\n--></style>";
-    $_[0] =~ s/<link\s+rel=.stylesheet.\s+href=["']?(.*?)["']?\s+type=["']?text\/css["']?[^>]*?>/&importStylesheet($1,$prefix,$suffix)/gei;
+    my $suffix = "\n--></style>";
+    $_[0] =~
+s/<link\s+rel=.stylesheet.\s+href=["']?(.*?)["']?\s+type=["']?text\/css["']?[^>]*?>/&importStylesheet($1,$prefix,$suffix)/gei;
 
     # search <style>-tags for @import directives
-    $_[0] =~ s/(<style[^>]*?>)(.*?)(<\/style>)/&doStyleContainer($2,$1,$3)/geism;
+    $_[0] =~
+      s/(<style[^>]*?>)(.*?)(<\/style>)/&doStyleContainer($2,$1,$3)/geism;
+
     # might be done better with recursive regexes
 }
 
@@ -65,34 +74,38 @@ sub readFile {
     open( IN_FILE, "<$name" ) || return '';
     local $/ = undef;
     my $data = <IN_FILE>;
-    close( IN_FILE );
-    $data = '' unless( defined( $data ));
+    close(IN_FILE);
+    $data = '' unless ( defined($data) );
     return $data;
 }
-
 
 sub importJavascript {
     my $text = $_[0];
 
     # determine filename from url
-    $text    =~ m/src=["'](.*?)["']/i;
+    $text =~ m/src=["'](.*?)["']/i;
     my $file = $1;
     my $src  = $1;
-    $file    =~ s/.*$Foswiki::cfg{PubUrlPath}/$Foswiki::cfg{PubDir}/g;
+    $file =~ s/.*$Foswiki::cfg{PubUrlPath}/$Foswiki::cfg{PubDir}/g;
 
     # read file
-    my $fileContent = readFile( $file );
+    my $fileContent = readFile($file);
 
     # return container
-    return $text unless $fileContent; # just to make sure
+    return $text unless $fileContent;    # just to make sure
 
     $fileContent =~ s/<(\/?script)/&lt;$1/go;
-    return "\n<!-- BrowserBoosterPlugin: $src -->\n" . '<script type="text/javascript">'."\n" . $fileContent . "\n</script>\n";
+    return
+        "\n<!-- BrowserBoosterPlugin: $src -->\n"
+      . '<script type="text/javascript">' . "\n"
+      . $fileContent
+      . "\n</script>\n";
 }
 
 sub parseStylesheet {
     my $css = $_[0];
-    $css =~ s/(.*?)\@import\s+url\(["']?(.*?)["']?\).*?;(.*)/&importStylesheet($2,$1,$3)/ge;
+    $css =~
+s/(.*?)\@import\s+url\(["']?(.*?)["']?\).*?;(.*)/&importStylesheet($2,$1,$3)/ge;
     return $css;
 }
 
@@ -116,16 +129,17 @@ sub importStylesheet {
     my $file   = $url;
     $file =~ s/.*$Foswiki::cfg{PubUrlPath}/$Foswiki::cfg{PubDir}/g;
 
-    if ( $file ) {
-      my $fileContent = readFile( $file );
+    if ($file) {
+        my $fileContent = readFile($file);
 
-      # determine current base path and rewrite urls
-      $url    =~ m/^(.*\/)[^\/]+$/;
-      $retval = rewriteUrls( $fileContent, $1 );
+        # determine current base path and rewrite urls
+        $url =~ m/^(.*\/)[^\/]+$/;
+        $retval = rewriteUrls( $fileContent, $1 );
 
-      # recursion
-      $retval = parseStylesheet( $retval );
-      # SMELL: We should maintain a list of visited urls to prevent loops
+        # recursion
+        $retval = parseStylesheet($retval);
+
+        # SMELL: We should maintain a list of visited urls to prevent loops
     }
 
     return $prefix . "/* BrowserBoosterPlugin: $url */\n" . $retval . $suffix;
@@ -135,7 +149,8 @@ sub doStyleContainer {
     my ( $content, $prefix, $suffix ) = @_;
 
     # import css via @import
-    $content =~ s/\@import\s+url\(["']?(.*?)["']?\).*?;/&importStylesheet($1,"","")/gei;
+    $content =~
+      s/\@import\s+url\(["']?(.*?)["']?\).*?;/&importStylesheet($1,"","")/gei;
 
     # $prefix = "\n<!-- " . $1 . " -->\n" . $prefix;
 

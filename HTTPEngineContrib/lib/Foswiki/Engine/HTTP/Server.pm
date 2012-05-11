@@ -73,17 +73,9 @@ sub default_values {
     $opts->{puburlpath}           = '/pub';
     $opts->{scripturlpath}        = '/bin';
     $opts->{pubdir}               = Cwd::abs_path(
-        File::Spec->catdir(
-            File::Basename::dirname( $0 ),
-            qw(.. pub)
-        )
-    );
+        File::Spec->catdir( File::Basename::dirname($0), qw(.. pub) ) );
     $opts->{scriptdir} = Cwd::abs_path(
-        File::Spec->catdir(
-            File::Basename::dirname( $0 ),
-            qw(.. bin)
-        )
-    );
+        File::Spec->catdir( File::Basename::dirname($0), qw(.. bin) ) );
     return $opts;
 }
 
@@ -102,7 +94,8 @@ sub process_request {
     };
 
     unless ( defined $method && $method =~ /(?:POST|GET|HEAD)/i ) {
-         Foswiki::Engine::HTTP::Util::sendResponse($this->{server}{client}, 501);
+        Foswiki::Engine::HTTP::Util::sendResponse( $this->{server}{client},
+            501 );
         return;
     }
 
@@ -113,7 +106,8 @@ sub process_request {
         $proto = $1;
     }
     else {
-        Foswiki::Engine::HTTP::Util::sendResponse($this->{server}{client}, 505);
+        Foswiki::Engine::HTTP::Util::sendResponse( $this->{server}{client},
+            505 );
         return;
     }
 
@@ -142,7 +136,8 @@ sub process_request {
         $path_info  =~ s/%(..)/chr(hex($1))/ge;
 
         unless ( defined $action ) {
-            Foswiki::Engine::HTTP::Util::sendResponse($this->{server}{client}, 403);
+            Foswiki::Engine::HTTP::Util::sendResponse( $this->{server}{client},
+                403 );
             return;    # Abort the connection
         }
 
@@ -159,8 +154,8 @@ sub process_request {
             $handler = 'CGI';
             push @args,
               (
-                scriptdir    => $this->{server}{scriptdir},
-                opts         => $this->{server},
+                scriptdir => $this->{server}{scriptdir},
+                opts      => $this->{server},
               );
         }
         else {
@@ -190,7 +185,8 @@ sub process_request {
         $worker->finish();
     }
     else {
-        Foswiki::Engine::HTTP::Util::sendResponse($this->{server}{client}, 404);
+        Foswiki::Engine::HTTP::Util::sendResponse( $this->{server}{client},
+            404 );
     }
 }
 

@@ -19,7 +19,7 @@ package Foswiki::Plugins::PublishPlugin::pdf;
 
 use strict;
 use Foswiki::Plugins::PublishPlugin::file;
-our @ISA = ( 'Foswiki::Plugins::PublishPlugin::file' );
+our @ISA = ('Foswiki::Plugins::PublishPlugin::file');
 
 use File::Path;
 
@@ -34,11 +34,12 @@ sub new {
 sub param_schema {
     my $class = shift;
     return {
-	outfile => {
-	    default => 'pdf',
-	    validator => \&Foswiki::Plugins::PublishPlugin::Publisher::validateFilename
-	},
-	%{$class->SUPER::param_schema()}
+        outfile => {
+            default => 'pdf',
+            validator =>
+              \&Foswiki::Plugins::PublishPlugin::Publisher::validateFilename
+        },
+        %{ $class->SUPER::param_schema() }
     };
 }
 

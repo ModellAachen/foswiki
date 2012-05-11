@@ -78,41 +78,51 @@ Setting "empty" as value of the "menu" attribute no submenu'll be shown
 =cut
 
 our @menuStack;
+
 sub pushMenu {
     my $name = shift;
-    push (@menuStack, $name);
- }
+    push( @menuStack, $name );
+}
 
 sub popMenu {
     my ( $this, $params, $theTopic, $theWeb ) = @_;
 
     my $name = pop(@menuStack);
-    
-    
+
     #add editing _if_ the next super plugin is in
-    if (defined($name) and ($Foswiki::cfg{Plugins}{JQZenTablePlugin}{Enabled})){
-        if (Foswiki::Func::isGuest()) {
+    if ( defined($name)
+        and ( $Foswiki::cfg{Plugins}{JQZenTablePlugin}{Enabled} ) )
+    {
+        if ( Foswiki::Func::isGuest() ) {
             return '<span class="foswikiRight editMenu">%LOGIN%</span>';
-        } else {
+        }
+        else {
             require Foswiki::Plugins::JQZenTablePlugin;
-            Foswiki::Plugins::JQZenTablePlugin::addMenuEditingToZone($theWeb, $theTopic);
-            #TODO: use topic permissions.. 
-            return Foswiki::Plugins::JQuerymbComponentsPlugin::MBMENU::MENUITEM($this, {
-                        _DEFAULT=>" %ICONURL{uweb_m12}% edit menu",
-                        type=>"footer",
-                        css=>"foswikiRight editMenu rootVoice",
-                        action=>"return \$(this).editMenu('$name', '%WEB%', '%TOPIC%'); return false;"
-                        }, $theTopic, $theWeb );
+            Foswiki::Plugins::JQZenTablePlugin::addMenuEditingToZone( $theWeb,
+                $theTopic );
+
+            #TODO: use topic permissions..
+            return Foswiki::Plugins::JQuerymbComponentsPlugin::MBMENU::MENUITEM(
+                $this,
+                {
+                    _DEFAULT => " %ICONURL{uweb_m12}% edit menu",
+                    type     => "footer",
+                    css      => "foswikiRight editMenu rootVoice",
+                    action =>
+"return \$(this).editMenu('$name', '%WEB%', '%TOPIC%'); return false;"
+                },
+                $theTopic,
+                $theWeb
+            );
         }
     }
     return '';
 }
 
-
 sub MENU {
     my ( $this, $params, $theTopic, $theWeb ) = @_;
 
-    my $name     = $params->{name};
+    my $name = $params->{name};
     pushMenu($name);
     my $extraCss = $params->{css};
 
@@ -124,13 +134,13 @@ sub MENU {
         'mbMenu::menu_red_' . $name,
         '<link rel="stylesheet" href="' . $extraCss . '" type="text/css"/>'
     );
-    
+
     Foswiki::Func::addToZone(
         "script",
-        'mbMenu::initializer-'.$name,
-'<script type="text/javascript">
+        'mbMenu::initializer-' . $name,
+        '<script type="text/javascript">
   $(function() {
-    $("#'.$name.'").buildMenu({
+    $("#' . $name . '").buildMenu({
         //template: foswiki.pubUrlPath + "/" + foswiki.systemWebName + "/JQuerymbComponentsPlugin/jquery.mb.menu/menuVoices.html",
         template: foswiki.scriptUrlPath+"/rest/JQZenTablePlugin/getEditForUndefinedMenu",
         additionalData: "pippo=1;mbMenuRootTopic="+foswiki.mbMenuRootTopic,
@@ -177,7 +187,7 @@ sub ENDMENU {
 
     my $edit = popMenu( $this, $params, $theTopic, $theWeb );
 
-    return $edit."</div>
+    return $edit . "</div>
   <!-- end horizontal menu -->
 </div>";
 }
@@ -210,16 +220,18 @@ should be written:
 sub MENUITEM {
     my ( $this, $params, $theTopic, $theWeb ) = @_;
 
-    my $title  = $params->{_DEFAULT} || '';
-    my $menu   = $params->{menu};
-    $menu = 'empty' if (defined($menu) and $menu eq '');
-    my $img    = $params->{img};
-    my $action = '';            #not sure why the action: attribute isn't working for me - TODO
-    $action = 'onclick="'.$params->{action}.'" ' if ( defined( $params->{action} ) );
-    my $href   = '';
+    my $title = $params->{_DEFAULT} || '';
+    my $menu = $params->{menu};
+    $menu = 'empty' if ( defined($menu) and $menu eq '' );
+    my $img = $params->{img};
+    my $action =
+      '';    #not sure why the action: attribute isn't working for me - TODO
+    $action = 'onclick="' . $params->{action} . '" '
+      if ( defined( $params->{action} ) );
+    my $href = '';
     $href = 'href="' . $params->{href} . '" ' if ( defined( $params->{href} ) );
     my $type = $params->{type};
-    my $cssClass  = $params->{css} || '';
+    my $cssClass = $params->{css} || '';
 
     my @jsonAttr = ();
     foreach my $key (qw/menu img/) {
@@ -234,7 +246,9 @@ sub MENUITEM {
     my $tmpl = "<a " . $relAttr . $href . $action
 
       #TODO: add href for non-js
-      . "class=\"rootVoice $cssClass {" . join( ', ', @jsonAttr ) . "}\" >$title</a>";
+      . "class=\"rootVoice $cssClass {"
+      . join( ', ', @jsonAttr )
+      . "}\" >$title</a>";
     return $tmpl;
 }
 
@@ -267,11 +281,10 @@ sub SUBMENU {
 
 sub ENDSUBMENU {
     my ( $this, $params, $theTopic, $theWeb ) = @_;
-    
+
     my $edit = popMenu( $this, $params, $theTopic, $theWeb );
 
-
-    return $edit.'</div>';
+    return $edit . '</div>';
 }
 
 1;

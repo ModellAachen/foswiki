@@ -278,10 +278,12 @@ sub _remove {
 }
 
 sub _updateTopic {
-    my $web       = shift;
-    my $topic     = shift;
-    my $savedMeta = shift;
-    my $options   = shift;
+    my $web              = shift;
+    my $topic            = shift;
+    my $savedMeta        = shift;
+    my $options          = shift;
+    my $MongoDB          = getMongoDB();
+    my $mongo_collection = $MongoDB->_getCollection( $web, 'current' );
 
     #print STDERR "-update($web, $topic)\n" if DEBUG;
     $savedMeta->getRev1Info('createdate');
@@ -291,6 +293,7 @@ sub _updateTopic {
         _topic => $topic
     };
 
+    $MongoDB->ensureMandatoryIndexes($mongo_collection);
     foreach my $key ( keys(%$savedMeta) ) {
 
         #        print STDERR "------------------ importing $key - "
@@ -315,14 +318,14 @@ sub _updateTopic {
 #TODO: move this into the search algo, so it makes an index the first time someone builds an app that sorts on it.
 #even then, we have a hard limit of 40 indexes, so we're going to have to get more creative.
 #mind you, we don't really need indexes for speed, just to cope with query() resultsets that contain more than 1Meg of documents - so maybe we can delay creation until that happens?
-                    getMongoDB()->ensureIndex(
-                        getMongoDB()->_getCollection( $web, 'current' ),
+                    $MongoDB->ensureIndex(
+                        $mongo_collection,
                         { $key . '.' . $elem->{name} . '.value' => 1 },
                         { name => $key . '.' . $elem->{name} }
                     );
                 }
 
-                $meta->{$key}{ $elem->{name} } = $elem;
+                $meta->{$key}{ $elem->{name} } = $elem if defined $elem->{name};
             }
         }
         else {
@@ -381,11 +384,17 @@ sub _updateTopic {
 #Item10611: Paul found that the date, rev and version TOPICINFO is sometimes a string and other times a number
 #rectify to always a string atm
                     $meta->{'TOPICINFO'}->{version} =
-                      int( $meta->{'TOPICINFO'}->{version} );
+                      defined $meta->{'TOPICINFO'}->{version}
+                      ? int( $meta->{'TOPICINFO'}->{version} )
+                      : 1;
                     $meta->{'TOPICINFO'}->{date} =
-                      int( $meta->{'TOPICINFO'}->{date} );
+                      defined $meta->{'TOPICINFO'}->{date}
+                      ? int( $meta->{'TOPICINFO'}->{date} )
+                      : 0;
                     $meta->{'TOPICINFO'}->{rev} =
-                      int( $meta->{'TOPICINFO'}->{rev} );
+                      defined $meta->{'TOPICINFO'}->{rev}
+                      ? int( $meta->{'TOPICINFO'}->{rev} )
+                      : 1;
                 }
             }
         }
@@ -399,9 +408,12 @@ sub _updateTopic {
         $meta->{'TOPICINFO'}->{author}          = 'BaseUserMapping_999';
         $meta->{'TOPICINFO'}->{_authorWikiName} = 'UnknownUser';
     }
-    $meta->{'TOPICINFO'}->{rev} = 1 if ( $meta->{'TOPICINFO'}->{rev} < 1 );
+    $meta->{'TOPICINFO'}->{rev} = 1
+      if ( !defined $meta->{'TOPICINFO'}{rev}
+        || $meta->{'TOPICINFO'}{rev} < 1 );
     $meta->{'TOPICINFO'}->{version} = 1
-      if ( $meta->{'TOPICINFO'}->{version} < 1 );
+      if ( !defined $meta->{'TOPICINFO'}{version}
+        || $meta->{'TOPICINFO'}{version} < 1 );
 
     $meta->{_raw_text} = $savedMeta->getEmbeddedStoreForm();
 
@@ -626,10 +638,10 @@ sub writeDebug {
     }
     else {
         Foswiki::Func::writeDebug($msg);
-        print STDERR $msg . "\n";
         if ( defined $level ) {
             ASSERT( $level =~ /^[-]?\d+$/ ) if DEBUG;
             if ( $level == -1 ) {
+                Foswiki::Func::writeWarning($msg);
                 print STDERR $msg . "\n";
             }
         }

@@ -1,4 +1,4 @@
-%META:TOPICINFO{author="ProjectContributor" comment="reprev" date="1320868361" format="1.1" reprev="10" version="10"}%
+%META:TOPICINFO{author="micha" comment="save topic" date="1334852393" format="1.1" reprev="15" version="15"}%
 %META:TOPICPARENT{name="TopicFunction"}%
 %TOC{depth="2"}%
 
@@ -30,7 +30,12 @@
   <p>%WEBSUMMARY%</p>
 </div> 
 %DBCALL{"Applications.BlogApp.RenderAuthorTools"}%<!-- -->
-%DBCALL{"Applications.BlogApp.RenderRecentComments" LIMIT="5"}%<!-- -->
+%DBCALL{"Applications.BlogApp.RenderRecentComments" 
+  LIMIT="5" 
+  %IF{"'%BASEWEB%.%BASETOPIC%'/TopicType=~'Category'" 
+    then="CAT=\"%URLPARAM{"catname" default="%BASETOPIC%"}%\"
+  }%
+}%<!-- -->
 %DBCALL{"Applications.BlogApp.RenderCategories"}%<!-- -->
 %DBCALL{"Applications.BlogApp.RenderArchives"}%<!-- -->
 <!-- -->%ENDSECTION{"Default"}%
@@ -56,8 +61,10 @@
 </div> 
 %DBCALL{"Applications.BlogApp.RenderAuthorTools"}%<!-- -->
 %DBCALL{"Applications.BlogApp.RenderSimilarBlogEntries"}%<!-- -->
-%DBCALL{"Applications.BlogApp.RenderRecentBlogEntries" LIMIT="10"}%<!-- -->
-<!-- -->%ENDSECTION{"BlogEntry"}%
+%DBCALL{"Applications.BlogApp.RenderRecentBlogEntries"
+  LIMIT="5"
+  CAT="%CATINFO{topic="%BASEWEB%.%BASETOPIC%" format="$name" limit="1"}%"
+}%<!-- -->%ENDSECTION{"BlogEntry"}%
 </verbatim>
 
 ---++ Category sidebar
@@ -86,7 +93,7 @@
 %DBCALL{"Applications.RenderFunctionCallers"}%
 
 ---++ Copyright
-&copy; 2005-2011 http://michaeldaumconsulting.com
+&copy; 2005-2012 http://michaeldaumconsulting.com
 
 %DBCALL{"Applications.GnuGeneralPublicLicense" section="notice"}%
 

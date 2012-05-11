@@ -37,12 +37,13 @@ Note that you won't need to surround an %IMAGEGALLERY tag of Foswiki:Extensions/
 -->
 
 |  Author(s): | Michael Daum |
-|  Copyright: | &copy; 2007-2011 Mika Tuupola http://www.appelsiini.net/ (jQuery plugin); %BR% \
-                &copy; 2011 Michael Daum http://michaeldaumconsulting.com (foswiki integration) |
+|  Copyright: | &copy; 2007-2012 Mika Tuupola http://www.appelsiini.net/ (jQuery plugin); %BR% \
+                &copy; 2011-2012 Michael Daum http://michaeldaumconsulting.com (foswiki integration) |
 |  License: | MIT license http://www.opensource.org/licenses/mit-license.php |
 |  Release: | %$RELEASE% |
 |  Version: | %$VERSION% |
 |  Change History: | <!-- versions below in reverse order -->&nbsp; |
+|  10 Mar 2012: | upgraded to latest version of lazzyload 1.7.2 |
 |  30 Sep 2011: | fixed dependency on jquery.metadata |
 |  Dependencies: | %$DEPENDENCIES% |
 |  Home page: | Foswiki:Extensions/%TOPIC% |

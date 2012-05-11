@@ -181,12 +181,13 @@ ARGH
 
     # Find the project lib root
 
-    if ( -e "$buildpldir/../../../Foswiki" ) {
+    if ( -e "$buildpldir/../../../Foswiki" || -e "$buildpldir/../lib/Foswiki" )
+    {
         $libpath = _findRelativeTo( $buildpldir, 'lib/Foswiki' );
         $targetProject = 'Foswiki';
     }
     else {
-        warn "Assuming this is a TWiki project\n";
+        print STDERR "Assuming this is a TWiki project\n";
         $libpath = _findRelativeTo( $buildpldir, 'lib/TWiki' );
         $targetProject = 'TWiki';
     }
@@ -1045,7 +1046,7 @@ sub _isPerl {
 =begin TML
 
 ---++++ target_test
-Basic CPAN:Test::Unit test target, runs <project>Suite.
+Basic CPAN:Test::Unit test target, runs &lt;project>Suite.
 
 =cut
 
@@ -1107,9 +1108,12 @@ sub filter_txt {
         sub {
             my ( $this, $text ) = @_;
 
-            # Replace the version (SVN Rev or wrongly saved number) with rev 1.
-            # Item10629: Must preserve version for CompareRevisionAddOnDemoTopic, or nothing to demo
-            $text =~ s/^(%META:TOPICINFO{.*version=").*?(".*}%)$/${1}1$2/m unless $from =~ m/CompareRevisionsAddOnDemoTopic.txt$/;
+            # Replace the version (SVN Rev or wrongly saved number)
+            # with rev 1.
+            # Item10629: Must preserve version for
+            # CompareRevisionAddOnDemoTopic, or nothing to demo
+            $text =~ s/^(%META:TOPICINFO{.*version=").*?(".*}%)$/${1}1$2/m
+              unless $from =~ m/CompareRevisionsAddOnDemoTopic.txt$/;
             $text =~ s/%\$(\w+)%/&_expand($this,$1)/geo;
             return $text;
         }
@@ -2251,7 +2255,7 @@ sub _uploadTopic {
 
     $form->{validation_key} = $this->_strikeone( $userAgent, $response );
 
-    $form->{text} =~ s/^%META:TOPICINFO{.*?\n//;  # Delete any old topicinfo
+    $form->{text} =~ s/^%META:TOPICINFO{.*?\n//;    # Delete any old topicinfo
     my $url =
 "$this->{UPLOADTARGETSCRIPT}/save$this->{UPLOADTARGETSUFFIX}/$this->{UPLOADTARGETWEB}/$topic";
     $form->{text} = <<EXTRA. $form->{text};

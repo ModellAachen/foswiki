@@ -1,4 +1,4 @@
-%META:TOPICINFO{author="ProjectContributor" comment="save topic" date="1311683343" format="1.1" reprev="9" version="9"}%
+%META:TOPICINFO{author="ProjectContributor" comment="save topic" date="1328085067" format="1.1" reprev="11" version="11"}%
 %META:TOPICPARENT{name="TopicFunction"}%
 %TOC{depth="2"}%
 
@@ -17,43 +17,43 @@ latter is used automatically when !SolrPlugin is installed.
 
 ---++ Implementation
 <verbatim class="tml">
-%STARTINCLUDE%<!-- -->
-<noautolink>
-%FORMATLIST{
-  "%DBCALL{"%WEB%.%TOPIC%" section="recentcomments"}%"
-   sort="on"
-   reverse="on"
-   pattern="(.*);(.*);(.*);(.*)"
-   split="\n"
-   limit="%IF{"defined LIMIT" then="%LIMIT%" else="10"}%"
-   header="<div class='blogSideBarSection'>
+%STARTINCLUDE%<noautolink>
+%METACOMMENTS{
+  web="%BASEWEB%" 
+  topic="%HOMETOPIC%"
+  search="State!='unpublished' %IF{"defined CAT" then="AND topic ISA '%CAT%'"}%"
+  sort="date"
+  reverse="on"
+  approved="on"
+  mindate="%CALC{"$TIMEADD($TIME(), -1, month)"}%"
+  limit="%IF{"defined LIMIT" then="%LIMIT%" else="10"}%"
+  header="<div class='blogSideBarSection'>
     <h2 >%IF{"defined CAT"
         then="%MAKETEXT{"Comments in [_1]" args="%CATINFO{cat="%CAT%" format="$title"}%"}%"
         else="%MAKETEXT{"Comments"}%"
       }%</h2>
     <$nopdirtyarea><ul>"
-   format="<li>
-     <a href='$4'>
+  format="<li>
+     <a href='$permlink'>
        <div class='foswikiRight'>
          $percntTMPL:P{\"comment::photo\"
            web=\"%USERSWEB%\"
-           topic=\"$2\"
+           topic=\"$author\"
          }$percnt
        </div>
-       <strong>$percntSPACEOUT{$2}$percnt</strong>
+       <strong>$percntSPACEOUT{$author}$percnt</strong>
        replied
-       $percntTIMESINCE{\"$1\" 
+       $percntTIMESINCE{\"$modified\" 
           format=\"<nobr>$time</nobr> ago\"
        }$percnt 
-       on &#147;$percntGETTOPICTITLE{\"%BASEWEB%.$3\"}$percnt&#148;
+       on &#147;$percntGETTOPICTITLE{\"$web.$topic\"}$percnt&#148;
        %CLEAR%
      </a>
      </li>"
-   footer="</ul></$nopdirtyarea></div>"
-   separator="$n"
+  footer="</ul></$nopdirtyarea></div>"
+  separator="$n"
 }%<!-- -->
-</noautolink>
-<!-- -->%STOPINCLUDE%
+</noautolink>%STOPINCLUDE%
 </verbatim>
 
 ---++ Photo
@@ -76,50 +76,13 @@ latter is used automatically when !SolrPlugin is installed.
 }%<!-- -->%ENDSECTION{"photo"}%
 </verbatim>
 
----++ List of comments
-<verbatim class="tml">
-%STARTSECTION{"recentcomments"}%%DBQUERY{
-  "commentdate > 0 AND State != 'unpublished' 
-   %IF{"defined CAT" then="AND topic ISA '%CAT%'"}%"
-   web="%BASEWEB%"
-   order="commentdate"
-   reverse="on"
-   limit="%IF{"defined LIMIT" then="%LIMIT%" else="10"}%"
-   format="$percntMETACOMMENTS{
-     topic=\"$web.$topic\"
-     approval=\"on\"
-     sort=\"date\"
-     mindate=\"%CALC{"$TIMEADD($TIME(), -1, month)"}%\"
-     format=\"$timestamp;$author;$topic;%SCRIPTURLPATH{"view"}%/$web/$topic#comment$id\"
-     separator=\"$dollarn\"
-   }$percnt"
-   separator="$n"
-}%%ENDSECTION{"recentcomments"}%
-</verbatim>
-
----+++ Solr implementation 
-Note: this query does not respect the publish state of a BlogEntry. That'll only
-be possible using Solr-4.0's latest join feature. As long as we don't have that yet
-this implementation is DIS_abled above. In addition we want to limit comments to
-those of a certain category. We might need to propagate some of these states down to 
-the comments subschema the same way we did this for attachments. Hm...
-<verbatim class="tml">
-%STARTSECTION{"recentcomments::solr"}%%SOLRSEARCH{
-  "web:%BASEWEB% type:comment createdate:[NOW-1MONTH TO NOW] state:approved"
-  sort="createdate desc"
-  limit="%IF{"defined LIMIT" then="%LIMIT%" else="10"}%"
-  format="$createdate;$dollarpercntUSERINFO{\\"$author\\" format=\\"$dollarwikiname\\"}$dollarpercnt;$topic;$url"
-  separator="$n"
-}%%ENDSECTION{"recentcomments::solr"}%
-</verbatim>
-
 ---++ Test
 %DBCALL{"%TOPIC%"}%
 
 %DBCALL{"Applications.RenderFunctionCallers"}%
 
 ---++ Copyright
-&copy; 2005-2011 http://michaeldaumconsulting.com
+&copy; 2005-2012 http://michaeldaumconsulting.com
 
 %DBCALL{"Applications.GnuGeneralPublicLicense" section="notice"}%
 

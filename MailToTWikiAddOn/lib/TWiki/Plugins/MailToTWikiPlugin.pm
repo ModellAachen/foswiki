@@ -11,7 +11,7 @@
 # the real work is done in the mailtotwiki script.
 #
 # See the MailToTWikiPlugin topic for full documentation.
-# 
+#
 
 package TWiki::Plugins::MailToTWikiPlugin;
 
@@ -27,26 +27,26 @@ our $InsertMarker = qr[(?<!<nop>)%{?MAILTOTWIKI_INSERT_HERE}?%];
 #
 # Initialise.
 #
-sub initPlugin
-{
-	# Check Plugins.pm version.
-	if ($TWiki::Plugins::VERSION < 1) {
-		TWiki::Func::writeWarning(
-		    "Version mismatch between $PluginName and Plugins.pm");
-		return 0;
-	}
-	return(1);
+sub initPlugin {
+
+    # Check Plugins.pm version.
+    if ( $TWiki::Plugins::VERSION < 1 ) {
+        TWiki::Func::writeWarning(
+            "Version mismatch between $PluginName and Plugins.pm");
+        return 0;
+    }
+    return (1);
 }
 
 #
 # Strip out the insertion marker.
 #
-sub commonTagsHandler
-{
-	# my ($text, $topic, $web) = @_;
+sub commonTagsHandler {
 
-	# Out, dammned spot!
-	$_[0] =~ s/\s*$InsertMarker\s*//g;
+    # my ($text, $topic, $web) = @_;
+
+    # Out, dammned spot!
+    $_[0] =~ s/\s*$InsertMarker\s*//g;
 }
 
 1;

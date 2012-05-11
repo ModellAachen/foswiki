@@ -1,13 +1,4 @@
 %META:TOPICINFO{author="ProjectContributor" date="1234355406" format="1.1" version="1.2"}%
-<!--
-
-   PLEASE DO NOT EDIT THIS TOPIC
-
-   It is automatically generated from the subversion repository, and any changes
-   you make will simply be overwritten the next time a release is generated.
-
-   Instead, you could check your fix in, raise a bug in the Bugs web, or mail the author(s).
--->
 ---+!! [[%TOPIC%][The Natural Skin]]
 %TOC%
 
@@ -130,8 +121,11 @@ always open an extra window.
 %$DEPENDENCIES%
 
 ---++ Skin Info
+<!-- 
+   * Set SHORTDESCRIPTION = %$SHORTDESCRIPTION%
+-->
 |  Skin Author: | Michael Daum |
-|  Copyright &copy;: | 2003-2010, Michael Daum http://michaeldaumconsulting.com |
+|  Copyright &copy;: | 2003-2012, Michael Daum http://michaeldaumconsulting.com |
 |  License: | GPL ([[http://www.gnu.org/copyleft/gpl.html][GNU General Public License]]) |
 |  Release: | %$RELEASE% |
 |  Version: | %$VERSION% |

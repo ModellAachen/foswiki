@@ -41,11 +41,11 @@ jQuery(function($) {
 %TMPL:DEF{"content"}%<!-- -->
 %TMPL:P{"checkbox"}%<!-- -->
 <div class="natBacklinksContainer"></div>
-<a class="jqUIDialogButton {icon:'ui-icon-cancel', click: function() { $(this).dialog('close'); }}">%MAKETEXT{"Close"}%</a>
+<a class="jqUIDialogButton jqUIDialogClose {icon:'ui-icon-cancel'}">%MAKETEXT{"Close"}%</a>
 <!-- -->%TMPL:END%
 
 %{ ################################################################################ }%
-%TMPL:DEF{"checkbox"}%%TMPL:P{context="SolrPluginEnabled" then="checkbox::solr" else="checboxk::default"}%%TMPL:END%
+%TMPL:DEF{"checkbox"}%%TMPL:P{context="SolrPluginEnabled" then="checkbox::solr" else="checkbox::default"}%%TMPL:END%
 %TMPL:DEF{"checkbox::default"}%<label><input type="checkbox" name="searchallwebs" class="foswikiCheckbox natBacklinksSearchAll"> %MAKETEXT{"Search in all webs"}%</label>%TMPL:END%
 %TMPL:DEF{"checkbox::solr"}%<input type="hidden" name="searchallwebs" value="true" class="natBacklinksSearchAll" />%TMPL:END%
 

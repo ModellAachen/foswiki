@@ -12,36 +12,38 @@
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details, published at 
+# GNU General Public License for more details, published at
 # http://www.gnu.org/copyleft/gpl.html
 #
 # =========================
 package TWiki::Plugins::XpTrackerPlugin::Task;
 
 sub new {
-	my $object= {name=>"", 
-				 est=>0,
-				 who=>0,
-				 reviewer=>"",
-				 spent=>0,
-				 etc=>0,
-				 tstatus=>""
-	};
+    my $object = {
+        name     => "",
+        est      => 0,
+        who      => 0,
+        reviewer => "",
+        spent    => 0,
+        etc      => 0,
+        tstatus  => ""
+    };
 
-	return bless $object;
+    return bless $object;
 }
 
 sub AUTOLOAD {
-	my $self=shift;
-	my $field=$AUTOLOAD;
-	$field =~ s/.*://;
- if (exists $self->{$field}) {
-    if (@_) {
-      return $self->{$field}=shift;
-    } else {
-      return $self->{$field};
+    my $self  = shift;
+    my $field = $AUTOLOAD;
+    $field =~ s/.*://;
+    if ( exists $self->{$field} ) {
+        if (@_) {
+            return $self->{$field} = shift;
+        }
+        else {
+            return $self->{$field};
+        }
     }
-  }
 }
 
 1;

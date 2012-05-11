@@ -26,32 +26,34 @@ use vars qw($tagname);
 $tagname = 'CHILDTOPICS';
 
 sub CHILDTOPICS {
-    my ($session, $params, $topic, $web) = @_;
-    my $format = $params->{format} || '   * $topic';
-    my $join = $params->{format} || "\n";
-    my $searchWeb = $params->{web} || $web;
-    my $searchTopic = $params->{topic} || $topic;
-    my @eachtopic = ();
-    my @topics = TWiki::Func::getTopicList($searchWeb);
+    my ( $session, $params, $topic, $web ) = @_;
+    my $format      = $params->{format} || '   * $topic';
+    my $join        = $params->{format} || "\n";
+    my $searchWeb   = $params->{web}    || $web;
+    my $searchTopic = $params->{topic}  || $topic;
+    my @eachtopic   = ();
+    my @topics      = TWiki::Func::getTopicList($searchWeb);
     my $excludeTopic = $params->{excludetopic};
-    
-    if (defined $excludeTopic) {
-        $excludeTopic = TWiki::Contrib::MoreFuncContrib::makeTopicPattern( $excludeTopic );
-        if( $excludeTopic ) {
+
+    if ( defined $excludeTopic ) {
+        $excludeTopic =
+          TWiki::Contrib::MoreFuncContrib::makeTopicPattern($excludeTopic);
+        if ($excludeTopic) {
             @topics = grep( !/$excludeTopic/i, @topics );
-         }
+        }
     }
 
     foreach my $t (@topics) {
-        my $meta = TWiki::Contrib::MoreFuncContrib::readTopicMeta($searchWeb, $t);
-        if ($meta->getParent() eq $searchTopic) {
+        my $meta =
+          TWiki::Contrib::MoreFuncContrib::readTopicMeta( $searchWeb, $t );
+        if ( $meta->getParent() eq $searchTopic ) {
             my $f = $format;
             $f =~ s/\$topic/$t/;
             $f =~ s/\$web/$searchWeb/;
             push @eachtopic, $f;
         }
     }
-    return join($join, @eachtopic);
+    return join( $join, @eachtopic );
 }
 
 return 1;

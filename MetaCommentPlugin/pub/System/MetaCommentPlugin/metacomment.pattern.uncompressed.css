@@ -1,0 +1,45 @@
+.cmtComments h2,
+.cmtComments h3 {
+  padding:0px;
+}
+.cmtComments .foswikiFormSteps {
+  margin-top:1.3846em; /* 18px */
+  border-left:0px;
+  border-right:0px;
+}
+.cmtStyle_threaded .foswikiFormSteps {
+  border-bottom:0px;
+  margin-bottom:0px;
+}
+.cmtComments .foswikiFormStep {
+  border:0px;
+}
+
+.simplemodal-container {
+  font-family: 'Helvetica Neue', Arial, 'Liberation Sans', FreeSans, sans-serif;
+  -moz-box-shadow: 0px 3px 10px #888;
+  -webkit-box-shadow: 0px 3px 10px #888;
+  box-shadow: 0px 3px 10px #888;
+  border:1px solid #BDBEC5;
+}
+.simplemodal-container .foswikiDialogTitle {
+  margin:0;
+  padding:13px;
+  background-color:#ddd;
+  color:#b20000;
+  font-size:115%;
+  font-weight:bold;
+}
+.simplemodal-container .foswikiFormSteps {
+  padding:0;
+}
+.simplemodal-container .foswikiFormStep {
+  margin:0;
+  border:0;
+}
+a.simplemodal-close {
+  display:none;
+}
+#simplemodal-overlay {
+  background:#fff;
+}

@@ -32,14 +32,13 @@ the text had been included from another topic.
 
 =cut
 
-
 package Foswiki::Plugins::JQueryLibPlugin;
 
 # Always use strict to enforce variable scoping
 use strict;
 
-require Foswiki::Func;    # The plugins API
-require Foswiki::Plugins; # For the API version
+require Foswiki::Func;       # The plugins API
+require Foswiki::Plugins;    # For the API version
 
 # $VERSION is referred to by Foswiki, and is the only global variable that
 # *must* exist in this package.
@@ -67,9 +66,8 @@ our $SHORTDESCRIPTION = 'Provides you with the jQuery javascript library';
 # and topic level.
 our $NO_PREFS_IN_TOPIC = 1;
 
-our $scriptDependencies='';
-our $styleDependencies='';
-
+our $scriptDependencies = '';
+our $styleDependencies  = '';
 
 =begin TML
 
@@ -98,16 +96,15 @@ FOOBARSOMETHING. This avoids namespace issues.
 =cut
 
 sub initPlugin {
-    my( $topic, $web, $user, $installWeb ) = @_;
-    
+    my ( $topic, $web, $user, $installWeb ) = @_;
+
     # check for Plugins.pm versions
-    if( $Foswiki::Plugins::VERSION < 2.0 ) {
+    if ( $Foswiki::Plugins::VERSION < 2.0 ) {
         Foswiki::Func::writeWarning( 'Version mismatch between ',
-                                     __PACKAGE__, ' and Plugins.pm' );
+            __PACKAGE__, ' and Plugins.pm' );
         return 0;
     }
-    
-    
+
     # Example code of how to get a preference value, register a macro
     # handler and register a RESTHandler (remove code you do not need)
 
@@ -117,136 +114,131 @@ sub initPlugin {
     # Optional: See %SYSTEMWEB%.DevelopingPlugins#ConfigSpec for information
     # on integrating your plugin configuration with =configure=.
 
-    # Always provide a default in case the setting is not defined in
-    # LocalSite.cfg. See %SYSTEMWEB%.Plugins for help in adding your plugin
-    # configuration to the =configure= interface.
-    # my $setting = $Foswiki::cfg{Plugins}{JQueryLibPlugin}{ExampleSetting} || 0;
+   # Always provide a default in case the setting is not defined in
+   # LocalSite.cfg. See %SYSTEMWEB%.Plugins for help in adding your plugin
+   # configuration to the =configure= interface.
+   # my $setting = $Foswiki::cfg{Plugins}{JQueryLibPlugin}{ExampleSetting} || 0;
 
     # Register the _EXAMPLETAG function to handle %EXAMPLETAG{...}%
     # This will be called whenever %EXAMPLETAG% or %EXAMPLETAG{...}% is
     # seen in the topic text.
     Foswiki::Func::registerTagHandler( 'JQSCRIPT', \&_JQSCRIPT );
-    Foswiki::Func::registerTagHandler( 'JQSTYLE', \&_JQSTYLE );
+    Foswiki::Func::registerTagHandler( 'JQSTYLE',  \&_JQSTYLE );
 
-    # Allow a sub to be called from the REST interface 
+    # Allow a sub to be called from the REST interface
     # using the provided alias
     #Foswiki::Func::registerRESTHandler('example', \&restExample);
-	
-	#Rest my globals for mod_perl support
-	$scriptDependencies='';
-	$styleDependencies='';
+
+    #Rest my globals for mod_perl support
+    $scriptDependencies = '';
+    $styleDependencies  = '';
 
     addStylesToHead();
     addScriptsToHead();
-    
+
     # Plugin correctly initialized
     return 1;
 }
 
+############
 
-############	
+sub addStylesToHead {
+    return unless ( defined $Foswiki::cfg{Plugins}{JQueryLibPlugin}{Styles} );
 
-sub addStylesToHead 
-	{
-	return unless (defined $Foswiki::cfg{Plugins}{JQueryLibPlugin}{Styles});	   
-	#First the styles 
-    my @styles = split(',',$Foswiki::cfg{Plugins}{JQueryLibPlugin}{Styles});        
-    foreach my $style (@styles)
-    	{                
-	    addStyleToHead($style);
-    	}    	
-	}
+    #First the styles
+    my @styles = split( ',', $Foswiki::cfg{Plugins}{JQueryLibPlugin}{Styles} );
+    foreach my $style (@styles) {
+        addStyleToHead($style);
+    }
+}
 
-############			
-	
-sub addStyleToHead
-	{
-	my $style=shift;
-	$style = trim($style);
-	my $styleid="JQueryLibPlugin_$style";	
-	#If our ID is already there don't go any further
-	return unless (index($styleDependencies,$styleid)==-1); 
-    Foswiki::Func::addToHEAD($styleid,JQueryStyle($style), $styleDependencies);
-    #Add dependency 
-    $styleDependencies.=', ' unless ($styleDependencies eq '');
-    $styleDependencies.=$styleid;       		
-	} 	
-	
-############			
+############
 
-sub addScriptsToHead	
-	{	
-	return unless (defined $Foswiki::cfg{Plugins}{JQueryLibPlugin}{Scripts});	
-	#Next the scripts 
-    my @scripts = split(',',$Foswiki::cfg{Plugins}{JQueryLibPlugin}{Scripts});        
-    foreach my $script (@scripts)
-    	{	    
-	    addScriptToHead($script);	
-    	}    	
-	}
-	
-############			
-	
-sub addScriptToHead	
-	{
-	my $script=shift;	
-    $script = trim($script);
-    my $scriptid="JQueryLibPlugin_$script";
+sub addStyleToHead {
+    my $style = shift;
+    $style = trim($style);
+    my $styleid = "JQueryLibPlugin_$style";
+
     #If our ID is already there don't go any further
-	return unless (index($scriptDependencies,$scriptid)==-1); 
-    Foswiki::Func::addToHEAD($scriptid,JQueryScript($script), $scriptDependencies);
+    return unless ( index( $styleDependencies, $styleid ) == -1 );
+    Foswiki::Func::addToHEAD( $styleid, JQueryStyle($style),
+        $styleDependencies );
+
     #Add dependency
-    $scriptDependencies.=', ' unless ($scriptDependencies eq '');
-    $scriptDependencies.=$scriptid;       		
-	}
-		
-############	
-	
-sub trim
-	{    
+    $styleDependencies .= ', ' unless ( $styleDependencies eq '' );
+    $styleDependencies .= $styleid;
+}
+
+############
+
+sub addScriptsToHead {
+    return unless ( defined $Foswiki::cfg{Plugins}{JQueryLibPlugin}{Scripts} );
+
+    #Next the scripts
+    my @scripts =
+      split( ',', $Foswiki::cfg{Plugins}{JQueryLibPlugin}{Scripts} );
+    foreach my $script (@scripts) {
+        addScriptToHead($script);
+    }
+}
+
+############
+
+sub addScriptToHead {
+    my $script = shift;
+    $script = trim($script);
+    my $scriptid = "JQueryLibPlugin_$script";
+
+    #If our ID is already there don't go any further
+    return unless ( index( $scriptDependencies, $scriptid ) == -1 );
+    Foswiki::Func::addToHEAD( $scriptid, JQueryScript($script),
+        $scriptDependencies );
+
+    #Add dependency
+    $scriptDependencies .= ', ' unless ( $scriptDependencies eq '' );
+    $scriptDependencies .= $scriptid;
+}
+
+############
+
+sub trim {
     my $string = shift;
     $string =~ s/^\s+//;
     $string =~ s/\s+$//;
     return $string;
-	}
+}
 
 ############
-		
-sub JQueryScript
-	{
-  	my ($scriptFileName) = @_;   
-  	return "<script type=\"text/javascript\" src=\"%PUBURLPATH%/%SYSTEMWEB%/JQueryLibPlugin/$scriptFileName\"></script>";
-	}
+
+sub JQueryScript {
+    my ($scriptFileName) = @_;
+    return
+"<script type=\"text/javascript\" src=\"%PUBURLPATH%/%SYSTEMWEB%/JQueryLibPlugin/$scriptFileName\"></script>";
+}
 
 ############
-	
-sub JQueryStyle
-	{
-  	my ($styleFileName) = @_;   
-  	return "<style type='text/css'>\@import url('%PUBURLPATH%/%SYSTEMWEB%/JQueryLibPlugin/$styleFileName');</style>";
-	}
+
+sub JQueryStyle {
+    my ($styleFileName) = @_;
+    return
+"<style type='text/css'>\@import url('%PUBURLPATH%/%SYSTEMWEB%/JQueryLibPlugin/$styleFileName');</style>";
+}
 
 ##############
 
-sub _JQSCRIPT
-	{
-    my($session, $params, $theTopic, $theWeb) = @_;    
-    addScriptToHead($params->{_DEFAULT});    
+sub _JQSCRIPT {
+    my ( $session, $params, $theTopic, $theWeb ) = @_;
+    addScriptToHead( $params->{_DEFAULT} );
     return '';
-	}
+}
 
-##############	
-	
-sub _JQSTYLE
-	{
-    my($session, $params, $theTopic, $theWeb) = @_;    
-    addStyleToHead($params->{_DEFAULT});
-    return '';    
-	}
+##############
 
-
-		
-
+sub _JQSTYLE {
+    my ( $session, $params, $theTopic, $theWeb ) = @_;
+    addStyleToHead( $params->{_DEFAULT} );
+    return '';
+}
 
 # The function used to handle the %EXAMPLETAG{...}% macro
 # You would have one of these for each macro you want to process.
@@ -268,8 +260,6 @@ sub _JQSTYLE
 #    # $params->{_DEFAULT} will be 'hamburger'
 #    # $params->{sideorder} will be 'onions'
 #}
-	
-	
 
 =begin TML
 

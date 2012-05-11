@@ -19,8 +19,8 @@
 package TWiki::Plugins::SlidyPlugin;
 
 use vars qw(
-        $web $topic $user $installWeb $VERSION $RELEASE $debug
-    );
+  $web $topic $user $installWeb $VERSION $RELEASE $debug
+);
 
 # This should always be $Rev$ so that TWiki can determine the checked-in
 # status of the plugin. It is used by the build automation tools, so
@@ -36,8 +36,9 @@ sub initPlugin {
     ( $topic, $web, $user, $installWeb ) = @_;
 
     # check for Plugins.pm versions
-    if( $TWiki::Plugins::VERSION < 1 ) {
-        TWiki::Func::writeWarning( "Version mismatch between SlidyPlugin and Plugins.pm" );
+    if ( $TWiki::Plugins::VERSION < 1 ) {
+        TWiki::Func::writeWarning(
+            "Version mismatch between SlidyPlugin and Plugins.pm");
         return 0;
     }
 
@@ -46,10 +47,10 @@ sub initPlugin {
 
 sub commonTagsHandler {
 ### my ( $text, $topic, $web ) = @_;   # do not uncomment, use $_[0], $_[1]... instead
-    if( $_[0] =~ /%SLIDYSTART/ ) {
+    if ( $_[0] =~ /%SLIDYSTART/ ) {
         require TWiki::Plugins::SlidyPlugin::Slidy;
-        TWiki::Plugins::SlidyPlugin::Slidy::init( $installWeb );
-        $_[0] = TWiki::Plugins::SlidyPlugin::Slidy::handler( @_ );
+        TWiki::Plugins::SlidyPlugin::Slidy::init($installWeb);
+        $_[0] = TWiki::Plugins::SlidyPlugin::Slidy::handler(@_);
     }
 }
 

@@ -78,30 +78,26 @@ our %parse_definitions = (
         pattern => "$periodic_rx\\s+-\\s+$full_date_rx",
         keys    => [qw(name p   dd1 mm1   yy1 dd2 mm2  yy2 xs  xcstr descr )]
     },
-    'dates with year' =>
-      { 
-        pattern => $full_date_rx, 
-        keys => [qw(name dd mm yy xs xcstr descr )] 
-     },
+    'dates with year' => {
+        pattern => $full_date_rx,
+        keys    => [qw(name dd mm yy xs xcstr descr )]
+    },
     'anniversary dates' => {
         pattern => "$anniversary_date_rx",
         keys    => [qw(name dd mm yy xs xcstr descr )]
     },
-    'dates without year' =>
-      { 
-        pattern => "$date_rx", 
-        keys => [qw(name dd mm xs xcstr descr )] 
+    'dates without year' => {
+        pattern => "$date_rx",
+        keys    => [qw(name dd mm xs xcstr descr )]
     },
-    'monthly repeaters' =>
-     { 
-          pattern => "$monthly_rx", 
-          keys => [qw(name nn dd xs xcstr descr )] 
+    'monthly repeaters' => {
+        pattern => "$monthly_rx",
+        keys    => [qw(name nn dd xs xcstr descr )]
     },
-    'weekly repeaters' =>
-      { 
-          pattern => "$weekly_rx", 
-          keys => [qw(name dd xs xcstr descr )] 
-      },
+    'weekly repeaters' => {
+        pattern => "$weekly_rx",
+        keys    => [qw(name dd xs xcstr descr )]
+    },
     'num-day-mon repeaters' => {
         pattern => "$numdaymon_rx",
         keys    => [qw(name dd dy mn xs xcstr descr )]
@@ -110,11 +106,10 @@ our %parse_definitions = (
         pattern => "$periodic_rx",
         keys    => [qw(name p dd mm yy xs xcstr descr )]
     },
-    'date monthly repeaters' =>
-      { 
-          pattern => "($days_rx)", 
-        keys => [qw(name dd xs xcstr descr )] 
-     },
+    'date monthly repeaters' => {
+        pattern => "($days_rx)",
+        keys    => [qw(name dd xs xcstr descr )]
+    },
 );
 
 our $expanding = 0;    # recursion block

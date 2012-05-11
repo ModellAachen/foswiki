@@ -19,4 +19,5 @@ The following variables can be used in the format string:
    * $url: url for the link
    * $marker: the marker set to the "marker" string if the link points to the current web
    * $tooltip: tooltip for the link, mostly used in a =title= argument of an anchor
+   * $summary: web summary as defined in the WEBSUMMARY preference variable
 

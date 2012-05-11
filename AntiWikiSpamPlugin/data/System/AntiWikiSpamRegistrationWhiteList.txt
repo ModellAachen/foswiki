@@ -1,0 +1,17 @@
+---+!! !AntiWikiSpamRegistrationWhiteList
+
+---++ List of local regular expressions
+The below verbatim block is extracted and used as a list of Regular
+Expressions for the AntiWikiSpamPlugin. Each line can contain a comment
+starting with a #. Both the domain name and the corresponding IP address
+(found by DNS lookup) are matched, so you can match either domain names or
+IP addresses. The whitelist overrides the blacklist i.e. an address *must*
+be found in the whitelist before the blacklist is checked. Don't forget to
+escape full-stops in regular expressions!
+
+<verbatim>
+\S+ # At least one non-whitespace character required
+</verbatim>
+
+   * Set ALLOWTOPICVIEW = %USERSWEB%.AdminGroup
+   * Set ALLOWTOPICCHANGE = %USERSWEB%.AdminGroup

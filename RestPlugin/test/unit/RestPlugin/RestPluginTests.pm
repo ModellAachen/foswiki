@@ -153,7 +153,8 @@ sub TODOtestGET_webs_doesnotexist {
 
     #TODO: does not exist
     {
-        my $meta = Foswiki::Meta->load($this->{session}, 'SystemDoesNotExist');
+        my $meta =
+          Foswiki::Meta->load( $this->{session}, 'SystemDoesNotExist' );
 
         try {
             my ( $replytext, $hdr ) =

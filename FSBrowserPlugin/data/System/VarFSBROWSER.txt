@@ -1,0 +1,9 @@
+%META:TOPICINFO{author="AlexisHazell" date="1332387044" format="1.1" version="2"}%
+%META:TOPICPARENT{name="FSBrowserPlugin"}%
+#VarFSBROWSER
+---+++ FSBROWSER -- create a filesystem tree in nested Foswiki list format
+   * The %<nop>FSBROWSER{}%= variable is handled by the FSBrowserPlugin
+   * Syntax: =%<nop>FSBROWSER{"/directory" maxdepth="number"]}%=
+   * Parameter =DEFAULT="..."= - directory to browser, relative to $Foswiki::cfg{PubUrlPath}
+   * Parameter =maxdepth="..."= - maximum depth of tree
+   * Example: =%<nop>FSBROWSER{"/mydir" maxdepth="3"}%=

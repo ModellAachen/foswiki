@@ -2,14 +2,15 @@
 ---+ Settings for WysiwygPlugin that are common to most editor integrations
 %STARTINCLUDE%
 ---++++ WYSIWYG_EXCLUDE - Prevent WYSIWYG editing 
-<blockquote class="foswikiHelp">%X% This is not supported currently by the !TinyMCE Editor.  This setting is not used.</blockquote>
-
-The *global* [[%SYSTEMWEB%.PreferenceSettings][preference setting]] =WYSIWYG_EXCLUDE= can be set to make the plugin sensitive to what is in a topic, before allowing it to be edited. You can set it up to veto an edit if the topic contains:
+The *global* [[%SYSTEMWEB%.PreferenceSettings][preference setting]] =WYSIWYG_EXCLUDE= can be set to make the plugin sensitive to what is in a topic, before allowing it to be edited. The comma separated list to fall back to text edit can include:
    * =html= - HTML tags (e.g. =&lt;div&gt;=, not including &lt;br&gt;), or 
    * =macros= - simple macros (e.g. =%<nop>VAR%=) or 
    * =calls= - macros with parameters e.g. =%<nop>MACRO{...}%=
    * =pre= blocks (=&lt;pre&gt;=)
    * HTML =comments= (=&lt;!--= ... =--&gt;=)
+   * =script= = inline HTML Script tags - _default_
+   * =style= = inline Css style tags - _default_
+   * =table= = inline html tables (=&lt;table ..&gt;.  TML tables are not excluded)
 If the plugin detects an excluded construct in the topic, it will refuse to allow the edit and will redirect to the default editor.
 ---+++++ WYSIWYG_EDITABLE_CALLS - Exceptions to WYSIWYG_EXCLUDE
 If you excluded =calls= in =WYSIWYG_EXCLUDE=, you can still define a subset of macros that do *not* block edits. this is done in the *global* [[%SYSTEMWEB%.PreferenceSettings][preference setting]] =WYSIWYG_EDITABLE_CALLS=, which should be a list of macro names separated by vertical bars, with no spaces, e.g: =* Set WYSIWYG_EDITABLE_CALLS = COMMENT|CALENDAR|INCLUDE=
@@ -19,7 +20,8 @@ You should set =WYSIWYG_EXCLUDE= and =WYSIWYG_EDITABLE_CALLS= in %USERSWEB%.Site
 ---++++ WYSIWYGPLUGIN_PROTECT_EXISTING_TAGS - Protect specific tags originally in the topic text
 The =WYSIWYGPLUGIN_PROTECT_EXISTING_TAGS= preference tells the translator 
 that certain HTML tags which were originally in the topic text should _remain_ as HTML tags;
-the translator will not try to convert them to TML.
+the translator will not try to convert them to TML.  This protects the tags
+themselves, and not the contents enclosed between the =&lt;tag>= and =&lt;/tag>=
 
 The default setting for this preference is defined within the plugin.
 It corresponds to =div, span=.
@@ -30,6 +32,22 @@ of HTML tags to TML markup remains subject to the other controls provided
 by the !WysiwygPlugin, including the =WYSIWYGPLUGIN_STICKYBITS= preference,
 =&lt;sticky&gt;= blocks, =&lt;literal&gt;= blocks and the rules applied 
 to tables and lists.
+
+---++++ WYSIWYGPLUGIN_PROTECT_TAG_BLOCKS - Protect specific tag blocks originally in the topic text
+The =WYSIWYGPLUGIN_PROTECT_TAG_BLOCKS= preference tells the translator
+that certain HTML tag blocks which were originally in the topic text should _remain_ as HTML blocks;
+the translator will not try to convert them to TML.
+
+The default setting for this preference is defined within the plugin.
+It corresponds to =script, style=.
+
+As an example, individual html tables can be protected by surrounding them
+with =&lt;sticky> .. &lt;/sticky> block.  However,if you want to have all
+=&lt;table> markup preserved as entered into topics by default, rather than subject to
+WYSIWYG editing,  add =table= to this list, and =&lt;table> markup will become
+automatically sticky.
+
+This feature may be disabled by setting the preference to a single comma.
 
 ---++++ WYSIWYGPLUGIN_STICKYBITS - Protect tags based upon their arguments
 You can define the global preference =WYSIWYGPLUGIN_STICKYBITS= to stop the

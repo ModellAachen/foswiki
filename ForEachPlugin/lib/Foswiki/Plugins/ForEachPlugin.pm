@@ -51,7 +51,7 @@ sub initPlugin {
     Foswiki::Func::writeDebug(
         "- Foswiki::Plugins::${pluginName}::initPlugin( $web.$topic ) is OK")
       if $debug;
-    
+
     return 1;
 }
 
@@ -78,11 +78,11 @@ s/%FOR{\s*"(.+?)"\s+start="(.+?)"\s+stop="(.+?)"\s+step="(.+?)"\s*}%(.*?)%NEXT{\
 sub handleForEach {
     my ( $var, $list, $body ) = @_;
     my $ldebug = $debug;
-    
+
     &Foswiki::Func::writeDebug(
 "- ${pluginName}::handleForEach(\n var: $var\n list: $list\n body: $body\n )"
     ) if $ldebug;
-    
+
     my $ret = "";
 
     foreach my $item ( split /\s*,\s*/, $list ) {
@@ -93,21 +93,21 @@ sub handleForEach {
     &Foswiki::Func::writeDebug(
         "- ${pluginName}::handleForEach() intermediate:\n$ret")
       if $ldebug;
-    
+
     $ret =~ s/\$percnt/%/g;
     $ret = &Foswiki::Func::expandCommonVariables($ret);
-    
+
     &Foswiki::Func::writeDebug(
         "- ${pluginName}::handleForEach() returns:\n$ret")
       if $ldebug;
-    
+
     return $ret;
 }
 
 # =========================
 sub handleFor {
     my ( $var, $start, $stop, $step, $body ) = @_;
-    
+
     unless (( $start =~ /^-?[0-9]+$/ )
         and ( $stop =~ /^-?[0-9]+$/ )
         and ( $step =~ /^-?[0-9]+$/ ) )
@@ -115,7 +115,7 @@ sub handleFor {
         return
 qq(%RED% FOR{"$var" start="$start" stop="$stop" step="$step"} : Not a number %ENDCOLOR%);
     }
-    
+
     if (   ( $step == 0 )
         or ( ( $start > $stop ) and ( $step > 0 ) )
         or ( ( $start < $stop ) and ( $step < 0 ) ) )
@@ -124,11 +124,11 @@ qq(%RED% FOR{"$var" start="$start" stop="$stop" step="$step"} : Not a number %EN
     }
 
     my $ldebug = $debug;
-    
+
     &Foswiki::Func::writeDebug(
 "- ${pluginName}::handleFor(\n var: $var\n start: $start\n stop: $stop\n step: $step\n body: $body\n )"
     ) if $ldebug;
-    
+
     my $ret = "";
 
     for (
@@ -145,13 +145,13 @@ qq(%RED% FOR{"$var" start="$start" stop="$stop" step="$step"} : Not a number %EN
     &Foswiki::Func::writeDebug(
         "- ${pluginName}::handleFor() intermediate:\n$ret")
       if $ldebug;
-    
+
     $ret =~ s/\$percnt/%/g;
     $ret = &Foswiki::Func::expandCommonVariables($ret);
-    
+
     &Foswiki::Func::writeDebug("- ${pluginName}::handleFor() returns:\n$ret")
       if $ldebug;
-    
+
     return $ret;
 }
 

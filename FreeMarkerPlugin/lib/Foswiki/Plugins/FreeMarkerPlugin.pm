@@ -8,12 +8,12 @@ use Foswiki::Plugins ();    # For the API version
 use Foswiki::Plugins::FreeMarkerPlugin::AttributeParser qw(new parse);
 use Foswiki::Plugins::FreeMarkerPlugin::FreeMarkerParser qw(new parse);
 
-our $VERSION = '$Rev: 4533 $';
+our $VERSION           = '$Rev: 4533 $';
 our $RELEASE           = '1.1.1';
 our $SHORTDESCRIPTION  = '<nop>FreeMarker template parser';
 our $NO_PREFS_IN_TOPIC = 1;
 our $pluginName        = 'FreeMarkerPlugin';
-our $debug = 0;
+our $debug             = 0;
 our $web;
 our $topic;
 
@@ -26,17 +26,17 @@ sub initPlugin {
             __PACKAGE__, ' and Plugins.pm' );
         return 0;
     }
-    
+
     $topic = $inTopic;
-    $web = $inWeb;
-    
+    $web   = $inWeb;
+
     $debug = Foswiki::Func::getPluginPreferencesFlag("DEBUG");
-    
-	Foswiki::Func::registerTagHandler( 'STARTFREEMARKER', \&_startFreeMarker );
-	Foswiki::Func::registerTagHandler( 'ENDFREEMARKER', \&_endFreeMarker );
-	
+
+    Foswiki::Func::registerTagHandler( 'STARTFREEMARKER', \&_startFreeMarker );
+    Foswiki::Func::registerTagHandler( 'ENDFREEMARKER',   \&_endFreeMarker );
+
     _debug("initPlugin; plugin initialized");
-    
+
     return 1;
 }
 
@@ -45,6 +45,7 @@ sub initPlugin {
 =cut
 
 sub commonTagsHandler {
+
     #my ($text, $topic, $web, $meta ) = @_;
 
     $_[0] =~
@@ -59,22 +60,22 @@ _handleTemplate($attributes, $content, $web, $topic)
 
 sub _handleTemplate {
     my ( $inAttrStr, $inContent, $inWeb, $inTopic ) = @_;
-    
+
     _debug("_handleTemplate");
-    _debug("\t inAttrStr=$inAttrStr");    
+    _debug("\t inAttrStr=$inAttrStr");
     _debug("\t inContent=$inContent");
-    
-	my $parser = new Foswiki::Plugins::FreeMarkerPlugin::FreeMarkerParser();
-	$parser->setDebugLevel( $debug ? 0x1F : 0 );
-	
-	my %attributes = Foswiki::Func::extractParameters($inAttrStr);
-	my $data = {};
-	$data = _attributesToData(\%attributes) if (%attributes);
-	
-    my $parsed = $parser->parse($inContent, $data);
-    
-    _debug("\t parsed=$parsed");    
-    
+
+    my $parser = new Foswiki::Plugins::FreeMarkerPlugin::FreeMarkerParser();
+    $parser->setDebugLevel( $debug ? 0x1F : 0 );
+
+    my %attributes = Foswiki::Func::extractParameters($inAttrStr);
+    my $data       = {};
+    $data = _attributesToData( \%attributes ) if (%attributes);
+
+    my $parsed = $parser->parse( $inContent, $data );
+
+    _debug("\t parsed=$parsed");
+
     return $parsed;
 }
 
@@ -85,42 +86,45 @@ Uses AttributeParser to convert string input to Perl data objects.
 =cut
 
 sub _attributesToData {
-    my ( $inAttr ) = @_;
-		
-	my $parser = new Foswiki::Plugins::FreeMarkerPlugin::AttributeParser();
-	$parser->setDebugLevel( $debug ? 0x1F : 0 );
+    my ($inAttr) = @_;
 
-	my $data = {};
+    my $parser = new Foswiki::Plugins::FreeMarkerPlugin::AttributeParser();
+    $parser->setDebugLevel( $debug ? 0x1F : 0 );
 
-	while ( my ($key, $value) = each %{$inAttr} ) {
-		# render $value so that we interpret $percnt and such
-		$value = Foswiki::Func::decodeFormatTokens($value);
-		$value = Foswiki::Func::expandCommonVariables( $value, $topic, $web );
-		
-		$data->{$key} = $parser->parse($value);
-	}
-	if ($data->{_DEFAULT}) {
-		foreach my $key ( keys %{$data->{_DEFAULT}} ) {
-			$data->{$key} = $data->{_DEFAULT}->{$key};
-		}
-		delete $data->{_DEFAULT};
-	}
-	
-	if ($debug) {
-		use Data::Dumper;
-		_debug("_attributesToData:\n" . Dumper($data));
-	}
-	
-	return $data;
+    my $data = {};
+
+    while ( my ( $key, $value ) = each %{$inAttr} ) {
+
+        # render $value so that we interpret $percnt and such
+        $value = Foswiki::Func::decodeFormatTokens($value);
+        $value = Foswiki::Func::expandCommonVariables( $value, $topic, $web );
+
+        $data->{$key} = $parser->parse($value);
+    }
+    if ( $data->{_DEFAULT} ) {
+        foreach my $key ( keys %{ $data->{_DEFAULT} } ) {
+            $data->{$key} = $data->{_DEFAULT}->{$key};
+        }
+        delete $data->{_DEFAULT};
+    }
+
+    if ($debug) {
+        use Data::Dumper;
+        _debug( "_attributesToData:\n" . Dumper($data) );
+    }
+
+    return $data;
 }
 
 # ignored
 sub _startFreeMarker {
+
     #my($session, $params, $inTopic, $inWeb) = @_;
 }
 
 # ignored
 sub _endFreeMarker {
+
     #my($session, $params, $inTopic, $inWeb) = @_;
 }
 

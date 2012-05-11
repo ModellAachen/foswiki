@@ -247,7 +247,7 @@ sub _make_error_image {
     # Get remaining parameters and pass to <img ... />
     my $options = "";
     foreach my $k ( keys %$parameters ) {
-	next if $k =~ /^_/;
+        next if $k =~ /^_/;
         $options .= "$k=\"$$parameters{$k}\" ";
     }
     return "<img src=\"%ATTACHURL%/$filename?t=$timestamp\" alt=\"$msg\""
@@ -490,7 +490,7 @@ sub _make_tambar_gauge {
     # Get remaining parameters and pass to <img ... />
     my $options = "";
     foreach my $k ( keys %$parameters ) {
-	next if $k =~ /^_/;
+        next if $k =~ /^_/;
         $options .= "$k=\"$$parameters{$k}\" ";
     }
     return "<img src=\"%ATTACHURL%/$filename?t=$timestamp\" alt=\"$alt\""
@@ -539,7 +539,7 @@ sub _make_trend_gauge {
     # Get remaining parameters and pass to <img ... />
     my $options = "";
     foreach my $k ( keys %$parameters ) {
-	next if $k =~ /^_/;
+        next if $k =~ /^_/;
         $options .= "$k=\"$$parameters{$k}\" ";
     }
     my $timestamp = time();

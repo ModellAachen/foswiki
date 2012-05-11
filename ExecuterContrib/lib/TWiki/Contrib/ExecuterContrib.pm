@@ -20,5 +20,6 @@ use vars qw( $VERSION $RELEASE $SHORTDESCRIPTION );
 
 $VERSION = '$Rev$';
 $RELEASE = '';
-$SHORTDESCRIPTION = 'Scripts running on a remote machine and executing tasks as defined by TaskExeContrib.';
+$SHORTDESCRIPTION =
+'Scripts running on a remote machine and executing tasks as defined by TaskExeContrib.';
 

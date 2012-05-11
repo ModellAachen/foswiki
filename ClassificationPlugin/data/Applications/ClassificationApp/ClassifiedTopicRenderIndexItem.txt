@@ -1,4 +1,4 @@
-%META:TOPICINFO{author="ProjectContributor" comment="reprev" date="1321307768" format="1.1" reprev="11" version="11"}%
+%META:TOPICINFO{author="micha" comment="reprev" date="1331631362" format="1.1" reprev="13" version="15"}%
 %META:TOPICPARENT{name="TopicFunction"}%
 %TOC{depth="2"}%
 
@@ -14,32 +14,31 @@ a summary for an object of type ClassifiedTopic.
 
 ---++ Implementation
 <verbatim class="tml">
-%STARTINCLUDE%<!-- -->
+%STARTINCLUDE%<!-- -->%CALC{"$SET(catinfo, 0)"}%
 %DBQUERY{topic="%OBJECT%"
   format="<div class='clsIndexItem clsTopicItem clsCassifiedTopicItem'>
-    $percntDBCALL{\"Applications.RenderTopicThumbnail\"}$percnt<!-- -->
+    $percntDBCALL{\"$web.$topic->Applications.RenderTopicThumbnail\"}$percnt<!-- -->
     [[$web.$topic][$expand(topictitle)]]&nbsp;$percntREDDOT{\"$web.$topic\"}$percnt
     $expand('<div class=\"foswikiTopicSummary\">' and Summary and '</div>')<!-- -->
     <div class='foswikiTopicInfo'>
       $percntCATINFO{\"$web.$topic\" 
         header=\"<span class='clsCatInfo'>$dollarpercntMAKETEXT{\\"Filed in [_1]\\" args=\\"\" 
         separator=\"&#44; \"
-        footer=\"\\"}$dollarpercnt<br /></span>\"
-      }$percnt<!-- -->
-      $percntTAGINFO{\"$web.$topic\" 
-        header=\"<span class='clsTagInfo'>$dollarpercntMAKETEXT{\\"Tagged [_1]\\" args=\\"\" 
+        footer=\"\\"}$dollarpercnt</span>$dollarpercntCALC{\\"$SET(catinfo, 1)\\"}$dollarpercnt\"
+      }$percnt$percntTAGINFO{\"$web.$topic\" 
+        header=\"<span class='clsTagInfo'>$percntCALC{\"$IF($GET(catinfo),&#44; $dollarpercntMAKETEXT{\\\"tagged [_1]\\\" args=\\\",$dollarpercntMAKETEXT{\\\"Tagged [_1]\\\" args=\\\")\"}$percnt\"
         separator=\"&#44; \"
         limit=\"5\"
-        footer=\"\\"}$dollarpercnt<br /></span>\"
+        footer=\"\\"}$dollarpercnt</span>\"
       }$percnt<!-- -->
-      <span class='clsAuthorDateInfo'>
+      <div class='clsAuthorDateInfo'>
         $formatTime(info.date),
         <nop>$percntGETTOPICTITLE{\"
              $percntUSERINFO{\"$expand(info.author)\"
                format=\"$wikiusername\"
              }$percnt\"
         }$percnt
-      </span>
+      </div>
     </div>
   </div>
   %CLEAR%"
@@ -54,7 +53,7 @@ a summary for an object of type ClassifiedTopic.
 %DBCALL{"Applications.RenderFunctionCallers"}%
 
 ---++ Copyright
-&copy; 2008-2011 Michael Daum http://michaeldaumconsulting.com
+&copy; 2008-2012 Michael Daum http://michaeldaumconsulting.com
 
 %DBCALL{"Applications.GnuGeneralPublicLicense" section="notice"}%
 

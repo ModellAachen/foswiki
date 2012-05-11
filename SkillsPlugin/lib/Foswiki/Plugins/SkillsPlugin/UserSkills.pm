@@ -25,11 +25,11 @@ my %_userSkills;    # contains an array of UserSkill objects keyed by user
 # Object that handles interaction with the user data (currently stored in the meta or the users topic)
 # $skillset is an optional Skills object that lets us filter on those skills
 sub new {
-    my ($class, $skillset) = @_;
+    my ( $class, $skillset ) = @_;
 
     #my ($class, $name, $cat, $rating, $comment) = @_;
 
-    my $self = bless( { skillset => $skillset}, $class );
+    my $self = bless( { skillset => $skillset }, $class );
 
     return $self;
 }
@@ -37,31 +37,34 @@ sub new {
 # loads the skills for a particular user
 # gets it from the meta of the topic and stores in global hash
 sub _loadUserSkills {
-    my ($self, $user) = @_;
+    my ( $self, $user ) = @_;
 
     my $mainWeb = Foswiki::Func::getMainWebname();
     my ( $meta, undef ) = Foswiki::Func::readTopic( $mainWeb, $user );
     my @skillsMeta = $meta->find('SKILLS');
-    my $userSkills = new Foswiki::Plugins::SkillsPlugin::UserSkill( $user );
+    my $userSkills = new Foswiki::Plugins::SkillsPlugin::UserSkill($user);
     foreach my $skillMeta (@skillsMeta) {
-        # Skip skills not in the skill set, if we have been given one
-        next if ($self->{skillset} && !$self->{skillset}->isKnownSkill(
-            $skillMeta->{category}, $skillMeta->{name}));
-        my $skill = new Foswiki::Plugins::SkillsPlugin::UserSkill(
-            $skillMeta->{name});
-        $skill->{rating} = $skillMeta->{rating} || -1;
-        $skill->{text} = $skillMeta->{comment} || '';
 
-        my @path = split('/', $skillMeta->{category});
-        $userSkills->addByPath($skill, @path);
+        # Skip skills not in the skill set, if we have been given one
+        next
+          if ( $self->{skillset}
+            && !$self->{skillset}
+            ->isKnownSkill( $skillMeta->{category}, $skillMeta->{name} ) );
+        my $skill =
+          new Foswiki::Plugins::SkillsPlugin::UserSkill( $skillMeta->{name} );
+        $skill->{rating} = $skillMeta->{rating}  || -1;
+        $skill->{text}   = $skillMeta->{comment} || '';
+
+        my @path = split( '/', $skillMeta->{category} );
+        $userSkills->addByPath( $skill, @path );
     }
 
     $_userSkills{$user} = $userSkills;
 }
 
 sub getUser {
-    my ($this, $user) = @_;
-    if (!$_userSkills{$user}) {
+    my ( $this, $user ) = @_;
+    if ( !$_userSkills{$user} ) {
         $this->_loadUserSkills($user);
     }
     return $_userSkills{$user};
@@ -69,7 +72,7 @@ sub getUser {
 
 # saves the skills for a particular user
 sub save {
-    my ($self, $user) = @_;
+    my ( $self, $user ) = @_;
 
     my $mainWeb = Foswiki::Func::getMainWebname();
 
@@ -78,8 +81,7 @@ sub save {
     $meta->remove('SKILLS');
     $user->saveToMeta($meta);
 
-    Foswiki::Func::saveTopic(
-        $meta->web(), $meta->topic(), $meta, $text,
+    Foswiki::Func::saveTopic( $meta->web(), $meta->topic(), $meta, $text,
         { dontlog => 1, comment => 'SkillsPlugin', minor => 1 } );
 }
 

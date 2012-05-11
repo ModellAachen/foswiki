@@ -51,8 +51,8 @@ sub new {
     my ( $class, $theWeb, $params ) = @_;
     my $this = bless( {}, $class );
 
-    $this->{_allwebs} = ( $params->{allwebs} &&
-      $params->{allwebs} =~ m/^(on|true|yes|1)$/io );
+    $this->{_allwebs} =
+      ( $params->{allwebs} && $params->{allwebs} =~ m/^(on|true|yes|1)$/io );
     $this->{_web} = $params->{web} || $theWeb;
 
     my $topic;
@@ -65,58 +65,72 @@ sub new {
 
     # Root of a URL that points to topics in this web. Used to detect
     # absolute URL references to topics
-    $this->{_hereUrl} = Foswiki::Func::getScriptUrl( $this->{_web}, "DUMMY", "view" );
+    $this->{_hereUrl} =
+      Foswiki::Func::getScriptUrl( $this->{_web}, "DUMMY", "view" );
     $this->{_hereUrl} =~ s/\/DUMMY$//o;
 
     my $allrefs = $params->{allrefs};
-    $this->{_keepAllRefs} = ( defined( $allrefs ) && $allrefs =~ m/^(on|true|yes|1)$/i );
+    $this->{_keepAllRefs} =
+      ( defined($allrefs) && $allrefs =~ m/^(on|true|yes|1)$/i );
 
     # Note; we read topics even if this user is denied read access. This
     # is secure, because we don't admit to where the reference to a topic came
     # from.
-    my @webs = $this->{_allwebs} ?
-      Foswiki::Func::getPublicWebList() : ( $this->{_web} );
-    foreach my $fromweb ( @webs ) {
-        foreach $topic ( grep( !/^WebStatistics$/,
-                        Foswiki::Func::getTopicList( $fromweb )) ) {
+    my @webs =
+      $this->{_allwebs} ? Foswiki::Func::getPublicWebList() : ( $this->{_web} );
+    foreach my $fromweb (@webs) {
+        foreach $topic (
+            grep( !/^WebStatistics$/, Foswiki::Func::getTopicList($fromweb) ) )
+        {
 
             # This code (or similar) is a subset of code that is
             # duplicated widely. For example, Store.pm updateReferingPages
 
-            my $text = Foswiki::Func::readTopicText( $fromweb, $topic, undef, 1 );
+            my $text =
+              Foswiki::Func::readTopicText( $fromweb, $topic, undef, 1 );
 
             # kill anchors
             $text =~ s/^\#$Foswiki::regex{wikiWordRegex}//go;
+
             # kill verbatim & noautolink
             $text =~ s/<(verbatim|noautolink)>.*?<\/\1>//sgo;
+
             # kill topic parent & info
             $text =~ s/^%META:TOPIC.*$//go;
 
             # Handle absolute URLs
-            $text =~ s/(^|[\-\*\s\(])[a-z]+:\/\/\S*\/$this->{_web}\/($Foswiki::regex{wikiWordRegex})\//$this->_wikiword($2,$fromweb,$topic)/geo;
+            $text =~
+s/(^|[\-\*\s\(])[a-z]+:\/\/\S*\/$this->{_web}\/($Foswiki::regex{wikiWordRegex})\//$this->_wikiword($2,$fromweb,$topic)/geo;
+
             # Handle [[]]
-            $text =~ s/\[\[([^\]]+)\](\[[^\]]+\])?\]/$this->_spaced($1,$fromweb,$topic)/geo;
-            # Note that we add " to the following RE's to ensure we pick up topic
-            # references embedded in parameters to tags
-            $text =~ s/[\s\(\"]$this->{_web}\.($Foswiki::regex{wikiWordRegex})/$this->_wikiword($1,$this->{_web},$topic)/ge;
+            $text =~
+s/\[\[([^\]]+)\](\[[^\]]+\])?\]/$this->_spaced($1,$fromweb,$topic)/geo;
+
+           # Note that we add " to the following RE's to ensure we pick up topic
+           # references embedded in parameters to tags
+            $text =~
+s/[\s\(\"]$this->{_web}\.($Foswiki::regex{wikiWordRegex})/$this->_wikiword($1,$this->{_web},$topic)/ge;
 
             # Kill <noautolink>
             $text =~ s/\n<noautolink>.*?\n<\/noautolink>//sgo;
 
             # Handle plain wikiwords
-            $text =~ s/[\s\(\"]($Foswiki::regex{wikiWordRegex})/$this->_wikiword($1,$fromweb,$topic)/geo;
+            $text =~
+s/[\s\(\"]($Foswiki::regex{wikiWordRegex})/$this->_wikiword($1,$fromweb,$topic)/geo;
 
             # Handle acronyms/abbreviations of three or more letters
             # 'Web.ABBREV' link:
-            $text =~ s/[\s\(\"]$this->{_web}\.($Foswiki::regex{abbrevRegex})/$this->_wikiword($1,$fromweb,$topic)/ge;
-            $text =~ s/[\s\(\"]($Foswiki::regex{abbrevRegex})/$this->_wikiword($1,$fromweb,$topic)/geo;
+            $text =~
+s/[\s\(\"]$this->{_web}\.($Foswiki::regex{abbrevRegex})/$this->_wikiword($1,$fromweb,$topic)/ge;
+            $text =~
+s/[\s\(\"]($Foswiki::regex{abbrevRegex})/$this->_wikiword($1,$fromweb,$topic)/geo;
         }
     }
     return $this;
 }
 
 sub _uc {
-    return uc( shift );
+    return uc(shift);
 }
 
 # PRIVATE handle a spaced wiki word (phrase in [[ ]])
@@ -133,7 +147,7 @@ sub _link {
     my $thisweb = $this->{_web};
 
     $text =~ s/^.*\b$thisweb[\/\.]($Foswiki::regex{wikiWordRegex})\b/$1/;
-    if( $text ne "" ) {
+    if ( $text ne "" ) {
         $this->_wikiword( $text, $web, $topic ) if ( $text =~ m/^\w+$/o );
     }
 
@@ -148,10 +162,12 @@ sub _wikiword {
     # don't treat it as a reference
     return "" if ( $text eq $topic );
 
-    if ( exists( $this->{$text} )) {
+    if ( exists( $this->{$text} ) ) {
         if ( !$this->{_keepAllRefs} ) {
             delete( $this->{$text} );
-        } elsif ( !$this->{_referees}{$text}{$topic} ) {
+        }
+        elsif ( !$this->{_referees}{$text}{$topic} ) {
+
             # This is potentially expensive. When looking for orphans,
             # it should suffice to know that a page is referred to, and
             # delete it from the hash. However we will need to know
@@ -170,30 +186,32 @@ sub tabulate {
     my $web = $this->{_web};
 
     my $header = "| *Action* | *$web";
-    my @list = grep( !/^_/, keys( %$this ));
+    my @list = grep( !/^_/, keys(%$this) );
     if ( $this->{_keepAllRefs} ) {
         $header .= " Topic* | *References* | *Referees* |";
         @list = sort { $this->{$a} <=> $this->{$b} } @list;
-    } else {
+    }
+    else {
         $header .= " Orphaned Topics* |";
         @list = sort @list;
     }
 
     my $scope = $this->{_allwebs} ? "" : "&amp;currentwebonly=on";
-    my $text = "";
-    my $url1 = "| <a href=\"%SCRIPTURL%/rename%SCRIPTSUFFIX%/$web";
-    foreach my $topic ( @list  ) {
-        $text .= "$url1/$topic?newweb=Trash&amp;nonwikiword=on$scope\">delete</a> | [[$web.$topic][$topic]]";
+    my $text  = "";
+    my $url1  = "| <a href=\"%SCRIPTURL%/rename%SCRIPTSUFFIX%/$web";
+    foreach my $topic (@list) {
+        $text .=
+"$url1/$topic?newweb=Trash&amp;nonwikiword=on$scope\">delete</a> | [[$web.$topic][$topic]]";
         if ( $this->{_keepAllRefs} ) {
             $text .= " | " . $this->{$topic} . " |";
-            foreach my $referee ( keys( %{$this->{_referees}{$topic}} )) {
+            foreach my $referee ( keys( %{ $this->{_referees}{$topic} } ) ) {
                 $text .= " $referee";
             }
         }
         $text .= " |\n";
     }
 
-    return "$header\n$text\n*" . scalar( @list ) . " topics*\n";
+    return "$header\n$text\n*" . scalar(@list) . " topics*\n";
 }
 
 1;

@@ -715,7 +715,8 @@ sub _formatType_select {
 	CGI::Select(
 	    { name => $fld,
 	      size => $size,
-	      class => 'atp_update userval value_' . $this->{$fld}
+	      class => 'atp_update userval value_' .
+		(defined $this->{$fld} ? $this->{$fld} : 'fw_field_not_defined'),
 	    },
 	    $fields ));
 }

@@ -31,3 +31,8 @@
 .ecpDisabled img {
   display:none;
 }
+
+.ecpForm .natEditTextArea {
+  width:98%;
+  margin:0px;
+} 

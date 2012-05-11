@@ -1,7 +1,7 @@
 ###############################################################################
 # NatSkinPlugin.pm - Plugin handler for the NatSkin.
 # 
-# Copyright (C) 2003-2011 MichaelDaum http://michaeldaumconsulting.com
+# Copyright (C) 2003-2012 MichaelDaum http://michaeldaumconsulting.com
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -72,7 +72,13 @@ sub getTopicTitle {
 
   #print STDERR "using foswiki core means\n";
 
-  my ($meta, undef) = Foswiki::Func::readTopic($web, $topic);
+  my ($meta, $text) = Foswiki::Func::readTopic($web, $topic);
+
+  if ($Foswiki::cfg{SecureTopicTitles}) {
+    my $wikiName = Foswiki::Func::getWikiName();
+    return $topic
+      unless Foswiki::Func::checkAccessPermission('VIEW', $wikiName, $text, $topic, $web, $meta);
+  }
 
   # read the formfield value
   my $title = $meta->get('FIELD', 'TopicTitle');

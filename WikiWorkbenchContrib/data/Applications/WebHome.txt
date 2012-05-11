@@ -1,4 +1,4 @@
-%META:TOPICINFO{author="micha" comment="reprev" date="1325758483" format="1.1" reprev="6" version="6"}%
+%META:TOPICINFO{author="ProjectContributor" comment="reprev" date="1325758483" format="1.1" reprev="6" version="6"}%
 Welcome to the %WEB% web.
 This web contains a set of WikiApplications that can be used in
 different parts of your <nop>%WIKITOOLNAME% wiki. It is used as a 

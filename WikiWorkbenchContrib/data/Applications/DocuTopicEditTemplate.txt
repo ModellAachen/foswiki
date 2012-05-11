@@ -1,9 +1,0 @@
-%META:TOPICINFO{author="ProjectContributor" comment="" date="1273479190" format="1.1" version="1"}%
-%META:TOPICPARENT{name="TopicView"}%
-%TMPL:INCLUDE{"Applications.WikiTopicEdit"}%
-
-%META:FORM{name="Applications.ApplicationTopic"}%
-%META:FIELD{name="TopicType" title="TopicType" value="TopicView"}%
-%META:FIELD{name="TopicTitle" attributes="" title="<nop>TopicTitle" value="DocuTopicEditTemplate"}%
-%META:FIELD{name="Summary" attributes="c" title="Summary" value="Editor for DocuTopics"}%
-%META:FIELD{name="WikiApplication" attributes="" title="WikiApplication" value="none"}%

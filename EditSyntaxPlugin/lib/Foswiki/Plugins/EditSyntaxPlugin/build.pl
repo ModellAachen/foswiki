@@ -18,7 +18,7 @@ BEGIN {
 use Foswiki::Contrib::Build;
 
 # Create the build object
-$build = new Foswiki::Contrib::Build( 'EditSyntaxPlugin' );
+$build = new Foswiki::Contrib::Build('EditSyntaxPlugin');
 
 # Build the target on the command line, or the default target
-$build->build($build->{target});
+$build->build( $build->{target} );

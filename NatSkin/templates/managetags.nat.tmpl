@@ -13,6 +13,7 @@
 %TMPL:DEF{"content"}%<!-- -->
 <form class="jqRenameTag" name="renametagform" action="%SCRIPTURLPATH{"rest"}%/ClassificationPlugin/renametag">
   <input type="hidden" name="web" value="%BASEWEB%" />
+  <input type="hidden" name="topic" value="%BASEWEB%.%BASETOPIC%" />
   <div class="foswikiFormStep">
     <h3>%MAKETEXT{"From"}%:</h3>
     <input type="text" class="foswikiInputField jqTextboxList jqFocus required {autocomplete:'%SCRIPTURL{"rest"}%/RenderPlugin/template/rest?name=classificationplugin&expand=querytags&topic=%BASEWEB%.%BASETOPIC%', clearControl:'#renameClear'}" size="30" name="from" />
@@ -28,8 +29,8 @@
       %MAKETEXT{"Select the tag to rename the above tags to. Leaving this empty will delete them."}%
     </div>
   </div>
-  <a class="jqUIDialogButton {icon:'ui-icon-circle-check', click: function() { $(this).find('form:first').submit(); }}">%MAKETEXT{"Submit"}%</a>
-  <a class="jqUIDialogButton {icon:'ui-icon-cancel', click: function() { $(this).dialog('close'); }}">%MAKETEXT{"Cancel"}%</a>
+  <a class="jqUIDialogButton jqUIDialogSubmit {icon:'ui-icon-circle-check'}">%MAKETEXT{"Submit"}%</a>
+  <a class="jqUIDialogButton jqUIDialogClose {icon:'ui-icon-cancel'}">%MAKETEXT{"Cancel"}%</a>
 </form>
 <!-- -->%TMPL:END%
 

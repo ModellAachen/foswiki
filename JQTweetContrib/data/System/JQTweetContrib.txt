@@ -1,0 +1,100 @@
+%META:TOPICINFO{author="ProjectContributor" comment="reprev" date="1334314767" format="1.1" reprev="3" version="6"}%
+---+!! %TOPIC%
+%SHORTDESCRIPTION%
+
+%TOC%
+
+%JQPLUGINS{"tweet"
+  format="
+    Homepage: $homepage <br />
+    Author(s): $author <br />
+    Version: $version
+  "
+}%
+---++ Summary
+%STARTSECTION{"summary"}%
+Put twitter on your website with tweet!, an unobtrusive javascript plugin for jquery.
+%ENDSECTION{"summary"}%
+
+---++ Features
+   * small size and fast download time
+   * will not slow down or pause your page while tweets are loading
+   * display up to 100 tweets, as permitted by the twitter search api
+   * display tweets from a twitter search, or from your own feed
+   * optional verb tense matching, for human readable tweets
+   * optionally display your avatar
+   * optionally display tweets from multiple accounts!
+   * automatic linking of @replies to users’ twitter page
+   * automatic linking of URLs
+   * automatic linking of #hashtags, to a twitter search of all your tags
+   * converts <3 to a css styleable ♥ (we ♥ hearts)
+   * customize the style with your own stylesheet or with other jquery plugins
+   * customize the layout with a user-defined template function
+
+---++ Demo
+
+%JQREQUIRE{"tweet" warn="off"}%
+
+<div id="foswikiTweets" class="jqTweet {query:'foswiki', count:10, refresh_interval:60}"></div>
+
+%BUTTON{"%MAKETEXT{"Refresh"}%" icon="arrow_refresh" onclick="jQuery('#foswikiTweets').trigger('tweet:load'); return false;"}%
+%CLEAR%
+
+---++ Usage
+
+<verbatim class="tml">
+%JQREQUIRE{"tweet"}%
+
+<div class="jqTweet {username:'foswiki'}"></div>
+
+<div class="jqTweet {query:'#foswiki'}"></div>
+</verbatim>
+
+---++ Parameters
+
+| *Name* | *Description* | *Default* |
+| username                           | [string or array] required unless using the 'query' option; one or more twitter screen names (use 'list' option for multiple names, where possible) | null |
+| list                               | [string]   optional name of list belonging to username | null |
+| favorites                          | [boolean]  display the user's favorites instead of his tweets | false |
+| query                              | [string]   optional search query (see also: http://search.twitter.com/operators) | null |
+| avatar_size                        | [integer]  height and width of avatar if displayed (48px max) | 48 |
+| count                              | [integer]  how many tweets to display? | 10 |
+| fetch                              | [integer]  how many tweets to fetch via the API (set this higher than 'count' if using the 'filter' option) | null |
+| page                               | [integer]  which page of results to fetch (if count != fetch, you'll get unexpected results) | 1 |
+| retweets                           | [boolean]  whether to fetch (official) retweets (not supported in all display modes) | true |
+| intro_text                         | [string]   do you want text BEFORE your your tweets? | null |
+| outro_text                         | [string]   do you want text AFTER your tweets? | null |
+| join_text                          | [string]   optional text in between date and tweet | "auto" |
+| auto_join_text_default             | [string]   auto text for non verb: "i said" bullocks | null |
+| auto_join_text_ed                  | [string]   auto text for past tense: "i" surfed | null |
+| auto_join_text_ing                 | [string]   auto tense for present tense: "i was" surfing | null |
+| auto_join_text_reply               | [string]   auto tense for replies: "i replied to" @someone "with" | null |
+| auto_join_text_url                 | [string]   auto tense for urls: "i was looking at" http:... | null |
+| loading_text                       | [string]   optional loading text, displayed while tweets load | null |
+| refresh_interval                   | [integer]  optional number of seconds after which to reload tweets | null |
+| twitter_url               | [string]   custom twitter url, if any (apigee, etc.) | "twitter.com" |
+| twitter_api_url       | [string]   custom twitter api url, if any (apigee, etc.) | "api.twitter.com" |
+| twitter_search_url | [string]   custom twitter search url, if any (apigee, etc.) | "search.twitter.com" |
+| template   | [string or function] template used to construct each tweet <li> - see code for available vars | "{avatar} <b>{user_name}</b> {text} <div class='tweet_date foswikiGrayText'>{tweet_date}</div>" |
+| comparator | [function] comparator used to sort tweets (see Array.sort) | <verbatim class="js"> function(tweet1, tweet2) {  return tweet2["tweet_time"] - tweet1["tweet_time"]; }</verbatim> |
+| filter | [function] whether or not to include a particular tweet (be sure to also set 'fetch') | <verbatim class="js">function(tweet) {return true; }</verbatim> |
+
+---++ Installation Instructions
+
+%$INSTALL_INSTRUCTIONS%
+
+---++ Info
+<!--
+   * Set SHORTDESCRIPTION = %$SHORTDESCRIPTION%
+-->
+
+|  Author(s): | Todd Matthews & Steve Purcell (jquery.tweet); Michael Daum (foswiki package) |
+|  Copyright: | &copy; Copyright (c) 2008-2011 Todd Matthews & Steve Purcell |
+|  License: | http://www.opensource.org/licenses/mit-license.php |
+|  Release: | %$RELEASE% |
+|  Version: | %$VERSION% |
+|  Change History: | <!-- versions below in reverse order -->&nbsp; |
+|  13 Apr 2012: | improved default template for tweets, required some changes to the orig jquery.tweet code |
+|  Dependencies: | %$DEPENDENCIES% |
+|  Home page: | Foswiki:Extensions/%TOPIC% |
+|  Support: | Foswiki:Support/%TOPIC% |

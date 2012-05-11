@@ -28,6 +28,7 @@ my $pluginName = 'MsOfficeAttachmentsAsHTMLPlugin';
 our $afterSaveHandlerSemaphore;
 
 sub initPlugin {
+
     #my ( $topic, $web, $user, $installWeb ) = @_;
     undef $afterSaveHandlerSemaphore;
     return 1;
@@ -44,33 +45,34 @@ sub afterAttachmentSaveHandler {
 
     my $htmlName = "$attachmentName.html";
 
-    my $cmd =
-      $Foswiki::cfg{Plugins}{MsOfficeAttachmentsAsHTMLPlugin}{doc2html};
+    my $cmd = $Foswiki::cfg{Plugins}{MsOfficeAttachmentsAsHTMLPlugin}{doc2html};
 
-    my ($data, $exit) = Foswiki::Sandbox::sysCommand(
+    my ( $data, $exit ) = Foswiki::Sandbox::sysCommand(
         undef, $cmd,
         ATTACHDIR => Foswiki::Func::getPubDir() . "/$web/$topic",
-        SRC => Foswiki::Func::getPubDir() . "/$web/$topic/$attachmentName$ext",
-        DEST => $htmlName);
+        SRC  => Foswiki::Func::getPubDir() . "/$web/$topic/$attachmentName$ext",
+        DEST => $htmlName
+    );
 
     die "$cmd failed with exit code $exit: $data" if $exit;
 
     # Process the attachment
-    if (defined $Foswiki::cfg{Plugins}{$pluginName}{filters} &&
-          scalar(@{$Foswiki::cfg{Plugins}{$pluginName}{filters}})) {
-        my $text = Foswiki::Func::readAttachment(
-            $web, $topic, "$attachmentName.html");
-        foreach my $rule (@{$Foswiki::cfg{Plugins}{$pluginName}{filters}}) {
-            $rule = Foswiki::Func::expandCommonVariables($rule, $topic, $web);
-            eval '$text=~'.$rule;
+    if ( defined $Foswiki::cfg{Plugins}{$pluginName}{filters}
+        && scalar( @{ $Foswiki::cfg{Plugins}{$pluginName}{filters} } ) )
+    {
+        my $text =
+          Foswiki::Func::readAttachment( $web, $topic, "$attachmentName.html" );
+        foreach my $rule ( @{ $Foswiki::cfg{Plugins}{$pluginName}{filters} } ) {
+            $rule = Foswiki::Func::expandCommonVariables( $rule, $topic, $web );
+            eval '$text=~' . $rule;
         }
-        my $tmp = Foswiki::Func::getWorkArea($pluginName).'/'.$htmlName;
+        my $tmp = Foswiki::Func::getWorkArea($pluginName) . '/' . $htmlName;
         my $fh;
-        open($fh, '>', $tmp) || die $!;
+        open( $fh, '>', $tmp ) || die $!;
         print $fh $text;
         close($fh);
-        Foswiki::Func::saveAttachment(
-            $web, $topic, $htmlName, { file => $tmp } );
+        Foswiki::Func::saveAttachment( $web, $topic, $htmlName,
+            { file => $tmp } );
         unlink($tmp);
     }
 
@@ -84,7 +86,7 @@ sub afterAttachmentSaveHandler {
 sub afterSaveHandler {
     return unless $afterSaveHandlerSemaphore;
 
-    my ($text, $topic, $web, $error, $meta) = @_;
+    my ( $text, $topic, $web, $error, $meta ) = @_;
 
     my $attachmentName = $afterSaveHandlerSemaphore;
     undef $afterSaveHandlerSemaphore;

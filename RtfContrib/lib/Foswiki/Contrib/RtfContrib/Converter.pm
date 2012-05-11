@@ -1,6 +1,6 @@
 # Plugin for Foswiki Collaboration Platform, http://foswiki.org/
 #
-# Copyright (C) 2007-2010 MichaelDaum http://michaeldaumconsulting.com
+# Copyright (C) 2007-2011 MichaelDaum http://michaeldaumconsulting.com
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -17,8 +17,7 @@ use strict;
 
 use vars qw($debug);
 
-use LWP::UserAgent;
-use Foswiki::Plugins::DBCachePlugin::Core;
+use Foswiki::Plugins::DBCachePlugin::Core ();
 use Foswiki::Attrs ();
 use Foswiki::Sandbox ();
 
@@ -116,7 +115,7 @@ sub readStrings {
     strip($cell2);
     strip($cell3);
     strip($cell4);
-    writeDebug("found translation '$cell1', '$cell2', '$cell3', '$cell4'");
+    #writeDebug("found translation '$cell1', '$cell2', '$cell3', '$cell4'");
     unless ($cell1 || $cell2 || $cell3 || $cell4) { # skip empty rows
       $nrRows--;
       next;
@@ -150,7 +149,7 @@ sub translate {
   $lang = uc($lang);
   my $translation = $this->{strings}{$key}{$lang} || $key;
 
-  writeDebug("translating $key -> $translation");
+  #writeDebug("translating $key -> $translation");
 
   return $translation;
 }
@@ -168,7 +167,7 @@ sub strip {
 sub cacheRtf {
   my ($this, $rtf) = @_;
 
-  writeDebug("called cacheRtf");
+  #writeDebug("called cacheRtf");
 
   # get rtf filename
   my $fileName = $this->getFileName();
@@ -249,19 +248,23 @@ sub processTemplate {
   # my rtf = shift; ... we use $_[0] instead
 
   my $topicObj = $this->{db}->fastget($this->{topic});
-  return unless $topicObj; # not found
-
   my $formName = $topicObj->fastget('form');
   my $formObj = $topicObj->fastget($formName) if $formName;
   my $attachmentsObj = $topicObj->fastget('attachments');
 
-  # insert keys 
+  # SMELL: use a proper parser
+  
+  $_[0] =~ s/\%URLPARAM\\{(.*?)\\}\%/$this->handleUrlparam($1)/ge;
+  $_[0] =~ s/\%MAKETEXT\\{(.*?)\\}\%/$this->handleMaketext($1)/ge;
+  $_[0] =~ s/\%ENCODE\\{(.*?)\\}\%/$this->handleEncode($1)/ge;
+
   if ($formObj) {
     $_[0] =~ s/\%FORMFIELD\\{("?.*?"?)\\}\%/$this->handleFormField($formObj, $1)/ge;
   } else {
     # remove formfield tags if there's none
     $_[0] =~ s/\%FORMFIELD\\{"?.*?"?\\}\%//ge;
   }
+
   $_[0] =~ s/\%TOPIC\%/$this->{topic}/g;
   $_[0] =~ s/\%WEB\%/$this->{web}/g;
   $_[0] =~ s/\%AUTHOR\%/$this->handleAuthor($topicObj)/ge;
@@ -272,13 +275,15 @@ sub processTemplate {
   $_[0] =~ s/\%SECTION\\{("?.*?"?)\\}\%/$this->handleTopicKey($topicObj, $1)/ge;
   $_[0] =~ s/\%ATTACHMENT\\{("?.*?"?)\\}\%/$this->handleAttachment($attachmentsObj, $1)/ge;
   $_[0] =~ s/\%IMAGE\\{("?.*?"?)\\}\%/$this->handleImage($1)/ge;
-  $_[0] =~ s/\%CELL\\{(.*?)\\}%/$this->handleCell($1)/ge;
+  $_[0] =~ s/\%CELL\\{(.*?)\\}\%/$this->handleCell($1)/ge;
 }
 
 
 ################################################################################
 sub handleRevision {
   my ($this, $obj) = @_;
+
+  return '' unless $obj;
 
   my $revision = $obj->fastget('info')->fastget('version');
   $revision =~ s/^.*\.(.*?)$/$1/o;
@@ -289,6 +294,8 @@ sub handleRevision {
 ################################################################################
 sub handleAuthor {
   my ($this, $obj) = @_;
+
+  return '' unless $obj;
 
   my $author = $obj->fastget('info')->fastget('author');
 
@@ -303,6 +310,8 @@ sub handleAuthor {
 ################################################################################
 sub handleFormField {
   my ($this, $obj, $params) = @_;
+
+  writeDebug("handleFormField($params)");
 
   $params = new Foswiki::Attrs($params);
   my $key = $params->{_DEFAULT} || $params->{key};
@@ -326,6 +335,8 @@ sub handleFormField {
 ################################################################################
 sub handleTopicKey {
   my ($this, $obj, $params) = @_;
+
+  return '' unless $obj;
 
   writeDebug("handleTopicKey($params)");
   $params = new Foswiki::Attrs($params);
@@ -373,15 +384,18 @@ sub handleImage {
   my $top = $params->{top};
   my $right = $params->{right};
 
-  writeDebug("header=$header");
-  writeDebug("footer=$footer");
+  #writeDebug("header=$header");
+  #writeDebug("footer=$footer");
 
   $height = 140 unless defined $height; # points
   $top = 161 unless defined $top;
   $right = 529 unless defined $right;
 
   my ($photo, $type, $imgWidth, $imgHeight, $errorMsg) = $this->getPhoto($fileName);
-  return (undef, "error while fetching photo: $errorMsg") unless $photo;
+  unless ($photo) {
+    writeDebug("error: $errorMsg");
+    return (undef, "error while fetching photo: $errorMsg");
+  }
 
   $imgWidth = 1 unless $imgWidth; # prevent division by zero; should never reach this
                                   # code: getPhoto() should have returned an
@@ -433,10 +447,69 @@ sub handleImage {
 }
 
 ################################################################################
+sub handleUrlparam {
+  my ($this, $args) = @_;
+
+  writeDebug("handleUrlparam($args)");
+  my $params = new Foswiki::Attrs($args);
+  my $theParam = $params->{_DEFAULT};
+  my $theDefault = $params->{default} || '';
+  my $result = $this->{query}->param($theParam);
+  $result = $theDefault unless defined $result;
+
+  return $this->tml2rtf($result);
+}
+################################################################################
+sub handleEncode {
+  my ($this, $args) = @_;
+
+  writeDebug("handleEncode($args)");
+  my $params = new Foswiki::Attrs($args);
+  my $theText = $params->{_DEFAULT};
+
+  # only quotes
+  $theText =~ s/'/\\\\'/g;
+  $theText =~ s/"/\\\\"/g;
+
+  writeDebug("result=".$theText);
+  return $theText;
+}
+
+################################################################################
+sub handleMaketext {
+  my ($this, $args) = @_;
+
+  writeDebug("handleMaketext()");
+  my $params = new Foswiki::Attrs($args);
+  my $theText = $params->{_DEFAULT};
+  my $theLang = $params->{lang} || $this->{query}->param('lang');
+  my $theArgs = $params->{args};
+
+  writeDebug("theText=$theText, theLang=".((defined $theLang)?$theLang:'undef'));
+
+  my $result = $theText;
+  $result = $this->translate($theLang, $result) if defined $theLang;
+
+  if ($theArgs) {
+    my @args = split(/\s*,\s*/, $theArgs);
+    my $len = scalar(@args);
+    for(my $i = 0; $i < $len; $i++) {
+      $result =~ s/\[_$i\]/$args[$i]/g;
+    }
+  }
+
+  $result = $this->tml2rtf($result);
+  writeDebug("result=$result");
+
+  return $result;
+}
+
+
+################################################################################
 sub handleCell {
   my ($this, $params) = @_;
 
-  writeDebug("handleCell($params)");
+  #writeDebug("handleCell($params)");
   $params = new Foswiki::Attrs($params);
   my $theTopic = $params->{_DEFAULT} || $params->{topic} || $this->{topic};
   my $theWeb = $params->{web} || $params->{web} || $this->{web};
@@ -444,7 +517,7 @@ sub handleCell {
   my $theCol = $params->{col} || $params->{column} || 0;
 
   ($theWeb, $theTopic) = Foswiki::Func::normalizeWebTopicName($theWeb, $theTopic);
-  writeDebug("theWeb=$theWeb, theTopic=$theTopic, theRow=$theRow, theCol=$theCol");
+  #writeDebug("theWeb=$theWeb, theTopic=$theTopic, theRow=$theRow, theCol=$theCol");
 
   my $db = $this->{db};
   if ($theWeb ne $this->{web}) {
@@ -489,10 +562,15 @@ sub getPhoto {
   writeDebug("getPhoto($fileName)");
 
   my $photo = '';
+  my $pubUrlPath =  Foswiki::Func::getPubUrlPath();
+  writeDebug("pubUrlPath=$pubUrlPath");
 
-  if ($fileName =~ /^(https?|ftp)/) {
+  if ($fileName =~ /^(https?|ftp)/ && $fileName !~ /^$pubUrlPath/) {
     # remote file
+
+    writeDebug("remote file");
     
+    require LWP::UserAgent;
     my $ua = LWP::UserAgent->new();
     $ua->agent('Foswiki RtfContrib'); 
     $ua->timeout(5);
@@ -508,9 +586,10 @@ sub getPhoto {
     # attachment 
     my $web = $this->{web};
     my $topic = $this->{topic};
-    my $pubUrlPath =  Foswiki::Func::getPubUrlPath();
+
     $fileName =~ s/%([\da-f]{2})/chr(hex($1))/gei; # Foswiki::urlDecode
     $fileName =~ s/\%PUBURLPATH%/$pubUrlPath/go;
+
     if ($fileName =~ /^$pubUrlPath\/(.*)[\/\.](.*?)[\/\.](.*?)\.(jpe?g|png|emf)$/) {
       $web = $1;
       $topic = $2;
@@ -545,7 +624,7 @@ sub tml2rtf {
 
   return '' unless $text;
 
-  writeDebug("tml2rtf - text before=$text");
+  #writeDebug("tml2rtf - text before=$text");
 
   # escape chars which are meaningful in rtf
   $text =~ s/([\\{}])/\\$1/go; 
@@ -572,16 +651,21 @@ sub tml2rtf {
   
   # TODO: parse wiki lists
   # TODO: parse wiki tables
+  # TODO: add utf8 encodings
 
   # encode special chars
   $text =~ s/Ä/\\'c4/go;
   $text =~ s/&Auml;/\\'c4/go;
   $text =~ s/ä/\\'e4/go;
   $text =~ s/&auml;/\\'e4/go;
+
   $text =~ s/Ö/\\'d6/go;
   $text =~ s/&Ouml;/\\'d6/go;
+
   $text =~ s/ö/\\'f6/go;
   $text =~ s/&ouml;/\\'f6/go;
+  $text =~ s/\xc3\xb6/\\'f6/go;
+
   $text =~ s/Ü/\\'dc/go;
   $text =~ s/&Uuml;/\\'dc/go;
   $text =~ s/ü/\\'fc/go;
@@ -594,7 +678,7 @@ sub tml2rtf {
 
   # TODO: have them all
 
-  writeDebug("tml2rtf - text after=$text");
+  #writeDebug("tml2rtf - text after=$text");
 
   return $text;
 }

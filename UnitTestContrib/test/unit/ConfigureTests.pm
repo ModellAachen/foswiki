@@ -18,6 +18,28 @@ use Foswiki::Configure::Valuer         ();
 use Foswiki::Configure::UI             ();
 use Foswiki::Configure::GlobalControls ();
 
+sub skip {
+    my ( $this, $test ) = @_;
+
+    return $this->SUPER::skip_test_if(
+        $test,
+        {
+            condition => { without_dep => 'Archive::Tar' },
+            tests     => {
+                'ConfigureTests::test_Util_createArchive_perlTar' =>
+                  'Missing Archive::Tar'
+            }
+        },
+        {
+            condition => { without_dep => 'Archive::Zip' },
+            tests     => {
+                'ConfigureTests::test_Util_createArchive_perlZip' =>
+                  'Missing Archive::Zip'
+            }
+        }
+    );
+}
+
 sub set_up {
     my $this = shift;
     $this->SUPER::set_up();
@@ -35,21 +57,16 @@ sub set_up {
     $this->{user}    = $Foswiki::cfg{AdminUserLogin};
     $this->createNewFoswikiSession( $this->{user} );
     $this->{test_web} = 'Testsystemweb1234';
-    my $webObject = Foswiki::Meta->new( $this->{session}, $this->{test_web} );
-    $webObject->populateNewWeb();
+    my $webObject = $this->populateNewWeb( $this->{test_web} );
     $webObject->finish();
     $this->{trash_web} = 'Testtrashweb1234';
-    $webObject = Foswiki::Meta->new( $this->{session}, $this->{trash_web} );
-    $webObject->populateNewWeb();
+    $webObject = $this->populateNewWeb( $this->{trash_web} );
     $webObject->finish();
     $this->{sandbox_web} = 'Testsandboxweb1234';
-    $webObject = Foswiki::Meta->new( $this->{session}, $this->{sandbox_web} );
-    $webObject->populateNewWeb();
+    $webObject = $this->populateNewWeb( $this->{sandbox_web} );
     $webObject->finish();
     $this->{sandbox_subweb} = 'Testsandboxweb1234/Subweb';
-    $webObject =
-      Foswiki::Meta->new( $this->{session}, $this->{sandbox_subweb} );
-    $webObject->populateNewWeb();
+    $webObject = $this->populateNewWeb( $this->{sandbox_subweb} );
     $webObject->finish();
     $this->{tempdir} = $Foswiki::cfg{TempfileDir} . '/test_ConfigureTests';
     rmtree( $this->{tempdir} )
@@ -1744,12 +1761,12 @@ sub test_Util_createArchive_perlTar {
     mkpath("$tempdir/$extbkup");
     _makePackage( "$tempdir/$extbkup", $extension );
 
-    eval { require Archive::Tar; 1; } or do {
-        my $mess = $@;
-        $mess =~ s/\(\@INC contains:.*$//s;
-        $this->expect_failure("CANNOT RUN test for tar archive:  $mess");
-        $this->assert(0);
-    };
+    #eval { require Archive::Tar; 1; } or do {
+    #    my $mess = $@;
+    #    $mess =~ s/\(\@INC contains:.*$//s;
+    #    $this->expect_failure("CANNOT RUN test for tar archive:  $mess");
+    #    $this->assert(0);
+    #};
 
     ( $file, $rslt ) =
       Foswiki::Configure::Util::createArchive( "$extbkup", "$tempdir", '0',
@@ -1787,12 +1804,12 @@ sub test_Util_createArchive_perlZip {
     mkpath("$tempdir/$extbkup");
     _makePackage( "$tempdir/$extbkup", $extension );
 
-    eval { require Archive::Zip; 1; } or do {
-        my $mess = $@;
-        $mess =~ s/\(\@INC contains:.*$//s;
-        $this->expect_failure("CANNOT RUN test for zip archive:  $mess");
-        $this->assert(0);
-    };
+    #eval { require Archive::Zip; 1; } or do {
+    #    my $mess = $@;
+    #    $mess =~ s/\(\@INC contains:.*$//s;
+    #    $this->expect_failure("CANNOT RUN test for zip archive:  $mess");
+    #    $this->assert(0);
+    #};
 
     ( $file, $rslt ) =
       Foswiki::Configure::Util::createArchive( "$extbkup", "$tempdir", '0',

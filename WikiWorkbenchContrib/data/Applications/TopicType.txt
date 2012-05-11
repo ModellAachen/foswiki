@@ -1,4 +1,4 @@
-%META:TOPICINFO{author="ProjectContributor" comment="reprev" date="1305110947" format="1.1" reprev="13" version="13"}%
+%META:TOPICINFO{author="micha" comment="reprev" date="1335188783" format="1.1" reprev="15" version="15"}%
 %DBCALL{"RenderTopicInstaller" TYPE="TopicType" PARENT="TopicType"}%
 ---++ Documentation
 %STARTSECTION{"documentation"}%
@@ -48,7 +48,7 @@ The TopicType topic is the factory to create new <nop>TopicTypes as well.
 | <nop>TopicTitle | text | 75 | | title | |
 | Inheritance | checkbox | 4 |%DBCALL{"Applications.GetTopicTypes" remote="off"}%| TopicType whose properties are implemented here too (see java's interfaces)  | |
 | Summary | text | 75 | | Short description of the role of this topic | c |
-| WikiApplication| select | 1 |%FLEXWEBLIST{subwebs="Applications" header="none, " footer="WikiWorkbench" format="$name, "}%| Application this topic belongs to | |
+| WikiApplication| wikiapp | 1 | | Application this topic belongs to | |
 
 
 %META:FORM{name="Applications.TopicType"}%

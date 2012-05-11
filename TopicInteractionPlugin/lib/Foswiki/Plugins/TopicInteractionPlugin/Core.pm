@@ -19,6 +19,7 @@ use strict;
 use Foswiki::Func ();
 use Foswiki::Sandbox ();
 use JSON ();
+use Encode ();
 
 use constant DEBUG => 0; # toggle me
 
@@ -197,6 +198,7 @@ sub prepareAction {
   my $web = $session->{webName};
 
   ($web, $topic) = Foswiki::Func::normalizeWebTopicName($web, $topic);
+  #print STDERR "topic='$topic'\n";
   unless (Foswiki::Func::topicExists($web, $topic)) {
     printJSONRPC($response, 101, "Topic $web.$topic does not exist", $id);
     return;
@@ -239,7 +241,7 @@ sub getRequestParams {
     writeDebug("param $key=$val") unless $key eq 'POSTDATA';
   }
 
-  my $queryString = $ENV{QUERY_STRING};
+  my $queryString = $ENV{QUERY_STRING} || '';
 
   foreach my $item (split(/[&;]/, $queryString)) {
     if ($item =~ /^(.+?)=(.*)$/ && !defined($params{$1})) {
@@ -257,11 +259,10 @@ sub urlDecode {
   my $value = shift;
 
   $value =~ s/%([\da-f]{2})/chr(hex($1))/gei;
-
   my $session = $Foswiki::Plugins::SESSION;
   my $downgradedValue = $session->UTF82SiteCharSet($value);
   $value = $downgradedValue if defined $downgradedValue;
-
+ 
   $value =~ s/^\s+//g;
   $value =~ s/\s+$//g;
 

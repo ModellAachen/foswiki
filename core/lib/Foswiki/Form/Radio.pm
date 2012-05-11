@@ -28,6 +28,12 @@ sub finish {
     undef $this->{valueMap};
 }
 
+# From System.DataForms, "The first item in the list for a select or
+# radio type is the default item."
+sub getDefaultValue {
+    return shift->getOptions()->[0];
+}
+
 sub getOptions {
     my $this = shift;
 
@@ -44,9 +50,9 @@ sub getOptions {
         foreach my $val (@$vals) {
             if ( $val =~ /^(.*?[^\\])=(.*)$/ ) {
                 $str = TAINT($1);
-		my $descr = $this->{_descriptions}{$val};
+                my $descr = $this->{_descriptions}{$val};
                 $val = $2;
-		$this->{_descriptions}{$val} = $descr;
+                $this->{_descriptions}{$val} = $descr;
                 $str =~ s/\\=/=/g;
             }
             else {
@@ -89,17 +95,17 @@ sub renderForEdit {
     }
 
     my %params = (
-            -name       => $this->{name},
-            -values     => $this->getOptions(),
-            -default    => $selected,
-            -columns    => $this->{size},
-            -attributes => \%attrs,
+        -name       => $this->{name},
+        -values     => $this->getOptions(),
+        -default    => $selected,
+        -columns    => $this->{size},
+        -attributes => \%attrs,
     );
-    if (defined $this->{valueMap}) {
-      $params{-labels} = $this->{valueMap};
+    if ( defined $this->{valueMap} ) {
+        $params{-labels} = $this->{valueMap};
     }
 
-    return ('', CGI::radio_group(%params));
+    return ( '', CGI::radio_group(%params) );
 }
 
 1;

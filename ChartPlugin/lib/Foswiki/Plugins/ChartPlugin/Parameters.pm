@@ -37,102 +37,108 @@
 package Foswiki::Plugins::ChartPlugin::Parameters;
 
 use Exporter;
-@ISA = ();
+@ISA    = ();
 @EXPORT = qw(
-    getParameter
-    getAllParameters
-    printParameters
+  getParameter
+  getAllParameters
+  printParameters
 );
 
 use strict;
 
-sub new
-{
-    my ($class, $parameters) = @_;
+sub new {
+    my ( $class, $parameters ) = @_;
     my $this = {};
     bless $this, $class;
     $this->_parseParameters($parameters);
     return $this;
 }
 
-sub _parseParameters
-{
+sub _parseParameters {
     my ( $this, $parameterList ) = @_;
     my %parameters;
-    my $length = length ($parameterList);
+    my $length = length($parameterList);
     my ( $char, @field );
 
     # First break the parameterList into individual parameters
     my $in_quote = 0;
-    my $field = "";
-    my $index = 0;
-    for (my $i = 0; $i < $length; $i++) {
+    my $field    = "";
+    my $index    = 0;
+    for ( my $i = 0 ; $i < $length ; $i++ ) {
+
         # Get character
         $char = substr( $parameterList, $i, 1 );
-        if( $char eq '"' ) {
-            if( $in_quote ) {        # If a " and already in a quote, then the end
+        if ( $char eq '"' ) {
+            if ($in_quote) {    # If a " and already in a quote, then the end
                 $in_quote = 0;
-            } else {                # Beginning of quoted field
+            }
+            else {              # Beginning of quoted field
                 $in_quote = 1;
             }
-        } else {
-            if( $char =~ /[,\s]+/ ) {        # A field separator only if not in quote
-                if( $in_quote ) {
+        }
+        else {
+            if ( $char =~ /[,\s]+/ ) {  # A field separator only if not in quote
+                if ($in_quote) {
                     $field .= $char;
-                } else {
-                    $field[$index++] = $field if( $field ne "" );
+                }
+                else {
+                    $field[ $index++ ] = $field if ( $field ne "" );
                     $field = "";
                 }
-            } else {
+            }
+            else {
                 $field .= $char;
             }
         }
     }
+
     # Deal with last field
-    $field[$index++] = $field if( $field ne "" );
+    $field[ $index++ ] = $field if ( $field ne "" );
 
     # Now break each parameter into a key=value pair.
-    for (my $i = 0; $i < $index; $i++) {
-        my ( $key, $value ) = split(/=/, $field[$i]);
+    for ( my $i = 0 ; $i < $index ; $i++ ) {
+        my ( $key, $value ) = split( /=/, $field[$i] );
+
         #print "field[$i] = [$field[$i]]\n";
         $parameters{$key} = $value;
     }
-    $this->_setParameters(\%parameters);
+    $this->_setParameters( \%parameters );
 }
 
-sub _setParameters
-{
-    my ($this, $parameters) = @_;
+sub _setParameters {
+    my ( $this, $parameters ) = @_;
     $$this{"PARAMETERS"} = $parameters;
 }
 
-sub getAllParameters
-{
+sub getAllParameters {
     my ($this) = @_;
-    return %{$$this{"PARAMETERS"}};
+    return %{ $$this{"PARAMETERS"} };
 }
 
 # Return the value for the specified Foswiki plugin parameter.  If the
 # parameter does not exist, then return the specified default value.  The
 # parameter is deleted from the list of specified parameters allowing the
 # code to determine what parameters remain and were not requested.
-sub getParameter
-{
+sub getParameter {
     my ( $this, $var_name, $default ) = @_;
     my $parametersRef = $$this{"PARAMETERS"};
-    my $value = delete $$parametersRef{$var_name};                # Delete since already parsed.
-    if( defined $value && $value ne "" ) {
+    my $value =
+      delete $$parametersRef{$var_name};    # Delete since already parsed.
+    if ( defined $value && $value ne "" ) {
         return $value;
-    } else {
+    }
+    else {
         return $default;
     }
 }
+
 sub printParameters {
     my ($this) = @_;
     my %parameters = $this->getAllParameters();
-    for my $key (keys %parameters) {
+    for my $key ( keys %parameters ) {
         my $val = $parameters{$key};
-        &Foswiki::Func::writeDebug( "- Foswiki::Plugins::ChartPlugin::Parameters::[$key]=[$val]");
+        &Foswiki::Func::writeDebug(
+            "- Foswiki::Plugins::ChartPlugin::Parameters::[$key]=[$val]");
     }
 }
 

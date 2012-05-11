@@ -1,4 +1,4 @@
-%META:TOPICINFO{author="ProjectContributor" date="1129746261" format="1.1" version="$Rev$"}%
+%META:TOPICINFO{author="ProjectContributor" date="1330678290" format="1.1" version="2"}%
 %META:TOPICPARENT{name="TopicFunction"}%
 ---++ Parameters
 NONE
@@ -7,18 +7,17 @@ NONE
 <verbatim class="tml">
 %STARTINCLUDE%
 ---++ Calls to '%INCLUDINGTOPIC%'
-%~~ DBQUERY{"text=~'\b%INCLUDINGTOPIC%\b'"
-~~~   exclude="%INCLUDINGTOPIC%"
-~~~   web="%BASEWEB%"
-~~~   format="   * [[$web.$topic][$topic]]"
-~~~ }%
-*~~ 
-%STOPINCLUDE%
+%DBQUERY{"text=~'\b%INCLUDINGTOPIC%\b'"
+  exclude="%INCLUDINGTOPIC%"
+  web="%BASEWEB%"
+  format="   * [[$web.$topic][$topic]]"
+}%%STOPINCLUDE%
 </verbatim>
 
 %DBCALL{"Applications.RenderFunctionCallers"}%
 
 %META:FORM{name="Applications.ApplicationTopic"}%
-%META:FIELD{name="TopicType" attributes="M" title="TopicType" value="TopicFunction"}%
-%META:FIELD{name="Summary" attributes="M" title="Summary" value="Render a list of topics that use a given TopicFunction"}%
+%META:FIELD{name="TopicType" title="TopicType" value="TopicFunction"}%
+%META:FIELD{name="TopicTitle" attributes="" title="<nop>TopicTitle" value=""}%
+%META:FIELD{name="Summary" attributes="c" title="Summary" value="Render a list of topics that use a given TopicFunction"}%
 %META:FIELD{name="WikiApplication" attributes="" title="WikiApplication" value="WikiWorkbench"}%

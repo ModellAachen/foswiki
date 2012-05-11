@@ -40,6 +40,11 @@
 	requires="JQUERYPLUGIN::FOSWIKI"
 }%%TMPL:P{
 	"LIBJS"
+	name="page-scroll"
+	id="BaseSkinJs/jquery.page-scroll"
+	requires="JQUERYPLUGIN::FOSWIKI"
+}%%TMPL:P{
+	"LIBJS"
 	name="easing"
 	id="BaseSkinJs/jquery.easing.1.3"
 	requires="JQUERYPLUGIN::FOSWIKI"

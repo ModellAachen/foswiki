@@ -1,4 +1,4 @@
-%META:TOPICINFO{author="ProjectContributor" comment="reprev" date="1271675222" format="1.1" reprev="1.3" rev="3" version="1.3"}%
+%META:TOPICINFO{author="micha" comment="reprev" date="1335189145" format="1.1" reprev="3" version="5"}%
 %META:TOPICPARENT{name="TopicType"}%
 %DBCALL{"RenderTopicInstaller" TYPE="TopicType" PARENT="TopicType"}%
 
@@ -23,7 +23,7 @@ of the ApplicationLicense.
 
 %META:FORM{name="Applications.TopicType"}%
 %META:FIELD{name="TopicType" title="TopicType" value="TopicType"}%
-%META:FIELD{name="TopicTitle" attributes="" title="<nop>TopicTitle" value="ApplicationLicense"}%
+%META:FIELD{name="TopicTitle" attributes="" title="<nop>TopicTitle" value=""}%
 %META:FIELD{name="Inheritance" attributes="" title="Inheritance" value="ApplicationTopic"}%
-%META:FIELD{name="Summary" attributes="" title="Summary" value="License for WikiApplications"}%
+%META:FIELD{name="Summary" attributes="c" title="Summary" value="License for WikiApplications"}%
 %META:FIELD{name="WikiApplication" attributes="" title="WikiApplication" value="WikiWorkbench"}%

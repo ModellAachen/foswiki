@@ -1,4 +1,4 @@
-%META:TOPICINFO{author="ProjectContributor" comment="reprev" date="1313776572" format="1.1" reprev="29" version="31"}%
+%META:TOPICINFO{author="micha" comment="save topic" date="1335338561" format="1.1" reprev="35" version="35"}%
 ---+!! %TOPIC%
 %BUTTON{"Toggle grid" icon="table" class="foswikiRight" onclick="jQuery('.natMain').toggleClass('showgrid-40x18')"}%
 
@@ -59,6 +59,7 @@ feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui
 blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla
 </p>
 
+%TWISTY%
 <p class="foswikiSmallish">
 *foswikiSmall:*
 Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh
@@ -80,6 +81,7 @@ hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu
 feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui
 blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla
 </p>
+%ENDTWISTY%
 
 ---++ Text-decorations
 
@@ -349,7 +351,6 @@ facilisi.
 </tr>
 </table>
 
-foo
 
 ---++ Verbatim
 

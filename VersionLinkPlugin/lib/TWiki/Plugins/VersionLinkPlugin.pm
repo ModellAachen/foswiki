@@ -27,8 +27,8 @@ package TWiki::Plugins::VersionLinkPlugin;
 
 # =========================
 use vars qw(
-        $web $topic $user $installWeb $VERSION $RELEASE $debug
-    );
+  $web $topic $user $installWeb $VERSION $RELEASE $debug
+);
 
 # This should always be $Rev$ so that TWiki can determine the checked-in
 # status of the plugin. It is used by the build automation tools, so
@@ -40,56 +40,65 @@ $VERSION = '$Rev$';
 # of the version number in PLUGINDESCRIPTIONS.
 $RELEASE = 'Dakar';
 
-
 # =========================
-sub initPlugin
-{
+sub initPlugin {
     ( $topic, $web, $user, $installWeb ) = @_;
 
     # check for Plugins.pm versions
-    if( $TWiki::Plugins::VERSION < 1 ) {
-        &TWiki::Func::writeWarning( "Version mismatch between VersionLinkPlugin and Plugins.pm" );
+    if ( $TWiki::Plugins::VERSION < 1 ) {
+        &TWiki::Func::writeWarning(
+            "Version mismatch between VersionLinkPlugin and Plugins.pm");
         return 0;
     }
 
-    # Get plugin preferences, the variable defined by:          * Set EXAMPLE = ...
-    $exampleCfgVar = &TWiki::Func::getPreferencesValue( "EMPTYPLUGIN_EXAMPLE" ) || "default";
+ # Get plugin preferences, the variable defined by:          * Set EXAMPLE = ...
+    $exampleCfgVar = &TWiki::Func::getPreferencesValue("EMPTYPLUGIN_EXAMPLE")
+      || "default";
 
     # Get plugin debug flag
-    $debug = &TWiki::Func::getPreferencesFlag( "VERSIONLINKPLUGIN_DEBUG" );
+    $debug = &TWiki::Func::getPreferencesFlag("VERSIONLINKPLUGIN_DEBUG");
 
     # Plugin correctly initialized
-    &TWiki::Func::writeDebug( "- TWiki::Plugins::VersionLinkPlugin::initPlugin( $web.$topic ) is OK" ) if $debug;
+    &TWiki::Func::writeDebug(
+        "- TWiki::Plugins::VersionLinkPlugin::initPlugin( $web.$topic ) is OK")
+      if $debug;
     return 1;
 }
 
 # =========================
-sub commonTagsHandler
-{
+sub commonTagsHandler {
 ### my ( $text, $topic, $web ) = @_;   # do not uncomment, use $_[0], $_[1]... instead
 
-    &TWiki::Func::writeDebug( "- VersionLinkPlugin::commonTagsHandler( $_[2].$_[1] )" ) if $debug;
+    &TWiki::Func::writeDebug(
+        "- VersionLinkPlugin::commonTagsHandler( $_[2].$_[1] )")
+      if $debug;
     $_[0] =~ s/%VERSIONLINK{(.*?)}%/&handleVersionLink($1)/geo;
     $_[0] =~ s/%VERSIONLINK%/&handleVersionLink("")/geo;
 }
 
 # =========================
-sub handleVersionLink
-{
+sub handleVersionLink {
     my $exp = @_;
-    my ($filename,$rev) = split(/,/,$_[0]);
+    my ( $filename, $rev ) = split( /,/, $_[0] );
 
-    if( ! $filename ) {
+    if ( !$filename ) {
+
         # help
-        return "$installWeb.VersionLinkPlugin help: Write a file/version expression, i.e. %<nop>VERSIONLINK{\"foo.c,1.1\"}%";
+        return
+"$installWeb.VersionLinkPlugin help: Write a file/version expression, i.e. %<nop>VERSIONLINK{\"foo.c,1.1\"}%";
     }
-    if( ! $rev ) {
+    if ( !$rev ) {
+
         # help
-        return "$installWeb.VersionLinkPlugin help: Write a file/version expression, i.e. %<nop>VERSIONLINK{\"foo.c,1.1\"}%";
+        return
+"$installWeb.VersionLinkPlugin help: Write a file/version expression, i.e. %<nop>VERSIONLINK{\"foo.c,1.1\"}%";
     }
 
-	my $text = "<a href=\"%SCRIPTURLPATH%/viewfile%SCRIPTSUFFIX%/%WEB%/%TOPIC%?rev=$rev&filename=$filename\">$filename</a>";
-    &TWiki::Func::writeDebug( "- VersionLinkPlugin::handleVersionLink: <<$text>>" ) if $debug;
+    my $text =
+"<a href=\"%SCRIPTURLPATH%/viewfile%SCRIPTSUFFIX%/%WEB%/%TOPIC%?rev=$rev&filename=$filename\">$filename</a>";
+    &TWiki::Func::writeDebug(
+        "- VersionLinkPlugin::handleVersionLink: <<$text>>")
+      if $debug;
 
     return "$text";
 }

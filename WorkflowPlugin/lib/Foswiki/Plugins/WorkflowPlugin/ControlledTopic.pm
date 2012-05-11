@@ -191,23 +191,29 @@ sub _isModifiable {
     # See if the workflow allows an edit
     # is the latest rev (or no rev) loaded?
     $this->{isEditable} = $this->isLatestRev();
+
     #print STDERR "Modify denied by isLatestRev\n" unless $this->{isEditable};
 
     # Does the workflow permit editing?
-    if ($this->{isEditable}) {
-	$this->{isEditable} = $this->{workflow}->allowEdit($this);
-	#print STDERR "Modify denied by allowEdit\n" unless $this->{isEditable};
+    if ( $this->{isEditable} ) {
+        $this->{isEditable} = $this->{workflow}->allowEdit($this);
+
+        #print STDERR "Modify denied by allowEdit\n" unless $this->{isEditable};
     }
+
     # Does Foswiki permit editing?
-    if ($this->{isEditable}) {
-	# DO NOT PASS $this->{meta}, because of Item11461
-	$this->{isEditable} = Foswiki::Func::checkAccessPermission(
-	    'CHANGE',      $Foswiki::Plugins::SESSION->{user},
-	    $this->{text}, $this->{topic},
-	    $this->{web} ) if $this->{isEditable};
-	#print STDERR "Modify denied by checkAccessPermission\n" unless $this->{isEditable};
+    if ( $this->{isEditable} ) {
+
+        # DO NOT PASS $this->{meta}, because of Item11461
+        $this->{isEditable} =
+          Foswiki::Func::checkAccessPermission( 'CHANGE',
+            $Foswiki::Plugins::SESSION->{user},
+            $this->{text}, $this->{topic}, $this->{web} )
+          if $this->{isEditable};
+
+#print STDERR "Modify denied by checkAccessPermission\n" unless $this->{isEditable};
     }
-    $this->{isEditable} ||= 0; # ensure defined
+    $this->{isEditable} ||= 0;    # ensure defined
 
     return $this->{isEditable};
 }

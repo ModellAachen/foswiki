@@ -20,7 +20,7 @@
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details, published at 
+# GNU General Public License for more details, published at
 # http://www.gnu.org/copyleft/gpl.html
 #
 # =========================
@@ -32,29 +32,35 @@ use TWiki::Func;
 use TWiki::Plugins::XpTrackerPlugin;
 
 #(RAF)
-#If this module is load using the "use" directive before the plugin is 
+#If this module is load using the "use" directive before the plugin is
 #initialized, $debug will be 0
 #(CC) this will not work in Dakar; TWiki::Func methods cannot be called before initPlugin.
 my $debug;
+
 #my $debug = &TWiki::Func::getPreferencesFlag( "XPTRACKERPLUGIN_DEBUG" );
 #&TWiki::Func::writeDebug( "- TWiki::Plugins::XpTrackerPlugin::ShowProjectTeams is loaded" ) if $debug;
 
-
 sub xpShowProjectTeams {
 
-    my ($project, $web) = @_;
+    my ( $project, $web ) = @_;
 
-    my @projTeams = &TWiki::Plugins::XpTrackerPlugin::xpGetProjectTeams($project, $web);
+    my @projTeams =
+      &TWiki::Plugins::XpTrackerPlugin::xpGetProjectTeams( $project, $web );
 
-    my $list = TWiki::Plugins::XpTrackerPlugin::HtmlUtil::emmitTwikiHeader(3,"All teams for project ".$project);
-    
-    $list .= TWiki::Plugins::XpTrackerPlugin::HtmlUtil::emmitArrayInBullets(@projTeams);
+    my $list = TWiki::Plugins::XpTrackerPlugin::HtmlUtil::emmitTwikiHeader( 3,
+        "All teams for project " . $project );
+
+    $list .= TWiki::Plugins::XpTrackerPlugin::HtmlUtil::emmitArrayInBullets(
+        @projTeams);
 
     # append CreateNewTeam form
-    $list .= &TWiki::Plugins::XpTrackerPlugin::xpCreateHtmlForm("NewnameTeam", &TWiki::Func::getPreferencesValue("XPTRACKERPLUGIN_TEAMTEMPLATE") , "Create new team for <nop>".$project." project");
+    $list .= &TWiki::Plugins::XpTrackerPlugin::xpCreateHtmlForm(
+        "NewnameTeam",
+        &TWiki::Func::getPreferencesValue("XPTRACKERPLUGIN_TEAMTEMPLATE"),
+        "Create new team for <nop>" . $project . " project"
+    );
 
     return $list;
 }
-
 
 1;

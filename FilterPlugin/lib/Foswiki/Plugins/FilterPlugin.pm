@@ -15,81 +15,72 @@
 #
 ###############################################################################
 package Foswiki::Plugins::FilterPlugin;
+
 use strict;
+use warnings;
 
-###############################################################################
-use vars qw(
-        $currentWeb $currentTopic $VERSION $RELEASE
-	$NO_PREFS_IN_TOPIC $SHORTDESCRIPTION
-        $doneInitCore
-    );
+use Foswiki::Func();
 
-$VERSION = '$Rev$';
-$RELEASE = '2.08';
-$NO_PREFS_IN_TOPIC = 1;
-$SHORTDESCRIPTION = 'Substitute and extract information from content by using regular expressions';
+our $VERSION = '$Rev$';
+our $RELEASE = '3.01';
+our $NO_PREFS_IN_TOPIC = 1;
+our $SHORTDESCRIPTION = 'Substitute and extract information from content by using regular expressions';
+our $core;
 
 ###############################################################################
 sub initPlugin {
-  ($currentTopic, $currentWeb) = @_;
+  my ($currentTopic, $currentWeb) = @_;
 
-  Foswiki::Func::registerTagHandler('FORMATLIST', \&handleFormatList);
-  Foswiki::Func::registerTagHandler('MAKEINDEX', \&handleMakeIndex);
-  Foswiki::Func::registerTagHandler('SUBST', \&handleSubst);
-  Foswiki::Func::registerTagHandler('EXTRACT', \&handleExtract);
+  Foswiki::Func::registerTagHandler('FORMATLIST', sub {
+    return getCore(shift)->handleFormatList(@_);
+  });
 
-  $doneInitCore = 0;
+  Foswiki::Func::registerTagHandler('MAKEINDEX', sub {
+    return getCore(shift)->handleMakeIndex(@_);
+  });
+
+  Foswiki::Func::registerTagHandler('SUBST', sub {
+    return getCore(shift)->handleSubst(@_);
+  });
+
+  Foswiki::Func::registerTagHandler('EXTRACT', sub {
+    return getCore(shift)->handleExtract(@_);
+  });
+
+  $core = undef;
   return 1;
 }
 
 ###############################################################################
 sub commonTagsHandler {
-  while($_[0] =~ s/%STARTSUBST{(?!.*%STARTSUBST)(.*?)}%(.*?)%STOPSUBST%/&handleFilterArea($1, 1, $2)/ges) {
+# my ($text, $topic, $web, $included, $meta ) = @_;
+
+  my $theTopic = $_[1];
+  my $theWeb = $_[2];
+
+  while($_[0] =~ s/%STARTSUBST{(?!.*%STARTSUBST)(.*?)}%(.*?)%STOPSUBST%/&handleFilterArea($1, 1, $2, $theWeb, $theTopic)/ges) {
     # nop
   }
-  while($_[0] =~ s/%STARTEXTRACT{(?!.*%STARTEXTRACT)(.*?)}%(.*?)%STOPEXTRACT%/&handleFilterArea($1, 0, $2)/ges) {
+  while($_[0] =~ s/%STARTEXTRACT{(?!.*%STARTEXTRACT)(.*?)}%(.*?)%STOPEXTRACT%/&handleFilterArea($1, 0, $2, $theWeb, $theTopic)/ges) {
     # nop
   }
 }
 
 ###############################################################################
-sub initCore {
+sub getCore {
+  my $session = shift;
 
-  return if $doneInitCore;
-  $doneInitCore = 1;
+  unless (defined $core) {
+    require Foswiki::Plugins::FilterPlugin::Core;
+    $core = new Foswiki::Plugins::FilterPlugin::Core($session)
+  }
 
-  require Foswiki::Plugins::FilterPlugin::Core;
-  Foswiki::Plugins::FilterPlugin::Core::init($currentWeb, $currentTopic);
+  return $core;
 }
 
 ###############################################################################
 sub handleFilterArea {
-  initCore();
-  return Foswiki::Plugins::FilterPlugin::Core::handleFilterArea(@_);
-}
-
-###############################################################################
-sub handleFormatList {
-  initCore();
-  return Foswiki::Plugins::FilterPlugin::Core::handleFormatList(@_);
-}
-
-###############################################################################
-sub handleMakeIndex {
-  initCore();
-  return Foswiki::Plugins::FilterPlugin::Core::handleMakeIndex(@_);
-}
-
-###############################################################################
-sub handleSubst {
-  initCore();
-  return Foswiki::Plugins::FilterPlugin::Core::handleSubst(@_);
-}
-
-###############################################################################
-sub handleExtract {
-  initCore();
-  return Foswiki::Plugins::FilterPlugin::Core::handleExtract(@_);
+  return getCore()->handleFilterArea(@_);
 }
 
 1;

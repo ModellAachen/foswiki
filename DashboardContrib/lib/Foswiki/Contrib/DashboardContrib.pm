@@ -1,4 +1,5 @@
 # See bottom of file for default license and copyright information
+
 =begin TML
 
 ---+ package Foswiki::Contrib::DashboardContrib
@@ -7,7 +8,6 @@ This is a stub module for a new contrib. Customise this module as
 required. 
 
 =cut
-
 
 package Foswiki::Contrib::DashboardContrib;
 
@@ -33,7 +33,8 @@ our $VERSION = '$Rev$';
 # topic - if you use %$RELEASE% with BuildContrib this is done automatically.
 our $RELEASE = '0.2';
 
-our $SHORTDESCRIPTION = 'add a configurable widget based dashboard to the User\'s homepage;
+our $SHORTDESCRIPTION =
+  'add a configurable widget based dashboard to the User\'s homepage;
 
 1;
 

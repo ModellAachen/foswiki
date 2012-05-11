@@ -42,13 +42,13 @@ sub new {
   my $this = bless($class->SUPER::new( 
     $session,
     name => 'FullCalendar',
-    version => '1.4.3',
+    version => '1.5.2',
     author => 'Adam Shaw',
     homepage => 'http://arshaw.com/fullcalendar/',
     puburl => '%PUBURLPATH%/%SYSTEMWEB%/JQFullCalendarPlugin',
-    css => ['fullcalendar.css'],
-    javascript => ['fullcalendar.js'],
-    dependencies => ['ui'], 
+    css => ['fullcalendar.css'],# 'fullcalendar.print.css'],
+    javascript => ['fullcalendar.js', 'gcal.js'],
+    dependencies => ['ui', 'ui::draggable', 'ui::resizable'], 
   ), $class);
 
   return $this;

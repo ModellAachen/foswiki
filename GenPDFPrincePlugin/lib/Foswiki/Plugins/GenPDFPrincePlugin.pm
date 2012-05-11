@@ -1,6 +1,6 @@
 # Plugin for Foswiki - The Free and Open Source Wiki, http://foswiki.org/
 #
-# Copyright (C) 2009 Michael Daum http://michaeldaumconsulting.com
+# Copyright (C) 2009-2012 Michael Daum http://michaeldaumconsulting.com
 #
 # This license applies to GenPDFPrincePlugin *and also to any derivatives*
 #
@@ -24,9 +24,10 @@ use Foswiki::Func ();
 use Foswiki::Plugins ();
 use Error qw(:try);
 use File::Path ();
+use Encode ();
 
 our $VERSION = '$Rev: 4419 (2009-07-03) $';
-our $RELEASE = '1.31';
+our $RELEASE = '1.32';
 our $SHORTDESCRIPTION = 'Generate PDF using Prince XML';
 our $NO_PREFS_IN_TOPIC = 1;
 our $baseTopic;
@@ -72,14 +73,20 @@ sub completePageHandler {
   # hope this gets fixed in prince at some time
   $_[0] =~ s/(href=["'])\?.*(#[^"'\s])+/$1$2/g;
 
+  # rewrite some urls to use file://..
+  #$_[0] =~ s/(<link[^>]+href=["'])([^"']+)(["'])/$1.toFileUrl($2).$3/ge;
+  $_[0] =~ s/(<img[^>]+src=["'])([^"']+)(["'])/$1.toFileUrl($2).$3/ge;
+
   # create temp files
   my $htmlFile = new File::Temp(SUFFIX => '.html', UNLINK => (DEBUG?0:1));
   my $errorFile = new File::Temp(SUFFIX => '.log', UNLINK => (DEBUG?0:1));
   my ($pdfFilePath, $pdfFile) = getFileName($baseWeb, $baseTopic);
 
   # creater html file
-  print $htmlFile "$_[0]";
-  #writeDebug("htmlFile=".$_[0]);
+  my $content = Encode::decode($Foswiki::cfg{Site}{CharSet}, $_[0]);
+
+  print $htmlFile $content;
+  writeDebug("htmlFile=".$htmlFile->filename);
 
   # create prince command
   my $session = $Foswiki::Plugins::SESSION;
@@ -142,6 +149,31 @@ sub getFileName {
   $filePath .= '/'.$fileName;
 
   return ($filePath, $fileName);
+}
+
+###############################################################################
+sub toFileUrl {
+  my $url = shift;
+
+  my $fileUrl = $url;
+
+  if ($fileUrl =~ /^(?:https?:\/\/$Foswiki::cfg{DefaultUrlHost})?$Foswiki::cfg{PubUrlPath}(.*)$/) {
+    $fileUrl = $1;
+    $fileUrl =~ s/\?.*$//;
+    if ($fileUrl =~ /^\/(.*)\/([^\/]+)\/[^\/]+$/) {
+      my $web = $1;
+      my $topic = $2;
+      my $wikiName = Foswiki::Func::getWikiName();
+      writeDebug("checking access for $wikiName on $web.$topic");
+      return '' unless Foswiki::Func::checkAccessPermission("VIEW", $wikiName, undef, $topic, $web);
+    }
+    $fileUrl = "file://".$Foswiki::cfg{PubDir}.$fileUrl;
+  } else {
+    writeDebug("url=$url does not point to the local server");
+  }
+
+  writeDebug("url=$url, fileUrl=$fileUrl");
+  return $fileUrl;
 }
 
 ###############################################################################

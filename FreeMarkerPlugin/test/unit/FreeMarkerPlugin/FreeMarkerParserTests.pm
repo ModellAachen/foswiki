@@ -31,121 +31,127 @@ my $DEFAULT_TEST_DATA = {
 };
 
 my $COMPLEX_TEST_DATA = {
-	pageSummary => {
-		memberList => {
-			'showHideSummaries' => {
-				'hideSummaries' => 'Hide summaries',
-				'showSummaries' => 'Show summaries'
-			},
-			'showHideTypeInfo' => {
-				'hideTypeInfo' => 'Hide type info',
-				'showTypeInfo' => 'Show type info'
-			},
-			memberSummaryPart => [
-				{
-				  '-private' => '0',
-				  'item' => [
-							  {
-								'-private' => '',
-								'typeInfo' => {
-												'typeInfoString' => '(inObjects:Array = null)',
-												'summary' => 'Creates a new array enumerator. ',
-												'-member' => ''
-											  },
-								'id' => 'ArrayEnumerator',
-								'title' => 'ArrayEnumerator'
-							  }
-							],
-				  'title' => 'Constructor'
-				},
-				{
-				  '-private' => '0',
-				  'item' => [
-							  {
-								'-private' => '',
-								'typeInfo' => {
-												'typeInfoString' => '(inObjects:Array) : void',
-												'summary' => 'Stores a pointer to array inArray.',
-												'-member' => ''
-											  },
-								'id' => 'setObjects',
-								'title' => 'setObjects'
-							  },
-							  {
-								'-private' => '',
-								'typeInfo' => {
-												'typeInfoString' => '() : *',
-												'summary' => 'Retrieves the object from the array at the current pointer location.',
-												'-member' => ''
-											  },
-								'id' => 'getCurrentObject',
-								'title' => 'getCurrentObject'
-							  },
-							  {
-								'-private' => '',
-								'typeInfo' => {
-												'typeInfoString' => '() : *',
-												'summary' => 'Increments the location pointer by one and returns the object from the array at that location.',
-												'-member' => ''
-											  },
-								'id' => 'getNextObject',
-								'title' => 'getNextObject'
-							  },
-							  {
-								'-private' => '',
-								'typeInfo' => {
-												'typeInfoString' => '() : Array',
-												'summary' => 'Retrieves all objects.',
-												'-member' => ''
-											  },
-								'id' => 'getAllObjects',
-								'title' => 'getAllObjects'
-							  },
-							  {
-								'-private' => '',
-								'typeInfo' => {
-												'typeInfoString' => '() : void',
-												'summary' => 'Puts the enumerator just before the first array item. ',
-												'-member' => ''
-											  },
-								'id' => 'reset',
-								'title' => 'reset'
-							  },
-							  {
-								'-private' => '',
-								'typeInfo' => {
-												'typeInfoString' => '() : int',
-												'-member' => ''
-											  },
-								'id' => 'getCurrentLocation',
-								'title' => 'getCurrentLocation'
-							  },
-							  {
-								'-private' => '',
-								'typeInfo' => {
-												'typeInfoString' => '(inLocation:int) : void',
-												'summary' => 'Sets the location pointer to a new position.',
-												'-member' => ''
-											  },
-								'id' => 'setCurrentLocation',
-								'title' => 'setCurrentLocation'
-							  },
-							  {
-								'-private' => '',
-								'typeInfo' => {
-												'typeInfoString' => '(inObject:Object) : void',
-												'summary' => 'Sets the location pointer to the location (in the array) of inObject.',
-												'-member' => ''
-											  },
-								'id' => 'setCurrentObject',
-								'title' => 'setCurrentObject'
-							  }
-							],
-				  'title' => 'Instance methods'
-				}
-			  ]
-		}
-	}
+    pageSummary => {
+        memberList => {
+            'showHideSummaries' => {
+                'hideSummaries' => 'Hide summaries',
+                'showSummaries' => 'Show summaries'
+            },
+            'showHideTypeInfo' => {
+                'hideTypeInfo' => 'Hide type info',
+                'showTypeInfo' => 'Show type info'
+            },
+            memberSummaryPart => [
+                {
+                    '-private' => '0',
+                    'item'     => [
+                        {
+                            '-private' => '',
+                            'typeInfo' => {
+                                'typeInfoString' => '(inObjects:Array = null)',
+                                'summary' => 'Creates a new array enumerator. ',
+                                '-member' => ''
+                            },
+                            'id'    => 'ArrayEnumerator',
+                            'title' => 'ArrayEnumerator'
+                        }
+                    ],
+                    'title' => 'Constructor'
+                },
+                {
+                    '-private' => '0',
+                    'item'     => [
+                        {
+                            '-private' => '',
+                            'typeInfo' => {
+                                'typeInfoString' => '(inObjects:Array) : void',
+                                'summary' =>
+                                  'Stores a pointer to array inArray.',
+                                '-member' => ''
+                            },
+                            'id'    => 'setObjects',
+                            'title' => 'setObjects'
+                        },
+                        {
+                            '-private' => '',
+                            'typeInfo' => {
+                                'typeInfoString' => '() : *',
+                                'summary' =>
+'Retrieves the object from the array at the current pointer location.',
+                                '-member' => ''
+                            },
+                            'id'    => 'getCurrentObject',
+                            'title' => 'getCurrentObject'
+                        },
+                        {
+                            '-private' => '',
+                            'typeInfo' => {
+                                'typeInfoString' => '() : *',
+                                'summary' =>
+'Increments the location pointer by one and returns the object from the array at that location.',
+                                '-member' => ''
+                            },
+                            'id'    => 'getNextObject',
+                            'title' => 'getNextObject'
+                        },
+                        {
+                            '-private' => '',
+                            'typeInfo' => {
+                                'typeInfoString' => '() : Array',
+                                'summary'        => 'Retrieves all objects.',
+                                '-member'        => ''
+                            },
+                            'id'    => 'getAllObjects',
+                            'title' => 'getAllObjects'
+                        },
+                        {
+                            '-private' => '',
+                            'typeInfo' => {
+                                'typeInfoString' => '() : void',
+                                'summary' =>
+'Puts the enumerator just before the first array item. ',
+                                '-member' => ''
+                            },
+                            'id'    => 'reset',
+                            'title' => 'reset'
+                        },
+                        {
+                            '-private' => '',
+                            'typeInfo' => {
+                                'typeInfoString' => '() : int',
+                                '-member'        => ''
+                            },
+                            'id'    => 'getCurrentLocation',
+                            'title' => 'getCurrentLocation'
+                        },
+                        {
+                            '-private' => '',
+                            'typeInfo' => {
+                                'typeInfoString' => '(inLocation:int) : void',
+                                'summary' =>
+'Sets the location pointer to a new position.',
+                                '-member' => ''
+                            },
+                            'id'    => 'setCurrentLocation',
+                            'title' => 'setCurrentLocation'
+                        },
+                        {
+                            '-private' => '',
+                            'typeInfo' => {
+                                'typeInfoString' => '(inObject:Object) : void',
+                                'summary' =>
+'Sets the location pointer to the location (in the array) of inObject.',
+                                '-member' => ''
+                            },
+                            'id'    => 'setCurrentObject',
+                            'title' => 'setCurrentObject'
+                        }
+                    ],
+                    'title' => 'Instance methods'
+                }
+            ]
+        }
+    }
 };
 
 $DEFAULT_TEST_DATA->{book}->{author}->{name} = 'Shakespeare';
@@ -1365,8 +1371,8 @@ sub test_tag_macro {
     my $result;
     my $expected;
 
-	# ------------------------------------------------
-	# no call
+    # ------------------------------------------------
+    # no call
     $template = '<#macro greet>
 Hello Joe!
 </#macro>';
@@ -1382,8 +1388,8 @@ Hello Joe!
     print("EXP=$expected.\n") if $DEBUG;
     $this->assert( $result eq $expected );
 
-	# ------------------------------------------------
-	# call short notation
+    # ------------------------------------------------
+    # call short notation
     $template = '<#macro greet>
 Hello Joe!
 </#macro>
@@ -1402,7 +1408,7 @@ Hello Joe!
     $this->assert( $result eq $expected );
 
     # ------------------------------------------------
-	# params
+    # params
     $template = '<#macro greet name call>
 ${call} ${name}!
 </#macro>
@@ -1421,7 +1427,7 @@ ${call} ${name}!
     $this->assert( $result eq $expected );
 
     # ------------------------------------------------
-	# in list
+    # in list
     $template = '<#macro season name>
 The time of year: ${name}
 </#macro>
@@ -1442,29 +1448,30 @@ The time of year: autumn
     print("EXP=$expected.\n") if $DEBUG;
     $this->assert( $result eq $expected );
 
-	# ------------------------------------------------
-	# in list 2
-	$tmpData = {
-		seasons => [
-					{
-						name => "winter",
-						month => "December"
-					},
-					{
-						name => "spring",
-						month => "March"
-					},
-					{
-						name => "summer",
-						month => "June"
-					},
-					{
-						name => "autumn",
-						month => "September"
-					}
-					]
-	};
-	#print "QQQ season 1=" . $tmpData->{seasons}->[0]->{name} . "\n";
+    # ------------------------------------------------
+    # in list 2
+    $tmpData = {
+        seasons => [
+            {
+                name  => "winter",
+                month => "December"
+            },
+            {
+                name  => "spring",
+                month => "March"
+            },
+            {
+                name  => "summer",
+                month => "June"
+            },
+            {
+                name  => "autumn",
+                month => "September"
+            }
+        ]
+    };
+
+    #print "QQQ season 1=" . $tmpData->{seasons}->[0]->{name} . "\n";
 
     $template = '<#macro season name>
 The time of year: ${name}
@@ -1506,8 +1513,9 @@ The time of year: autumn
     $this->assert( $result eq $expected );
 
     # ------------------------------------------------
-	# in list with if
-    $template = '<#ftl encoding="UTF-8" strip_whitespace="false"><#macro people name len>
+    # in list with if
+    $template =
+      '<#ftl encoding="UTF-8" strip_whitespace="false"><#macro people name len>
 <#if len gt 3>
 Long name:${name}
 <#else>
@@ -1532,23 +1540,23 @@ Long name:Roger';
     print("EXP=$expected.\n") if $DEBUG;
     $this->assert( $result eq $expected );
 
-	# ------------------------------------------------
-	# pass list
-	$template = '<#macro mylist title items>
+    # ------------------------------------------------
+    # pass list
+    $template = '<#macro mylist title items>
 ${title?cap_first}:
 <#list items as x>
 - ${x?cap_first}
 </#list>
 </#macro>
 <@mylist items=["mouse", "elephant", "python"] title="Animals"/>';
-	
-	$parser = new Foswiki::Plugins::FreeMarkerPlugin::FreeMarkerParser();
-	$parser->{debugLevel} = $PARSER_DEBUG_LEVEL;
-	$parser->{debug}      = $PARSER_DEBUG;
-	$parsed = $parser->parse( $template, $DEFAULT_TEST_DATA );
 
-	$result   = $parsed;
-	$expected = 'Animals:
+    $parser = new Foswiki::Plugins::FreeMarkerPlugin::FreeMarkerParser();
+    $parser->{debugLevel} = $PARSER_DEBUG_LEVEL;
+    $parser->{debug}      = $PARSER_DEBUG;
+    $parsed = $parser->parse( $template, $DEFAULT_TEST_DATA );
+
+    $result   = $parsed;
+    $expected = 'Animals:
 - Mouse
 - Elephant
 - Python
@@ -1558,26 +1566,24 @@ ${title?cap_first}:
     $this->assert( $result eq $expected );
 
     # ------------------------------------------------
-	# pass list param
-	$tmpData = {
-		animals => ["mouse", "elephant", "python"]
-	};
-	
-	$template = '<#macro mylist title items>
+    # pass list param
+    $tmpData = { animals => [ "mouse", "elephant", "python" ] };
+
+    $template = '<#macro mylist title items>
 ${title?cap_first}:
 <#list items as x>
 - ${x?cap_first}
 </#list>
 </#macro>
 <@mylist items=animals title="Animals"/>';
-	
-	$parser = new Foswiki::Plugins::FreeMarkerPlugin::FreeMarkerParser();
-	$parser->{debugLevel} = $PARSER_DEBUG_LEVEL;
-	$parser->{debug}      = $PARSER_DEBUG;
-	$parsed = $parser->parse( $template, $tmpData );
 
-	$result   = $parsed;
-	$expected = 'Animals:
+    $parser = new Foswiki::Plugins::FreeMarkerPlugin::FreeMarkerParser();
+    $parser->{debugLevel} = $PARSER_DEBUG_LEVEL;
+    $parser->{debug}      = $PARSER_DEBUG;
+    $parsed = $parser->parse( $template, $tmpData );
+
+    $result   = $parsed;
+    $expected = 'Animals:
 - Mouse
 - Elephant
 - Python
@@ -1586,29 +1592,25 @@ ${title?cap_first}:
     print("EXP=$expected.\n") if $DEBUG;
     $this->assert( $result eq $expected );
 
-	# ------------------------------------------------
-	# pass list param nested
-	$tmpData = {
-		animals => {
-			mammals => ["mouse", "elephant", "cat"]
-		}
-	};
-	
-	$template = '<#macro mylist title items>
+    # ------------------------------------------------
+    # pass list param nested
+    $tmpData = { animals => { mammals => [ "mouse", "elephant", "cat" ] } };
+
+    $template = '<#macro mylist title items>
 ${title?cap_first}:
 <#list items as x>
 - ${x?cap_first}
 </#list>
 </#macro>
 <@mylist items=animals.mammals title="Animals"/>';
-	
-	$parser = new Foswiki::Plugins::FreeMarkerPlugin::FreeMarkerParser();
-	$parser->{debugLevel} = $PARSER_DEBUG_LEVEL;
-	$parser->{debug}      = $PARSER_DEBUG;
-	$parsed = $parser->parse( $template, $tmpData );
 
-	$result   = $parsed;
-	$expected = 'Animals:
+    $parser = new Foswiki::Plugins::FreeMarkerPlugin::FreeMarkerParser();
+    $parser->{debugLevel} = $PARSER_DEBUG_LEVEL;
+    $parser->{debug}      = $PARSER_DEBUG;
+    $parsed = $parser->parse( $template, $tmpData );
+
+    $result   = $parsed;
+    $expected = 'Animals:
 - Mouse
 - Elephant
 - Cat
@@ -1617,35 +1619,34 @@ ${title?cap_first}:
     print("EXP=$expected.\n") if $DEBUG;
     $this->assert( $result eq $expected );
 
-	# ------------------------------------------------
-	# pass hash param nested
-	$tmpData = {
-		data => {
-			field => {
-				title => "Whole lotta luck",
-				date => 1969
-			}
-		}
-	};
-	
-	$template = '<#macro myhash d>
+    # ------------------------------------------------
+    # pass hash param nested
+    $tmpData = {
+        data => {
+            field => {
+                title => "Whole lotta luck",
+                date  => 1969
+            }
+        }
+    };
+
+    $template = '<#macro myhash d>
 title:${d.title}
 </#macro>
 <@myhash d=data.field/>';
-	
-	$parser = new Foswiki::Plugins::FreeMarkerPlugin::FreeMarkerParser();
-	$parser->{debugLevel} = $PARSER_DEBUG_LEVEL;
-	$parser->{debug}      = $PARSER_DEBUG;
-	$parsed = $parser->parse( $template, $tmpData );
 
-	$result   = $parsed;
-	$expected = 'title:Whole lotta luck
+    $parser = new Foswiki::Plugins::FreeMarkerPlugin::FreeMarkerParser();
+    $parser->{debugLevel} = $PARSER_DEBUG_LEVEL;
+    $parser->{debug}      = $PARSER_DEBUG;
+    $parsed = $parser->parse( $template, $tmpData );
+
+    $result   = $parsed;
+    $expected = 'title:Whole lotta luck
 ';
     print("RES=$result.\n")   if $DEBUG;
     print("EXP=$expected.\n") if $DEBUG;
     $this->assert( $result eq $expected );
 
-    
 =not
     # ------------------------------------------------
 	# invalid param
@@ -1694,6 +1695,7 @@ Hello Joe!
     print("EXP=$expected.\n") if $DEBUG;
     $this->assert( $result eq $expected );
 =cut
+
 }
 
 =pod
@@ -1726,7 +1728,7 @@ sub test_tag_list {
     $this->assert( $result eq $expected );
 =cut
 
-	# ---
+    # ---
     $template = '<ul>
 <#list ["winter", "spring", "summer", "autumn"] as x>
 <li>season = <b>${x}</b></li>
@@ -1757,13 +1759,14 @@ sub test_tag_list {
 sub test_tag_list_nested {
     my ($this) = @_;
 
-	my $template;
+    my $template;
     my $parser;
     my $parsed, my $data;
     my $result;
     my $expected;
-    
-    $template = '<#list ["winter", "spring", "summer", "autumn"] as x><#list 1..3 as y>
+
+    $template =
+      '<#list ["winter", "spring", "summer", "autumn"] as x><#list 1..3 as y>
 - ${x}, ${y}
 </#list></#list>';
 
@@ -1789,9 +1792,9 @@ sub test_tag_list_nested {
     print("RES=$result.\n")   if $DEBUG;
     print("EXP=$expected.\n") if $DEBUG;
     $this->assert( $result eq $expected );
-    
+
     # ----------
-    
+
     $template = '<#list ["winter", "spring", "summer", "autumn"] as x>
 <#if x??>
 <#list 1..3 as y>
@@ -1959,15 +1962,8 @@ sub test_tag_list_data_key {
     print("RES=$result.\n")   if $DEBUG;
     print("EXP=$expected.\n") if $DEBUG;
     $this->assert( $result eq $expected );
-    
-    my $tmpData = {
-		nestedlist => 
-        	{
-	            people => {
-	            	ages => [ 10, 20, 30 ]
-	            }
-	        }
-	};
+
+    my $tmpData = { nestedlist => { people => { ages => [ 10, 20, 30 ] } } };
 
     $template = '<#list nestedlist.people.ages as age>
 - ${age}
@@ -1996,21 +1992,21 @@ sub test_list_data_keys_at_different_levels {
     my $expected;
 
     my $tmpData = {
-    	title => 'Bedtime Stories',
-    	chapters => [
-    		{
-    			title => 'One',
-    			page => 3
-    		},
-    		{
-    			title => 'Two',
-    			page => 12
-    		},
-    		{
-    			title => 'Three',
-    			page => 19
-    		}
-    	]
+        title    => 'Bedtime Stories',
+        chapters => [
+            {
+                title => 'One',
+                page  => 3
+            },
+            {
+                title => 'Two',
+                page  => 12
+            },
+            {
+                title => 'Three',
+                page  => 19
+            }
+        ]
     };
 
     $template = '<#list chapters as chapter>
@@ -2028,7 +2024,7 @@ sub test_list_data_keys_at_different_levels {
     print("RES=$result.\n")   if $DEBUG;
     print("EXP=$expected.\n") if $DEBUG;
     $this->assert( $result eq $expected );
-    
+
 }
 
 =pod
@@ -2408,14 +2404,13 @@ sub test_tag_if {
     my ($this) = @_;
 
     my $tmpData = {
-        x     => 1,
-        color => 'green',
-        nested => 
-			{
-				name => 'mary',
-				ages => [ 10, 20, 30 ],
-				empty => []
-			}
+        x      => 1,
+        color  => 'green',
+        nested => {
+            name  => 'mary',
+            ages  => [ 10, 20, 30 ],
+            empty => []
+        }
     };
 
     my $template;
@@ -2424,7 +2419,7 @@ sub test_tag_if {
     my $result;
     my $expected;
 
-	# ------------------------------------------------
+    # ------------------------------------------------
     # ==
     $template = '<#if x == 1>
 </#if>';
@@ -2437,7 +2432,7 @@ sub test_tag_if {
     print("RES=$result.\n")   if $DEBUG;
     print("EXP=$expected.\n") if $DEBUG;
     $this->assert( $result eq $expected );
-    
+
     # ------------------------------------------------
     # ==
     $template = '<#if x == 1>
@@ -2722,7 +2717,7 @@ empty array exists
     print("RES=$result.\n")   if $DEBUG;
     print("EXP=$expected.\n") if $DEBUG;
     $this->assert( $result eq $expected );
-    
+
     # ------------------------------------------------
     # ?? with array
     $template = '<#if nested.ages??>
@@ -2802,9 +2797,7 @@ sub test_tag_if_logic {
         color  => 'green',
         male   => 1,
         female => 0,
-        nested => {
-        	x => 1
-        }
+        nested => { x => 1 }
     };
 
     my $template;
@@ -2826,7 +2819,7 @@ sub test_tag_if_logic {
     print("EXP=$expected.\n") if $DEBUG;
     $this->assert( $result eq $expected );
 
-	# ------------------------------------------------
+    # ------------------------------------------------
     # &&
     $template = "<#if x?? && male??>1</#if>";
     $parser   = new Foswiki::Plugins::FreeMarkerPlugin::FreeMarkerParser();
@@ -2838,7 +2831,7 @@ sub test_tag_if_logic {
     print("RES=$result.\n")   if $DEBUG;
     print("EXP=$expected.\n") if $DEBUG;
     $this->assert( $result eq $expected );
-    
+
     # ------------------------------------------------
     # && with non existing var
     $template = "<#if x?? && y??>1<#else>0</#if>";
@@ -2851,7 +2844,7 @@ sub test_tag_if_logic {
     print("RES=$result.\n")   if $DEBUG;
     print("EXP=$expected.\n") if $DEBUG;
     $this->assert( $result eq $expected );
-    
+
     # ------------------------------------------------
     # && with existing nested var
     $template = "<#if x?? && nested.x??>1<#else>0</#if>";
@@ -2864,7 +2857,7 @@ sub test_tag_if_logic {
     print("RES=$result.\n")   if $DEBUG;
     print("EXP=$expected.\n") if $DEBUG;
     $this->assert( $result eq $expected );
-    
+
     # ------------------------------------------------
     # && with non existing nested var
     $template = "<#if x?? && nested.y??>1<#else>0</#if>";
@@ -2877,7 +2870,7 @@ sub test_tag_if_logic {
     print("RES=$result.\n")   if $DEBUG;
     print("EXP=$expected.\n") if $DEBUG;
     $this->assert( $result eq $expected );
-    
+
     # ------------------------------------------------
     # ?? && !??
     $template = "<#if x?? && !nested.y??>1<#else>0</#if>";
@@ -2890,7 +2883,7 @@ sub test_tag_if_logic {
     print("RES=$result.\n")   if $DEBUG;
     print("EXP=$expected.\n") if $DEBUG;
     $this->assert( $result eq $expected );
-    
+
     # ------------------------------------------------
     # ?? && !??
     $template = "<#if x?? && !nested.x??>1<#else>0</#if>";
@@ -3988,10 +3981,10 @@ ${l?join(", ")}';
     my @seaAnimals  = ( 'shark',   'lobster', 'starfish' );
     my @landAnimals = ( 'gorilla', 'zebra',   'elephant' );
     $tmpData = {
-    	animals => {
-	        sea  => \@seaAnimals,
-    	    land => \@landAnimals
-    	}
+        animals => {
+            sea  => \@seaAnimals,
+            land => \@landAnimals
+        }
     };
     $parser = new Foswiki::Plugins::FreeMarkerPlugin::FreeMarkerParser();
     $parser->{debugLevel} = $PARSER_DEBUG_LEVEL;
@@ -4302,13 +4295,13 @@ sub test_tag_dump {
     my $result;
     my $expected;
     my $tmpData = {
-    	data => {
-			colors => [
-				"red",  "green",  "black", "gray",
-				"blue", "purple", "brown", "yellow"
-			],
-			selectedcolor => "green"
-		}
+        data => {
+            colors => [
+                "red",  "green",  "black", "gray",
+                "blue", "purple", "brown", "yellow"
+            ],
+            selectedcolor => "green"
+        }
     };
 
     $template = '<#dump data/>';
@@ -4334,9 +4327,9 @@ sub test_tag_dump {
     print("RES=$result.\n")   if $DEBUG;
     print("EXP=$expected.\n") if $DEBUG;
     $this->assert( $result eq $expected );
-    
+
     #----------
-    
+
     $template = '<#dump data.colors />';
     $parser   = new Foswiki::Plugins::FreeMarkerPlugin::FreeMarkerParser();
     $parser->{debugLevel} = $PARSER_DEBUG_LEVEL;
@@ -4472,13 +4465,13 @@ sub test_complex_1 {
 
 sub test_complex_2 {
     my ($this) = @_;
-    
+
     my $template;
     my $parser;
     my $parsed, my $data;
     my $result;
     my $expected;
-    
+
     # ---
     $template = '<#if pageSummary.memberList.memberSummaryPart??>
 <div class="memberList">
@@ -4523,13 +4516,13 @@ sub test_complex_2 {
 
 sub test_complex_3 {
     my ($this) = @_;
-    
+
     my $template;
     my $parser;
     my $parsed, my $data;
     my $result;
     my $expected;
-    
+
     # ---
     $template = '<#macro iconButton class icon label>
 <span class="${class}"><a href="#"><span class="icon">${icon}</span><span class="label">${label}</span></a></span>
@@ -4618,40 +4611,32 @@ sub test_complex_3 {
 
 sub test_recursive {
     my ($this) = @_;
-    
+
     my $template;
     my $parser;
     my $parsed, my $data;
     my $result;
     my $expected;
-    
+
     my $tmpData = {
-    	tree =>
-    	{
-    		name => 'root',
-    		child =>
-    		{
-    			name => 'child 1',
-    			child => 
-    			{
-    				name => 'child 2',
-    				child => 
-    				{
-						name => 'child 3',
-						child => 
-						{
-							name => 'child 5',
-							child =>
-							{
-								name => 'child 6' 
-							}
-						}
-					}
-				}
-    		}
-    	}
+        tree => {
+            name  => 'root',
+            child => {
+                name  => 'child 1',
+                child => {
+                    name  => 'child 2',
+                    child => {
+                        name  => 'child 3',
+                        child => {
+                            name  => 'child 5',
+                            child => { name => 'child 6' }
+                        }
+                    }
+                }
+            }
+        }
     };
-    
+
     $template = '<#macro treeMacro node>
 <#if node.name??>
 - ${node.name}
@@ -4672,6 +4657,7 @@ sub test_recursive {
     print("EXP=$expected.\n") if $DEBUG;
     $this->assert( $result eq $expected );
 }
+
 =pod
 sub testest {
 	my ($this) = @_;
@@ -4756,13 +4742,12 @@ sub testest {
 }
 =cut
 
-
 # HELPER FUNCTIONS
 
 sub _trimSpaces {
 
     #my $parsed = $_[0]
-	return if !$_[0];
+    return if !$_[0];
     $_[0] =~ s/^[[:space:]]+//s;    # trim at start
     $_[0] =~ s/[[:space:]]+$//s;    # trim at end
 }

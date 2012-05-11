@@ -31,7 +31,8 @@ sub mkPathTo {
                     FILENAME => $path . $dir
                 );
                 if ($exit) {
-                    throw Error::Simple( "SVN: mkdir $path $dir failed: $! $output" );
+                    throw Error::Simple(
+                        "SVN: mkdir $path $dir failed: $! $output");
                 }
             }
             $path .= $dir;
@@ -41,7 +42,7 @@ sub mkPathTo {
 
 sub new {
     my $class = shift;
-    my $this = $class->SUPER::new( @_ );
+    my $this  = $class->SUPER::new(@_);
     undef $this->{rcsFile};
     return $this;
 }
@@ -56,7 +57,7 @@ sub init {
         $this->mkPathTo( $this->{file} );
 
         unless ( open( F, '>' . $this->{file} ) ) {
-            throw Error::Simple( "SVN: add $this->{file} failed: $!" );
+            throw Error::Simple("SVN: add $this->{file} failed: $!");
         }
         close(F);
 
@@ -65,30 +66,30 @@ sub init {
             FILENAME => $this->{file}
         );
         if ($exit) {
-            throw Error::Simple(
-                "SVN: add $this->{file} failed: $! $output" );
+            throw Error::Simple("SVN: add $this->{file} failed: $! $output");
         }
     }
 }
 
 sub _info {
-    my ($this, $version) = @_;
-    $version = (defined $version) ? "-r $version" : '';
-    my ($info, $exit) = Foswiki::Sandbox->sysCommand(
+    my ( $this, $version ) = @_;
+    $version = ( defined $version ) ? "-r $version" : '';
+    my ( $info, $exit ) = Foswiki::Sandbox->sysCommand(
         $Foswiki::cfg{SubversionContrib}{svnCommand}
           . " info $version %FILENAME|F%",
-        
+
         FILENAME => $this->{file}
-       );
+    );
     if ($exit) {
-        throw Error::Simple( "SVN: info $version $this->{file} failed: $! $info" .join(' ',caller));
+        throw Error::Simple( "SVN: info $version $this->{file} failed: $! $info"
+              . join( ' ', caller ) );
     }
     my @info;
-    foreach my $line (split(/\r?\n/, $info)) {
-        if ($line =~ /^([\w ]+): (.*)$/) {
-            push(@info, $1);
+    foreach my $line ( split( /\r?\n/, $info ) ) {
+        if ( $line =~ /^([\w ]+): (.*)$/ ) {
+            push( @info, $1 );
             my $v = _fixTime($2);
-            push(@info, $v);
+            push( @info, $v );
         }
     }
     return @info;
@@ -96,8 +97,8 @@ sub _info {
 
 sub _fixTime {
     my $v = shift;
-    if ($v =~ /^(\d[-\d]+) (\d[\d:]+) (?:([-+]\d\d)(\d\d)) \(.*\)$/) {
-        my $d = $1.'T'.$2;
+    if ( $v =~ /^(\d[-\d]+) (\d[\d:]+) (?:([-+]\d\d)(\d\d)) \(.*\)$/ ) {
+        my $d = $1 . 'T' . $2;
         $d .= "$3:$4" if defined $3;
         $v = Foswiki::Time::parseTime($d);
     }
@@ -110,35 +111,35 @@ sub getInfo {
     return $this->SUPER::getInfo() unless -e $this->{file};
     my %info = $this->_info($version);
     return {
-        version => $info{'Revision'} || 1,
-        date => $info{'Last Changed Date'} || 0,
-        author => $info{'Last Changed Author'},
-        comment => '' # Could recover comment from the log
-       };
+        version => $info{'Revision'}          || 1,
+        date    => $info{'Last Changed Date'} || 0,
+        author  => $info{'Last Changed Author'},
+        comment => ''    # Could recover comment from the log
+    };
 }
 
 # Override VC::Handler
 sub getRevisionHistory {
     my $this = shift;
-    if (-e $this->{file}) {
+    if ( -e $this->{file} ) {
         my ( $output, $exit ) = Foswiki::Sandbox->sysCommand(
             $Foswiki::cfg{SubversionContrib}{svnCommand} . ' log %FILE|F%',
             FILE => $this->{file} );
         if ($exit) {
-            throw Error::Simple( "SVN: log $this->{file} failed: $! $output" );
+            throw Error::Simple("SVN: log $this->{file} failed: $! $output");
         }
         my @revs;
-        foreach my $rev (split(/\r?\n/, $output)) {
-            if ($rev =~ /^r(\d+)\s\|\s([^|]+)\s\|\s([^|]+)\s\|/) {
-                my $id = $1;
-                my $who = $2;
+        foreach my $rev ( split( /\r?\n/, $output ) ) {
+            if ( $rev =~ /^r(\d+)\s\|\s([^|]+)\s\|\s([^|]+)\s\|/ ) {
+                my $id   = $1;
+                my $who  = $2;
                 my $when = _fixTime($3);
-                push(@revs, $id);
+                push( @revs, $id );
             }
         }
-        return new Foswiki::ListIterator(\@revs);
+        return new Foswiki::ListIterator( \@revs );
     }
-    return new Foswiki::ListIterator([]);
+    return new Foswiki::ListIterator( [] );
 }
 
 sub getLatestRevisionID {
@@ -156,20 +157,21 @@ sub getLatestRevisionID {
 
 sub getNextRevisionID {
     my $this = shift;
-    my $f = $this->{file};
-    if (! -d $f) {
+    my $f    = $this->{file};
+    if ( !-d $f ) {
         $f =~ s#/+[^/]*$##;
     }
     my ( $output, $exit ) = Foswiki::Sandbox->sysCommand(
         $Foswiki::cfg{SubversionContrib}{svnCommand} . ' log -r HEAD %DIR|F%',
-       DIR => $f);
+        DIR => $f );
     if ($exit) {
-        throw Error::Simple( "SVN: log -r HEAD failed: $! $output" );
+        throw Error::Simple("SVN: log -r HEAD failed: $! $output");
     }
-    if ($output =~ /^r(\d+)\s*\|/m) {
+    if ( $output =~ /^r(\d+)\s*\|/m ) {
         return $1 + 1;
     }
-    # Might not 
+
+    # Might not
     throw Error::Simple(`svn log -r HEAD`);
 }
 
@@ -183,30 +185,33 @@ sub getLatestRevisionTime {
 
 # Override VC::Handler
 sub revisionExists {
-    my ($this, $id) = @_;
+    my ( $this, $id ) = @_;
     return 0 unless defined $id;
     my ( $output, $exit ) = Foswiki::Sandbox->sysCommand(
         $Foswiki::cfg{SubversionContrib}{svnCommand} . ' log %FILE|F%',
         FILE => $this->{file} );
     if ($exit) {
-        throw Error::Simple( "SVN: log $this->{file} failed: $! $output" );
+        throw Error::Simple("SVN: log $this->{file} failed: $! $output");
     }
-    return ($output =~ /^r$id /); 
+    return ( $output =~ /^r$id / );
 }
 
 # Override VC::Handler
 sub getRevision {
     my ( $this, $version ) = @_;
-    return $this->SUPER::getRevision() unless defined $version
-      && -e $this->{file};
+    return $this->SUPER::getRevision()
+      unless defined $version
+          && -e $this->{file};
 
     my ( $output, $exit ) = Foswiki::Sandbox->sysCommand(
         $Foswiki::cfg{SubversionContrib}{svnCommand}
           . " cat -r %VERSION|U% %FILE|F%",
         VERSION => $version,
-        FILE => $this->{file} );
+        FILE    => $this->{file}
+    );
     if ($exit) {
-        throw Error::Simple( "SVN: cat -r$version $this->{file} failed: $! $output" );
+        throw Error::Simple(
+            "SVN: cat -r$version $this->{file} failed: $! $output");
     }
     return $output;
 }
@@ -219,7 +224,7 @@ sub restoreLatestRevision {
         $Foswiki::cfg{SubversionContrib}{svnCommand} . ' revert %FILE|F%',
         FILE => $this->{file} );
     if ($exit) {
-        throw Error::Simple( "SVN: revert $this->{file} failed: $! $output" );
+        throw Error::Simple("SVN: revert $this->{file} failed: $! $output");
     }
 }
 
@@ -227,18 +232,20 @@ sub remove {
     my $this = shift;
 
     my ( $output, $exit ) = Foswiki::Sandbox->sysCommand(
-        $Foswiki::cfg{SubversionContrib}{svnCommand} . ' rm -m %COMMENT|U% %FILE|F%',
+        $Foswiki::cfg{SubversionContrib}{svnCommand}
+          . ' rm -m %COMMENT|U% %FILE|F%',
         COMMENT => '',
-        FILE => $this->{file} );
+        FILE    => $this->{file}
+    );
     if ($exit) {
-        throw Error::Simple( "SVN: rm $this->{file} failed: $! $output" );
+        throw Error::Simple("SVN: rm $this->{file} failed: $! $output");
     }
 }
 
 sub copyFile {
     my ( $this, $from, $to ) = @_;
 
-    $this->mkPathTo( $to );
+    $this->mkPathTo($to);
 
     my ( $output, $exit ) = Foswiki::Sandbox->sysCommand(
         $Foswiki::cfg{SubversionContrib}{svnCommand} . ' cp %FROM|F% %TO|F%',
@@ -246,21 +253,21 @@ sub copyFile {
         TO   => $to
     );
     if ($exit) {
-        throw Error::Simple( "SVN: copy $from $to failed: $! $output" );
+        throw Error::Simple("SVN: copy $from $to failed: $! $output");
     }
 }
 
 sub moveFile {
     my ( $this, $from, $to ) = @_;
 
-    $this->mkPathTo( $to );
+    $this->mkPathTo($to);
     my ( $output, $exit ) = Foswiki::Sandbox->sysCommand(
         $Foswiki::cfg{SubversionContrib}{svnCommand} . ' mv %FROM|F% %TO|F%',
         FROM => $from,
         TO   => $to
     );
     if ($exit) {
-        throw Error::Simple( "SVN: move $from $to failed: $! $output" );
+        throw Error::Simple("SVN: move $from $to failed: $! $output");
     }
 }
 
@@ -273,10 +280,10 @@ sub addRevisionFromText {
         $Foswiki::cfg{SubversionContrib}{svnCommand}
           . " commit -m %COMMENT|U% %FILE|F%",
         COMMENT => $comment,
-        FILE => $this->{file}
+        FILE    => $this->{file}
     );
     if ($exit) {
-        throw Error::Simple( "SVN: commit $this->{file} failed: $! $output" );
+        throw Error::Simple("SVN: commit $this->{file} failed: $! $output");
     }
 }
 
@@ -284,15 +291,15 @@ sub addRevisionFromStream {
     my ( $this, $stream, $comment, $user, $date ) = @_;
     $this->init();
 
-    $this->saveStream( $stream );
+    $this->saveStream($stream);
     my ( $output, $exit ) = Foswiki::Sandbox->sysCommand(
         $Foswiki::cfg{SubversionContrib}{svnCommand}
           . " commit -m %COMMENT|U% %FILE|F%",
         COMMENT => $comment,
-        FILE => $this->{file}
+        FILE    => $this->{file}
     );
     if ($exit) {
-        throw Error::Simple( "SVN: commit $this->{file} failed: $! $output" );
+        throw Error::Simple("SVN: commit $this->{file} failed: $! $output");
     }
 }
 
@@ -322,7 +329,7 @@ sub revisionDiff {
         FILE => $this->{file}
     );
     if ($exit) {
-        throw Error::Simple( "SVN: diff failed: $! $output" );
+        throw Error::Simple("SVN: diff failed: $! $output");
     }
     $output =~ s/\nProperty changes on:.*$//s;
     require Foswiki::Store::RcsWrap;
@@ -331,7 +338,8 @@ sub revisionDiff {
 
 sub getRevisionAtTime {
     my ( $this, $date ) = @_;
-    my %info = $this->_info( '{'.Foswiki::FormatTime( $date, '$http' ).'}' );
+    my %info =
+      $this->_info( '{' . Foswiki::FormatTime( $date, '$http' ) . '}' );
     return $info{'Revision'};
 }
 

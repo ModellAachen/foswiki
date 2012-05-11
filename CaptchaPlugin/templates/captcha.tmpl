@@ -1,0 +1,40 @@
+%TMPL:DEF{"captcha"}%<!-- -->
+%TMPL:P{"captcha::start"}%<!-- -->
+%TMPL:P{"captcha::image"}%<!-- -->
+%TMPL:P{"captcha::title"}%<!-- -->
+%TMPL:P{"captcha::input"}%<!-- -->
+%TMPL:P{"captcha::description"}%<!-- -->
+%TMPL:P{"captcha::end"}%<!-- -->
+%TMPL:P{"captcha::javascript"}%<!-- -->
+<!-- -->%TMPL:END%
+
+%TMPL:DEF{"captcha::start"}%<div class="foswikiFormStep"><div class="jqCaptcha">%TMPL:END%
+
+%TMPL:DEF{"captcha::title"}%<h3>%MAKETEXT{"Verification code"}%: <span class="foswikiAlert">**</span></h3>%TMPL:END%
+
+%TMPL:DEF{"captcha::image"}%<!-- -->
+  <div class="foswikiRight" style="margin-left:2em">
+    <span class="jqCaptchaContainer"></span>
+    <p> %BUTTON{"%MAKETEXT{"get a different image"}%" icon="arrow_refresh" class="jqCaptchaReload simple foswikiRight"}% %CLEAR% </p>
+  </div>
+<!-- -->%TMPL:END%
+
+%TMPL:DEF{"captcha::input"}%<!-- -->
+  <input type='text' name='captcha_response' size='40' class='foswikiInputField' autocomplete="off" />
+  <label class='error' style='display:none'>%TMPL:P{"captcha::check::error"}%</label>
+  <label class='success' style='display:none'>%TMPL:P{"captcha::check::success"}%</label>
+<!-- -->%TMPL:END%
+
+%TMPL:DEF{"captcha::check::success"}%%JQICON{"accept"}% %MAKETEXT{"Validation successful"}%%TMPL:END%
+%TMPL:DEF{"captcha::check::error"}%%JQICON{"error"}% %MAKETEXT{"Invalid validation code"}%%TMPL:END%
+
+%TMPL:DEF{"captcha::description"}%<!-- -->
+  <div class="foswikiFormDescription">
+    %MAKETEXT{"This is a security check to test whether you are a human visitor and to prevent automated spam submission."}%
+  </div>
+<!-- -->%TMPL:END%
+
+%TMPL:DEF{"captcha::end"}%%CLEAR%</div>%CLEAR%</div>%TMPL:END%
+
+%TMPL:DEF{"captcha::javascript"}%%JQREQUIRE{"captcha"}%%TMPL:END%
+

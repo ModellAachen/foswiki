@@ -1,7 +1,6 @@
 TARGET= \
   attach.js \
   BaseStyle.css \
-  edit.js \
   history.js \
   login.js \
   natskin.js \

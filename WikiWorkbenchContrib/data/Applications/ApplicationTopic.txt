@@ -23,7 +23,7 @@ all parts of an application are gathered to create documentation and use it for 
 | TopicType | checkbox | 3 |%DBCALL{"Applications.GetTopicTypes" remote="off"}%| Document type  | |
 | <nop>TopicTitle | text | 75 | | title | |
 | Summary | text | 75 | | Short description of the role of this topic | c |
-| WikiApplication| select+values | 1 |%FLEXWEBLIST{subwebs="Applications" header="none, " footer="WikiWorkbench" format="$name, "}%| Application this topic belongs to | |
+| WikiApplication| wikiapp | 1 | | Application this topic belongs to | |
 
 
 %META:FORM{name="Applications.TopicType"}%

@@ -93,7 +93,7 @@ foswiki.base.edit = (function () {
 		*/
 		initRaw: function () {
 			var nowysiwyg = parseInt(jQuery('form[name=main] [name="nowysiwyg"]').val(), 10),
-				$textarea = jQuery('.foswikiEditTextarea textarea'),
+				$textarea = jQuery('.foswikiEditTextarea textarea.foswikiWysiwygEdit'),
 				that = this;
 
 			if (nowysiwyg !== 1) {
@@ -110,7 +110,7 @@ foswiki.base.edit = (function () {
 		fitTextArea: function () {
 			var FOOTER_HEIGHT = jQuery('.foswikiFooter').outerHeight(),
 				MIN_AREA_HEIGHT = jQuery('.foswikiEditTextarea').position().top + FOOTER_HEIGHT,
-				$textarea = jQuery('.foswikiEditTextarea textarea');
+				$textarea = jQuery('.foswikiEditTextarea textarea.foswikiWysiwygEdit');
 			this.fitToContent($textarea[0], MIN_AREA_HEIGHT);
 		}
 	};
@@ -144,7 +144,6 @@ if (FoswikiTiny !== undefined) {
 
 jQuery(document).ready(function ($) {
 	"use strict";
-	console.log("doc ready", foswiki.base.edit);
 	foswiki.base.edit.initRaw();
 });
 

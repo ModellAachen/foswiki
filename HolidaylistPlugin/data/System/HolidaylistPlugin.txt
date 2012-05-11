@@ -329,6 +329,7 @@ The following settings are available as preferences:
 |  Version: | %$VERSION% |
 |  Release: | %$RELEASE% |
 |  Change History: | <!-- versions below in reverse order -->&nbsp; |
+|  2.001 (15 Mar 2012) | Foswiki:Tasks.Item11647: make more than one %HOLIDAYLIST per page work (again) |
 |  2.000 (28 Nov 2011) | Foswiki:Main.MichaelDaum: a more professional look&feel; fixed some persistent-perl gotchas |
 |  1.033 (03 Jun 2011) | Add missing =topic= parameter. |
 |  1.032 (20 Jul 2010) | Foswiki:Tasks.Item9361: Show correct smiley if comment is white space only. |

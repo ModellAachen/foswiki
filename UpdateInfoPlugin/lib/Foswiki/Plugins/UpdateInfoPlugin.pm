@@ -65,18 +65,21 @@ sub initPlugin {
     # Get plugin preferences
     $debug = &Foswiki::Func::getPreferencesFlag("UPDATEINFOPLUGIN_DEBUG");
 
-    $days = &Foswiki::Func::getPreferencesValue("UPDATEINFODAYS")
+    $days =
+         &Foswiki::Func::getPreferencesValue("UPDATEINFODAYS")
       || &Foswiki::Func::getPreferencesValue("UPDATEINFOPLUGIN_DAYS")
       || "5";
 
-    $version = &Foswiki::Func::getPreferencesValue("UPDATEINFOVERSION")
+    $version =
+         &Foswiki::Func::getPreferencesValue("UPDATEINFOVERSION")
       || &Foswiki::Func::getPreferencesValue("UPDATEINFOPLUGIN_VERSION")
       || "1.1";
 
-    $wnre   = $Foswiki::regex{'webNameRegex'};
-    $wwre   = $Foswiki::regex{'wikiWordRegex'};
-    $manre  = $Foswiki::regex{'mixedAlphaNum'};
-    $abbre  = $Foswiki::regex{'abbrevRegex'};
+    $wnre  = $Foswiki::regex{'webNameRegex'};
+    $wwre  = $Foswiki::regex{'wikiWordRegex'};
+    $manre = $Foswiki::regex{'mixedAlphaNum'};
+    $abbre = $Foswiki::regex{'abbrevRegex'};
+
     #$smanre = $Foswiki::regex{'singleMixedAlphaNumRegex'};
 
     Foswiki::Func::writeDebug(
@@ -97,7 +100,7 @@ sub update_info {
     # save old link (preserve [[-style links)
     my $oldwikiword = $wikiword;
 
-    # clear [[-style formatting for [[WikiWordAsWebName.WikiWord][link text]] 
+    # clear [[-style formatting for [[WikiWordAsWebName.WikiWord][link text]]
     # and [[WikiWord][link text]]
     $wikiword =~ s/\[\[($wnre\.$wwre|$wwre)\]\[.*?\]\]/$1/o;
 
@@ -110,6 +113,7 @@ sub update_info {
     # Turn spaced-out names into WikiWords - upper case first letter of
     # whole link, and first of each word.
     $topic =~ s/^(.)/\U$1/o;
+
     #$topic =~ s/\s($smanre)/\U$1/go;
     #$topic =~ s/\[\[($smanre)(.*?)\]\]/\u$1$2/o;
 
@@ -169,8 +173,8 @@ sub update_info {
     if ($match) {
         $updated =
           ( ( time - $info{"date"} ) / 86400 ) < $params{"days"};    #24*60*60
-        $new =
-          $updated && ( ( $info{"version"} + 0 ) <= ( $params{"version"} + 0 ) );
+        $new = $updated
+          && ( ( $info{"version"} + 0 ) <= ( $params{"version"} + 0 ) );
 
         $r = "";
         if ($updated) {

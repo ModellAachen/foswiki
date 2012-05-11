@@ -14,7 +14,7 @@ use strict;
 use Assert;
 
 sub new {
-    my( $class, $text ) = @_;
+    my ( $class, $text ) = @_;
 
     my $this = { text => $text };
     $this->{children} = [];
@@ -23,9 +23,9 @@ sub new {
 
 # debug generate the parse tree as HTML
 sub stringify {
-    my( $this ) = @_;
+    my ($this) = @_;
     my $r = $this->{text};
-    foreach my $kid ( @{$this->{children}} ) {
+    foreach my $kid ( @{ $this->{children} } ) {
         $r .= $kid->stringify();
     }
     return $r;
@@ -37,16 +37,16 @@ sub isLeaf {
 
 # Called by the parser
 sub addChild {
-    my( $this, $node ) = @_;
-    push( @{$this->{children}}, $node );
+    my ( $this, $node ) = @_;
+    push( @{ $this->{children} }, $node );
 }
 
 # generate the parse tree, applying filters
 sub generate {
-    my ($this, $filterURI, $filterHandler) = @_;
+    my ( $this, $filterURI, $filterHandler, $filterInline ) = @_;
     my $text = $this->{text};
-    foreach my $kid ( @{$this->{children}} ) {
-        $text .= $kid->generate($filterURI, $filterHandler);
+    foreach my $kid ( @{ $this->{children} } ) {
+        $text .= $kid->generate( $filterURI, $filterHandler, $filterInline );
     }
     return $text;
 }

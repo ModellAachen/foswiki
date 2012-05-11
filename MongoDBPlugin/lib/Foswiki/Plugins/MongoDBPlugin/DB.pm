@@ -43,7 +43,7 @@ $MongoDB::Cursor::slave_okay = 1;
 #use constant MONITOR => $Foswiki::cfg{MONITOR}{'Foswiki::Plugins::MongoDBPlugin'} || 0;
 use constant MONITOR       => 0;
 use constant MONITOR_INDEX => 0;
-my $MAX_NUM_INDEXES = 56;
+my $MAX_NUM_INDEXES = 64;
 
 sub new {
     my $class  = shift;
@@ -153,6 +153,53 @@ sub query {
     return $cursor;
 }
 
+sub ensureMandatoryIndexes {
+    my ( $this, $collection ) = @_;
+
+    $this->ensureIndex( $collection, { _topic => 1 }, { name => '_topic' } );
+
+    #    $this->ensureIndex(
+    #        $collection,
+    #        { _topic => 1,             _web   => 1 },
+    #        { name   => '_topic:_web', unique => 1 }
+    #    );
+    $this->ensureIndex(
+        $collection,
+        { _topic => 1, 'TOPICINFO.rev' => -1 },
+        { name   => '_topic:_rev' }
+    );
+
+    $this->ensureIndex(
+        $collection,
+        { 'TOPICINFO.author' => 1 },
+        { name               => 'TOPICINFO.author' }
+    );
+    $this->ensureIndex(
+        $collection,
+        { 'TOPICINFO.date' => 1 },
+        { name             => 'TOPICINFO.date' }
+    );
+    $this->ensureIndex(
+        $collection,
+        { 'TOPICPARENT.name' => 1 },
+        { name               => 'TOPICPARENT.name' }
+    );
+    $this->ensureIndex(
+        $collection,
+        { 'CREATEINFO.author' => 1 },
+        { name                => 'CREATEINFO.author' }
+    );
+    $this->ensureIndex(
+        $collection,
+        { 'CREATEINFO.date' => 1 },
+        { name              => 'CREATEINFO.date' }
+    );
+    $this->ensureIndex( $collection, { 'address' => 1 },
+        { name => 'address' } );
+
+    return;
+}
+
 sub update {
     my $self = shift;
     my $web  = shift;
@@ -177,46 +224,7 @@ sub update {
     my $collection = $self->_getCollection( $web, $collectionName );
 
 #TODO: not the most efficient place to create and index, but I want to be sure, to be sure.
-    $self->ensureIndex( $collection, { _topic => 1 }, { name => '_topic' } );
-
-    #    $self->ensureIndex(
-    #        $collection,
-    #        { _topic => 1,             _web   => 1 },
-    #        { name   => '_topic:_web', unique => 1 }
-    #    );
-    $self->ensureIndex(
-        $collection,
-        { _topic => 1, 'TOPICINFO.rev' => -1 },
-        { name   => '_topic:_rev' }
-    );
-
-    $self->ensureIndex(
-        $collection,
-        { 'TOPICINFO.author' => 1 },
-        { name               => 'TOPICINFO.author' }
-    );
-    $self->ensureIndex(
-        $collection,
-        { 'TOPICINFO.date' => 1 },
-        { name             => 'TOPICINFO.date' }
-    );
-    $self->ensureIndex(
-        $collection,
-        { 'TOPICPARENT.name' => 1 },
-        { name               => 'TOPICPARENT.name' }
-    );
-    $self->ensureIndex(
-        $collection,
-        { 'CREATEINFO.author' => 1 },
-        { name                => 'CREATEINFO.author' }
-    );
-    $self->ensureIndex(
-        $collection,
-        { 'CREATEINFO.date' => 1 },
-        { name              => 'CREATEINFO.date' }
-    );
-    $self->ensureIndex( $collection, { 'address' => 1 },
-        { name => 'address' } );
+    $self->ensureMandatoryIndexes($collection);
 
 #TODO: maybe should use the auto indexed '_id' (or maybe we can use this as a tuid - unique foreach rev of each topic..)
 #then again, atm, its totally random, so may be good for sharding.
@@ -292,36 +300,57 @@ sub ensureIndex {
         #$collection = $self->_getCollection($database, $collection);
     }
 
-    #cache the indexes we know about
-    if ( not defined( $self->{mongoDBIndexes} ) ) {
-        my @indexes = $collection->get_indexes();
-        $self->{mongoDBIndexes} = \@indexes;
-    }
-    foreach my $index ( @{ $self->{mongoDBIndexes} } ) {
+    if ( !$self->haveIndexFor( $collection, $options->{name} ) ) {
+        if ( $self->canIndex( $collection, $options->{name} ) ) {
+            writeDebug( 'creating an index in '
+                  . $collection->full_name
+                  . " for $options->{name}" )
+              if MONITOR_INDEX;
 
-        #print STDERR "we already have:  ".$index->{name}." index\n";
-        if ( $options->{name} eq $index->{name} ) {
+            #TODO: consider doing these in a batch at the end of a request, or?
+            $collection->ensure_index( $indexRef, $options );
 
-#print STDERR "already exists " . $options->{name} . " index\n" if MONITOR_INDEX;
-
-            #already exists, do nothing.
-            return;
+            # Clear cache
+            delete $self->{mongoDBIndexes}{ $collection->full_name() };
+        }
+        elsif ( !exists $self->{cannot_index}{$collection}{ $options->{name} } )
+        {
+            writeDebug( "$MAX_NUM_INDEXES indexes already set in "
+                  . $collection->full_name
+                  . ", refusing to create another for $options->{name}" );
+            $self->{cannot_index}{$collection}{ $options->{name} } = 1;
         }
     }
-    if ( scalar( @{ $self->{mongoDBIndexes} } ) >= $MAX_NUM_INDEXES ) {
-        writeDebug(
-"*******************ouch. MongoDB can only have $MAX_NUM_INDEXES indexes per collection : "
-              . $options->{name} )
-          if MONITOR_INDEX;
-        return;
-    }
-    writeDebug( "creating " . $options->{name} . " index" ) if MONITOR_INDEX;
-
-    #TODO: consider doing these in a batch at the end of a request, or?
-    $collection->ensure_index( $indexRef, $options );
-    undef $self->{mongoDBIndexes};    #clear the cache :/
 
     return;
+}
+
+sub canIndex {
+    my ( $self, $collection, $key ) = @_;
+    my $can_index = $self->haveIndexFor( $collection, $key );
+
+    if ( !$can_index
+        && scalar(
+            keys %{ $self->{mongoDBIndexes}{ $collection->full_name() } } ) <
+        $MAX_NUM_INDEXES )
+    {
+        $can_index = 1;
+    }
+
+    return $can_index;
+}
+
+# Gives false negatives, which is okay (multiple ensure_index on the same key)
+sub haveIndexFor {
+    my ( $self, $collection, $key ) = @_;
+    my $collection_name = $collection->full_name();
+
+    if ( !exists $self->{mongoDBIndexes}{$collection_name} ) {
+        %{ $self->{mongoDBIndexes}{$collection_name} } =
+          map { $_->{name} => 1 } $collection->get_indexes();
+    }
+
+    return $self->{mongoDBIndexes}{$collection_name}{$key};
 }
 
 sub remove {
@@ -517,6 +546,10 @@ sub _MONGODB {
     return "\n<verbatim>\n" . Dumper($result) . "\n</verbatim>\n";
 
     #return join(', ', map { "$_: ".($data->{$_}||'UNDEF')."\n" } keys(%$data));
+}
+
+sub _MAX_NUM_INDEXES {
+    return $MAX_NUM_INDEXES;
 }
 
 1;

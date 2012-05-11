@@ -78,11 +78,12 @@ and highly dangerous!
 =cut
 
 sub initPlugin {
-    my( $topic, $web, $user, $installWeb ) = @_;
+    my ( $topic, $web, $user, $installWeb ) = @_;
 
     # check for Plugins.pm versions
-    if( $TWiki::Plugins::VERSION < 1.026 ) {
-        TWiki::Func::writeWarning( "Version mismatch between $pluginName and Plugins.pm" );
+    if ( $TWiki::Plugins::VERSION < 1.026 ) {
+        TWiki::Func::writeWarning(
+            "Version mismatch between $pluginName and Plugins.pm");
         return 0;
     }
 
@@ -93,10 +94,11 @@ sub initPlugin {
 }
 
 sub _ORIGINALAUTHOR {
-    my($session, $params, $theTopic, $theWeb) = @_;
-    my $aWeb = $params->{web} || $theWeb;
+    my ( $session, $params, $theTopic, $theWeb ) = @_;
+    my $aWeb   = $params->{web}   || $theWeb;
     my $aTopic = $params->{topic} || $theTopic;
 
-    my ($date, $user, $rev, $comment) = TWiki::Func::getRevisionInfo($aWeb, $aTopic, "1");
+    my ( $date, $user, $rev, $comment ) =
+      TWiki::Func::getRevisionInfo( $aWeb, $aTopic, "1" );
     return TWiki::Func::getMainWebname() . '.' . $user;
 }

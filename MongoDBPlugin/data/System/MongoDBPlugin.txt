@@ -36,12 +36,12 @@ timemouts and webserver restarts. The following examples assume:
    * Your web server user is =www-data= (default on Debian systems)
    * The path to the root of your Foswiki installation is =/path/to/foswiki=
 
-%JQREQUIRE{"chili"}%<verbatim class="bash">cd /path/to/foswiki
-sudo -u www-data bin/./rest /MongoDBPlugin/update -updateweb Sandbox</verbatim>
+%JQREQUIRE{"chili"}%<verbatim class="bash">cd /path/to/foswiki/bin
+sudo -u www-data ./rest /MongoDBPlugin/update -updateweb Sandbox</verbatim>
 
 If this is working and you're ready to load your entire Foswiki, it's best to run in the background detached from your terminal session as follows:
-<verbatim class="bash">cd /path/to/foswiki
-sudo -u www-data nohup bin/./rest /MongoDBPlugin/update -updateweb all -recurse on &</verbatim>
+<verbatim class="bash">cd /path/to/foswiki/bin
+sudo -u www-data nohup ./rest /MongoDBPlugin/update -updateweb all -recurse on &</verbatim>
 
 You can keep an eye on the progress of the load by looking at the =nohup.out= file which will be created in =/path/to/foswiki= (with =tail -f nohup.out=, for example).
 

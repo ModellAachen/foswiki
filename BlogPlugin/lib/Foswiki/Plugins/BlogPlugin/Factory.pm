@@ -10,16 +10,16 @@
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details, published at 
+# GNU General Public License for more details, published at
 # http://www.gnu.org/copyleft/gpl.html
 #
 ###############################################################################
 package Foswiki::Plugins::BlogPlugin::Factory;
 
 use strict;
-use vars qw($debug);
+use warnings;
 
-$debug = 1; # toggle me
+our $debug = 0;    # toggle me
 
 ###############################################################################
 sub new {
@@ -31,6 +31,7 @@ sub new {
 ###############################################################################
 # static
 sub writeDebug {
+
   #&Foswiki::Func::writeDebug('- BlogPlugin - ' . $_[0]) if $debug;
   #print STDERR "DEBUG - BlogPlugin - $_[0]\n" if $debug;
 }
@@ -75,38 +76,35 @@ sub handleCreateBlog {
   writeDebug("user=$user");
 
   # check permission, user authorized to create webs?
-  unless($session->{user}->isAdmin()) { 
+  unless ($session->{user}->isAdmin()) {
     throw Foswiki::OopsException(
       'accessdenied',
       def => 'topic_access',
       web => $webName,
       topic => $topicName,
-      params =>
-      [ 'MANAGE',
-	$session->{i18n}->maketext('access not allowed on web')
-      ]
+      params => [ 'MANAGE', $session->{i18n}->maketext('access not allowed on web') ]
     );
   }
 
   # check params
-  unless($newWeb) {
-    throw Foswiki::OopsException('attention', 
-      def => 'web_missing'
-    );
+  unless ($newWeb) {
+    throw Foswiki::OopsException('attention', def => 'web_missing');
   }
   unless (Foswiki::isValidWebName($newWeb, 1)) {
-    throw Foswiki::OopsException('attention', 
-      def =>'invalid_web_name', 
+    throw Foswiki::OopsException(
+      'attention',
+      def => 'invalid_web_name',
       params => $newWeb
     );
   }
   $newWeb = Foswiki::Sandbox::untaintUnchecked($newWeb);
   $baseWeb = Foswiki::Sandbox::untaintUnchecked($baseWeb);
 
-  if( $session->{store}->webExists($newWeb)) {
-    throw Foswiki::OopsException('attention', 
-      def => 'web_exists', 
-      params => $newWeb 
+  if ($session->{store}->webExists($newWeb)) {
+    throw Foswiki::OopsException(
+      'attention',
+      def => 'web_exists',
+      params => $newWeb
     );
   }
 
@@ -128,18 +126,17 @@ sub handleCreateBlog {
 
   my $err = $session->{store}->createWeb($user, $newWeb, $baseWeb, $opts);
   if ($err) {
-    throw Foswiki::OopsException('attention', 
+    throw Foswiki::OopsException(
+      'attention',
       def => 'web_creation_error',
-      params => [ $newWeb, $err ] 
+      params => [ $newWeb, $err ]
     );
   }
 
   # finally
   my $url = Foswiki::Func::getViewUrl($webName, $topicName);
-  $url .= 
-    "?blogfactorymsg=Successfuly created the $newWeb!!!" .
-    "&newweb=$newWeb&blogname=$blogName";
-  
+  $url .= "?blogfactorymsg=Successfuly created the $newWeb!!!" . "&newweb=$newWeb&blogname=$blogName";
+
   Foswiki::Func::redirectCgiQuery($query, $url);
   return '';
 }

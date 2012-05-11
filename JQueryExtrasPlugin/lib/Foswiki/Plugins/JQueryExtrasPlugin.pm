@@ -12,7 +12,7 @@ package Foswiki::Plugins::JQueryExtrasPlugin;
 use strict;
 use warnings;
 
-use Foswiki::Func ();       # The plugins API
+use Foswiki::Func    ();    # The plugins API
 use Foswiki::Plugins ();    # For the API version
 
 our $VERSION = '$Rev$';
@@ -21,7 +21,8 @@ our $RELEASE = '03 Mar 2010';
 
 # Short description of this plugin
 # One line description, is shown in the %SYSTEMWEB%.TextFormattingRules topic:
-our $SHORTDESCRIPTION = 'Miscellaneous jQuery plugins that could not be shipped with the base JQueryPlugin package';
+our $SHORTDESCRIPTION =
+'Miscellaneous jQuery plugins that could not be shipped with the base JQueryPlugin package';
 
 our $NO_PREFS_IN_TOPIC = 1;
 
@@ -45,12 +46,12 @@ sub initPlugin {
             __PACKAGE__, ' and Plugins.pm' );
         return 0;
     }
-    if ($Foswiki::cfg{Plugins}{JQueryPlugin}{Enabled}) {
+    if ( $Foswiki::cfg{Plugins}{JQueryPlugin}{Enabled} ) {
         require Foswiki::Plugins::JQueryPlugin;
-        Foswiki::Plugins::JQueryPlugin::registerPlugin("QTip",
-        'Foswiki::Plugins::JQueryExtrasPlugin::QTIP');
-        Foswiki::Plugins::JQueryPlugin::registerPlugin("MapHilight",
-        'Foswiki::Plugins::JQueryExtrasPlugin::MAPHILIGHT');
+        Foswiki::Plugins::JQueryPlugin::registerPlugin( "QTip",
+            'Foswiki::Plugins::JQueryExtrasPlugin::QTIP' );
+        Foswiki::Plugins::JQueryPlugin::registerPlugin( "MapHilight",
+            'Foswiki::Plugins::JQueryExtrasPlugin::MAPHILIGHT' );
     }
 
     # Plugin correctly initialized

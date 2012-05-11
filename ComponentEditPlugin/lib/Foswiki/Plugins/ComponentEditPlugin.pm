@@ -61,7 +61,7 @@ my %syntax = (
             type    => 'text',
             default => '',
             DOCCO =>
-'• $name expands to the group name, and (for users list only)
+              '• $name expands to the group name, and (for users list only)
 • $wikiname, $username and $wikiusername to the relevant strings.
 • $allowschange returns 0 (false) or 1 (true) if that group can be modified by the current user.
 • $allowschange(UserWikiName)'
@@ -275,17 +275,20 @@ sub initPlugin {
 sub getEdit {
     my ($session) = shift;
     my $tml = decode_entities( $session->{cgiQuery}->param('tml') );
-    #TODO: don't want to get distracted by this til the old code works - need to de unicode the URI, or?
+
+#TODO: don't want to get distracted by this til the old code works - need to de unicode the URI, or?
     $tml =~ s/\xa0/ /g;
+
     #TODO: very naive multi-line removeal
     $tml =~ s/"\s*\n/"/g;
 
     #print STDERR "---- ($tml)---\n";
 
     my $helperform = '';
+
     #TODO: hand coded dumbness - go find the MarcoRegex..
     $tml =~ /%([A-Z]*){(.*)}%/;
-    if (defined($1)) {
+    if ( defined($1) ) {
         my $type   = $1;
         my $search = $2;
 
@@ -294,16 +297,14 @@ sub getEdit {
 
         $helperform =
           CGI::start_table( { border => 0, class => 'foswikiFormTable' } );
-          
+
         my @rows;
 
         #put DOCCO and defaultparameter first
-        $helperform .= CGI::Tr(
-            CGI::th($type),
-            CGI::th('Value'),
-        );
+        $helperform .= CGI::Tr( CGI::th($type), CGI::th('Value'), );
 
-        $helperform .= CGI::hidden( -name => 'foswikitagname', -default => $type );
+        $helperform .=
+          CGI::hidden( -name => 'foswikitagname', -default => $type );
 
         foreach my $param_keys ( keys( %{ $syntax{$type} } ) ) {
             next if ( $param_keys eq 'DOCUMENTATION' );
@@ -311,25 +312,28 @@ sub getEdit {
             my $value = getHtmlControlFor( $type, $param_keys, $attrs );
 
             my @docco_attrs;
-            push( @docco_attrs, title => $syntax{$type}->{$param_keys}->{DOCCO} );
+            push( @docco_attrs,
+                title => $syntax{$type}->{$param_keys}->{DOCCO} );
 
-            my $_DEFAULT_TAG = $syntax{$type}->{$param_keys}->{defaultparameter} || 0;
-            my $line = CGI::Tr(
-                CGI::td( {@docco_attrs}, $param_keys ),
-                CGI::td($value),
-            );
+            my $_DEFAULT_TAG = $syntax{$type}->{$param_keys}->{defaultparameter}
+              || 0;
+            my $line = CGI::Tr( CGI::td( {@docco_attrs}, $param_keys ),
+                CGI::td($value), );
             if ($_DEFAULT_TAG) {
-                unshift(@rows, $line);
-            } else {
-                push(@rows, $line);
+                unshift( @rows, $line );
+            }
+            else {
+                push( @rows, $line );
             }
         }
-        $helperform .= join("\n", @rows);
+        $helperform .= join( "\n", @rows );
         $helperform .= CGI::end_table();
-    } else {
+    }
+    else {
+
         #not a tag?
     }
-    
+
     #TODO: evaluate the MAKETEXT's, and the variables....
     my $textarea =
       Foswiki::Func::readTemplate( 'componenteditplugin', 'popup' );
@@ -426,7 +430,8 @@ sub getHtmlControlFor {
               'Foswiki.ComponentEditPlugin.inputFieldModified(event)',
             -onkeyup => 'Foswiki.ComponentEditPlugin.inputFieldModified(event)',
             -foswikidefault => $syntax{$TMLtype}->{$param_key}->{default},
-            -defaultparameter => $syntax{$TMLtype}->{$param_key}->{defaultparameter}
+            -defaultparameter =>
+              $syntax{$TMLtype}->{$param_key}->{defaultparameter}
         );
     }
     elsif ( $syntax{$TMLtype}->{$param_key}->{type} eq 'dropdown' ) {
@@ -450,7 +455,8 @@ sub getHtmlControlFor {
                 onchange =>
                   'Foswiki.ComponentEditPlugin.inputFieldModified(event)',
                 foswikidefault => $syntax{$TMLtype}->{$param_key}->{default},
-                defaultparameter => $syntax{$TMLtype}->{$param_key}->{defaultparameter}
+                defaultparameter =>
+                  $syntax{$TMLtype}->{$param_key}->{defaultparameter}
             },
             $choices
         );
@@ -467,7 +473,8 @@ sub getHtmlControlFor {
                 class          => 'foswikiRadioButton',
                 label          => $item,
                 foswikidefault => $syntax{$TMLtype}->{$param_key}->{default},
-                defaultparameter => $syntax{$TMLtype}->{$param_key}->{defaultparameter}
+                defaultparameter =>
+                  $syntax{$TMLtype}->{$param_key}->{defaultparameter}
             };    #$session->handleCommonTags( $item, $web, $topic ) };
 
             $selected = $item if ( $item eq $value );

@@ -1,4 +1,6 @@
-data/System/VarCachePlugin.txt NEW
-data/System/VarCachePluginTest.txt NEW
-lib/Foswiki/Plugins/VarCachePlugin.pm NEW
-pub/System/VarCachePlugin/cachetopic.gif NEW
+!noci
+data/System/VarCachePlugin.txt 644
+data/System/VarCachePluginTest.txt 644
+data/System/VarVARCACHE.txt 0644
+lib/Foswiki/Plugins/VarCachePlugin.pm 644
+pub/System/VarCachePlugin/cachetopic.gif 644

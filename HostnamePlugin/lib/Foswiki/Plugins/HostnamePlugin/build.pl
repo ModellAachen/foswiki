@@ -3,11 +3,10 @@
 # Build for HostnamePlugin
 #
 
-
 BEGIN {
-  foreach my $pc (split(/:/, $ENV{FOSWIKI_LIBS})) {
-    unshift @INC, $pc;
-  }
+    foreach my $pc ( split( /:/, $ENV{FOSWIKI_LIBS} ) ) {
+        unshift @INC, $pc;
+    }
 }
 
 use Foswiki::Contrib::Build;
@@ -22,13 +21,16 @@ $build = new Foswiki::Contrib::Build('HostnamePlugin');
 
 # name of web to upload to
 $build->{UPLOADTARGETWEB} = 'Extensions';
+
 # Full URL of pub directory
 $build->{UPLOADTARGETPUB} = 'http://foswiki.org/pub';
+
 # Full URL of bin directory
 $build->{UPLOADTARGETSCRIPT} = 'http://foswiki.org/bin';
+
 # Script extension
 $build->{UPLOADTARGETSUFFIX} = '';
 
 # Build the target on the command line, or the default target
-$build->build($build->{target});
+$build->build( $build->{target} );
 

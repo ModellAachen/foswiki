@@ -1,0 +1,36 @@
+%META:TOPICINFO{author="ProjectContributor" comment="reprev" date="1332761584" format="1.1" reprev="1" version="1"}%
+%META:TOPICPARENT{name="TimeTracker"}%
+%{<verbatim class="tml">}%
+%TMPL:INCLUDE{"editform"}%
+%{</verbatim>}%
+
+%{<verbatim class="tml">}%
+%TMPL:DEF{"firsttab"}%<!-- -->
+%TAB{"%MAKETEXT{"Details"}%"}%
+%RENDERFOREDIT{ 
+  form="Sandbox.TimeTracker"
+  topic="%BASEWEB%.%BASETOPIC%"
+  exclude="^(TopicType|Category|Tag)$" 
+  TopicTitle_title="%MAKETEXT{"Title"}%"
+  TopicTitle_value="%URLPARAM{"TopicTitle" default="%TMPL:P{"topictitle" hideautoinc="on"}%"}%"
+}% 
+%ENDTAB%
+<!-- -->%TMPL:END%
+%{</verbatim>}%
+
+%{<verbatim class="tml">}%
+%TMPL:DEF{"formfields"}%<!-- -->
+<input type="hidden" name="action" value="text" />
+%TMPL:P{"categoriestab"}%<!-- -->
+%TMPL:P{"tagstab"}%<!-- -->
+%TMPL:P{"notes"}%
+<!-- -->%TMPL:END%
+%{</verbatim>}%
+
+%{<verbatim class="tml">}%
+%TMPL:DEF{"notes"}%<!-- -->
+%TAB{"%MAKETEXT{"Notes"}%"}%
+%TMPL:P{"textarea"}%
+%ENDTAB%
+<!-- -->%TMPL:END%
+%{</verbatim>}%

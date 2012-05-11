@@ -1,0 +1,58 @@
+# CaptchaPlugin translations
+msgid ""
+msgstr ""
+"Project-Id-Version: Foswiki $Id\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: 2010-09-14 12:56+0000\n"
+"Last-Translator: Michael Daum <daum@michaeldaumconsulting.com>\n"
+"Language-Team: Foswiki German Translation Team <none>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: de\n"
+
+#: templates/oopscaptcha.tmpl:8
+msgid "Attention"
+msgstr "Achtung"
+
+#: templates/editcaptcha.tmpl:4
+msgid "Can't read security code?"
+msgstr "Ist der Sicherheits-Code unleserlich?"
+
+#: templates/captcha.tmpl:29
+msgid "Invalid validation code"
+msgstr "Ungültiger Sicherheits-Code"
+
+#: templates/oopscaptcha.tmpl:5
+msgid "Please go back and <a href='javascript:history.back()'>try again</a>."
+msgstr ""
+"Bitte gehen Sie mit Ihrem Browser <a href=\"javascript:history.back()"
+"\">zurück</a> und versuchen Sie es erneut."
+
+#: templates/oopscaptcha.tmpl:4
+msgid "The security code you entered for verification did not match the image."
+msgstr ""
+"Der Sicherheits-Code, den Sie eingegeben haben, passt leider nicht zum Bild."
+
+#: templates/captcha.tmpl:33
+msgid ""
+"This is a security check to test whether you are a human visitor and to "
+"prevent automated spam submission."
+msgstr ""
+"Dies ist ein Sicherheits-Test, um zu prüfen, ob Sie ein menschlicher "
+"Besucher sind. Dadurch sollen automatische Spam-Registrierungen verhindern "
+"werden."
+
+#: templates/captcha.tmpl:28
+msgid "Validation successful"
+msgstr "Überprüfung erfolgreich"
+
+#: templates/captcha.tmpl:13 templates/editcaptcha.tmpl:4
+msgid "Verification code"
+msgstr "Sicherheits-Code"
+
+#: templates/captcha.tmpl:18
+msgid "get a different image"
+msgstr "ein anderes Bild laden"

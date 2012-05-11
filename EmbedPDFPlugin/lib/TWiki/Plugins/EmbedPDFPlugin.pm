@@ -11,7 +11,7 @@
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details, published at 
+# GNU General Public License for more details, published at
 # http://www.gnu.org/copyleft/gpl.html
 #
 # =========================
@@ -37,24 +37,24 @@
 #   getSessionValueHandler  ( $key )                                1.010  Use only in one Plugin
 #   setSessionValueHandler  ( $key, $value )                        1.010  Use only in one Plugin
 #
-# initPlugin is required, all other are optional. 
+# initPlugin is required, all other are optional.
 # For increased performance, all handlers except initPlugin are
 # disabled. To enable a handler remove the leading DISABLE_ from
 # the function name. Remove disabled handlers you do not need.
 #
-# NOTE: To interact with TWiki use the official TWiki functions 
+# NOTE: To interact with TWiki use the official TWiki functions
 # in the TWiki::Func module. Do not reference any functions or
 # variables elsewhere in TWiki!!
 
-
 # =========================
-package TWiki::Plugins::EmbedPDFPlugin;    # change the package name and $pluginName!!!
+package TWiki::Plugins::EmbedPDFPlugin
+  ;    # change the package name and $pluginName!!!
 
 # =========================
 use vars qw(
-        $web $topic $user $installWeb $VERSION $RELEASE $pluginName
-        $debug $linkText $prerendered
-    );
+  $web $topic $user $installWeb $VERSION $RELEASE $pluginName
+  $debug $linkText $prerendered
+);
 
 # This should always be $Rev$ so that TWiki can determine the checked-in
 # status of the plugin. It is used by the build automation tools, so
@@ -66,81 +66,91 @@ $VERSION = '$Rev$';
 # of the version number in PLUGINDESCRIPTIONS.
 $RELEASE = 'Dakar';
 
-$pluginName = 'EmbedPDFPlugin';  # Name of this Plugin
+$pluginName = 'EmbedPDFPlugin';    # Name of this Plugin
 
 # =========================
-sub initPlugin
-{
+sub initPlugin {
     ( $topic, $web, $user, $installWeb ) = @_;
 
     # check for Plugins.pm versions
-    if( $TWiki::Plugins::VERSION < 1 ) {
-        TWiki::Func::writeWarning( "Version mismatch between $pluginName and Plugins.pm" );
+    if ( $TWiki::Plugins::VERSION < 1 ) {
+        TWiki::Func::writeWarning(
+            "Version mismatch between $pluginName and Plugins.pm");
         return 0;
     }
 
     # Get plugin debug flag
-    $debug = TWiki::Func::getPreferencesFlag( "\U$pluginName\E_DEBUG" );
+    $debug = TWiki::Func::getPreferencesFlag("\U$pluginName\E_DEBUG");
 
     # Get plugin preferences, the variable defined by:      * Set LINKTEXT = ...
-    $linkText = TWiki::Func::getPreferencesValue( "EMBEDPDFPLUGIN_LINKTEXT" );
+    $linkText = TWiki::Func::getPreferencesValue("EMBEDPDFPLUGIN_LINKTEXT");
 
     # Get plugin preferences, the variable defined by:   * Set PRERENDERED = ...
-    $prerendered = TWiki::Func::getPreferencesValue( "EMBEDPDFPLUGIN_PRERENDERED" );
+    $prerendered =
+      TWiki::Func::getPreferencesValue("EMBEDPDFPLUGIN_PRERENDERED");
 
     # Plugin correctly initialized
-    TWiki::Func::writeDebug( "- TWiki::Plugins::${pluginName}::initPlugin( $web.$topic ) is OK" ) if $debug;
+    TWiki::Func::writeDebug(
+        "- TWiki::Plugins::${pluginName}::initPlugin( $web.$topic ) is OK")
+      if $debug;
     return 1;
 }
 
 # =========================
-sub commonTagsHandler
-{
+sub commonTagsHandler {
 ### my ( $text, $topic, $web ) = @_;   # do not uncomment, use $_[0], $_[1]... instead
-    
-    TWiki::Func::writeDebug( "- ${pluginName}::commonTagsHandler( $_[2].$_[1] )" ) if $debug;
+
+    TWiki::Func::writeDebug("- ${pluginName}::commonTagsHandler( $_[2].$_[1] )")
+      if $debug;
 
     # This is the place to define customized tags and variables
     # Called by sub handleCommonTags, after %INCLUDE:"..."%
 
     $_[0] =~ s+%EMBEDPDF{\s*(.*?)\s*}%+&handleEmbedPDF($1, $_[1], $_[2])+ge;
-    $_[0] =~ s+%EMBEDPDFSIZE{\s*([A-Za-z0-9_-]*?)\s*}%+&handleEmbedPDFSize($1, $_[1], $_[2])+ge;
+    $_[0] =~
+s+%EMBEDPDFSIZE{\s*([A-Za-z0-9_-]*?)\s*}%+&handleEmbedPDFSize($1, $_[1], $_[2])+ge;
 }
 
-sub handleEmbedPDF
-{
+sub handleEmbedPDF {
     my ( $thePDFFile, $theTopic, $theWeb ) = @_;
 
-    if ( $prerendered && -r TWiki::Func::getPubDir() . "/$theWeb/$theTopic/$thePDFFile.$prerendered" ) {
-	$result = "<img src=\"%ATTACHURL%/$thePDFFile.$prerendered\">";
-    } else {
-	$result = "<embed src=\"%ATTACHURL%/$thePDFFile.pdf\" %EMBEDPDFSIZE{$thePDFFile}% />";
+    if ( $prerendered
+        && -r TWiki::Func::getPubDir()
+        . "/$theWeb/$theTopic/$thePDFFile.$prerendered" )
+    {
+        $result = "<img src=\"%ATTACHURL%/$thePDFFile.$prerendered\">";
+    }
+    else {
+        $result =
+"<embed src=\"%ATTACHURL%/$thePDFFile.pdf\" %EMBEDPDFSIZE{$thePDFFile}% />";
     }
 
-    $result = "<table><tbody><tr><td align=\"center\">$result</td></tr><tr><td align=\"center\"><a href=\"%ATTACHURL%/$thePDFFile.pdf\">$linkText</a></td></tr></tbody></table>" if $linkText;
+    $result =
+"<table><tbody><tr><td align=\"center\">$result</td></tr><tr><td align=\"center\"><a href=\"%ATTACHURL%/$thePDFFile.pdf\">$linkText</a></td></tr></tbody></table>"
+      if $linkText;
     return $result;
 }
 
 # =========================
 
-sub handleEmbedPDFSize
-{
+sub handleEmbedPDFSize {
     my ( $thePDFFile, $theTopic, $theWeb ) = @_;
 
-    $pdf = TWiki::Func::readFile
-	( TWiki::Func::getPubDir() . "/$theWeb/$theTopic/$thePDFFile.pdf" );
+    $pdf =
+      TWiki::Func::readFile(
+        TWiki::Func::getPubDir() . "/$theWeb/$theTopic/$thePDFFile.pdf" );
     if ( $pdf =~ /MediaBox\s*\[\s*([0-9]+\s+){2}([0-9]+)\s+([0-9]+)\s*\]/ ) {
-	$width = $2;
-	$height = $3;
-	$query = TWiki::Func::getCgiQuery();
-	if ( $query && $query->user_agent("MSIE") ) {
-	    $width += 60;
-	    if ( $width < 360) {
-		$width = 360;
-	    }
-	    $height += 110;
-	}
-	return "width=\"$width\" height=\"$height\"";
+        $width  = $2;
+        $height = $3;
+        $query  = TWiki::Func::getCgiQuery();
+        if ( $query && $query->user_agent("MSIE") ) {
+            $width += 60;
+            if ( $width < 360 ) {
+                $width = 360;
+            }
+            $height += 110;
+        }
+        return "width=\"$width\" height=\"$height\"";
     }
     return "note=\"size unknown\"";
 }

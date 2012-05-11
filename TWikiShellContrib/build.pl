@@ -24,52 +24,64 @@ BEGIN {
 
 use TWiki::Contrib::Build;
 
-
 # Declare our build package
-{ package TWikiShellBuild;
-  @TWikiShellBuild::ISA = ( "TWiki::Contrib::Build" );
+{
 
-  use File::Basename; 
-  use Pod::Text;
+    package TWikiShellBuild;
+    @TWikiShellBuild::ISA = ("TWiki::Contrib::Build");
 
-  sub new {
-    my $class = shift;
-    return bless( $class->SUPER::new( "TWikiShellContrib","TWikiShellContrib/TWikiShell" ), $class );
-  }
+    use File::Basename;
+    use Pod::Text;
 
-  sub target_pod {
-    my $this = shift;
-    my $tmpfile = '/tmp/buildpod';
-    $this->{POD} = '';
-    my $services='';
-    my $commandSet='';
-    foreach my $file (@{$this->{files}}) {
-        my $pmfile = $file->{name};
-        if ($pmfile =~ /\.pm$/o) {
-            $pmfile = $this->{basedir}.'/'.$pmfile;
-            my $parser = new Pod::Text(indent => 0);
-            if ($pmfile=~ /TWiki\/Contrib\/TWikiShellContrib/) {
-               $parser->parse_from_file($pmfile, $tmpfile);
-               open(TMP, "+>>$tmpfile");
-               while (<TMP>) {
-                   $commandSet .= $_;
-               }
-               close(TMP);
-               #unlink($tmpfile);
-            } else {
-                my $basename = &basename($pmfile,".pm");
-               $services .= '---++'.$basename."\n";
+    sub new {
+        my $class = shift;
+        return bless(
+            $class->SUPER::new(
+                "TWikiShellContrib", "TWikiShellContrib/TWikiShell"
+            ),
+            $class
+        );
+    }
+
+    sub target_pod {
+        my $this    = shift;
+        my $tmpfile = '/tmp/buildpod';
+        $this->{POD} = '';
+        my $services   = '';
+        my $commandSet = '';
+        foreach my $file ( @{ $this->{files} } ) {
+            my $pmfile = $file->{name};
+            if ( $pmfile =~ /\.pm$/o ) {
+                $pmfile = $this->{basedir} . '/' . $pmfile;
+                my $parser = new Pod::Text( indent => 0 );
+                if ( $pmfile =~ /TWiki\/Contrib\/TWikiShellContrib/ ) {
+                    $parser->parse_from_file( $pmfile, $tmpfile );
+                    open( TMP, "+>>$tmpfile" );
+                    while (<TMP>) {
+                        $commandSet .= $_;
+                    }
+                    close(TMP);
+
+                    #unlink($tmpfile);
+                }
+                else {
+                    my $basename = &basename( $pmfile, ".pm" );
+                    $services .= '---++' . $basename . "\n";
+                }
             }
         }
+        $this->{POD} =
+            "\n---+ Services\n"
+          . $services
+          . "\n\n---+ Bundled CommandSets\n"
+          . $commandSet . "\n";
+        print $this->{POD};
     }
-    $this->{POD}= "\n---+ Services\n".$services."\n\n---+ Bundled CommandSets\n".$commandSet."\n";
-    print $this->{POD};
-  }
 }
 
 # Create the build object
 $build = new TWikiShellBuild();
 
 # Build the target on the command line, or the default target
-$build->build($build->{target});
+$build->build( $build->{target} );
 

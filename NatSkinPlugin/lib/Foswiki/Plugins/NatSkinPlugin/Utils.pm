@@ -1,7 +1,7 @@
 ###############################################################################
 # NatSkinPlugin.pm - Plugin handler for the NatSkin.
 # 
-# Copyright (C) 2003-2010 MichaelDaum http://michaeldaumconsulting.com
+# Copyright (C) 2003-2012 MichaelDaum http://michaeldaumconsulting.com
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -18,6 +18,8 @@
 
 package Foswiki::Plugins::NatSkinPlugin::Utils;
 use strict;
+use warnings;
+
 use Foswiki::Func ();
 use Foswiki::Plugins ();
 
@@ -60,21 +62,6 @@ sub urlEncode {
   $text =~ s/([^0-9a-zA-Z-_.:~!*'\/])/'%'.sprintf('%02x',ord($1))/ge;
 
   return $text;
-}
-
-###############################################################################
-sub isTrue {
-  my ($value, $default) = @_;
-
-  $default ||= 0;
-
-  return $default unless defined($value);
-
-  $value =~ s/^\s*(.*?)\s*$/$1/gi;
-  $value =~ s/off//gi;
-  $value =~ s/no//gi;
-  $value =~ s/false//gi;
-  return ($value) ? 1 : 0;
 }
 
 ###############################################################################

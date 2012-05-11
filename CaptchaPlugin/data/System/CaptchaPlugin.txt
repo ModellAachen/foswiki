@@ -1,191 +1,66 @@
-%META:TOPICINFO{author="WikiContributors" date="1186585733" format="1.1" reprev="1.10" version="1.10"}%
----+!! <nop>%TOPIC%
+%META:TOPICINFO{author="ProjectContributor" date="1186585733" version="1"}%
+---+!! %TOPIC%
 
 A visual confirmation plugin, known as Captcha, for new user registration.
 This plugin prevents automated scripts in creating users and spam your wiki with their url's to get a better google ranking.
 
 %TOC%
 
-------
-
 ---++ Syntax Rules
 
-   * The tag %<nop>CAPTCHAURL% expands to the url of the image containing the scrambled text;
-   * The tag %<nop>CAPTCHAHASH% expands to the hash matching the image.
+%INCLUDE{"VarCAPTCHA"}%
 
----++ Plugin Settings
+---++ Installation Instructions
 
-Plugin settings are stored as preferences variables. To reference a plugin setting write ==%<nop>&lt;plugin&gt;_&lt;setting&gt;%==, i.e. ==%<nop>INTERWIKIPLUGIN_SHORTDESCRIPTION%==
+%$INSTALL_INSTRUCTIONS%
 
-   * One line description, is shown in the %SYSTEMWEB%.TextFormattingRules topic:
-      * Set SHORTDESCRIPTION = To prevent automated bots from spamming
-
-   * Debug plugin: (See output in =data/debug.txt=)
-      * Set DEBUG = 0
-
-Additionally, the following settings can be changed in =lib/LocalSite.cfg=, the list below shows the defaults.
-
-   * $Foswiki::cfg{Plugins}{CaptchaPlugin}{Expiry} = 3600;  # Time in seconds after which a Captcha will expire and be removed
-   * $Foswiki::cfg{Plugins}{CaptchaPlugin}{EnableSave} = 0;  # Enable Captcha for topic save
-   * $Foswiki::cfg{Plugins}{CaptchaPlugin}{SaveForAll} = 0;  # Enable Captcha for all users, not just Main.WikiGuest
-   * $Foswiki::cfg{Plugins}{CaptchaPlugin}{DeleteAfterSave} = 0;  # Delete Captcha after successful topic save
-   * $Foswiki::cfg{Plugins}{CaptchaPlugin}{ColourSafe} = 0;  # Enable for black and white shades only
-   * $Foswiki::cfg{Plugins}{CaptchaPlugin}{NumberOfCharacters} = 5;  # Number of characters on Captcha
-   * $Foswiki::cfg{Plugins}{CaptchaPlugin}{Characters} = '1234567890'; # Captcha characters, numbers are the safest
-
----++ Plugin Installation Instructions
-
-__Note:__ You do not need to install anything on the browser to use this plugin. The following instructions are for the administrator who installs the plugin on the server where TWiki is running. 
-
-   * Download the ZIP file from the Plugin web (see below)
-   * Unzip ==%TOPIC%.zip== in your Foswiki installation directory. Content:
-     | *File:* | *Description:* |
-     | ==data/System/CaptchaPlugin.txt== | Plugin topic |
-     | ==Register.pm-4.1.2.patch== | Patch for the register module |
-     | ==edit.pattern.tmpl-4.1.2.patch== | Patch for Pattern |
-     | ==edittoolbar.nat.tmpl-3.0-pre13.patch== | Patch for !NatSkin |
-     | ==templates/oopscaptcha.tmpl== | Error template |
-     | ==templates/editcaptcha.tmpl== | Edit template |
-     | ==lib/Foswiki/Plugins/%TOPIC%.pm== | Plugin Perl module |
-     | ==pub/System/CaptchaPlugin/fonts/*== | A collection of free fonts to get you started |
-     | ==pub/System/CaptchaPlugin/_db== | Hash database directory |
-     | ==pub/System/CaptchaPlugin/img== | Image directory |
-
-   * Apply the patch ==Register.pm-4.1.2.patch== to ==lib/Foswiki/UI/Register.pm== (alternatively, patch Register.pm manually, see section below), be sure to make a backup so you can revert the patch if you want to disable the plugin:
-      * cd /path/to/foswiki
-      * cp lib/Foswiki/UI/Register.pm lib/Foswiki/UI/Register.pm.dist
-      * patch < ../register.patch
    * Restrict access to the files, for example, by including the following in your httpd.conf:
-<pre>
-         &lt;Directory "/path/to/foswiki/pub/System/%TOPIC%/_db"&gt;
-           deny from all
-         &lt;/Directory&gt;
-         &lt;Directory "/path/to/foswiki/pub/System/CaptchaPlugin/fonts"&gt;
-           deny from all
-         &lt;/Directory&gt;
-</pre>
+    <verbatim class="xml">
+<Directory "/path/to/foswiki/pub/System/%TOPIC%/db">
+  deny from all
+</Directory>
+<Directory "/path/to/foswiki/pub/System/CaptchaPlugin/fonts">
+  deny from all
+</Directory>
+</verbatim>
    * Enable the plugin via the =bin/configure= script
-   * Install necessary !TrueType fonts in to ==pub/System/%TOPIC%/fonts/==
-      * This allows the plugin to randomly choose the fonts to use
-      * The more you have, the higher the chances of fending off spambots
    * Test if the installation was successful:
-      * Create a topic containing ==&lt;IMG SRC="%<nop>CAPTCHAURL%"&gt;== and ==%<nop>CAPTCHAHASH%==
+      * Create a topic containing the macro =%<nop>CAPTCHA%=
       * When loading this topic you should see an obfuscated character string loaded as a png and a hexadecimal hash.
       * Check whether the hash database is properly protected by going to the url http://my.wiki.server/my/foswiki/path/pub/System/%TOPIC%/db/hashes.pag, you should see a permission denied message.
    * Now edit your System.UserRegistration topic
-      * Display the image !%CAPTCHAURL% somewhere in your form, along with a text instructing new users to copy the obfuscated text into the appropriate text input.
-      * Add the appropriate text input as ==Twk1CaptchaString==
-      * Add a hidden input as ==Twk1CaptchaHash== having as value !%CAPTCHAHASH%
+      * Display the image =%CAPTCHA%= somewhere in your form, along with a text instructing new users to copy the obfuscated text into the appropriate text input.
       * For example, add this to your System.UserRegistration:
-<pre>
-            &lt;tr&gt;
-              &lt;td valign="top" align="right"&gt;&lt;IMG SRC="%<nop>CAPTCHAURL%"&gt;: &lt;br /&gt; (..) &nbsp; &lt/td&gt;
-              &lt;td&gt;&lt;input type="hidden" name="Twk1CaptchaHash" value="%<nop>CAPTCHAHASH%"&gt;
-                  &lt;input type="text" name="Twk1CaptchaString" size="5"&gt;&lt;/td&gt;  =&lt;font color="red"&gt;**&lt;/font&gt;=
-            &lt;/tr&gt;
-</pre>
-   * That's it.
+        <verbatim class="tml">%CAPTCHAFORM%</verbatim>
 
 ---+++ Captcha on topic edit
 
-If you want to protect edits by Main.WikiGuest with a captcha, add the following line to your =lib/LocalSite.cfg=:
+If you want to protect edits by %USERSWEB%.WikiGuest with a captcha, add the following line to your =lib/LocalSite.cfg=:
 
-<pre>$Foswiki::cfg{Plugins}{CaptchaPlugin}{EnableSave} = 1;</pre>
+<verbatim>$Foswiki::cfg{Plugins}{CaptchaPlugin}{EnableSave} = 1;</verbatim>
 
 A =editcaptcha.tmpl= has been prepared for you. All you need to do is TMPL:INCLUDE it into your =edit*.tmpl=. Two patches are available for Pattern (=edit.pattern.tmpl=) and !NatSkin (=edittoolbar.nat.tmpl=).
 
-At the moment, =editcaptcha.tmpl= requires TWiki:Plugins.IfDefinedPlugin to determine whether the user is WikiGuest or not. If you have enabled =$TWiki::cfg{Plugins}{CaptchaPlugin}{SaveForAll} = 1;=, modify =editcaptcha.tmpl= appropriately.
-
-
----+++ Manually patching the register binary
-
-Refer to the patch file.
-
----++++ Guide for TWiki 4.0.5
-Find these lines in ==lib/Foswiki/UI/Register.pm==:
-<pre>
- }
- 
- # generate user entry
-</pre>
-
-Insert the code below directly *BEFORE* the line containing the curly bracket '{':
-
-<pre>
-    # verify captcha
-    eval { use Foswiki::Plugins::CaptchaPlugin; };
-
-    my %database;
-    my $vcHash = $data->{CaptchaHash};
-    my $vcTxt = $data->{CaptchaString};
-
-    open(LOCKFILE,">".&Foswiki::Func::getPubDir()."/Foswiki/CaptchaPlugin/_db/hashes.lock");
-    flock(LOCKFILE,2);
-
-    dbmopen(%database, &Foswiki::Func::getPubDir()."/Foswiki/CaptchaPlugin/_db/hashes",0644);
-
-    my ($time,$txt) = split(',',$database{$vcHash});
-
-    if ( not(lc($txt) eq lc($vcTxt)) || ($txt eq '') ) {
-                dbmclose(%database);
-                close(LOCKFILE);
-                throw Foswiki::OopsException( 'captcha',
-                                           web => $data->{webName},
-                                       topic => $topic,
-                                       def => 'invalid_vcstr',
-                                       params => [ "wrong" ] );
-    }
-
-    dbmclose(%database);
-
-    close(LOCKFILE);
-
-        Foswiki::Plugins::CaptchaPlugin::expire($vcHash);
-</pre>
-
-Now find:
-
-<pre>
-             # 'WikiName' omitted because they can't
-             # change it, and 'Confirm' is a duplicate
-             push( @{$data->{form}}, $form )
-              unless ($name eq 'WikiName' || $name eq 'Confirm');
-</pre>
-
-and change the last line to:
-
-<pre>
-             # 'WikiName' omitted because they can't
-             # change it, and 'Confirm' is a duplicate
-             push( @{$data->{form}}, $form )
-              unless ($name eq 'WikiName' || $name eq 'Confirm' || $name eq 'CaptchaHash' || $name eq 'CaptchaString');
-</pre>
----++ Further Development
-
-   * Refactor to comply with Foswiki's convention
-   * Adjustable font size range
-   * Adjustable height and width
-   * replace IfDefinedPlugin requirement with =IF=
-
 ---++ Plugin Info
+<!--
+   * Set SHORTDESCRIPTION = Visual confirmation to prevent automated bots from spamming
+-->
 
-|  Plugin Author: | Foswiki:Main.KoenMartens, Foswiki:Main.KwangErnLiew |
-|  Plugin Version: | 28 Oct 2007 1.5-pre4 |
+|  Author(s): | Foswiki:Main.KoenMartens, Foswiki:Main.KwangErnLiew, Foswiki:Main.MichaelDaum |
+|  License: | GPL ([[http://www.gnu.org/copyleft/gpl.html][GNU General Public License]]) |
+|  Release: | %$RELEASE% |
+|  Version: | %$VERSION% |
 |  Change History: | &nbsp; |
 |  24 Dec 2009: | started to port to foswiki - Foswiki:Main.SvenDowideit |
-|  28 Oct 2007: | Fixed bug on RegistrationAgent |
-|  16 Aug 2007: | Added black and white shades only; Added =editcaptcha.tmpl=; Moved all attributes to =LocalSite.cfg=; Removed DeleteAfterRegistration |
+|  28 Oct 2007: | Fixed bug on <nop>RegistrationAgent |
+|  16 Aug 2007: | Added black and white shades only; Added =editcaptcha.tmpl=; Moved all attributes to =LocalSite.cfg=; Removed <nop>DeleteAfterRegistration |
 |  08 Aug 2007: | Added support for captcha on topic save (thanks Foswiki:Main.KwangErnLiew), fixed some minor bugs, added some free fonts |
 |  06 Aug 2007: | Colourised fonts; Randomised font type, font size, background colour, and font positioning; Fixed hash display on user pages; Modified oopscaptcha.tmpl |
 |  03 Aug 2006: | Renamed to %TOPIC%, adapted to Dakar (TWiki 4.0.x). |
 |  03 Jan 2006: | Fixed some problems with expiry, also optimised according to !FastPluginHints. |
 |  10 Oct 2005: | Strip hash and text from arguments to register binary, or they will end up in the newly created user topic. |
 |  07 Oct 2005: | Initial version |
-|  CPAN Dependencies: | GD, Digest::MD5 |
-|  Optional Dependencies: | Foswiki:Plugins.IfDefinedPlugin |
-|  Other Dependencies: | none |
-|  Perl Version: | 5.005 |
-|  License: | GPL ([[http://www.gnu.org/copyleft/gpl.html][GNU General Public License]]) |
+|  Dependencies: | %$DEPENDENCIES% |
 |  Plugin Home: | http://foswiki.org/Extensions/%TOPIC% |
 |  Feedback: | http://foswiki.org/Support/%TOPIC%Dev |
 

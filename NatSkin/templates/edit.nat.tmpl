@@ -13,13 +13,13 @@
 %TMPL:DEF{"bodyclass"}%natEditBody%TMPL:END%
 %TMPL:DEF{"meta"}% %HTTP_EQUIV_ON_EDIT% %TMPL:END%
 %TMPL:DEF{"titleaction"}%%IF{"defined 'rev'" then="%MAKETEXT{"restore"}%" else="%MAKETEXT{"edit"}%"}%%TMPL:END%
-%TMPL:DEF{"moretabs"}%%TMPL:P{"permissionstab"}%%TMPL:END%
 %TMPL:DEF{"contentheader"}%%TMPL:END%
 
 %{ ################################################################################ 
   SMELL: should come from cfg
 }%
 %TMPL:DEF{"supportedlanguages"}%
+  %MAKETEXT{"auto-detect"}%=detect,
   %MAKETEXT{"Chinese"}%=cjk,
   %MAKETEXT{"Danish"}%=da,
   %MAKETEXT{"Dutch"}%=nl,
@@ -37,38 +37,38 @@
   %MAKETEXT{"Turkish"}%=tr
 %TMPL:END%
 
-%TMPL:DEF{"settings"}%<!-- -->
-<h2>%MAKETEXT{"Topic preferences"}%</h2>
-<div class="foswikiFormSteps">
-  <div class="foswikiFormStep">
-    <h3>%MAKETEXT{"Parent topic"}%:</h3>
-    <input class="foswikiInputField jqUIAutocomplete" autocomplete="%SCRIPTURL{"view"}%/%SYSTEMWEB%/JQueryAjaxHelper?section=topic&contenttype=text/plain&skin=text&baseweb=%BASEWEB%" type="text" name="topicparent" id="topicparent" size="40" value="%TOPICPARENT%"  />
-  </div>
-  <div class="foswikiFormStep foswikiFormLast">
-    <h3>%MAKETEXT{"Content language"}%:</h3>
-    <input type='hidden' name='Default+CONTENT_LANGUAGE' value='%GETVAR{"CONTENT_LANGUAGE" scope="web" default="en"}%' />
-    <select name="Local+CONTENT_LANGUAGE" class="foswikiSelect">
-      %FORMATLIST{
-        "%TMPL:P{"supportedlanguages"}%"
-        split="\s*,\s*"
-        pattern="(.*)=(.*)"
-        separator="$n"
-        format="<option value='$2' $percntIF{\"$'CONTENT_LANGUAGE'='$2' or (not defined CONTENT_LANGUAGE and '$2'='en')\" then=\"selected\"}$percnt>$1</option>"
-      }%
-    </select>
-  </div>
-</div>
-%TMPL:P{"showonscreen"}%%TMPL:P{context="MetaCommentPluginEnabled" then="commentpreferences"}%
-%TMPL:P{"moresettings"}%<!--  -->
+%TMPL:DEF{"moretopicsettings"}%<!-- -->
+  <tr>
+    <th>%MAKETEXT{"Content language"}%</th>
+    <td>
+      <input type='hidden' name='Default+CONTENT_LANGUAGE' value='%GETVAR{"CONTENT_LANGUAGE" scope="web" default="detect"}%' />
+      <select name="Local+CONTENT_LANGUAGE" class="foswikiSelect">
+        %FORMATLIST{
+          "%TMPL:P{"supportedlanguages"}%"
+          split="\s*,\s*"
+          pattern="(.*)=(.*)"
+          separator="$n"
+          format="<option value='$2' $percntIF{\"$'CONTENT_LANGUAGE'='$2' or (not defined CONTENT_LANGUAGE and '$2'='detect')\" then=\"selected\"}$percnt>$1</option>"
+        }%
+      </select>
+    </td>
+  </tr>
+<!-- -->%TMPL:END%
+
+%TMPL:DEF{"moresettings"}%<!-- -->
+%TMPL:P{"skinsettings"}%<!-- -->
+%TMPL:P{"showonscreen"}%<!-- -->
+%TMPL:P{context="MetaCommentPluginEnabled" then="commentsettings"}%<!-- -->
 <!-- -->%TMPL:END%
 
 %{ ################################################################################ }%
 %TMPL:DEF{"showonscreen"}%<!-- -->
-<h2>%MAKETEXT{"Show on screen"}%</h2>
+<h2>%MAKETEXT{"Display settings"}%</h2>
 <div class="foswikiFormSteps">
   <div class="foswikiFormStep">
     <table class="foswikiLayoutTable">
 %TMPL:P{"showonscreen::sidebar"}%<!-- -->
+%TMPL:P{"showonscreen::menu"}%<!-- -->
 %TMPL:P{"showonscreen::topicactions"}%<!-- -->
 %TMPL:P{"showonscreen::breadcrumbs"}%<!-- -->
 %TMPL:P{"showonscreen::revinfo"}%<!-- -->
@@ -81,10 +81,105 @@
 <!-- -->%TMPL:END%
 
 %{ ################################################################################ }%
+%TMPL:DEF{"skinsettings"}%<!-- -->
+<h2>%MAKETEXT{"Skin settings"}%</h2>
+<div class="foswikiFormSteps">
+  <div class="foswikiFormStep">
+    <table class="foswikiLayoutTable">
+      <tr>
+        <th>%MAKETEXT{"Style"}%</th>
+        <td>
+          <input type='hidden' name='Default+NATSKIN_STYLE' value='%GETVAR{"NATSKIN_STYLE" scope="web" default="jazzynote"}%' />
+          <select class="foswikiSelect" id="style" name="Local+NATSKIN_STYLE">
+            %FORMATLIST{"%KNOWNSTYLES%" 
+              pattern="\s*(.*)\s*" 
+              format="<option $percntIF{\"context natskin_style_$1\" then=\"selected='selected'\"}$percnt>$1</option>" 
+              join="\n" 
+              separator=" "
+            }%
+          </select>
+        </td>
+      </tr>
+      <tr>
+        <th>%MAKETEXT{"Variation"}%</th>
+        <td>
+          <input type='hidden' name='Default+NATSKIN_VARIATION' value='%GETVAR{"NATSKIN_VARIATION" scope="web" default="none"}%' />
+          <select class="foswikiSelect" id="variation" name="Local+NATSKIN_VARIATION"></select>
+        </td>
+      </tr>
+      <tr>
+        <th>%MAKETEXT{"Layout"}%</th>
+        <td>
+          <input type='hidden' name='Default+NATSKIN_LAYOUT' value='%GETVAR{"NATSKIN_LAYOUT" scope="web" default="bordered"}%' />
+          <table class="foswikiLayoutTable" width="100%">
+            <tr>
+              <td><input type="radio" class="foswikiRadiobox" id="fixed" name="Local+NATSKIN_LAYOUT" value="fixed" %IF{"context natskin_layout_fixed" then="checked='checked'"}% /></td>
+              <td><label for="fixed">%MAKETEXT{"fixed"}%</label></td>
+              <td><input type="radio" class="foswikiRadiobox" id="fluid" name="Local+NATSKIN_LAYOUT" value="fluid" %IF{"context natskin_layout_fluid" then="checked='checked'"}% /></td>
+              <td><label for="fluid">%MAKETEXT{"fluid"}%</label></td>
+              <td><input type="radio" class="foswikiRadiobox" id="bordered" name="Local+NATSKIN_LAYOUT" value="bordered" %IF{"context natskin_layout_bordered" then="checked='checked'"}% /></td>
+              <td><label for="bordered">%MAKETEXT{"bordered"}%</label></td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </div>
+<literal>
+<script>
+jQuery(function() {
+  var knownVariations = {
+    %KNOWNVARIATIONS{
+      format="'$style': ['$variations']" 
+      separator=", "
+      varseparator="', '"
+    }%
+  },
+  selectedVariation = '%SKINSTATE{"$variation"}%';
+
+  function setVariations() {
+    var style = jQuery("#style").val();
+    var varSelect = jQuery("#variation").empty().append("<option>none</option>");
+    if (knownVariations[style]) {
+      for (var i = 0; i < knownVariations[style].length; i++) {
+        var variation = knownVariations[style][i];
+        var selected = variation == selectedVariation ? "selected":"";
+        varSelect.append("<option "+selected+">"+knownVariations[style][i]+"</option>");
+      }
+    }
+    if (jQuery.browser.msie) {
+      varSelect.find("option").width("auto"); // IE7 fix, IE6 is okay
+    }
+  }
+  jQuery("#style").change(function() {
+    setVariations();
+  }).change();
+});
+</script>
+</literal>
+</div>
+<!-- -->%TMPL:END%
+
+%{ ################################################################################ }%
+%TMPL:DEF{"showonscreen::menu"}%<tr>
+  <th>%MAKETEXT{"Menu"}%<input type='hidden' name='Default+NATSKIN_MENU' value='%GETVAR{"NATSKIN_MENU" scope="web" default="on"}%' /></th>
+  <td><input type='radio' class='foswikiRadioButton' id="displaymenu_on" name='Local+NATSKIN_MENU' value='%GETVAR{"NATSKIN_MENU" scope="web" default="on"}%' %IF{"$'NATSKIN_MENU'='on' OR isempty 'NATSKIN_MENU'" then="checked='checked'"}% /></td>
+  <td><label for="displaymenu_on">%MAKETEXT{"on"}%</label></td>
+  <td><input type='radio' class='foswikiRadioButton' id="displayform_off" name='Local+NATSKIN_MENU' value='off' %IF{"$'NATSKIN_MENU'='off'" then="checked='checked'"}% /></td>
+  <td><label for="displayform_off">%MAKETEXT{"off"}%</label></td>
+</tr>%TMPL:END%
+
+%{ ################################################################################ }%
 %TMPL:DEF{"showonscreen::sidebar"}%<tr>
   <th>%MAKETEXT{"Sidebar"}%<input type='hidden' name='Default+NATSKIN_SIDEBAR' value='%GETVAR{"NATSKIN_SIDEBAR" scope="web" default="on"}%' /></th>
-  <td><input type='radio' class='foswikiRadioButton' id="displayform_on" name='Local+NATSKIN_SIDEBAR' value='%GETVAR{"NATSKIN_SIDEBAR" scope="web" default="on"}%' %IF{"$'NATSKIN_SIDEBAR'=~'on|left|right|both' OR isempty 'NATSKIN_SIDEBAR'" then="checked='checked'"}% /></td>
-  <td><label for="displayform_on">%MAKETEXT{"on"}%</label></td>
+  <td><input type='radio' class='foswikiRadioButton' id="displaysidebar_on" name='Local+NATSKIN_SIDEBAR' value='%GETVAR{"NATSKIN_SIDEBAR" scope="web" default="on"}%' %IF{"$'NATSKIN_SIDEBAR'='on' OR isempty 'NATSKIN_SIDEBAR'" then="checked='checked'"}% /></td>
+  <td><label for="displaysidebar_on">%MAKETEXT{"on"}%</label></td>
+  <td><input type='radio' class='foswikiRadioButton' id="displaysidebar_left" name='Local+NATSKIN_SIDEBAR' value='left' %IF{"$'NATSKIN_SIDEBAR'='left'" then="checked='checked'"}% /></td>
+  <td><label for="displaysidebar_left">%MAKETEXT{"left"}%</label></td>
+  <td><input type='radio' class='foswikiRadioButton' id="displaysidebar_right" name='Local+NATSKIN_SIDEBAR' value='right' %IF{"$'NATSKIN_SIDEBAR'='right'" then="checked='checked'"}% /></td>
+  <td><label for="displaysidebar_right">%MAKETEXT{"right"}%</label></td>
+  <td><input type='radio' class='foswikiRadioButton' id="displaysidebar_both" name='Local+NATSKIN_SIDEBAR' value='both' %IF{"$'NATSKIN_SIDEBAR'='both'" then="checked='checked'"}% /></td>
+  <td><label for="displaysidebar_both">%MAKETEXT{"both"}%</label></td>
   <td><input type='radio' class='foswikiRadioButton' id="displayform_off" name='Local+NATSKIN_SIDEBAR' value='off' %IF{"$'NATSKIN_SIDEBAR'='off'" then="checked='checked'"}% /></td>
   <td><label for="displayform_off">%MAKETEXT{"off"}%</label></td>
 </tr>%TMPL:END%
@@ -144,9 +239,9 @@
 </tr>%TMPL:END%
 
 %{ ################################################################################ }%
-%TMPL:DEF{"commentpreferences"}%<!-- -->
+%TMPL:DEF{"commentsettings"}%<!-- -->
 <div id="cmtPreferences" %IF{"isempty 'DISPLAYCOMMENTS' or $'DISPLAYCOMMENTS'='off'" then="style='display:none'"}%>
-<h2>%MAKETEXT{"Comment preferences"}%</h2>
+<h2>%MAKETEXT{"Comment settings"}%</h2>
 <div class="foswikiFormSteps">
   <div class="foswikiFormStep">
     <input type='hidden' name='Default+COMMENTFORMAT' value="%GETVAR{"COMMENTFORMAT" scope="web" default="%TMPL:P{"comments::format::default"}%"}%" />
@@ -197,103 +292,4 @@
   requires="JQUERYPLUGIN"
 }%<!-- -->
 </div>%TMPL:END%
-
-%{ ################################################################################ }%
-%TMPL:DEF{"permissionstab"}%<!-- -->
-%TAB{"%MAKETEXT{"Permissions"}%"}%
-<noautolink>
-<h2>%MAKETEXT{"Permissions"}%</h2>
-<div class="foswikiFormSteps" id="permissionsForm">
-  <input type="hidden" name="Set+ALLOWTOPICVIEW" value="%GETVAR{"ALLOWTOPICVIEW" default="undefined"}%" class="permset_view" id="allow_view" />
-  <input type="hidden" name="Set+DENYTOPICVIEW" value="%GETVAR{"DENYTOPICVIEW" default="undefined"}%" class="permset_view" id="deny_view" />
-  <input type="hidden" name="Set+ALLOWTOPICCHANGE" value="%GETVAR{"ALLOWTOPICCHANGE" default="undefined"}%" class="permset_change" id="allow_change" />
-  <input type="hidden" name="Set+DENYTOPICCHANGE" value="%GETVAR{"DENYTOPICCHANGE" default="undefined"}%" class="permset_change" id="deny_change" />
-  <input type="hidden" name="Default+ALLOWTOPICVIEW" value="undefined" />
-  <input type="hidden" name="Default+ALLOWTOPICCHANGE" value="undefined" />
-  <input type="hidden" name="Default+DENYTOPICVIEW" value="undefined" />
-  <input type="hidden" name="Default+DENYTOPICCHANGE" value="undefined" />
-  <input type="hidden" name="Default+PERMSET_VIEW" value="default" />
-  <input type="hidden" name="Default+PERMSET_CHANGE" value="default" />
-  <div class="foswikiFormStep">
-    <h3>%MAKETEXT{"Users who may view"}%:</h3>
-      <input type="radio" class="foswikiRadioButton" id="default_view" name="Local+PERMSET_VIEW" value="default" %IF{"$'PERMSET_VIEW'='default' OR isempty 'PERMSET_VIEW'" then="checked='checked'"}% /> 
-      <label for="default_view" title='%MAKETEXT{"default as defined in the [_1]" args="<nop>%WEBPREFSTOPIC%"}%'>%MAKETEXT{"Default"}%</label>
-
-      <input type="radio" class="foswikiRadioButton" id="everybody_view" name="Local+PERMSET_VIEW" value="everybody" %IF{"$'PERMSET_VIEW'='everybody'" then="checked='checked'"}% /> 
-      <label for="everybody_view" title="%MAKETEXT{"public view access"}%">%MAKETEXT{"Everybody"}%</label>
-
-      <input type="radio" class="foswikiRadioButton" id="registered_users_view" name="Local+PERMSET_VIEW" value="registeredusers" %IF{"$'PERMSET_VIEW'='registeredusers'" then="checked='checked'"}% /> 
-      <label for="registered_users_view" title='%MAKETEXT{"restrict read access to users that have an account on this site"}%'>%MAKETEXT{"Registered users"}%</label>
-
-      <input type="radio" class="foswikiRadioButton" id="just_author_view" name="Local+PERMSET_VIEW" value="justauthor" %IF{"$'PERMSET_VIEW'='justauthor'" then="checked='checked'"}% />
-      <label for="just_author_view" title='%MAKETEXT{"restrict access to [_1]" args="%SPACEOUT{"%WIKINAME%"}%"}%'>%MAKETEXT{"Just me"}%</label>
-
-      <input type="radio" class="foswikiRadioButton" id="nobody_view" name="Local+PERMSET_VIEW" value="nobody" %IF{"$'PERMSET_VIEW'='nobody'" then="checked='checked'"}% /> 
-      <label for="nobody_view" title='%MAKETEXT{"strictly deny any access to this topic"}%'>%MAKETEXT{"Nobody"}%</label>
-
-      <table class="foswikiNullTable">
-        <tr>
-          <td>
-            <input type="radio" class="foswikiRadioButton" id="details_view_toggle" name="Local+PERMSET_VIEW" value="details" %IF{"$'PERMSET_VIEW'='details'" then="checked='checked'"}% />
-          </td>
-          <td>
-            <label for="details_view_toggle" title='%MAKETEXT{"specify a list of users and/or groups"}%'>&nbsp;%MAKETEXT{"Specific users/groups"}%</label>
-          </td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>
-            <div id="details_view_container" %IF{"$'PERMSET_VIEW'!='details'" then="style='display:none'"}%>
-              <input type="text" size="40" id="details_view" autocomplete="off" name="Local+PERMSET_VIEW_DETAILS" value="%GETVAR{"PERMSET_VIEW_DETAILS"}%" />
-              <input type="hidden" name="Default+PERMSET_VIEW_DETAILS" value="" />
-            </div>
-          </td>
-        </tr>
-      </table>
-  </div>
-
-  <div class="foswikiFormStep">
-    <h3>%MAKETEXT{"Users who may edit"}%:</h3>
-    <input type="radio" class="foswikiRadioButton" id="default_change" name="Local+PERMSET_CHANGE" value="default" %IF{"$'PERMSET_CHANGE'='default' OR isempty 'PERMSET_CHANGE'" then="checked='checked'"}% /> 
-    <label for="default_change" title='%MAKETEXT{"default as defined in the [_1]" args="<nop>%WEBPREFSTOPIC%"}%'>%MAKETEXT{"Default"}%</label>
-
-    <input type="radio" class="foswikiRadioButton" id="registered_users_change" name="Local+PERMSET_CHANGE"  value="registeredusers" %IF{"$'PERMSET_CHANGE'='registeredusers'" then="checked='checked'"}% /> 
-    <label for="registered_users_change" title='%MAKETEXT{"restrict write access to users that have an account on this site"}%'>%MAKETEXT{"Registered users"}%</label>
-
-    <input type="radio" class="foswikiRadioButton" id="just_author_change" name="Local+PERMSET_CHANGE" value="justauthor" %IF{"$'PERMSET_CHANGE'='justauthor'" then="checked='checked'"}% />
-    <label for="just_author_change" title='%MAKETEXT{"restrict access to [_1]" args="%SPACEOUT{"%WIKINAME%"}%"}%'>%MAKETEXT{"Just me"}%</label>
-
-    <input type="radio" class="foswikiRadioButton" id="nobody_change" name="Local+PERMSET_CHANGE" value="nobody" %IF{"$'PERMSET_CHANGE'='nobody'" then="checked='checked'"}% /> 
-    <label for="nobody_change" title='%MAKETEXT{"strictly deny write access to this topic"}%'>%MAKETEXT{"Nobody"}%</label>
-
-    <table class="foswikiNullTable">
-      <tr>
-        <td>
-          <input type="radio" class="foswikiRadioButton" id="details_change_toggle" name="Local+PERMSET_CHANGE" value="details" %IF{"$'PERMSET_CHANGE'='details'" then="checked='checked'"}% />
-        </td>
-        <td>
-          <label for="details_change_toggle" title='%MAKETEXT{"specify a list of users and/or groups"}%'>&nbsp;%MAKETEXT{"Specific users/groups"}%</label>
-        </td>
-      </tr>
-      <tr>
-        <td></td>
-        <td>
-          <div id="details_change_container" %IF{"$'PERMSET_CHANGE'!='details'" then="style='display:none'"}%>
-            <input type="text" size="40" id="details_change" autocomplete="off" name="Local+PERMSET_CHANGE_DETAILS" value="%GETVAR{"PERMSET_CHANGE_DETAILS"}%" />
-            <input type="hidden" name="Default+PERMSET_CHANGE_DETAILS" value="" />
-          </div>
-        </td>
-      </tr>
-    </table>
-  </div>
-</div>
-%ADDTOZONE{
-  "script"
-  tag="NATSKIN:EDIT" 
-  text="<script src='%PUBURLPATH%/%SYSTEMWEB%/NatSkin/edit.js'></script>"
-  requires="NATSKIN::OPTS"
-}%<!-- -->
-</noautolink>
-%ENDTAB%
-<!-- -->%TMPL:END%
 

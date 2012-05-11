@@ -320,8 +320,9 @@ sub _sortFiles {
       || $Foswiki::Plugins::TopicDataHelperPlugin::sortDirections{'NONE'};
 
     use Data::Dumper;
-    _debug( "\t sortKey=$sortKey; compareMode=$compareMode; sortOrder=$sortOrder" );
-    
+    _debug(
+        "\t sortKey=$sortKey; compareMode=$compareMode; sortOrder=$sortOrder");
+
     # set default sort order for sort modes
     if ( $sortOrder ==
         $Foswiki::Plugins::TopicDataHelperPlugin::sortDirections{'NONE'} )
@@ -613,8 +614,8 @@ sub _expandStandardEscapes {
 sub _debug {
     my ( $inText, $inDebug ) = @_;
 
-	#print STDERR "$inText\n";
-	
+    #print STDERR "$inText\n";
+
     Foswiki::Func::writeDebug($inText)
       if $inDebug || $debug;
 }

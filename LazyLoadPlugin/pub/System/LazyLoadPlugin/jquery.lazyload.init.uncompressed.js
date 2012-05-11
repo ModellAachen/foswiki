@@ -1,18 +1,20 @@
 jQuery(function($) {
 
   var defaults = {
-    effect: "fadeIn"
+    effect: "fadeIn",
+    skip_invisible: false
   };
 
-  $(".jqLazyLoad:not(.jqInitedLazyLoad)").livequery(function() {
+  $(".jqLazyLoad:not(.jqInitedLazyLoad)").each(function() {
     var $this = $(this), 
         opts = $.extend({}, defaults, $this.metadata());
 
-    // placeholder must match the one used in perl handler
-    opts.placeholder = foswiki.getPreference("PUBURLPATH") + "/" +
-                 foswiki.getPreference("SYSTEMWEB") + "/LazyLoadPlugin/img/white.gif",
-
     $this.addClass("jqInitedLazyLoad");
     $this.find("img").lazyload(opts);
+ 
+    // give it a nother clap after a second
+    setTimeout(function() {
+      $(window).trigger("resize");
+    }, 500);
   });
 });

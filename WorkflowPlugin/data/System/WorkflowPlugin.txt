@@ -182,6 +182,8 @@ __Note:__ For strict access control, the plugin should know who is looking at th
 |  Version: | %$VERSION% |
 |  Release: | %$RELEASE% |
 |  Change History: | <!-- versions below in reverse order -->&nbsp; |
+|  1.12.7 (08 Feb 2012) | Foswiki:Main.GilmarSantosJr: Foswikitask:Item11513: fix WORKFLOWHISTORY date field |
+|  1.12.6 (31 Jan 2012) | Foswiki:Main.GilmarSantosJr: Foswikitask:Item11489: fix SEARCH on WORKFLOWHISTORY |
 |  1.12.5 (20 Jan 2012) | Foswiki:Main.CrawfordCurrie: Foswikitask:Item11459: fix bug when used with comment plugin. |
 |  1.12.4 (11 Jan 2012) | Foswiki:Main.MichaelDaum: Foswikitask:Item11430, Foswikitask:Item11419: fixed error in save handler that prevented any edit change to a topic under workflow control |
 |  1.12.3 (10 Jan 2012) | Foswiki:Main.MichaelDaum: Foswikitask:Item11405: fixed performance issue editing topics that are _not_ under workflow control |

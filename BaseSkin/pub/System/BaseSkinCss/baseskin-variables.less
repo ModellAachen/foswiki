@@ -22,6 +22,10 @@
 
 @fw_body_line_height: @fw_ratio_golden * @fw_basefont; // could be a number as well, like 18 (pixels)
 
+@fw_display_roomy: roomy;
+@fw_display_cosy: cosy;
+@fw_display_tight: tight;
+
 @fw_topbar_height: 50;
 @fw_corner_radius_button: 2px;
 @fw_corner_radius_block: 3px;
@@ -105,7 +109,7 @@
 @fw_component_padding_em: 0em + @fw_strand1_ratio_up_1 / @fw_basefont;
 @fw_component_padding_h_em: 0em + @fw_strand1_ratio_up_2 / @fw_basefont;
 @fw_component_padding_v_em: 0em + @fw_strand1_ratio_up_1 / @fw_basefont;
-@fw_tool_padding_em: 0em + @fw_strand1_ratio_down_2 / @fw_basefont;
+@fw_tool_padding_em: 0em + @fw_strand1_ratio_down_1 / @fw_basefont;
 
 .fw_em_font_size(@size) {
 	font-size: 0em + (@size / @fw_basefont);
@@ -164,12 +168,30 @@
 	.fw_em_margin_top(@fw_size_p);
 	.fw_em_margin_bottom(@fw_size_p);
 }
-.fw_section_padding () {
-	padding-top: @fw_section_padding_em;
-	padding-bottom: @fw_section_padding_em;
+
+.fw_section_padding (@display) when (@display = roomy) {
+	@padding: 0em + @fw_strand1_ratio_up_3 / @fw_basefont;
+	padding-top: @padding;
+	padding-bottom: @padding;
 	padding-right: 0;
 	padding-left: 0;
 }
+.fw_section_padding (@display) when (@display = cosy) {
+	@padding: 0em + @fw_strand2_ratio_up_2 / @fw_basefont;
+	padding-top: @padding;
+	padding-bottom: @padding;
+	padding-right: 0;
+	padding-left: 0;
+}
+.fw_section_padding (@display) when (@display = tight) {
+	@padding: 0em + @fw_strand1_ratio_up_2 / @fw_basefont;
+	padding-top: @padding;
+	padding-bottom: @padding;
+	padding-right: 0;
+	padding-left: 0;
+}
+
+
 .fw_component_padding () {
 	padding-top: @fw_component_padding_em;
 	padding-bottom: @fw_component_padding_em;
@@ -188,7 +210,20 @@
 	padding-left: @fw_tool_padding_em;
 	padding-right: @fw_tool_padding_em;
 }
-.fw_tool_padding_vertical_only () {
-	padding-top: @fw_tool_padding_em;
-	padding-bottom: @fw_tool_padding_em;
+
+
+.fw_tool_padding_vertical_only (@display) when (@display = roomy) {
+	@padding: 0em + @fw_strand1_ratio_1 / @fw_basefont;
+	padding-top: @padding;
+	padding-bottom: @padding;
+}
+.fw_tool_padding_vertical_only (@display) when (@display = cosy) {
+	@padding: 0em + @fw_strand1_ratio_down_1 / @fw_basefont;
+	padding-top: @padding;
+	padding-bottom: @padding;
+}
+.fw_tool_padding_vertical_only (@display) when (@display = tight) {
+	@padding: 0em + @fw_strand1_ratio_down_2 / @fw_basefont;
+	padding-top: @padding;
+	padding-bottom: @padding;
 }

@@ -3,16 +3,16 @@
 # Build for MsOfficeAttachmentsAsHTMLPlugin
 #
 BEGIN {
-  foreach my $pc (split(/:/, $ENV{TWIKI_LIBS})) {
-    unshift @INC, $pc;
-  }
+    foreach my $pc ( split( /:/, $ENV{TWIKI_LIBS} ) ) {
+        unshift @INC, $pc;
+    }
 }
 
 use TWiki::Contrib::Build;
 
 # Create the build object
-$build = new TWiki::Contrib::Build( 'MsOfficeAttachmentsAsHTMLPlugin' );
+$build = new TWiki::Contrib::Build('MsOfficeAttachmentsAsHTMLPlugin');
 
 # Build the target on the command line, or the default target
-$build->build($build->{target});
+$build->build( $build->{target} );
 

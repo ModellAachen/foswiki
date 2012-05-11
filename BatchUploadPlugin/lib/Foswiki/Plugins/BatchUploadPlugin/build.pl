@@ -3,16 +3,16 @@
 # Build for BatchUploadPlugin
 #
 BEGIN {
-  foreach my $pc (split(/:/, $ENV{FOSWIKI_LIBS})) {
-    unshift @INC, $pc;
-  }
+    foreach my $pc ( split( /:/, $ENV{FOSWIKI_LIBS} ) ) {
+        unshift @INC, $pc;
+    }
 }
 
 use Foswiki::Contrib::Build;
 
 # Create the build object
-$build = new Foswiki::Contrib::Build( 'BatchUploadPlugin' );
+$build = new Foswiki::Contrib::Build('BatchUploadPlugin');
 
 # Build the target on the command line, or the default target
-$build->build($build->{target});
+$build->build( $build->{target} );
 

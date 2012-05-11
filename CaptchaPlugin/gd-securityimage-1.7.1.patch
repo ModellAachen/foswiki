@@ -1,0 +1,107 @@
+diff -ur GD.orig/SecurityImage/GD.pm GD/SecurityImage/GD.pm
+--- GD.orig/SecurityImage/GD.pm	2011-09-04 01:18:55.000000000 +0200
++++ GD/SecurityImage/GD.pm	2011-10-28 16:13:23.405555086 +0200
+@@ -34,6 +34,7 @@
+ use constant FULL_CIRCLE             => 360;
+ 
+ use GD;
++use Math::Trig ();
+ 
+ $VERSION = '1.71';
+ 
+@@ -44,7 +45,15 @@
+    # Create the image object
+    my $self = shift;
+    $self->{image} = GD::Image->new($self->{width}, $self->{height});
+-   $self->cconvert($self->{bgcolor}); # set background color
++
++   # set background color
++   if ($self->{bgcolor} eq 'transparent') {
++    my $white = $self->cconvert('#ffffff'); 
++    $self->{image}->transparent($white);
++   } else {
++    $self->cconvert($self->{bgcolor}); 
++  }
++
+    $self->setThickness($self->{thickness}) if $self->{thickness};
+    if ( $self->_versionlt( '2.07' ) ) {
+       foreach my $prop ( NEWSTUFF ) {
+@@ -99,38 +108,37 @@
+ 
+ sub _insert_text_ttf_scramble {
+    my($self, $key, $ctext) = @_;
+-   require Math::Trig;
+ 
+-         my @char;
+-         my $anglex;
+-         my $total = 0;
+-         my $space = [ $self->ttf_info( 0, 'A' ), 0, q{  } ];
+          my @randomy;
++         my $space = [ $self->ttf_info( 0, 'm' ), 0, q{  } ];
+          my $sy = $space->[CHY] || 1;
++
+          ## no critic (ValuesAndExpressions::ProhibitMagicNumbers)
+-         push @randomy,  $_, - $_ foreach $sy*1.2,$sy, $sy/2, $sy/4, $sy/8;
++         push @randomy,  $_, - $_ foreach $sy, $sy/2, $sy/4, $sy/6 , $sy/8;
+          ## use critic
++
++         my @char;
+          foreach (split m{}xms, $key) { # get char parameters
+-            $anglex = $self->random_angle;
+-            $total += $space->[CHX];
+-            push @char, [$self->ttf_info($anglex, $_), $anglex, $_], $space, $space, $space;
++            my $anglex = $self->random_angle;
++            push @char, [$self->ttf_info($anglex, $_), $anglex, $_];
+          }
+-         $total *= 2;
++
++         my $sx = ($self->{width} - 10) / scalar(@char);
+          my @config = ($ctext, $self->{font}, $self->{ptsize});
+-         my($x,$y);
+-         foreach my $box (reverse @char) {
+-            $x  = $self->{width}  / 2 + ($box->[CHX] - $total);
+-            $y  = $self->{height} / 2 +  $box->[CHY];
+-            $y += $randomy[int rand @randomy];
++         my $height = $self->{height} / 2;
++
++         my $pos = 5;
++         foreach my $box (@char) {
++            my $x  = $pos - $box->[CHX];
++            my $y  = $height +  $box->[CHY] + $randomy[int rand @randomy];
+             $self->{image}->$TTF(@config, Math::Trig::deg2rad($box->[CHAR]), $x, $y, $box->[ANGLE]);
+-            $total -= $space->[CHX];
++            $pos += $sx;
+          }
+    return;
+ }
+ 
+ sub _insert_text_ttf_normal {
+    my($self, $key, $ctext) = @_;
+-   require Math::Trig;
+    # don' t draw. we just need info...
+    my $info = sub {
+       my $txt = shift;
+@@ -150,6 +158,7 @@
+ 
+    my(@box, $x, $y);
+    my $tl = $self->{_TEXT_LOCATION_};
++
+    if ( $tl->{_place_} ) {
+       # put the text to one of the four corners in the image
+       my $white = $self->cconvert( [ RGB_WHITE ] );
+@@ -179,6 +188,7 @@
+       @box = $info->($key);
+       $x   = ($self->{width}  - ($box[LOWRIGHTX] - $box[LOWLEFTX])) / 2;
+       $y   = ($self->{height} - ($box[UPLEFTY]   - $box[LOWLEFTY])) / 2;
++      $y += $box[CHX];
+    }
+ 
+    # this needs a fix. adjust x,y
+@@ -282,7 +292,6 @@
+    my $self  = shift;
+    my $angle = shift || 0;
+    my $text  = shift;
+-   require Math::Trig;
+    my @box = GD::Image->$TTF(
+                $self->{_COLOR_}{text},
+                $self->{font},

@@ -1,15 +1,15 @@
-%META:TOPICINFO{author="TemiV" comment="save topic" date="1306909975" format="1.1" reprev="6" version="6"}%
+%META:TOPICINFO{_authorWikiName="TemiV" author="TemiV" comment="save topic" date="1322103608" format="1.1" reprev="5" version="5"}%
 %GRID{
    query="%FORMATLIST{"%INCLUDE{"%PUBURL%/%BASEWEB%/%BASETOPIC%/selection.txt"}%" separator="' OR gen_spec='" header="gen_spec='" footer="'" split=","}%"
    multiselect="on"
-   form="AcaciaCharactersForm"
-   web="Acacia.LLB.MigrationScriptsAcaciaCharacters"
+   form="TaxonProfile/Definitions.Acacia_TaxonWWWK_Form"
+   web="Acacia/LLB/Taxa/WWWK"
    colname_width="30"
    columns="Topic, genus, species, habit, Bark, Triangular_shaped_phyllode, Aril_colour, Statedistribution, Botanicalregions"
    colname_title="title"
    filterbar="on"
    edit="on"
-   Triangular_shaped_phyllode_title="%RENDERFORDISPLAY{form="Acacia/LLB/MigrationScriptsAcaciaCharacters.AcaciaCharactersForm" fields="Triangular_shaped_phyllode" format="$description"}%"
+   Triangular_shaped_phyllode_title="%RENDERFORDISPLAY{form="TaxonProfile/Definitions.Acacia_TaxonWWWK_Form" fields="Triangular_shaped_phyllode" format="$description"}%"
    pager="on"
    width="auto"
    height="auto"

@@ -2,7 +2,7 @@
 # See LICENSE for terms of distribution.
 #
 # Author: Richard DeSimine
-# 
+#
 #package Date::Business;
 package TWiki::Plugins::Business;
 
@@ -10,281 +10,318 @@ use strict;
 use POSIX;
 use Time::Local;
 use vars qw($VERSION @ISA @EXPORT);
- 
+
 require Exporter;
 require DynaLoader;
- 
+
 @ISA = qw(Exporter DynaLoader);
 
 $VERSION = '1.2';
- 
-use constant DAY              => 86_400;
-use constant WEEK             => DAY * 7;
-use constant E_SUNDAY         => DAY * 3; # offset from Epoch Day Of Week
-use constant THURSDAY         => 4;       # day of week
-use constant FRIDAY           => 5;       # day of week
-use constant SATURDAY         => 6;       # day of week
-use constant SUNDAY           => 0;       # day of week
+
+use constant DAY      => 86_400;
+use constant WEEK     => DAY * 7;
+use constant E_SUNDAY => DAY * 3;    # offset from Epoch Day Of Week
+use constant THURSDAY => 4;          # day of week
+use constant FRIDAY   => 5;          # day of week
+use constant SATURDAY => 6;          # day of week
+use constant SUNDAY   => 0;          # day of week
 
 # create a new object with the specified date
 # an offset in business days may be provided
 sub new($;$$$) {
-  my($class) = shift;
-  my(%params) = @_;
-  
-  my($date)    = $params{DATE};    # string or Date object
-  my($offset)  = $params{OFFSET};  # business days
-  
-  bless my $self = {'val' => 0}, $class;
-  $self->{FORCE}   = $params{FORCE}   if (defined($params{FORCE}));
-  $self->{HOLIDAY} = $params{HOLIDAY} if (ref($params{HOLIDAY}) eq 'CODE');
-  
-  # is the date parameter another Date::Business object?
-  if (ref($date) eq __PACKAGE__) {
-    $self->{val}       = $date->{val};
-    $self->{FORCE}   ||= $date->{FORCE}   if (defined($date->{FORCE}));
-    $self->{HOLIDAY} ||= $date->{HOLIDAY} if (ref($date->{HOLIDAY}) eq 'CODE');
-  } else {
-    # if not a Date::Business object is it a date string?
-    if (defined($date) && length($date) != 0) {
-      $self->{'val'} = image2value($date);
-    } else {
-      # else use current localtime
-      my($lt) = timegm(localtime());
-      $self->{'val'} = $lt - ($lt % DAY);
+    my ($class)  = shift;
+    my (%params) = @_;
+
+    my ($date)   = $params{DATE};      # string or Date object
+    my ($offset) = $params{OFFSET};    # business days
+
+    bless my $self = { 'val' => 0 }, $class;
+    $self->{FORCE} = $params{FORCE} if ( defined( $params{FORCE} ) );
+    $self->{HOLIDAY} = $params{HOLIDAY}
+      if ( ref( $params{HOLIDAY} ) eq 'CODE' );
+
+    # is the date parameter another Date::Business object?
+    if ( ref($date) eq __PACKAGE__ ) {
+        $self->{val} = $date->{val};
+        $self->{FORCE} ||= $date->{FORCE} if ( defined( $date->{FORCE} ) );
+        $self->{HOLIDAY} ||= $date->{HOLIDAY}
+          if ( ref( $date->{HOLIDAY} ) eq 'CODE' );
     }
-  }
-  
-  # compute offset if specified
-  if (defined($offset)) {    
-    $self->addb($offset)  if ($offset > 0);
-    $self->subb(-$offset) if ($offset < 0);
-  } else {
-    # if the date was initialized with a weekend or holiday
-    # and the FORCE option is set, force it to the 'next'
-    # or 'prev' business day
-    if (defined($params{FORCE})) {
-      if ($self->day_of_week == SATURDAY || $self->day_of_week == SUNDAY ||
-	  (ref($self->{HOLIDAY}) eq 'CODE' && 
-	   $self->{HOLIDAY}->($self->image, $self->image))) {
-	$self->prevb if ($self->{FORCE} eq 'prev');
-	$self->nextb if ($self->{FORCE} eq 'next');
-      }
+    else {
+
+        # if not a Date::Business object is it a date string?
+        if ( defined($date) && length($date) != 0 ) {
+            $self->{'val'} = image2value($date);
+        }
+        else {
+
+            # else use current localtime
+            my ($lt) = timegm( localtime() );
+            $self->{'val'} = $lt - ( $lt % DAY );
+        }
     }
-  }
-  return $self;
+
+    # compute offset if specified
+    if ( defined($offset) ) {
+        $self->addb($offset) if ( $offset > 0 );
+        $self->subb( -$offset ) if ( $offset < 0 );
+    }
+    else {
+
+        # if the date was initialized with a weekend or holiday
+        # and the FORCE option is set, force it to the 'next'
+        # or 'prev' business day
+        if ( defined( $params{FORCE} ) ) {
+            if (
+                   $self->day_of_week == SATURDAY
+                || $self->day_of_week == SUNDAY
+                || ( ref( $self->{HOLIDAY} ) eq 'CODE'
+                    && $self->{HOLIDAY}->( $self->image, $self->image ) )
+              )
+            {
+                $self->prevb if ( $self->{FORCE} eq 'prev' );
+                $self->nextb if ( $self->{FORCE} eq 'next' );
+            }
+        }
+    }
+    return $self;
 }
 
 sub image2value($;$) {
-  my($image) = @_;
+    my ($image) = @_;
 
-  $image =~ m/(....)(..)(..)/;
-  return timegm(0, 0, 0, $3, ($2-1), $1 - 1900);
-}  
+    $image =~ m/(....)(..)(..)/;
+    return timegm( 0, 0, 0, $3, ( $2 - 1 ), $1 - 1900 );
+}
 
 sub value($) {
-  my($self) = @_;
-  return $self->{'val'};
-}  
+    my ($self) = @_;
+    return $self->{'val'};
+}
 
 sub image($) {
-  my($self) = @_;
-  return POSIX::strftime("%Y%m%d", gmtime($self->{'val'}));
-}  
+    my ($self) = @_;
+    return POSIX::strftime( "%Y%m%d", gmtime( $self->{'val'} ) );
+}
 
 sub next(;$) {
-  my($self, $n) = @_;
-  $n = 1 if (!defined($n));
-  $self->{'val'} += DAY * $n;
+    my ( $self, $n ) = @_;
+    $n = 1 if ( !defined($n) );
+    $self->{'val'} += DAY * $n;
 }
 
 sub prev(;$) {
-  my($self, $n) = @_;
-  $n = 1 if (!defined($n));
-  $self->{'val'} -= (DAY * $n);
+    my ( $self, $n ) = @_;
+    $n = 1 if ( !defined($n) );
+    $self->{'val'} -= ( DAY * $n );
 }
 
 sub datecmp($$) {
-  my($self, $other) = @_;
+    my ( $self, $other ) = @_;
 
-  return $self->{'val'} <=> $other->{'val'};
+    return $self->{'val'} <=> $other->{'val'};
 }
 
 sub eq($$) {
-  my($self, $other) = @_;
+    my ( $self, $other ) = @_;
 
-  return $self->{'val'} <=> $other->{'val'};
+    return $self->{'val'} <=> $other->{'val'};
 }
 
 sub gt($$) {
-  my($self, $other) = @_;
-  return $self->{'val'} > $other->{'val'};
+    my ( $self, $other ) = @_;
+    return $self->{'val'} > $other->{'val'};
 }
 
 sub lt($$) {
-  my($self, $other) = @_;
-  return $self->{'val'} < $other->{'val'};
+    my ( $self, $other ) = @_;
+    return $self->{'val'} < $other->{'val'};
 }
 
 sub add($$) {
-  my($self, $inc) = @_;
-  $self->{'val'} += $inc * DAY;
+    my ( $self, $inc ) = @_;
+    $self->{'val'} += $inc * DAY;
 }
 
 sub sub($$) {
-  my($self, $inc) = @_;
-  $self->{'val'} -= $inc * DAY;
+    my ( $self, $inc ) = @_;
+    $self->{'val'} -= $inc * DAY;
 }
 
 sub diff($$) {
-  my($self, $other) = @_;
+    my ( $self, $other ) = @_;
 
-  return int(($self->{'val'} - $other->{'val'}) / DAY);
+    return int( ( $self->{'val'} - $other->{'val'} ) / DAY );
 }
 
 sub day_of_week($$) {
-  my($self) = @_;
-  return (gmtime($self->{'val'}))[6];
+    my ($self) = @_;
+    return ( gmtime( $self->{'val'} ) )[6];
 }
-
 
 # business date functions
 sub nextb() {
-  my($self) = @_;
-  $self->addb(1);
+    my ($self) = @_;
+    $self->addb(1);
 }
 
 sub prevb() {
-  my($self) = @_;
-  $self->subb(1);
+    my ($self) = @_;
+    $self->subb(1);
 }
 
 # takes a reference to $self and a reference
 # to an object of type Date::Business and returns
 # the difference in business days
 sub diffb($$;$$) {
-  my($self, $other, $force_self, $force_other) = @_;
-  return -1 if (!defined($other));
-  my($days, $o_val, $sval, $tmp, $dow);
-  my($sign) = 1;
-  
-  $force_self  ||= 'prev';
-  $force_other ||= 'prev';
+    my ( $self, $other, $force_self, $force_other ) = @_;
+    return -1 if ( !defined($other) );
+    my ( $days, $o_val, $sval, $tmp, $dow );
+    my ($sign) = 1;
 
-  $sval = $self->{val};
-  while ($force_self eq 'prev') {
-    $tmp = $sval;
-    $dow = (gmtime($sval))[6];
-    $sval -= 2 * DAY if ($dow == SUNDAY);
-    $sval -= 1 * DAY if ($dow == SATURDAY);
-    $sval -= 1 * DAY if (ref($self->{HOLIDAY}) eq 'CODE' && 
-			 $self->{HOLIDAY}->(POSIX::strftime("%Y%m%d", gmtime($sval)),
-					    POSIX::strftime("%Y%m%d", gmtime($sval))));
-    last if ($sval == $tmp);
-  }  
-  while ($force_self eq 'next') {
-    $tmp = $sval;
-    $dow = (gmtime($sval))[6];
-    $sval += 1 * DAY if ($dow == SUNDAY);
-    $sval += 2 * DAY if ($dow == SATURDAY);
-    $sval += 1 * DAY if (ref($self->{HOLIDAY}) eq 'CODE' && 
-		   $self->{HOLIDAY}->(POSIX::strftime("%Y%m%d", gmtime($sval)),
-				      POSIX::strftime("%Y%m%d", gmtime($sval))));
-    last if ($sval == $tmp);
-  }
-  
-  $o_val = $other->{val};
-  while ($force_other eq 'prev') {
-    $tmp = $o_val;
-    $dow = (gmtime($o_val))[6];
-    $o_val -= 2 * DAY if ($dow == SUNDAY);
-    $o_val -= 1 * DAY if ($dow == SATURDAY);
-    $o_val -= 1 * DAY if (ref($other->{HOLIDAY}) eq 'CODE' && 
-			  $other->{HOLIDAY}->(POSIX::strftime("%Y%m%d", gmtime($o_val)),
-					      POSIX::strftime("%Y%m%d", gmtime($o_val))));
-    last if ($o_val == $tmp);
-  }  
-  while ($force_other eq 'next') {
-    $tmp = $o_val;
-    $dow = (gmtime($o_val))[6];
-    $o_val += 1 * DAY if ($dow == SUNDAY);
-    $o_val += 2 * DAY if ($dow == SATURDAY);
-    $o_val += 1 * DAY if (ref($other->{HOLIDAY}) eq 'CODE' && 
-			  $other->{HOLIDAY}->(POSIX::strftime("%Y%m%d", gmtime($o_val)),
-					      POSIX::strftime("%Y%m%d", gmtime($o_val))));
-    last if ($o_val == $tmp);
-  }
-  
-  if ($sval < $o_val){
-    $sign = -1;
-  } else {
-    $tmp = $sval;
-    $sval = $o_val;
-    $o_val = $tmp;
-  }
-  
-  my($weeks) = int((($o_val - $sval)/WEEK)) * 5;
-  $days = ((($o_val + E_SUNDAY) / DAY) % 7) - ((($sval + E_SUNDAY)/ DAY) % 7);
-  $days += 5 if ($days < 0);
+    $force_self  ||= 'prev';
+    $force_other ||= 'prev';
 
-  if (ref($other->{HOLIDAY}) eq 'CODE') {
-    $days -= $self->{HOLIDAY}->(POSIX::strftime("%Y%m%d", gmtime($sval)),
-				POSIX::strftime("%Y%m%d", gmtime($o_val)));
-  }
-  return $sign * ($weeks + $days);
+    $sval = $self->{val};
+    while ( $force_self eq 'prev' ) {
+        $tmp = $sval;
+        $dow = ( gmtime($sval) )[6];
+        $sval -= 2 * DAY if ( $dow == SUNDAY );
+        $sval -= 1 * DAY if ( $dow == SATURDAY );
+        $sval -= 1 * DAY
+          if (
+            ref( $self->{HOLIDAY} ) eq 'CODE'
+            && $self->{HOLIDAY}->(
+                POSIX::strftime( "%Y%m%d", gmtime($sval) ),
+                POSIX::strftime( "%Y%m%d", gmtime($sval) )
+            )
+          );
+        last if ( $sval == $tmp );
+    }
+    while ( $force_self eq 'next' ) {
+        $tmp = $sval;
+        $dow = ( gmtime($sval) )[6];
+        $sval += 1 * DAY if ( $dow == SUNDAY );
+        $sval += 2 * DAY if ( $dow == SATURDAY );
+        $sval += 1 * DAY
+          if (
+            ref( $self->{HOLIDAY} ) eq 'CODE'
+            && $self->{HOLIDAY}->(
+                POSIX::strftime( "%Y%m%d", gmtime($sval) ),
+                POSIX::strftime( "%Y%m%d", gmtime($sval) )
+            )
+          );
+        last if ( $sval == $tmp );
+    }
+
+    $o_val = $other->{val};
+    while ( $force_other eq 'prev' ) {
+        $tmp = $o_val;
+        $dow = ( gmtime($o_val) )[6];
+        $o_val -= 2 * DAY if ( $dow == SUNDAY );
+        $o_val -= 1 * DAY if ( $dow == SATURDAY );
+        $o_val -= 1 * DAY
+          if (
+            ref( $other->{HOLIDAY} ) eq 'CODE'
+            && $other->{HOLIDAY}->(
+                POSIX::strftime( "%Y%m%d", gmtime($o_val) ),
+                POSIX::strftime( "%Y%m%d", gmtime($o_val) )
+            )
+          );
+        last if ( $o_val == $tmp );
+    }
+    while ( $force_other eq 'next' ) {
+        $tmp = $o_val;
+        $dow = ( gmtime($o_val) )[6];
+        $o_val += 1 * DAY if ( $dow == SUNDAY );
+        $o_val += 2 * DAY if ( $dow == SATURDAY );
+        $o_val += 1 * DAY
+          if (
+            ref( $other->{HOLIDAY} ) eq 'CODE'
+            && $other->{HOLIDAY}->(
+                POSIX::strftime( "%Y%m%d", gmtime($o_val) ),
+                POSIX::strftime( "%Y%m%d", gmtime($o_val) )
+            )
+          );
+        last if ( $o_val == $tmp );
+    }
+
+    if ( $sval < $o_val ) {
+        $sign = -1;
+    }
+    else {
+        $tmp   = $sval;
+        $sval  = $o_val;
+        $o_val = $tmp;
+    }
+
+    my ($weeks) = int( ( ( $o_val - $sval ) / WEEK ) ) * 5;
+    $days =
+      ( ( ( $o_val + E_SUNDAY ) / DAY ) % 7 ) -
+      ( ( ( $sval + E_SUNDAY ) / DAY ) % 7 );
+    $days += 5 if ( $days < 0 );
+
+    if ( ref( $other->{HOLIDAY} ) eq 'CODE' ) {
+        $days -= $self->{HOLIDAY}->(
+            POSIX::strftime( "%Y%m%d", gmtime($sval) ),
+            POSIX::strftime( "%Y%m%d", gmtime($o_val) )
+        );
+    }
+    return $sign * ( $weeks + $days );
 }
 
 # adds n business days
 sub addb($$) {
-  my($self, $inc) = @_;
+    my ( $self, $inc ) = @_;
 
-  return if ($inc == 0 || $inc < 0 && $self->subb(-$inc));
+    return if ( $inc == 0 || $inc < 0 && $self->subb( -$inc ) );
 
-  my($start) = $self->{'val'};
-  my($weeks) = int($inc/5) * 7;
-  my($dow)   = (($self->{'val'} + E_SUNDAY) / DAY) % 7;
-  my($days)  = $inc % 5;
-  if ($dow > THURSDAY) {
-    $self->{'val'} -= 1 * DAY if ($dow == FRIDAY);
-    $self->{'val'} -= 2 * DAY if ($dow == SATURDAY);
-    $dow-- if ($days == 0);
-  }
-  $days += 2 if ($days + $dow > THURSDAY);
-  $self->{'val'} += ($weeks + $days) * DAY;
+    my ($start) = $self->{'val'};
+    my ($weeks) = int( $inc / 5 ) * 7;
+    my ($dow)   = ( ( $self->{'val'} + E_SUNDAY ) / DAY ) % 7;
+    my ($days)  = $inc % 5;
+    if ( $dow > THURSDAY ) {
+        $self->{'val'} -= 1 * DAY if ( $dow == FRIDAY );
+        $self->{'val'} -= 2 * DAY if ( $dow == SATURDAY );
+        $dow-- if ( $days == 0 );
+    }
+    $days += 2 if ( $days + $dow > THURSDAY );
+    $self->{'val'} += ( $weeks + $days ) * DAY;
 
-  if (ref($self->{HOLIDAY}) eq 'CODE') {
-      my($start_txt) = POSIX::strftime("%Y%m%d", gmtime($start + DAY));
-      my($numHolidays) = $self->{HOLIDAY}->($start_txt, $self->image);
-      $self->addb($numHolidays) if ($numHolidays);
-  }
-  return 1;
+    if ( ref( $self->{HOLIDAY} ) eq 'CODE' ) {
+        my ($start_txt) = POSIX::strftime( "%Y%m%d", gmtime( $start + DAY ) );
+        my ($numHolidays) = $self->{HOLIDAY}->( $start_txt, $self->image );
+        $self->addb($numHolidays) if ($numHolidays);
+    }
+    return 1;
 }
 
 # subs n business days
 sub subb($$) {
-  my($self, $dec) = @_;
+    my ( $self, $dec ) = @_;
 
-  return if ($dec == 0 || $dec < 0 && $self->addb(-$dec));
+    return if ( $dec == 0 || $dec < 0 && $self->addb( -$dec ) );
 
-  my($start) = $self->{'val'};
-  my($weeks) = int($dec/5) * 7;
-  my($dow)   = (($self->{'val'} + E_SUNDAY) / DAY) % 7;
-  my($days)  =  $dec % 5;
-  if ($dow > 4) {
-    $self->{'val'} += 2 * DAY if ($dow == FRIDAY);
-    $self->{'val'} += 1 * DAY if ($dow == SATURDAY);
-    $days += 2 if ($days);
-  } else {
-    $days += 2 if ($days > $dow);
-  }
-  $self->{'val'} -= ($weeks + $days) * DAY;
+    my ($start) = $self->{'val'};
+    my ($weeks) = int( $dec / 5 ) * 7;
+    my ($dow)   = ( ( $self->{'val'} + E_SUNDAY ) / DAY ) % 7;
+    my ($days)  = $dec % 5;
+    if ( $dow > 4 ) {
+        $self->{'val'} += 2 * DAY if ( $dow == FRIDAY );
+        $self->{'val'} += 1 * DAY if ( $dow == SATURDAY );
+        $days          += 2       if ($days);
+    }
+    else {
+        $days += 2 if ( $days > $dow );
+    }
+    $self->{'val'} -= ( $weeks + $days ) * DAY;
 
-  if (ref($self->{HOLIDAY}) eq 'CODE') {
-      my($end_txt) = POSIX::strftime("%Y%m%d", gmtime($start - DAY));
-      my($numHolidays) = $self->{HOLIDAY}->($self->image, $end_txt);
-      $self->subb($numHolidays) if ($numHolidays);
-  }
-  return 1;
+    if ( ref( $self->{HOLIDAY} ) eq 'CODE' ) {
+        my ($end_txt) = POSIX::strftime( "%Y%m%d", gmtime( $start - DAY ) );
+        my ($numHolidays) = $self->{HOLIDAY}->( $self->image, $end_txt );
+        $self->subb($numHolidays) if ($numHolidays);
+    }
+    return 1;
 }
 1;
 __END__

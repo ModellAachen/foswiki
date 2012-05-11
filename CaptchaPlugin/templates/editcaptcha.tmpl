@@ -1,12 +1,8 @@
 <!-- template: editcaptcha.tmpl -->
-%TMPL:DEF{"editcaptcha"}%
-%IFDEFINEDTHEN{ "%WIKINAME%" as="TWikiGuest" }%
-<!-- tried table-less, failed miserably across different skins -->
+%TMPL:DEF{"editcaptcha"}%<!-- -->
 <table style="width:500px; border:1px dashed #AC0300"><tr>
-	<td align="center"><span style="font-weight:900;">%MAKETEXT{"Enter security code:"}%</span><br /><span style="font-size:0.8em;"><a href="javascript:location.reload()">%MAKETEXT{"Can't read security code?"}%</a></span></td>
-	<td align="center"><input type="text" name="Twk1CaptchaString" size="10" /></td>
-	<td align="center"><img src="%CAPTCHAURL%" alt="Security code" border="0" /> <input type="hidden" name="Twk1CaptchaHash" value="%CAPTCHAHASH%"></td>
+	<td align="center"><span style="font-weight:900;">%MAKETEXT{"Verification code"}%:</span><br /><span style="font-size:0.8em;"><a href="javascript:location.reload()">%MAKETEXT{"Can't read security code?"}%</a></span></td>
+	<td align="center"><input type="text" name="captcha_response" size="10" /></td>
+	<td align="center"><img src="%CAPTCHAURL%" alt="Security code" border="0" /> <input type="hidden" name="captcha_challenge" value="%CAPTCHAHASH%"></td>
 </tr></table>
-%ELSEDEFINED%
-%FIDEFINED%
-%TMPL:END%
+<!-- -->%TMPL:END%

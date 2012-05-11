@@ -53,8 +53,8 @@ package Foswiki::Plugins::RegexCacheSearchPlugin;
 use strict;
 use DB_File;
 
-require Foswiki::Func;    # The plugins API
-require Foswiki::Plugins; # For the API version
+require Foswiki::Func;       # The plugins API
+require Foswiki::Plugins;    # For the API version
 
 # $VERSION is referred to by Foswiki, and is the only global variable that
 # *must* exist in this package.
@@ -70,7 +70,8 @@ our $RELEASE = '$Date: 2010-06-01 17:13:53 +0200 (Tue, 01 Jun 2010) $';
 
 # Short description of this plugin
 # One line description, is shown in the %SYSTEMWEB%.TextFormattingRules topic:
-our $SHORTDESCRIPTION = 'Support Regex Cache for use with PurePerlCached search algorithm';
+our $SHORTDESCRIPTION =
+  'Support Regex Cache for use with PurePerlCached search algorithm';
 
 # You must set $NO_PREFS_IN_TOPIC to 0 if you want your plugin to use
 # preferences set in the plugin topic. This is required for compatibility
@@ -109,12 +110,12 @@ FOOBARSOMETHING. This avoids namespace issues.
 =cut
 
 sub initPlugin {
-    my( $topic, $web, $user, $installWeb ) = @_;
+    my ( $topic, $web, $user, $installWeb ) = @_;
 
     # check for Plugins.pm versions
-    if( $Foswiki::Plugins::VERSION < 2.0 ) {
+    if ( $Foswiki::Plugins::VERSION < 2.0 ) {
         Foswiki::Func::writeWarning( 'Version mismatch between ',
-                                     __PACKAGE__, ' and Plugins.pm' );
+            __PACKAGE__, ' and Plugins.pm' );
         return 0;
     }
 
@@ -137,7 +138,7 @@ sub initPlugin {
     # seen in the topic text.
     # Foswiki::Func::registerTagHandler( 'EXAMPLETAG', \&_EXAMPLETAG );
 
-    # Allow a sub to be called from the REST interface 
+    # Allow a sub to be called from the REST interface
     # using the provided alias
     # Foswiki::Func::registerRESTHandler('example', \&restExample);
 
@@ -514,37 +515,41 @@ This handler is called each time a topic is saved.
 sub afterSaveHandler {
     my ( $text, $topic, $web, $error, $meta ) = @_;
     print STDERR "afterSaveHandler\n";
-#
-#    # You can work on $text in place by using the special perl
-#    # variable $_[0]. These allow you to operate on $text
-#    # as if it was passed by reference; for example:
-#    # $_[0] =~ s/SpecialString/my alternative/ge;
 
-    my $savedWebTopic = lc($web . "\\" . $topic);
-    
+    #
+    #    # You can work on $text in place by using the special perl
+    #    # variable $_[0]. These allow you to operate on $text
+    #    # as if it was passed by reference; for example:
+    #    # $_[0] =~ s/SpecialString/my alternative/ge;
+
+    my $savedWebTopic = lc( $web . "\\" . $topic );
+
     # print STDERR "savedWebTopic = '$savedWebTopic'\n";
-   
+
     my $db_btree = new DB_File::BTREEINFO;
-    $db_btree->{'cachesize'} = 4*1024*1024;
- 		
+    $db_btree->{'cachesize'} = 4 * 1024 * 1024;
+
     my $workArea = Foswiki::Func::getWorkArea('RegexCachePlugin');
     my $workfile = $workArea . '/regex.db';
 
     my %cache;
- 				
-    my $db = tie %cache, "DB_File", $workfile, O_RDWR|O_CREAT, 0666, $db_btree
-    or die "Cannot open file '$workfile': $!\n";
+
+    my $db = tie %cache, "DB_File", $workfile, O_RDWR | O_CREAT, 0666, $db_btree
+      or die "Cannot open file '$workfile': $!\n";
 
     print STDERR "DB opened\n";
-    
+
     # Flush the Regex cache for this web & topic
-    my $dbKey = $savedWebTopic . "\t";
+    my $dbKey   = $savedWebTopic . "\t";
     my $dbValue = "";
-    
-    for (my $st = $db->seq($dbKey, $dbValue, R_CURSOR) ;
-            $st == 0 ;
-            $st = $db->seq($dbKey, $dbValue, R_NEXT) ) {
-        my ($dbWebTopic, $dbRFlag, $dbRegex ) = split(/\t/,$dbKey);
+
+    for (
+        my $st = $db->seq( $dbKey, $dbValue, R_CURSOR ) ;
+        $st == 0 ;
+        $st = $db->seq( $dbKey, $dbValue, R_NEXT )
+      )
+    {
+        my ( $dbWebTopic, $dbRFlag, $dbRegex ) = split( /\t/, $dbKey );
         last if $dbWebTopic ne $savedWebTopic;
         delete $cache{$dbKey};
     }
@@ -571,50 +576,58 @@ This handler is called just after the rename/move/delete action of a web, topic 
 =cut
 
 sub afterRenameHandler {
-    my ( $oldWeb, $oldTopic, $oldAttachment,
-         $newWeb, $newTopic, $newAttachment ) = @_;
+    my ( $oldWeb, $oldTopic, $oldAttachment, $newWeb, $newTopic,
+        $newAttachment ) = @_;
 
-    my $oldWebTopic = lc($oldWeb . "\\" . $oldTopic);
-    my $newWebTopic = lc($newWeb . "\\" . $newTopic);
-    
-    if($oldWebTopic eq $newWebTopic) { # Maybe it's not possible for this handler to be called with old and new the same, but just in case
+    my $oldWebTopic = lc( $oldWeb . "\\" . $oldTopic );
+    my $newWebTopic = lc( $newWeb . "\\" . $newTopic );
+
+    if ( $oldWebTopic eq $newWebTopic )
+    { # Maybe it's not possible for this handler to be called with old and new the same, but just in case
         return;
     }
 
-    my $db_btree = new DB_File::HASHINFO ;
-    $db_btree->{'cachesize'} = 4*1024*1024;
- 		
+    my $db_btree = new DB_File::HASHINFO;
+    $db_btree->{'cachesize'} = 4 * 1024 * 1024;
+
     my $workArea = Foswiki::Func::getWorkArea('RegexCachePlugin');
     my $workfile = $workArea . '/regex.db';
 
     my %cache;
- 				
-    my $db = tie %cache, "DB_File", $workfile, O_RDWR|O_CREAT, 0666, $db_btree
-    or die "Cannot open file '$workfile': $!\n";
+
+    my $db = tie %cache, "DB_File", $workfile, O_RDWR | O_CREAT, 0666, $db_btree
+      or die "Cannot open file '$workfile': $!\n";
 
     # Rename keys for the web and/or topic requested
-    my $dbKey = $oldWebTopic . "\t";  # Start processing with this partial key
+    my $dbKey   = $oldWebTopic . "\t";  # Start processing with this partial key
     my $dbValue = "";
-    
-    RENAME:
-    for (my $st = $db->seq($dbKey, $dbValue, R_CURSOR) ;
-            $st == 0 ;
-            $st = $db->seq($dbKey, $dbValue, R_NEXT) ) {
-            
-        my ($dbWebTopic, $dbRFlag, $dbRegex ) = split(/\t/,$dbKey);
-        my ($dbWeb, $dbTopic) = split(/\\/, $dbWebTopic);
-               
-        last RENAME if $dbWeb ne $oldWeb;  # Last entry for a Web rename
-        last RENAME if $oldTopic ne '' && $dbWebTopic ne $oldWebTopic;  # Last entry for a Topic rename
-        
-        my $newKey = $oldTopic eq '' ? "$newWeb\\$dbTopic\t$dbRFlag\t$dbRegex" : 
-                                       "$newWeb\\$newTopic\t$dbRFlag\t$dbRegex" ; 
+
+  RENAME:
+    for (
+        my $st = $db->seq( $dbKey, $dbValue, R_CURSOR ) ;
+        $st == 0 ;
+        $st = $db->seq( $dbKey, $dbValue, R_NEXT )
+      )
+    {
+
+        my ( $dbWebTopic, $dbRFlag, $dbRegex ) = split( /\t/, $dbKey );
+        my ( $dbWeb, $dbTopic ) = split( /\\/, $dbWebTopic );
+
+        last RENAME if $dbWeb ne $oldWeb;    # Last entry for a Web rename
+        last RENAME
+          if $oldTopic ne ''
+              && $dbWebTopic ne $oldWebTopic;    # Last entry for a Topic rename
+
+        my $newKey =
+          $oldTopic eq ''
+          ? "$newWeb\\$dbTopic\t$dbRFlag\t$dbRegex"
+          : "$newWeb\\$newTopic\t$dbRFlag\t$dbRegex";
         $cache{$newKey} = $dbValue;
         delete $cache{$dbKey};
     }
     $db->sync();
     undef $db;
-    untie %cache;    
+    untie %cache;
 }
 
 =begin TML

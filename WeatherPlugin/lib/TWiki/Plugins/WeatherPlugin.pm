@@ -11,7 +11,7 @@
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details, published at 
+# GNU General Public License for more details, published at
 # http://www.gnu.org/copyleft/gpl.html
 #
 # =========================
@@ -19,17 +19,14 @@
 # This WeatherPlugin (C) 2004 Andre Bonhote, COLT Telecom <andre@colt.net>
 #
 
-
-
 # =========================
 package TWiki::Plugins::WeatherPlugin;
 
 # =========================
 use vars qw(
-        $web $topic $user $installWeb $VERSION $RELEASE $pluginName
-        $debug $partnerId $license
-    );
-
+  $web $topic $user $installWeb $VERSION $RELEASE $pluginName
+  $debug $partnerId $license
+);
 
 use Weather::Com;
 
@@ -46,73 +43,73 @@ $RELEASE = 'Dakar';
 $pluginName = 'WeatherPlugin';
 
 # =========================
-sub initPlugin
-{
+sub initPlugin {
     ( $topic, $web, $user, $installWeb ) = @_;
 
     # check for Plugins.pm versions
-    if( $TWiki::Plugins::VERSION < 1.021 ) {
-        TWiki::Func::writeWarning( "Version mismatch between $pluginName and Plugins.pm" );
+    if ( $TWiki::Plugins::VERSION < 1.021 ) {
+        TWiki::Func::writeWarning(
+            "Version mismatch between $pluginName and Plugins.pm");
         return 0;
     }
 
     # Get plugin debug flag
-    $debug = TWiki::Func::getPluginPreferencesFlag( "DEBUG" );
+    $debug = TWiki::Func::getPluginPreferencesFlag("DEBUG");
 
-    # Get plugin preferences, the variable defined by:          * Set EXAMPLE = ...
-    $partnerId = TWiki::Func::getPluginPreferencesValue( "PARTNERID" );
-    $license = TWiki::Func::getPluginPreferencesValue( "LICENSE" );
+ # Get plugin preferences, the variable defined by:          * Set EXAMPLE = ...
+    $partnerId = TWiki::Func::getPluginPreferencesValue("PARTNERID");
+    $license   = TWiki::Func::getPluginPreferencesValue("LICENSE");
 
     # Plugin correctly initialized
-    TWiki::Func::writeDebug( "- TWiki::Plugins::${pluginName}::initPlugin( $web.$topic ) is OK" ) if $debug;
+    TWiki::Func::writeDebug(
+        "- TWiki::Plugins::${pluginName}::initPlugin( $web.$topic ) is OK")
+      if $debug;
     return 1;
 }
 
-
 # =========================
-sub commonTagsHandler
-{
+sub commonTagsHandler {
 ### my ( $text, $topic, $web ) = @_;   # do not uncomment, use $_[0], $_[1]... instead
 
-    TWiki::Func::writeDebug( "- ${pluginName}::commonTagsHandler( $_[2].$_[1] )" ) if $debug;
+    TWiki::Func::writeDebug("- ${pluginName}::commonTagsHandler( $_[2].$_[1] )")
+      if $debug;
 
     # This is the place to define customized tags and variables
     # Called by TWiki::handleCommonTags, after %INCLUDE:"..."%
 
-
-		$_[0] =~ s:%WEATHER{(.*?)}%:&_handleWeatherTag($1,$2):geo;
+    $_[0] =~ s:%WEATHER{(.*?)}%:&_handleWeatherTag($1,$2):geo;
 }
-
 
 sub _handleWeatherTag {
-	my ($city) = @_;
-	my $return = "";
+    my ($city) = @_;
+    my $return = "";
 
-	my %params = (
-		'current'			=> 1,
-		'partner_id'	=> $partnerId,
-		'license'			=> $license,
-	);
+    my %params = (
+        'current'    => 1,
+        'partner_id' => $partnerId,
+        'license'    => $license,
+    );
 
-  TWiki::Func::writeDebug( "- TWiki::Plugins::${pluginName} - $city" ) if $debug;
+    TWiki::Func::writeDebug("- TWiki::Plugins::${pluginName} - $city")
+      if $debug;
 
-	BLOCK: {
-		unless($city) {
-      TWiki::Func::writeDebug( "- TWiki::Plugins::${pluginName} - No city given" ) if $debug;
-			last BLOCK;
-		}
-		my $request = new Weather::Com(%params);
+  BLOCK: {
+        unless ($city) {
+            TWiki::Func::writeDebug(
+                "- TWiki::Plugins::${pluginName} - No city given")
+              if $debug;
+            last BLOCK;
+        }
+        my $request = new Weather::Com(%params);
 
+        if ( $city =~ /^[A-Z]{4}[0-9]{4}$/ ) {
+            my $weather = $request->get_weather($city);
+            my $temp    = $weather->{cc}->{tmp} . " " . $weather->{head}->{ut};
+            my $humi    = $weather->{cc}->{hmid};
+            my $icon    = $weather->{cc}->{icon};
+            my $ccity   = $weather->{loc}->{dnam};
 
-
-		if ($city =~ /^[A-Z]{4}[0-9]{4}$/) {
-			my $weather = $request->get_weather($city);
-      my $temp = $weather->{cc}->{tmp} . " " . $weather->{head}->{ut};
-      my $humi = $weather->{cc}->{hmid};
-      my $icon = $weather->{cc}->{icon};
-      my $ccity = $weather->{loc}->{dnam};
-   
-      $return .=qq(
+            $return .= qq(
 <div><table bgcolor="#eeeeee">
   <tr><td align='center'><em>$ccity</em></td></tr>
   <tr><td align='center'><img src="/images/weather/32/$icon.png" alt="icon"></td></tr>
@@ -120,18 +117,18 @@ sub _handleWeatherTag {
 </table></div>
 );
 
+        }
+        else {
+            my $location = $request->search($city);
 
-		} else {
-  		my $location = $request->search($city);
+            foreach ( keys %{$location} ) {
+                my $weather = $request->get_weather($_);
+                my $temp = $weather->{cc}->{tmp} . " " . $weather->{head}->{ut};
+                my $humi = $weather->{cc}->{hmid};
+                my $icon = $weather->{cc}->{icon};
+                my $ccity = $weather->{loc}->{dnam};
 
-  		foreach (keys %{$location}) {
-  			my $weather = $request->get_weather($_);
-  		  my $temp = $weather->{cc}->{tmp} . " " . $weather->{head}->{ut};
-    		my $humi = $weather->{cc}->{hmid};
-    		my $icon = $weather->{cc}->{icon};
-  			my $ccity = $weather->{loc}->{dnam};
-			
-			$return .=qq(
+                $return .= qq(
 <div><table bgcolor="#eeeeee">
   <tr><td align='center'><em>$ccity</em></td></tr>
   <tr><td align='center'><img src="/images/weather/32/$icon.png" alt="icon"></td></tr>
@@ -139,14 +136,12 @@ sub _handleWeatherTag {
 </table></div>
 );
 
-  		}
-		}
-	}
+            }
+        }
+    }
 
-	return $return;
-		
+    return $return;
 
 }
- 
 
 1;

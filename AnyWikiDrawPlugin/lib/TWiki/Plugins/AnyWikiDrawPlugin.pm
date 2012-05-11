@@ -22,7 +22,6 @@
 #
 # For licensing info read LICENSE file in the TWiki root.
 
-
 =pod
 
 ---+ package AnyWikiDrawPlugin
@@ -73,15 +72,15 @@ package TWiki::Plugins::AnyWikiDrawPlugin;
 # Always use strict to enforce variable scoping
 use strict;
 
-require TWiki::Func;    # The plugins API
-require TWiki::Plugins; # For the API version
+require TWiki::Func;       # The plugins API
+require TWiki::Plugins;    # For the API version
 
 #use File::Basename;    # mmm?
 
-
 # $VERSION is referred to by TWiki, and is the only global variable that
 # *must* exist in this package.
-use vars qw( $VERSION $RELEASE $SHORTDESCRIPTION $debug $pluginName $NO_PREFS_IN_TOPIC $editButton $editmess );
+use vars
+  qw( $VERSION $RELEASE $SHORTDESCRIPTION $debug $pluginName $NO_PREFS_IN_TOPIC $editButton $editmess );
 
 # This should always be $Rev: 15942 (22 Jan 2008) $ so that TWiki can determine the checked-in
 # status of the plugin. It is used by the build automation tools, so
@@ -104,7 +103,7 @@ $SHORTDESCRIPTION = 'AnyWikiDrawPlugin is the cool drawing plugin';
 # if you want the users to be able to change settings, then use standard TWiki
 # preferences that can be defined in your %USERSWEB%.SitePreferences and overridden
 # at the web and topic level.
-$NO_PREFS_IN_TOPIC = 0; #TODO: Set it back to one
+$NO_PREFS_IN_TOPIC = 0;    #TODO: Set it back to one
 
 # Name of this Plugin, only used in this module
 $pluginName = 'AnyWikiDrawPlugin';
@@ -142,11 +141,12 @@ FOOBARSOMETHING. This avoids namespace issues.
 =cut
 
 sub initPlugin {
-    my( $topic, $web, $user, $installWeb ) = @_;
+    my ( $topic, $web, $user, $installWeb ) = @_;
 
     # check for Plugins.pm versions
-    if( $TWiki::Plugins::VERSION < 1.026 ) {
-        TWiki::Func::writeWarning( "Version mismatch between $pluginName and Plugins.pm" );
+    if ( $TWiki::Plugins::VERSION < 1.026 ) {
+        TWiki::Func::writeWarning(
+            "Version mismatch between $pluginName and Plugins.pm");
         return 0;
     }
 
@@ -161,19 +161,18 @@ sub initPlugin {
     my $setting = $TWiki::cfg{Plugins}{AnyWikiDrawPlugin}{ExampleSetting} || 0;
     $debug = $TWiki::cfg{Plugins}{AnyWikiDrawPlugin}{Debug} || 0;
 
-    
-    $editButton = 1; 
-  	$editmess = TWiki::Func::getPreferencesValue( "ANYWIKIDRAWPLUGIN_EDIT_TEXT" ) || "Edit Drawing";
-  	$editmess =~ s/['"]/`/g;
-    
-    
+    $editButton = 1;
+    $editmess = TWiki::Func::getPreferencesValue("ANYWIKIDRAWPLUGIN_EDIT_TEXT")
+      || "Edit Drawing";
+    $editmess =~ s/['"]/`/g;
+
     # register the _EXAMPLETAG function to handle %EXAMPLETAG{...}%
     # This will be called whenever %EXAMPLETAG% or %EXAMPLETAG{...}% is
     # seen in the topic text.
     TWiki::Func::registerTagHandler( 'ANYWIKIDRAW', \&_ANYWIKIDRAW );
-    TWiki::Func::registerTagHandler( 'AWDRAW', \&_ANYWIKIDRAW );
+    TWiki::Func::registerTagHandler( 'AWDRAW',      \&_ANYWIKIDRAW );
 
-    # Allow a sub to be called from the REST interface 
+    # Allow a sub to be called from the REST interface
     # using the provided alias
     #TWiki::Func::registerRESTHandler('example', \&restExample);
 
@@ -183,9 +182,9 @@ sub initPlugin {
 
 # The function used to handle the %EXAMPLETAG{...}% variable
 # You would have one of these for each variable you want to process.
-sub _ANYWIKIDRAW 
-	{
-    my($session, $params, $theTopic, $theWeb) = @_;
+sub _ANYWIKIDRAW {
+    my ( $session, $params, $theTopic, $theWeb ) = @_;
+
     # $session  - a reference to the TWiki session object (if you don't know
     #             what this is, just ignore it)
     # $params=  - a reference to a TWiki::Attrs object containing parameters.
@@ -199,45 +198,39 @@ sub _ANYWIKIDRAW
     # For example, %EXAMPLETAG{'hamburger' sideorder="onions"}%
     # $params->{_DEFAULT} will be 'hamburger'
     # $params->{sideorder} will be 'onions'
-    
-  
-    
-      
-  	#my( $attributes, $width, $height, $topic, $web ) = @_;
-  
-  
-	my $fileName = $params->{_DEFAULT} || undef;
-	my $width = $params->{width} || 640;
-	my $height= $params->{height} || 480;
-  
-  	#Fail if no drawing name
-  	unless ( defined $fileName)
-  		{
-		return "*\%RED%$pluginName ERROR*: You must specifiy a name for your drawing!\%ENDCOLOR%";    	  	
-  		}
-    
-	#sanitize the file name  	
-  	$fileName =~ s/[^A-Za-z0-9_\.\-]//go; # delete special characters
-  	
-  	my $query = TWiki::Func::getCgiQuery();
-  
-  	#Check for the file extension
-	if ($fileName !~ /\./ || $fileName =~/\.draw/)
-		{
-		return handleDrawDrawing($fileName, $theTopic, $theWeb);
-		} 
-	else
-		{
-		if (($query->param('editDrawing')||'') eq $fileName)
-			{
-			return editAnyDrawing($fileName, $width, $height, $theTopic, $theWeb);
-			}
-		else
-			{
-			return handleAnyDrawing($fileName, $width, $height, $theTopic, $theWeb);
-			}
-		}
+
+    #my( $attributes, $width, $height, $topic, $web ) = @_;
+
+    my $fileName = $params->{_DEFAULT} || undef;
+    my $width    = $params->{width}    || 640;
+    my $height   = $params->{height}   || 480;
+
+    #Fail if no drawing name
+    unless ( defined $fileName ) {
+        return
+"*\%RED%$pluginName ERROR*: You must specifiy a name for your drawing!\%ENDCOLOR%";
     }
+
+    #sanitize the file name
+    $fileName =~ s/[^A-Za-z0-9_\.\-]//go;    # delete special characters
+
+    my $query = TWiki::Func::getCgiQuery();
+
+    #Check for the file extension
+    if ( $fileName !~ /\./ || $fileName =~ /\.draw/ ) {
+        return handleDrawDrawing( $fileName, $theTopic, $theWeb );
+    }
+    else {
+        if ( ( $query->param('editDrawing') || '' ) eq $fileName ) {
+            return editAnyDrawing( $fileName, $width, $height, $theTopic,
+                $theWeb );
+        }
+        else {
+            return handleAnyDrawing( $fileName, $width, $height, $theTopic,
+                $theWeb );
+        }
+    }
+}
 
 =pod
 
@@ -273,10 +266,13 @@ This handler is called very early, immediately after =earlyInitPlugin=.
 =cut
 
 sub DISABLE_initializeUserHandler {
+
     # do not uncomment, use $_[0], $_[1]... instead
     ### my ( $loginName, $url, $pathInfo ) = @_;
 
-    TWiki::Func::writeDebug( "- ${pluginName}::initializeUserHandler( $_[0], $_[1] )" ) if $debug;
+    TWiki::Func::writeDebug(
+        "- ${pluginName}::initializeUserHandler( $_[0], $_[1] )")
+      if $debug;
 }
 
 =pod
@@ -293,10 +289,13 @@ Called when a new user registers with this TWiki.
 =cut
 
 sub DISABLE_registrationHandler {
+
     # do not uncomment, use $_[0], $_[1]... instead
     ### my ( $web, $wikiName, $loginName ) = @_;
 
-    TWiki::Func::writeDebug( "- ${pluginName}::registrationHandler( $_[0], $_[1] )" ) if $debug;
+    TWiki::Func::writeDebug(
+        "- ${pluginName}::registrationHandler( $_[0], $_[1] )")
+      if $debug;
 }
 
 =pod
@@ -332,10 +331,12 @@ handler. Use the =$meta= object.
 =cut
 
 sub DISABLE_commonTagsHandler {
+
     # do not uncomment, use $_[0], $_[1]... instead
     ### my ( $text, $topic, $web, $meta ) = @_;
 
-    TWiki::Func::writeDebug( "- ${pluginName}::commonTagsHandler( $_[2].$_[1] )" ) if $debug;
+    TWiki::Func::writeDebug("- ${pluginName}::commonTagsHandler( $_[2].$_[1] )")
+      if $debug;
 
     # do custom extension rule, like for example:
     # $_[0] =~ s/%XYZ%/&handleXyz()/ge;
@@ -366,10 +367,13 @@ __NOTE:__ This handler is not separately called on included topics.
 =cut
 
 sub DISABLE_beforeCommonTagsHandler {
+
     # do not uncomment, use $_[0], $_[1]... instead
     ### my ( $text, $topic, $web, $meta ) = @_;
 
-    TWiki::Func::writeDebug( "- ${pluginName}::beforeCommonTagsHandler( $_[2].$_[1] )" ) if $debug;
+    TWiki::Func::writeDebug(
+        "- ${pluginName}::beforeCommonTagsHandler( $_[2].$_[1] )")
+      if $debug;
 }
 
 =pod
@@ -393,10 +397,13 @@ handler.
 =cut
 
 sub DISABLE_afterCommonTagsHandler {
+
     # do not uncomment, use $_[0], $_[1]... instead
     ### my ( $text, $topic, $web, $meta ) = @_;
 
-    TWiki::Func::writeDebug( "- ${pluginName}::afterCommonTagsHandler( $_[2].$_[1] )" ) if $debug;
+    TWiki::Func::writeDebug(
+        "- ${pluginName}::afterCommonTagsHandler( $_[2].$_[1] )")
+      if $debug;
 }
 
 =pod
@@ -447,6 +454,7 @@ Since TWiki::Plugins::VERSION = '1.026'
 =cut
 
 sub DISABLE_preRenderingHandler {
+
     # do not uncomment, use $_[0], $_[1]... instead
     #my( $text, $pMap ) = @_;
 }
@@ -467,6 +475,7 @@ Since TWiki::Plugins::VERSION = '1.026'
 =cut
 
 sub DISABLE_postRenderingHandler {
+
     # do not uncomment, use $_[0], $_[1]... instead
     #my $text = shift;
 }
@@ -488,10 +497,12 @@ __NOTE__: meta-data may be embedded in the text passed to this handler
 =cut
 
 sub DISABLE_beforeEditHandler {
+
     # do not uncomment, use $_[0], $_[1]... instead
     ### my ( $text, $topic, $web ) = @_;
 
-    TWiki::Func::writeDebug( "- ${pluginName}::beforeEditHandler( $_[2].$_[1] )" ) if $debug;
+    TWiki::Func::writeDebug("- ${pluginName}::beforeEditHandler( $_[2].$_[1] )")
+      if $debug;
 }
 
 =pod
@@ -514,10 +525,12 @@ handler. Use the =$meta= object.
 =cut
 
 sub DISABLE_afterEditHandler {
+
     # do not uncomment, use $_[0], $_[1]... instead
     ### my ( $text, $topic, $web ) = @_;
 
-    TWiki::Func::writeDebug( "- ${pluginName}::afterEditHandler( $_[2].$_[1] )" ) if $debug;
+    TWiki::Func::writeDebug("- ${pluginName}::afterEditHandler( $_[2].$_[1] )")
+      if $debug;
 }
 
 =pod
@@ -542,10 +555,12 @@ text format.
 =cut
 
 sub DISABLE_beforeSaveHandler {
+
     # do not uncomment, use $_[0], $_[1]... instead
     ### my ( $text, $topic, $web ) = @_;
 
-    TWiki::Func::writeDebug( "- ${pluginName}::beforeSaveHandler( $_[2].$_[1] )" ) if $debug;
+    TWiki::Func::writeDebug("- ${pluginName}::beforeSaveHandler( $_[2].$_[1] )")
+      if $debug;
 }
 
 =pod
@@ -567,10 +582,12 @@ __NOTE:__ meta-data is embedded in $text (using %META: tags)
 =cut
 
 sub DISABLE_afterSaveHandler {
+
     # do not uncomment, use $_[0], $_[1]... instead
     ### my ( $text, $topic, $web, $error, $meta ) = @_;
 
-    TWiki::Func::writeDebug( "- ${pluginName}::afterSaveHandler( $_[2].$_[1] )" ) if $debug;
+    TWiki::Func::writeDebug("- ${pluginName}::afterSaveHandler( $_[2].$_[1] )")
+      if $debug;
 }
 
 =pod
@@ -591,11 +608,13 @@ This handler is called just after the rename/move/delete action of a web, topic 
 =cut
 
 sub DISABLE_afterRenameHandler {
+
     # do not uncomment, use $_[0], $_[1]... instead
     ### my ( $oldWeb, $oldTopic, $oldAttachment, $newWeb, $newTopic, $newAttachment ) = @_;
 
-    TWiki::Func::writeDebug( "- ${pluginName}::afterRenameHandler( " .
-                             "$_[0].$_[1] $_[2] -> $_[3].$_[4] $_[5] )" ) if $debug;
+    TWiki::Func::writeDebug( "- ${pluginName}::afterRenameHandler( "
+          . "$_[0].$_[1] $_[2] -> $_[3].$_[4] $_[5] )" )
+      if $debug;
 }
 
 =pod
@@ -618,9 +637,12 @@ The attributes hash will include at least the following attributes:
 =cut
 
 sub DISABLE_beforeAttachmentSaveHandler {
+
     # do not uncomment, use $_[0], $_[1]... instead
     ###   my( $attrHashRef, $topic, $web ) = @_;
-    TWiki::Func::writeDebug( "- ${pluginName}::beforeAttachmentSaveHandler( $_[2].$_[1] )" ) if $debug;
+    TWiki::Func::writeDebug(
+        "- ${pluginName}::beforeAttachmentSaveHandler( $_[2].$_[1] )")
+      if $debug;
 }
 
 =pod
@@ -641,9 +663,12 @@ will include at least the following attributes:
 =cut
 
 sub DISABLE_afterAttachmentSaveHandler {
+
     # do not uncomment, use $_[0], $_[1]... instead
     ###   my( $attrHashRef, $topic, $web ) = @_;
-    TWiki::Func::writeDebug( "- ${pluginName}::afterAttachmentSaveHandler( $_[2].$_[1] )" ) if $debug;
+    TWiki::Func::writeDebug(
+        "- ${pluginName}::afterAttachmentSaveHandler( $_[2].$_[1] )")
+      if $debug;
 }
 
 =pod
@@ -667,6 +692,7 @@ topic text (and in forms).
 =cut
 
 sub DISABLE_beforeMergeHandler {
+
     # do not uncomment, use $_[0], $_[1]... instead
     #my( $text, $currRev, $currText, $origRev, $origText, $web, $topic ) = @_;
 }
@@ -744,7 +770,7 @@ using the =TWiki::Func::addToHEAD= method.
 sub DISABLE_modifyHeaderHandler {
     my ( $headers, $query ) = @_;
 
-    TWiki::Func::writeDebug( "- ${pluginName}::modifyHeaderHandler()" ) if $debug;
+    TWiki::Func::writeDebug("- ${pluginName}::modifyHeaderHandler()") if $debug;
 }
 
 =pod
@@ -764,10 +790,13 @@ the others will be ignored.
 =cut
 
 sub DISABLE_redirectCgiQueryHandler {
+
     # do not uncomment, use $_[0], $_[1] instead
     ### my ( $query, $url ) = @_;
 
-    TWiki::Func::writeDebug( "- ${pluginName}::redirectCgiQueryHandler( query, $_[1] )" ) if $debug;
+    TWiki::Func::writeDebug(
+        "- ${pluginName}::redirectCgiQueryHandler( query, $_[1] )")
+      if $debug;
 }
 
 =pod
@@ -820,7 +849,7 @@ Return the new link text.
 =cut
 
 sub DISABLE_renderWikiWordHandler {
-    my( $linkText, $hasExplicitLinkLabel, $web, $topic ) = @_;
+    my ( $linkText, $hasExplicitLinkLabel, $web, $topic ) = @_;
     return $linkText;
 }
 
@@ -841,6 +870,7 @@ cache and security plugins.
 =cut
 
 sub DISABLE_completePageHandler {
+
     #my($html, $httpHeaders) = @_;
     # modify $_[0] or $_[1] if you must change the HTML or headers
 }
@@ -861,10 +891,10 @@ For more information, check %SYSTEMWEB%.CommandAndCGIScripts#rest
 =cut
 
 sub restExample {
-   #my ($session) = @_;
-   return "This is an example of a REST invocation\n\n";
-}
 
+    #my ($session) = @_;
+    return "This is an example of a REST invocation\n\n";
+}
 
 =pod
 
@@ -875,121 +905,129 @@ sub restExample {
 # Handle Drawing tag for the .draw file format
 #
 sub handleDrawDrawing {
-  my( $fileName, $topic, $web ) = @_;
-  my $nameVal = $fileName;
-  
-	if ($nameVal =~/\.draw$/) {
-		$nameVal = substr($nameVal, 0, length($nameVal) - 5);
-	}
-  
-  # should really use TWiki server-side include mechanism....
-  my $mapFile = TWiki::Func::getPubDir() . "/$web/$topic/$nameVal.map";
-  my $img = "src=\"%ATTACHURLPATH%/$nameVal.gif\"";
-  my $editUrl =
-	TWiki::Func::getOopsUrl($web, $topic, "anywikidraw", $nameVal);
-  my $imgText = "";
-  my $edittext = $editmess;
-  $edittext =~ s/%F%/$nameVal/g;
-  my $hover =
-    "onmouseover=\"window.status='$edittext';return true;\" ".
-      "onmouseout=\"window.status='';return true;\"";
+    my ( $fileName, $topic, $web ) = @_;
+    my $nameVal = $fileName;
 
-  if ( -e $mapFile ) {
-	my $mapname = $nameVal;
-	$mapname =~ s/^.*\/([^\/]+)$/$1/;
-	$img .= " usemap=\"#$mapname\"";
-	my $map = TWiki::Func::readFile($mapFile);
-    # Unashamed hack to handle Web.TopicName links
-    $map =~ s/href=\"((\w+)\.)?(\w+)(#\w+)?\"/&_processHref($2,$3,$4,$web)/ge;
-	$map = TWiki::Func::expandCommonVariables( $map, $topic );
-	$map =~ s/%MAPNAME%/$mapname/g;
-	$map =~ s/%ANYWIKIDRAW%/$editUrl/g;
-	$map =~ s/%EDITTEXT%/$edittext/g;
-	$map =~ s/%HOVER%/$hover/g;
-	$map =~ s/[\r\n]+//g;
-
-	# Add an edit link just above the image if required
-	$imgText .= "<img $img>$map";
-	if ( $editButton == 1 ) {
-		$imgText .= "<a href=\"$editUrl\" $hover>Edit</a>";
+    if ( $nameVal =~ /\.draw$/ ) {
+        $nameVal = substr( $nameVal, 0, length($nameVal) - 5 );
     }
-  } else {
-	# insensitive drawing; the whole image gets a rather more
-	# decorative version of the edit URL
-	$imgText .= "<a href=\"$editUrl\" $hover>".
-          "<img $img $hover alt=\"$edittext\" title=\"$edittext\" /></a>";
-	if ( $editButton == 1 ) {
-		$imgText .= "<a href=\"$editUrl\" $hover>Edit</a>";
-    }
-  }
 
-  return $imgText;
+    # should really use TWiki server-side include mechanism....
+    my $mapFile = TWiki::Func::getPubDir() . "/$web/$topic/$nameVal.map";
+    my $img     = "src=\"%ATTACHURLPATH%/$nameVal.gif\"";
+    my $editUrl =
+      TWiki::Func::getOopsUrl( $web, $topic, "anywikidraw", $nameVal );
+    my $imgText  = "";
+    my $edittext = $editmess;
+    $edittext =~ s/%F%/$nameVal/g;
+    my $hover = "onmouseover=\"window.status='$edittext';return true;\" "
+      . "onmouseout=\"window.status='';return true;\"";
+
+    if ( -e $mapFile ) {
+        my $mapname = $nameVal;
+        $mapname =~ s/^.*\/([^\/]+)$/$1/;
+        $img .= " usemap=\"#$mapname\"";
+        my $map = TWiki::Func::readFile($mapFile);
+
+        # Unashamed hack to handle Web.TopicName links
+        $map =~
+          s/href=\"((\w+)\.)?(\w+)(#\w+)?\"/&_processHref($2,$3,$4,$web)/ge;
+        $map = TWiki::Func::expandCommonVariables( $map, $topic );
+        $map =~ s/%MAPNAME%/$mapname/g;
+        $map =~ s/%ANYWIKIDRAW%/$editUrl/g;
+        $map =~ s/%EDITTEXT%/$edittext/g;
+        $map =~ s/%HOVER%/$hover/g;
+        $map =~ s/[\r\n]+//g;
+
+        # Add an edit link just above the image if required
+        $imgText .= "<img $img>$map";
+        if ( $editButton == 1 ) {
+            $imgText .= "<a href=\"$editUrl\" $hover>Edit</a>";
+        }
+    }
+    else {
+
+        # insensitive drawing; the whole image gets a rather more
+        # decorative version of the edit URL
+        $imgText .= "<a href=\"$editUrl\" $hover>"
+          . "<img $img $hover alt=\"$edittext\" title=\"$edittext\" /></a>";
+        if ( $editButton == 1 ) {
+            $imgText .= "<a href=\"$editUrl\" $hover>Edit</a>";
+        }
+    }
+
+    return $imgText;
 }
-
 
 =pod
 
 
 =cut
 
-
 #
 # Handle Drawing tag for all formats except the .draw file format
 #
 sub handleAnyDrawing {
-  my( $fileName, $width, $height, $topic, $web ) = @_;
-  my $nameVal = $fileName;
-  
-  # should really use TWiki server-side include mechanism....
-  my $mapFile = TWiki::Func::getPubDir() . "/$web/$topic/$nameVal.map";
-  my $img = '';
-  if($nameVal =~ /\.svg$/) {
-  	$img = "src=\"%ATTACHURLPATH%/$nameVal.png\"";
-  } else {
-  	$img = "src=\"%ATTACHURLPATH%/$nameVal\"";
-  }
-  my $editUrl = TWiki::Func::getScriptUrl($web, $topic, "view", editDrawing=>$nameVal);
-  my $imgText = "";
-  my $edittext = $editmess;
-  $edittext =~ s/%F%/$nameVal/g;
-  my $hover =
-    "onmouseover=\"window.status='$edittext';return true;\" ".
-      "onmouseout=\"window.status='';return true;\"";
+    my ( $fileName, $width, $height, $topic, $web ) = @_;
+    my $nameVal = $fileName;
 
-  if ( -e $mapFile ) {
-	my $mapname = $nameVal;
-	$mapname =~ s/^.*\/([^\/]+)$/$1/;
-	$img .= " usemap=\"#$mapname\"";
-	my $map = TWiki::Func::readFile($mapFile);
-    # Unashamed hack to handle Web.TopicName links
-    $map =~ s/href=\"((\w+)\.)?(\w+)(#\w+)?\"/&_processHref($2,$3,$4,$web)/ge;
-	$map = TWiki::Func::expandCommonVariables( $map, $topic );
-	$map =~ s/%MAPNAME%/$mapname/g;
-	$map =~ s/%ANYWIKIDRAW%/$editUrl/g;
-	$map =~ s/%EDITTEXT%/$edittext/g;
-	$map =~ s/%HOVER%/$hover/g;
-	$map =~ s/[\r\n]+//g;
+    # should really use TWiki server-side include mechanism....
+    my $mapFile = TWiki::Func::getPubDir() . "/$web/$topic/$nameVal.map";
+    my $img     = '';
+    if ( $nameVal =~ /\.svg$/ ) {
+        $img = "src=\"%ATTACHURLPATH%/$nameVal.png\"";
+    }
+    else {
+        $img = "src=\"%ATTACHURLPATH%/$nameVal\"";
+    }
+    my $editUrl = TWiki::Func::getScriptUrl( $web, $topic, "view",
+        editDrawing => $nameVal );
+    my $imgText  = "";
+    my $edittext = $editmess;
+    $edittext =~ s/%F%/$nameVal/g;
+    my $hover = "onmouseover=\"window.status='$edittext';return true;\" "
+      . "onmouseout=\"window.status='';return true;\"";
 
-	# Add an edit link just above the image if required
-	if ($editButton eq 1) {
-		$imgText .= "$map<img $img>";
-		$imgText .= "<a href=\"$editUrl\" $hover>Edit</a>";
-	} else {
-		$imgText .= "<a href=\"$editUrl\" $hover>".
-			"<img $img $hover alt=\"$edittext\" title=\"$edittext\" />$map</a>";
-	}
-  } else {
-	# insensitive drawing; the whole image gets a rather more
-	# decorative version of the edit URL
-	if ($editButton eq 1) {
-		$imgText .= "<img $img>";
-		$imgText .= "<a href=\"$editUrl\" $hover>Edit</a>";
-	} else {
-		$imgText .= "<a href=\"$editUrl\" $hover>".
-			"<img $img $hover alt=\"$edittext\" title=\"$edittext\" /></a>";
-	}
-  }
-  return $imgText;
+    if ( -e $mapFile ) {
+        my $mapname = $nameVal;
+        $mapname =~ s/^.*\/([^\/]+)$/$1/;
+        $img .= " usemap=\"#$mapname\"";
+        my $map = TWiki::Func::readFile($mapFile);
+
+        # Unashamed hack to handle Web.TopicName links
+        $map =~
+          s/href=\"((\w+)\.)?(\w+)(#\w+)?\"/&_processHref($2,$3,$4,$web)/ge;
+        $map = TWiki::Func::expandCommonVariables( $map, $topic );
+        $map =~ s/%MAPNAME%/$mapname/g;
+        $map =~ s/%ANYWIKIDRAW%/$editUrl/g;
+        $map =~ s/%EDITTEXT%/$edittext/g;
+        $map =~ s/%HOVER%/$hover/g;
+        $map =~ s/[\r\n]+//g;
+
+        # Add an edit link just above the image if required
+        if ( $editButton eq 1 ) {
+            $imgText .= "$map<img $img>";
+            $imgText .= "<a href=\"$editUrl\" $hover>Edit</a>";
+        }
+        else {
+            $imgText .= "<a href=\"$editUrl\" $hover>"
+              . "<img $img $hover alt=\"$edittext\" title=\"$edittext\" />$map</a>";
+        }
+    }
+    else {
+
+        # insensitive drawing; the whole image gets a rather more
+        # decorative version of the edit URL
+        if ( $editButton eq 1 ) {
+            $imgText .= "<img $img>";
+            $imgText .= "<a href=\"$editUrl\" $hover>Edit</a>";
+        }
+        else {
+            $imgText .= "<a href=\"$editUrl\" $hover>"
+              . "<img $img $hover alt=\"$edittext\" title=\"$edittext\" /></a>";
+        }
+    }
+    return $imgText;
 }
 
 =pod
@@ -997,44 +1035,55 @@ Output HTML code for editing a drawing using the java applet.
 
 =cut
 
-
 sub editAnyDrawing {
-	my( $fileName, $width, $height, $topic, $web ) = @_;
-  
-	my $nameVal = $fileName;
-  
-	my $drawingFile = TWiki::Func::getPubDir() . "/$web/$topic/$nameVal";
-	my $downloadURL = "%ATTACHURLPATH%/$nameVal";
-	my $scriptURLPath = "%SCRIPTURLPATH%/pack200%SCRIPTSUFFIX%";
-	
-	my $output = '<a name="appletdrawing"></a>'.
-			'<div style="z-index: 101;">'.
-			'<applet codebase="/" '.
-			' archive="'.$scriptURLPath.'/pub/TWiki/AnyWikiDrawPlugin/AnyWikiDrawForTWiki.jar"'. 
-			' code="org.anywikidraw.twiki.TWikiDrawingApplet.class"'.
-			' width="'.(($width + 4 < 400) ? 400 : $width+4).'" height="'.(($height + 130 < 200) ? 200 : $height+130).'">'.
-				'<param name="DrawingName" value="'.$nameVal.'">'.
-				'<param name="DrawingWidth" value="'.$width.'">'.
-				'<param name="DrawingHeight" value="'.$height.'">'.
-				((-e $drawingFile) ? '<param name="DrawingURL" value="'.$downloadURL.'">' : '').
-				'<param name="PageURL" value="'."%SCRIPTURLPATH%/view%SCRIPTSUFFIX%/%WEB%/%TOPIC%".'">'.
-				'<param name="UploadURL" value="'."%SCRIPTURLPATH%/upload%SCRIPTSUFFIX%/%WEB%/%TOPIC%".'">'.
-			'</applet>'.
-			'</div>';
-	return $output;
+    my ( $fileName, $width, $height, $topic, $web ) = @_;
+
+    my $nameVal = $fileName;
+
+    my $drawingFile   = TWiki::Func::getPubDir() . "/$web/$topic/$nameVal";
+    my $downloadURL   = "%ATTACHURLPATH%/$nameVal";
+    my $scriptURLPath = "%SCRIPTURLPATH%/pack200%SCRIPTSUFFIX%";
+
+    my $output =
+        '<a name="appletdrawing"></a>'
+      . '<div style="z-index: 101;">'
+      . '<applet codebase="/" '
+      . ' archive="'
+      . $scriptURLPath
+      . '/pub/TWiki/AnyWikiDrawPlugin/AnyWikiDrawForTWiki.jar"'
+      . ' code="org.anywikidraw.twiki.TWikiDrawingApplet.class"'
+      . ' width="'
+      . ( ( $width + 4 < 400 ) ? 400 : $width + 4 )
+      . '" height="'
+      . ( ( $height + 130 < 200 ) ? 200 : $height + 130 ) . '">'
+      . '<param name="DrawingName" value="'
+      . $nameVal . '">'
+      . '<param name="DrawingWidth" value="'
+      . $width . '">'
+      . '<param name="DrawingHeight" value="'
+      . $height . '">'
+      . (
+        ( -e $drawingFile )
+        ? '<param name="DrawingURL" value="' . $downloadURL . '">'
+        : ''
+      )
+      . '<param name="PageURL" value="'
+      . "%SCRIPTURLPATH%/view%SCRIPTSUFFIX%/%WEB%/%TOPIC%" . '">'
+      . '<param name="UploadURL" value="'
+      . "%SCRIPTURLPATH%/upload%SCRIPTSUFFIX%/%WEB%/%TOPIC%" . '">'
+      . '</applet>'
+      . '</div>';
+    return $output;
 }
 
 sub _processHref {
     my ( $web, $topic, $anchor, $defweb ) = @_;
 
-    $web = $defweb unless ( $web );
-    $anchor = "" unless $anchor;
+    $web    = $defweb unless ($web);
+    $anchor = ""      unless $anchor;
 
     return "href=\"%SCRIPTURLPATH%/view%SCRIPTSUFFIX%/$web/$topic$anchor\"";
 }
-
-
-
 
 1;
 

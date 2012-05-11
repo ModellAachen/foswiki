@@ -15,7 +15,7 @@ One line description, required for extensions repository catalog.
 This plugin provides a rest handler that can replace the inbuilt ={AutoAttachPubFiles}= functionality with a batched update - 
 so you can upload (ftp, drag&drop etc) thousands of images into Foswiki's pub area, and then tell Foswiki to update the attachments to all your topics.
 
-This will allow you to SEARCH for attachments, use DBCacheContrib & DBCachePlugin, and use any other functionality that relies on the topic files containing references to the attachments.
+This will allow you to ise =viewfile= (which will refuse to serve files not in the topic Meta), SEARCH for attachments, use DBCacheContrib & DBCachePlugin, and use any other functionality that relies on the topicss containing Meta registration of attachments (as are made when attaching through the web UI). 
 
 Doing this may provide a speed advantage as it will remove the need for Foswiki to scan the requested topics' attachment directory.
 
@@ -26,15 +26,16 @@ Warning: because Foswiki does not deal well with attachments with special charac
 Warning: checking 28500 topics (many with attachments) takes around 2-3 minutes on my test system, with no plugins that have an beforeSave or afterSave handler registered.
 
 ---+++ Triggering an Attachment Update
-As this is a %SYSTEMWEB%.RestHandler based plugin, you can trigger it to run from a suitably authenticated URL (it will only update topics
+As this is a restHandler based plugin, you can trigger it to run from a suitably authenticated URL (it will only update topics
 your user as permission to edit) - for example, to update the Sandbox web
    * %SCRIPTURL{rest}%/UpdateAttachmentsPlugin/update?topic=Sandbox.WebHome
 
-Or using a cronjob - make sure the cronjob is running as the same user as Foswiki's web access is
-   * =./rest UpdateAttachmentsPlugin.update topic Sandbox.WebHome=
-   * =./rest /UpdateAttachmentsPlugin/update -topic Sandbox.WebHome -user AdminUser=
-   
 (if you get a 500 or premature end of script error, chances are your current user does not have permission to change the web or topics)
+
+
+Or using a cronjob - make sure the cronjob is running as the same user as Foswiki's web access is
+   * =./rest /UpdateAttachmentsPlugin/update -topic Sandbox.WebHome=
+   
 
 ---++ Settings
 These settings are in the configure web interface in the <nop>Update Attachments Plugin section of [[%SCRIPTURL{configure}%][configure]].
@@ -53,7 +54,7 @@ This plugin _may_ not function correctly if =$Foswiki::cfg{AutoAttachPubFiles}= 
 ---++ Plugin Info
 
 |  Plugin Author(s): | Foswiki:Main.SvenDowideit - http://fosiki.com a %PUBURL%/%WEB%/%TOPIC%/wikiringlogo20x20.png [[http://WikiRing.com][WikiRing]] founding partner  <br/> Foswiki:Main.GeorgeClark - revised for Foswiki 1.1 |
-|  Copyright: | &copy; 2008-2009 SvenDowideit@fosiki.com <br/> &copy; 2010 Foswiki Contributors |
+|  Copyright: | &copy; 2008-2012 SvenDowideit@fosiki.com <br/> &copy; 2010 Foswiki Contributors |
 |  Attachment Icon | based on eXperience Crystal, by David Christian Berg |
 |  License: | [[http://www.gnu.org/licenses/gpl.html][GPL 3 (Gnu General Public License)]] |
 |  Plugin Version: | %$VERSION% |

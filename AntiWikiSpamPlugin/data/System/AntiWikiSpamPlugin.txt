@@ -1,7 +1,6 @@
 ---+!! !AntiWikiSpamPlugin
 <!--
-One line description, required for extensions repository catalog.
-   * Set SHORTDESCRIPTION = lightweight wiki spam prevention
+   * Set SHORTDESCRIPTION = %$SHORTDESCRIPTION%
 -->
 %SHORTDESCRIPTION%
 
@@ -13,6 +12,8 @@ This plugin attempts to reduce the instance of Wiki Spam by using the
 [[http://moinmo.in/AntiSpamGlobalSolution][AntiSpamGlobalSolution]]
 regex's.  Anytime it detects that a saved page contains a string in the regex
 list, it _only_ refuses to save it.
+
+It can also check new registrations to see if the email address used matches a blacklist (or whitelist).
 
 *Major premise is not to create any unnecessary load on the server and not to use excess server resources by holding connections open.*
 
@@ -36,10 +37,26 @@ cd [foswiki-bin-directory]
 </verbatim>
    * Set the =GETLISTTIMEOUT= to a very large number so that the cron job will be the only source of updates
 
+---++ Removing User Accounts
+
+Normally user accounts should not be removed, as they represent the history of topic changes.  In addition if the WikiName is reused, the new user "assumes"
+the history of the prior user.   However, when dealing with spam registrations, it's generally recommended to remove the accounts. This plugin
+provides a REST handler that can remove user accounts from the wiki, which you can access through the following form.
+   * The User will be removed from the Mapping manager if supported
+   * The User will be removed from any groups
+   * The User topic and any attachments are moved to the %TRASHWEB% Web as =SuspectSpammer&lt;WikiName&gt;&lt;timestamp&gt;=
+*This function is only available to Administrators*
+
+<!-- %JQREQUIRE{"ui, ui::autocomplete"}% -->
+<form name="admin" action="%SCRIPTURLPATH{rest}%/AntiWikiSpamPlugin/removeUser" method="post">
+%INCLUDE{"System.JQueryAjaxHelper" section="userselector" INPUT_NAME="user" MULTI="false"}%
+<input type="submit" class="foswikiSubmit" value="Remove User" /> 
+</form>
+
 ---++ Configuration
 
 The configuration of this plugin is done using the %SCRIPTURL{"configure"}%
-tool.  There are 5 settings used to control the operation and agressiveness of
+tool.  There are 5 settings used to control the operation and aggressiveness of
 the spam filter:
 
 %TABLE{sort="off"}%
@@ -49,6 +66,11 @@ the spam filter:
 | ={Plugins}{AntiWikiSpamPlugin}{GETLISTTIMEOUT}= | Maximum age of the public regular expression list in minutes.  When age is exceeded, an updated list will be fetched | 60 |
 | ={Plugins}{AntiWikiSpamPlugin}{BypassGroup}= | A Wiki group listing members who are permitted to save without any Spam checking. Note that members of the %USERSWEB%.AdminGroup are always permitted to save. | AntiWikiSpamBypassGroup |
 | ={Plugins}{AntiWikiSpamPlugin}{HitThreshold}= | Number of regex hits required to block the save. Set to -1 to simulate operation.  | 1 |
+
+---++ Registration
+Registration is controlled by limiting the email domains that can be used by people registering to the wiki. For example, you can set up a whitelist so that only people with a corporate email address can register, or set up a blacklist to filter known email hosts that spammers use.
+
+The lists are held in topics, usually called %SYSTEMWEB%.AntiWikiSpamRegistrationWhiteList and %SYSTEMWEB%.AntiWikiSpamRegistrationWhiteList. Sample topics are provided. Each topic is a simple list of Perl regular expressions. At least one expression in the whitelist must match the email address to permit registration. If any expression in the blacklist matches, registration will be denied.
 
 ---++ Installation Instructions
 
@@ -65,16 +87,17 @@ To cause a true failure, remove the VIEW and CHANGE restrictions to the topic an
 
 
 |  Author(s): | Foswiki:Main.SvenDowideit - http://fosiki.com |
-|  Copyright: | &copy; 2005-2009 SvenDowideit@fosiki.com |
+|  Copyright: | &copy; 2005-2009 SvenDowideit@fosiki.com %BR% &copy; 2009-2012 George Clark %BR% &copy; 2012 Crawford Currie http://c-dot.co.uk |
 |  License: | [[http://www.gnu.org/licenses/gpl3.html][GPL 3 (Gnu General Public License)]] |
 |  Version: | %$VERSION% |
 |  Release: | %$RELEASE% |
 |  Change History: | <!-- versions below in reverse order -->&nbsp; |
-|  25 Apr 2011: | Foswikitask:Item1091 - add whitelist, <br />Foswikitask:Item1580 - also process comments, <br />Foswikitask:Item10680 - Improve local regex capability |
-|  4 Jan 2009: | updated for Foswiki v1.0 |
-|  4 Sep 2007: | updated to 4.2 |
-|  22 Jul 2006: | resurected it for TWiki 4.0 due to demand for a low resource AntiSpam solution |
-|  22 Aug 2005: | Initial version |
+|  1.3.2 (TBD) | Foswikitask:Item11679: When removing a user, remove it from any groups. |
+|  1.3.1 (19 Mar 2012) | Remove dialog would remove current user if entered user was not konwn to the Mapper. |
+|  1.3 (14 Mar 2012) | Foswikitask:Item11544: add white/black lists for common spam sources (Foswiki:Main.CrawfordCurrie) <br />Foswikitask:Item11646:  add remove dialog <br />Foswikitask:Item11593: Uninitialized variable |
+|  1.2 (25 Apr 2011) | Foswikitask:Item1091 - add whitelist, <br />Foswikitask:Item1580 - also process comments, <br />Foswikitask:Item10680 - Improve local regex capability |
+|  1.1 (4 Jan 2009) | updated for Foswiki v1.0 |
+|  1.0 (22 Aug 2005) | Initial version |
 |  Dependencies: | %$DEPENDENCIES% |
 |  Home page: | http://foswiki.org/bin/view/Extensions/AntiWikiSpamPlugin |
 

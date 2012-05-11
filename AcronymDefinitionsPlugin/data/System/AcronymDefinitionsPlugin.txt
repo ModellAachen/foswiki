@@ -1,0 +1,47 @@
+%META:TOPICPARENT{name="Plugins"}%
+<!--
+One line description, required for extensions repository catalog.
+   * Set SHORTDESCRIPTION = A plugin to wrap acronyms in an HTML "acronym" element with "title" attribute
+-->
+---+!! Acronym Definitions Plugin
+
+%SHORTDESCRIPTION%
+
+This plugin allows to create an "acronym definitions topic", containing a dot-point list of acronyms together with their definitions:
+
+   * GNU - GNU's not Unix
+   * FSF - Free Software Foundation
+
+which the plugin will then use to wrap all instances of those acronyms in an HTML &lt;acronym&gt; tag, with the acronym definition as the tag's 'title' text. Web browsers such as Chromium then display the definition text as a popup when one hovers the mouse pointer over the acronym.
+
+The dot-point list must be in the above format, i.e. each line must be of the form:
+
+   * [acronym] - [definition]
+
+with three leading spaces.
+
+The plugin considers an 'acronym' to be a series of at least three upper-case letters. 
+
+Learn how to create your own plugin in %SYSTEMWEB%.DevelopingPlugins.
+
+---++ Preferences
+
+Specify the acronym definition topic using the ACRONYMDEFINITIONSPLUGIN_ACRONYMDEFINITIONS preference in your SitePreferences topic, e.g.:
+
+ACRONYMDEFINITIONSPLUGIN_ACRONYMDEFINITIONS = Main.AcronymDefinitions
+
+---++ Installation
+%$INSTALL_INSTRUCTIONS%
+
+---++ Info
+
+|  Author: | AlexisHazell |
+|  Copyright: | &copy; 2011, Foswiki Contributors |
+|  License: | GPL ([[http://www.gnu.org/copyleft/gpl.html][GNU General Public License]]) |
+|  Release: | %$RELEASE% |
+|  Version: | %$VERSION% |
+|  Change&nbsp;History: | <!-- versions below in reverse order -->&nbsp; |
+|  1.0.0 (XX Mmm 20XX): | Initial version |
+|  Home: | http://foswiki.org/Extensions/%TOPIC% |
+|  Support: | http://foswiki.org/Support/%TOPIC% |
+

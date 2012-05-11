@@ -26,7 +26,8 @@
 #
 
 # =========================
-package TWiki::Plugins::XmlQueryPlugin;    # change the package name and $pluginName!!!
+package TWiki::Plugins::XmlQueryPlugin
+  ;    # change the package name and $pluginName!!!
 
 use TWiki;
 use TWiki::Func ();
@@ -36,10 +37,10 @@ use strict;
 use vars qw(
   $web $topic $user $installWeb $VERSION $RELEASE $pluginName
   $debug $activeCfgVar $initialized $readswitchon
-  $xmldir 
-  $cache 
-  $cachelimit 
-  $cacheexpires 
+  $xmldir
+  $cache
+  $cachelimit
+  $cacheexpires
   $datadir $pubdir
   $libxslt_debug
   $dbi_connections
@@ -48,45 +49,47 @@ use vars qw(
 
 BEGIN {
 
-    $pluginName   = 'XmlQueryPlugin';     # Name of this Plugin
+    $pluginName = 'XmlQueryPlugin';    # Name of this Plugin
 
     ###########################################################################
     # modify the following hash to include your database connection definations
     ###########################################################################
     $dbi_connections = {
         'xxxxx' => {
-            'DBD' =>      'dbi:mysql:database=xxxxxxxxxxxxxx;host=yyyyyyyyyyyyyy.zzzzz',
+            'DBD' =>
+              'dbi:mysql:database=xxxxxxxxxxxxxx;host=yyyyyyyyyyyyyy.zzzzz',
             'user'     => 'uuuuuuuuuuuuuuuu',
             'password' => 'pppppppppp'
         },
         'clonethis' => { 'DBD' => '', 'user' => '', 'password' => '' },
     };
     ###########################################################################
-    # Modify the following variable to allow TWiki page authors to specify 
-    # their own DBI connections instead of being limited to the above set. This 
-    # is a potential security risk depending on which DBD drivers are installed 
-    # on the instance of perl running TWiki e.g. if a DBD driver allowing access
-    # to local files is available that is a major security hole when this variable
-    # is set to 1.
+  # Modify the following variable to allow TWiki page authors to specify
+  # their own DBI connections instead of being limited to the above set. This
+  # is a potential security risk depending on which DBD drivers are installed
+  # on the instance of perl running TWiki e.g. if a DBD driver allowing access
+  # to local files is available that is a major security hole when this variable
+  # is set to 1.
     ###########################################################################
-    $allow_user_to_specify_dbi_connection=1;
-    ###########################################################################    
+    $allow_user_to_specify_dbi_connection = 1;
+    ###########################################################################
     # The following settings control the location of the auto generated XML and
     # cache files, plus size limits. Placed here as they are not suitable Plugin
     # Preferences
     ####################
-    $xmldir = undef ; # undef = use platform specific default for plugin file storage
-    $cachelimit   = 1024 * 1024 * 100 ;    # default 100 meg
-    $cacheexpires = 'never'; 
+    $xmldir =
+      undef;    # undef = use platform specific default for plugin file storage
+    $cachelimit   = 1024 * 1024 * 100;    # default 100 meg
+    $cacheexpires = 'never';
 
-    ###########################################################################    
-    # do not modify below. Settings suitable for modification can be altered via WebPreferences
-    # see Plugin documentation for more info on this
+    ###########################################################################
+# do not modify below. Settings suitable for modification can be altered via WebPreferences
+# see Plugin documentation for more info on this
     $initialized = 0;
-    $VERSION = '1.204';
-    $RELEASE = 'Dakar';
-    $debug   = 0;
-    $cache   = undef;
+    $VERSION     = '1.204';
+    $RELEASE     = 'Dakar';
+    $debug       = 0;
+    $cache       = undef;
 }
 
 # =========================
@@ -102,14 +105,18 @@ sub initPlugin {
 
     # Get plugin debug flag and other preferences
 
-    # Get plugin preferences 
-    my ($cl,$ct);
-    if( $TWiki::Plugins::VERSION < 1.1 ) {
+    # Get plugin preferences
+    my ( $cl, $ct );
+    if ( $TWiki::Plugins::VERSION < 1.1 ) {
+
         # Cairo codebase
-        $debug  = &TWiki::Func::getPreferencesFlag("\U$pluginName\E_DEBUG") || $debug;  
-    } else {
+        $debug = &TWiki::Func::getPreferencesFlag("\U$pluginName\E_DEBUG")
+          || $debug;
+    }
+    else {
+
         # Dakar codebase
-        $debug  = TWiki::Func::getPluginPreferencesFlag('DEBUG') || $debug;
+        $debug = TWiki::Func::getPluginPreferencesFlag('DEBUG') || $debug;
     }
 
     # Setup cache size limit
@@ -144,18 +151,20 @@ sub initPlugin {
     }
 
     # ensure that the XMLDIR is correctly defined
-    if (not defined $xmldir) {
-      if( $TWiki::Plugins::VERSION >= 1.1 ) {
-	# TWiki 4.0+ provides a plugin work area
-	$xmldir = TWiki::Func::getWorkArea($pluginName);
-      } else {
-	$xmldir      = '/var/tmp/twiki_xml';
-      }
-      # override xmldir if it has a Unix style path on a Windows machine
-      $xmldir  = 'c:/.twiki_xml' if $^O eq 'MSWin32' and $xmldir !~ /^\[a-z]\:/i;
+    if ( not defined $xmldir ) {
+        if ( $TWiki::Plugins::VERSION >= 1.1 ) {
+
+            # TWiki 4.0+ provides a plugin work area
+            $xmldir = TWiki::Func::getWorkArea($pluginName);
+        }
+        else {
+            $xmldir = '/var/tmp/twiki_xml';
+        }
+
+        # override xmldir if it has a Unix style path on a Windows machine
+        $xmldir = 'c:/.twiki_xml'
+          if $^O eq 'MSWin32' and $xmldir !~ /^\[a-z]\:/i;
     }
-
-
 
     # Plugin correctly initialized
     TWiki::Func::writeDebug(
@@ -167,12 +176,15 @@ sub initPlugin {
 
 # =========================
 sub commonTagsHandler {
-    TWiki::Func::writeDebug("- ${pluginName}::commonTagsHandler( $_[2] $_[1] )") if $debug;
+    TWiki::Func::writeDebug("- ${pluginName}::commonTagsHandler( $_[2] $_[1] )")
+      if $debug;
 
     return unless ( $_[0] =~ m/\%(XSLTSTART|XMLSTART)/o );
 
-    $_[0] =~ s/\n?%XSLTSTART{(.*?)}%(.*?)%XSLTEND%\s*\n?/&_handle_XSLT_tag($1,$2,$_[1],$_[2])/geos;
-    $_[0] =~ s/%XMLSTART{(.*?)}%(.*?)%XMLEND%/&_handle_XML_tag($1,$2,$_[1],$_[2])/geos;
+    $_[0] =~
+s/\n?%XSLTSTART{(.*?)}%(.*?)%XSLTEND%\s*\n?/&_handle_XSLT_tag($1,$2,$_[1],$_[2])/geos;
+    $_[0] =~
+      s/%XMLSTART{(.*?)}%(.*?)%XMLEND%/&_handle_XML_tag($1,$2,$_[1],$_[2])/geos;
 
 }
 
@@ -180,13 +192,15 @@ sub commonTagsHandler {
 sub beforeSaveHandler {
 ### my ( $text, $topic, $web ) = @_;   # do not uncomment, use $_[0], $_[1]... instead
 
-    TWiki::Func::writeDebug("- ${pluginName}::beforeSaveHandler( $_[2] $_[1] )") if $debug;
+    TWiki::Func::writeDebug("- ${pluginName}::beforeSaveHandler( $_[2] $_[1] )")
+      if $debug;
     generateXML( $_[0], $_[1], $_[2], 0 );
 }
 
 # =========================
 sub afterEditHandler {
-    TWiki::Func::writeDebug("- ${pluginName}::afterEditHandler( $_[2].$_[1] )") if $debug;
+    TWiki::Func::writeDebug("- ${pluginName}::afterEditHandler( $_[2].$_[1] )")
+      if $debug;
 
     # ensure that the cache has a copy of the previewed xml to work with
     generateXML( $_[0], $_[1], $_[2], 1 );
@@ -195,7 +209,9 @@ sub afterEditHandler {
 sub generateXML {
 
     #return if $activeCfgVar !~ /true/i;
-    TWiki::Func::writeDebug("TWiki::Plugins::XmlQueryPlugin::_generateXML  $_[1] $_[2]") if $debug;
+    TWiki::Func::writeDebug(
+        "TWiki::Plugins::XmlQueryPlugin::_generateXML  $_[1] $_[2]")
+      if $debug;
     return if not _initialize();
 
     # initize vars
@@ -206,11 +222,11 @@ sub generateXML {
     my $data = { 'metadata' => {}, 'actions' => {}, 'tables' => {} };
 
     # extract data
-    my $title    = _processTitle( $text,    $topic, $web );
+    my $title = _processTitle( $text, $topic, $web );
     my $metadata = _processMetaData( $text, $topic, $web );
-    my $actions  = _processActions( $text,  $topic, $web );
-    my $tables   = _processTables( $text,   $topic, $web );
-    my $xml      = _processXML( $text,      $topic, $web );
+    my $actions = _processActions( $text, $topic, $web );
+    my $tables = _processTables( $text, $topic, $web );
+    my $xml = _processXML( $text, $topic, $web );
 
     # build data structure to generate XML
     my $out;
@@ -229,7 +245,7 @@ sub generateXML {
     $page->{'data'} = $out;
 
     # Generate XML to temporary file
-    mkdir($xmldir)        if not -d $xmldir;
+    mkdir($xmldir) if not -d $xmldir;
     mkdir("$xmldir/$web") if not -d "$xmldir/$web";
     my $xmlfile = "$xmldir/$web/$topic.xml";
     $xmlfile .= '.preview' if defined $preview;
@@ -285,7 +301,8 @@ sub _processXML {
         $xmlargs = TWiki::Func::expandCommonVariables( $xmlargs, $topic, $web )
           if $xmlargs =~ /\%.*\%/;
         my $h = _args2hash($xmlargs);
-        $xml->[$i] = XML::Simple::XMLin( $xmltxt, KeepRoot => 1, ForceArray => 1 )
+        $xml->[$i] =
+          XML::Simple::XMLin( $xmltxt, KeepRoot => 1, ForceArray => 1 )
           if $xmltxt =~ /\<.*\>/;
         foreach my $key ( keys %$h ) {
             $xml->[$i]->{$key} = $h->{$key};
@@ -510,7 +527,9 @@ sub _handle_XSLT_tag {
 
     # process an xslt tag
     my ( $args_txt, $xslt_txt, $topic, $web ) = @_;
-    TWiki::Func::writeDebug("TWiki::Plugins::XmlQueryPlugin::_handle_XSLT_tag $web $topic ") if $debug;
+    TWiki::Func::writeDebug(
+        "TWiki::Plugins::XmlQueryPlugin::_handle_XSLT_tag $web $topic ")
+      if $debug;
     return if not _initialize();
 
     my $t0        = new Benchmark;
@@ -521,24 +540,26 @@ sub _handle_XSLT_tag {
 
     ###############################
     # read the args associated with the xslt
-    $args_txt = TWiki::Func::expandCommonVariables( $args_txt, $topic, $web ) if $args_txt =~ /\%.*\%/;
+    $args_txt = TWiki::Func::expandCommonVariables( $args_txt, $topic, $web )
+      if $args_txt =~ /\%.*\%/;
     my $args = _args2hash( $args_txt, 'urlinc' );
-    $benchmark = 1 if ( exists $args->{'benchmark'} and 
-                        lc( $args->{'benchmark'} ) eq 'on' ) or 
-                        ( exists $args->{'debug'} and 
-                          lc( $args->{'debug'} ) eq 'on' );
+    $benchmark = 1
+      if ( exists $args->{'benchmark'}
+        and lc( $args->{'benchmark'} ) eq 'on' )
+      or ( exists $args->{'debug'}
+        and lc( $args->{'debug'} ) eq 'on' );
 
     # the output of the xslt can be redirected to an attachment
     my $output_to;
-    if (exists $args->{'output'}) {
-        my $output_dir="$pubdir/$web/$topic";
-        $output_to=$args->{'output'};
-        $output_to=~s/^.*[\\\/]//g; # strip all but the basename
-        # create the content dir if it doesn't already exist
-        File::Path::mkpath($output_dir) if ! -d $output_dir; 
-        $output_to="$output_dir/$output_to";
+    if ( exists $args->{'output'} ) {
+        my $output_dir = "$pubdir/$web/$topic";
+        $output_to = $args->{'output'};
+        $output_to =~ s/^.*[\\\/]//g;    # strip all but the basename
+             # create the content dir if it doesn't already exist
+        File::Path::mkpath($output_dir) if !-d $output_dir;
+        $output_to = "$output_dir/$output_to";
     }
-    
+
     # check for a web def
     my $quiet = 0;
     $quiet = 1
@@ -547,7 +568,7 @@ sub _handle_XSLT_tag {
     my $debug_output = 0;
     $debug_output = 1
       if exists $args->{'debug'}
-      and $args->{'debug'} =~ /^(on|full)$/i;
+          and $args->{'debug'} =~ /^(on|full)$/i;
 
     # check for caching request
     my $usecache          = 1;
@@ -587,7 +608,8 @@ sub _handle_XSLT_tag {
           <$datadir/[A-Z]*>;    # find match to web
         if ( not @xw ) {
             return if $quiet;
-            return '<font color=red>Error Web '
+            return
+                '<font color=red>Error Web '
               . _escapeHTML( $args->{'web'} )
               . ' not matched </font><br>';
         }
@@ -610,7 +632,8 @@ sub _handle_XSLT_tag {
         }
         if ( $fcount == 0 ) {
             return if $quiet;
-            return '<font color=red>Error no topics for web '
+            return
+                '<font color=red>Error no topics for web '
               . _escapeHTML( $args->{'web'} )
               . ' topic '
               . _escapeHTML( $args->{'topic'} )
@@ -634,8 +657,7 @@ sub _handle_XSLT_tag {
                         push @{ $files->{$xweb}->{$atopic} }, $f;
                         if ($usecache) {
                             my @s = stat($f);
-                            $crcstr .=
-                              $s[9]
+                            $crcstr .= $s[9]
                               . ',';    # add last modified date to crc string
                         }
                         $fcount++;
@@ -660,7 +682,7 @@ sub _handle_XSLT_tag {
         foreach my $atopic ( sort keys %{ $files->{$xweb} } ) {
             $xmlstr .= "\n<topic name=\"$atopic\">\n";
 
-            # insert the topic xml, preview xml if it is available for this topic
+           # insert the topic xml, preview xml if it is available for this topic
             if (    $xweb eq $web
                 and $atopic eq $topic
                 and -r "$xmldir/$xweb/$atopic.xml.preview" )
@@ -679,7 +701,8 @@ sub _handle_XSLT_tag {
             # now include attachments
             $xmlstr .= '<attachments>' . "\n";
             foreach my $attach ( @{ $files->{$xweb}->{$atopic} } ) {
-                $xmlstr .= '<attachment name=\"' . File::Basename::basename($attach) . "\">\n";
+                $xmlstr .= '<attachment name=\"'
+                  . File::Basename::basename($attach) . "\">\n";
                 $xmlstr .= "<xi:include href=\"$attach\"/>\n";
                 $xmlstr .= '</attachment>' . "\n";
             }
@@ -735,51 +758,58 @@ sub _handle_XSLT_tag {
         eval {
             $TWiki::Plugins::XmlQueryPlugin::libxslt_debug = '';
 
-            if ($debug_output and $args->{'debug'} =~ /^full$/ ) {
+            if ( $debug_output and $args->{'debug'} =~ /^full$/ ) {
                 XML::LibXSLT->debug_callback(
-                sub {$TWiki::Plugins::XmlQueryPlugin::libxslt_debug .= join( ',', @_ ) . "<br/>\n";} );
+                    sub {
+                        $TWiki::Plugins::XmlQueryPlugin::libxslt_debug .=
+                          join( ',', @_ ) . "<br/>\n";
+                    }
+                );
             }
 
             # Setup the XML parse
             my $parser = XML::LibXML->new();
             $parser->complete_attributes(0);
-            $readswitchon=1; # allow external docs to to sourced from the filesystem
+            $readswitchon =
+              1;    # allow external docs to to sourced from the filesystem
             my $xmlcrc = String::CRC::crc($crcstr);
-            $b .= _update_benchmark( 'XML Parser Setup', $t0 )   if $benchmark;
+            $b .= _update_benchmark( 'XML Parser Setup', $t0 ) if $benchmark;
             $xml = $parser->parse_string($xmlstr);
             $b .= _update_benchmark( 'XML parse toplevel string', $t0 )
               if $benchmark;
             $parser->process_xincludes($xml);
             $b .= _update_benchmark( 'XML parse includes', $t0 ) if $benchmark;
-            
+
             # now setup the XSLT
-            $readswitchon=0; # disallow the reading of external docs on filesystem
+            $readswitchon =
+              0;    # disallow the reading of external docs on filesystem
             $parser->pedantic_parser(1) if $debug_output == 1;
             $parser->line_numbers(1)    if $debug_output == 1;
             my $style_doc = $parser->parse_string($xslt_txt);
-            $b .= _update_benchmark( 'XML parse XSLT', $t0 )      if $benchmark;
+            $b .= _update_benchmark( 'XML parse XSLT', $t0 ) if $benchmark;
             my $xslt = XML::LibXSLT->new();
-            $b .= _update_benchmark( 'XSLT Parser Setup', $t0 )   if $benchmark;
+            $b .= _update_benchmark( 'XSLT Parser Setup', $t0 ) if $benchmark;
             $stylesheet = $xslt->parse_stylesheet($style_doc);
-            $b .= _update_benchmark( 'XSLT parsed', $t0 )         if $benchmark;
-            XML::LibXSLT->debug_callback(undef) if $debug_output and $args->{'debug'} =~ /^full$/ ;
+            $b .= _update_benchmark( 'XSLT parsed', $t0 ) if $benchmark;
+            XML::LibXSLT->debug_callback(undef)
+              if $debug_output and $args->{'debug'} =~ /^full$/;
         };
 
         unlink $preview if defined $preview;
 
         if ( $@ or not defined $xml ) {
-            return          if $quiet;
+            return if $quiet;
             my $str =
                 '<table border=1><caption>XSLT ERRORS</caption>'
               . '<tr><th valign=top>Error Message</th><td><pre>'
               . _escapeHTML($@) . '<br/>'
-              . '<tr><th valign=top>Debug Trace</th><td><pre>'              
+              . '<tr><th valign=top>Debug Trace</th><td><pre>'
               . _escapeHTML($TWiki::Plugins::XmlQueryPlugin::libxslt_debug)
               . '</pre></td></tr><tr><th valign=top>XSLT</th><td><pre>'
               . _escapeHTML($xslt_txt)
               . '</pre></td></tr><tr><th valign=top>XML Includes</th>'
               . '<td><pre>'
-              . _escapeHTML( $xmlstr)
+              . _escapeHTML($xmlstr)
               . '</pre></td></tr><tr><th valign=top>XML Included</th>'
               . '<td><pre>'
               . _escapeHTML( substr( $xml->toString, 0, 9999 ) )
@@ -797,10 +827,12 @@ sub _handle_XSLT_tag {
         eval {
             if ( not scalar( keys %$args ) )
             {
+
                 # no args to pass
                 $results = $stylesheet->transform($xml);
             }
             else {
+
                 # pass args into stylesheet
                 $results =
                   $stylesheet->transform( $xml,
@@ -808,7 +840,7 @@ sub _handle_XSLT_tag {
             }
         };
         if ($@) {
-            return                     if $quiet;
+            return if $quiet;
             return "<pre>\n($@)\n<br/>" if $@;
         }
 
@@ -816,16 +848,18 @@ sub _handle_XSLT_tag {
         $result_str = $stylesheet->output_string($results);
 
         # save the result
-        $cache->set( $checksum, $result_str, $localcacheexpires ) if ( $usecache and not $debug_output );
+        $cache->set( $checksum, $result_str, $localcacheexpires )
+          if ( $usecache and not $debug_output );
 
         $b .= _update_benchmark( 'Result Cached', $t0 ) if $benchmark;
 
         # if an output file has been specified then write to that
-        if (defined $output_to) {
-            open(FH,'>',$output_to) or return "Error writing to $output_to <br/> $!";
-            flock FH, 2; # lock the file            
+        if ( defined $output_to ) {
+            open( FH, '>', $output_to )
+              or return "Error writing to $output_to <br/> $!";
+            flock FH, 2;    # lock the file
             print FH $result_str;
-            flock FH, 8; # unlock the file            
+            flock FH, 8;    # unlock the file
             close(FH);
         }
 
@@ -838,7 +872,8 @@ sub _handle_XSLT_tag {
             else {
                 $xml_string = substr( $xml->toString, 0, 9999 );
             }
-            return "<table border=1><caption>DEBUG=$args->{'debug'}</caption>"
+            return
+                "<table border=1><caption>DEBUG=$args->{'debug'}</caption>"
               . '<tr><th valign=top>XML Includes</th><td><pre>'
               . _escapeHTML($xmlstr)
               . '</pre><tr><th valign=top>XML Included</th><td><pre>'
@@ -862,7 +897,7 @@ sub _handle_XSLT_tag {
     # user requested benchmark numbers along with result
     return $result_str . "<br><b>Benchmark</b><table>$b</table>" if $benchmark;
 
-    return if defined $output_to; # no output to screen
+    return if defined $output_to;    # no output to screen
 
     # vanilla result
     return $result_str;
@@ -872,30 +907,29 @@ sub _handle_XSLT_tag {
 # these callbacks allow disabling of local file reads
 sub _callback_match_file_uri {
     my $uri = shift;
-    return $uri !~ /:\/\// or $uri =~ /^\s*file:\/\//; # handle local files
+    return $uri !~ /:\/\// or $uri =~ /^\s*file:\/\//;    # handle local files
 }
-
 
 sub _callback_open_file_uri {
     my $uri = shift;
 
     # unless the global variable $readswitchon has been set to 1 refuse to
     # read the external file
-    return 0 if not defined $readswitchon or ! $readswitchon;
+    return 0 if not defined $readswitchon or !$readswitchon;
 
     my $handler = new IO::File;
-    if ( not $handler->open( "<$uri" ) ){
+    if ( not $handler->open("<$uri") ) {
         $handler = 0;
     }
-    
+
     return $handler;
 }
 
 sub _callback_read_file_uri {
     my $handler = shift;
     my $length  = shift;
-    my $buffer = undef;
-    if ( $handler ) {
+    my $buffer  = undef;
+    if ($handler) {
         $handler->read( $buffer, $length );
     }
     return $buffer;
@@ -903,28 +937,28 @@ sub _callback_read_file_uri {
 
 sub _callback_close_file_uri {
     my $handler = shift;
-    if ( $handler ) {
+    if ($handler) {
         $handler->close();
     }
     return 1;
 }
 
-
-
 sub _update_benchmark {
     my ( $msg, $t0 ) = @_;
-    return "<tr><td>$msg:</td><td>"
+    return
+        "<tr><td>$msg:</td><td>"
       . Benchmark::timestr( Benchmark::timediff( new Benchmark, $t0 ) )
       . "</td></tr>\n";
 
 }
 
-
 sub _handle_XML_tag {
 
     # process an xml tag
     my ( $args_txt, $xml_txt, $topic, $web ) = @_;
-    TWiki::Func::writeDebug("TWiki::Plugins::XmlQueryPlugin::_handle_XML_tag $web $topic ") if $debug;
+    TWiki::Func::writeDebug(
+        "TWiki::Plugins::XmlQueryPlugin::_handle_XML_tag $web $topic ")
+      if $debug;
     return if not _initialize();
 
     # read the args associated with the xml
@@ -957,7 +991,9 @@ sub _process_xslt_url {
     my $b         = $_[3];    # this var may be modified
     my $t0        = $_[4];
 
-    TWiki::Func::writeDebug("TWiki::Plugins::XmlQueryPlugin::_process_xslt_url  ") if $debug;
+    TWiki::Func::writeDebug(
+        "TWiki::Plugins::XmlQueryPlugin::_process_xslt_url  ")
+      if $debug;
 
     if ( exists $args->{'url'} and $args->{'url'} !~ /^\s*$/ ) {
         my $ua = LWP::UserAgent->new;
@@ -967,8 +1003,10 @@ sub _process_xslt_url {
         if ( $response->is_success ) {
             my $str = $response->content;
             $_[1] = $str;
-        } else {
-            return '<font color=red>Error loading '
+        }
+        else {
+            return
+                '<font color=red>Error loading '
               . _escapeHTML( $args->{'url'} ) . '<br>'
               . $response->status_line
               . ' </font><br>';
@@ -977,8 +1015,9 @@ sub _process_xslt_url {
         $_[3] .= _update_benchmark( 'URL Get', $t0 ) if $benchmark;
     }
     else {
-        # for each  urlinc parameter get the content of the url and place it into the
-        # xml to be processed
+
+   # for each  urlinc parameter get the content of the url and place it into the
+   # xml to be processed
         if ( exists $args->{'urlinc'} ) {
             my @urls;
             if ( ref $args->{'urlinc'} eq 'ARRAY' ) {
@@ -989,80 +1028,95 @@ sub _process_xslt_url {
             }
 
             my $id = 0;
-          
+
             foreach my $url (@urls) {
                 $id++;
                 $_[1] .= "<url id=\"$id\">\n";
                 $_[1] .= "<xi:include href=\"$url\"/>\n";
                 $_[1] .= "\n</url>\n";
-             }
+            }
         }
         $_[1] .= '</twiki>';    # complete the xml;
     }
     return;
 }
 
-
 # return the xml data for a specific topic
 sub _xslt_read_topic {
-    my ($web,$topic)   = @_;
-    
-    TWiki::Func::writeDebug("TWiki::Plugins::XmlQueryPlugin::_xslt_read_topic") if $debug;
+    my ( $web, $topic ) = @_;
 
-    if (not TWiki::Func::checkAccessPermission( 'VIEW', TWiki::Func::getWikiName(), '', $topic, $web )) {
+    TWiki::Func::writeDebug("TWiki::Plugins::XmlQueryPlugin::_xslt_read_topic")
+      if $debug;
+
+    if (
+        not TWiki::Func::checkAccessPermission(
+            'VIEW', TWiki::Func::getWikiName(),
+            '', $topic, $web
+        )
+      )
+    {
         return _import_dbi_data_warning("Error cannot read $web.$topic");
     }
 
     my $filecheck = {};
     $filecheck->{$web}->{$topic} = [];
     _ensureXMLUptodate($filecheck);
-    
+
     my $parser = XML::LibXML->new();
     $readswitchon = 1;
     my $doc = $parser->parse_file("$xmldir/$web/$topic.xml");
     $readswitchon = 0;
     return $doc;
-    
+
 }
 
 # return the xml data for a specific topic
 sub _xslt_read_attachment {
-    my ($web,$topic,$attachment)   = @_;
-    
-    TWiki::Func::writeDebug("TWiki::Plugins::XmlQueryPlugin::_xslt_read_attachment") if $debug;
+    my ( $web, $topic, $attachment ) = @_;
+
+    TWiki::Func::writeDebug(
+        "TWiki::Plugins::XmlQueryPlugin::_xslt_read_attachment")
+      if $debug;
     my $file = "$pubdir/$web/$topic/$attachment";
 
-    if (not TWiki::Func::checkAccessPermission( 'VIEW', TWiki::Func::getWikiName(), '', $topic, $web ) or
-        not -r "$file") {
-        return _import_dbi_data_warning("Error cannot read $web.$topic $attachment");
+    if (
+        not TWiki::Func::checkAccessPermission( 'VIEW',
+            TWiki::Func::getWikiName(),
+            '', $topic, $web )
+        or not -r "$file"
+      )
+    {
+        return _import_dbi_data_warning(
+            "Error cannot read $web.$topic $attachment");
     }
-    
+
     my $parser = XML::LibXML->new();
     $readswitchon = 1;
     my $doc = $parser->parse_file($file);
     $readswitchon = 0;
     return $doc;
-    
-}
 
+}
 
 # return the current set of CGI parameters. Optionally filtered by a supplied set
 sub _xslt_cgi_param {
-    my $dbi_def   = shift;
-    my @cgi_args  = @_;
+    my $dbi_def  = shift;
+    my @cgi_args = @_;
 
-    TWiki::Func::writeDebug("TWiki::Plugins::XmlQueryPlugin::_xslt_cgi_param") if $debug;
+    TWiki::Func::writeDebug("TWiki::Plugins::XmlQueryPlugin::_xslt_cgi_param")
+      if $debug;
 
     # extract cgi filter parameters from values passed in
     my %cgi_filter;
     foreach my $sa (@cgi_args) {
-        if (ref $sa eq 'XML::LibXML::NodeList') {
-            while (my $str = $sa->string_value()) {
+        if ( ref $sa eq 'XML::LibXML::NodeList' ) {
+            while ( my $str = $sa->string_value() ) {
                 $cgi_filter{$str} = 1;
                 $sa->shift;
             }
-        } else {
-            $cgi_filter{$sa} = 1
+        }
+        else {
+            $cgi_filter{$sa} = 1;
         }
     }
 
@@ -1084,35 +1138,36 @@ sub _xslt_cgi_param {
     return $doc;
 }
 
-
-
 sub _xslt_dbi_select {
-    my $dbi_def   = shift;
-    my $user      = shift;
-    my $password  = shift;
-    my $sql       = shift;
-    my @sql_args  = @_;
+    my $dbi_def  = shift;
+    my $user     = shift;
+    my $password = shift;
+    my $sql      = shift;
+    my @sql_args = @_;
 
-    TWiki::Func::writeDebug("TWiki::Plugins::XmlQueryPlugin::_xslt_dbi_select  ") if $debug;
+    TWiki::Func::writeDebug(
+        "TWiki::Plugins::XmlQueryPlugin::_xslt_dbi_select  ")
+      if $debug;
 
-    my ($dbh,$error) = _dbi_connect( $dbi_def, $user, $password );
+    my ( $dbh, $error ) = _dbi_connect( $dbi_def, $user, $password );
     return $error if defined $error;
 
     # prepare select statement
     my $sth = $dbh->prepare_cached($sql)
       or return _import_dbi_data_warning(
-        "Error preparing statement $sql " . $dbh->errstr);
+        "Error preparing statement $sql " . $dbh->errstr );
 
     # extract sql parameters from values passed in
     my @sql_bind;
     foreach my $sa (@sql_args) {
-        if (ref $sa eq 'XML::LibXML::NodeList') {
-            while (my $str = $sa->string_value()) {
-                push @sql_bind,$str;
+        if ( ref $sa eq 'XML::LibXML::NodeList' ) {
+            while ( my $str = $sa->string_value() ) {
+                push @sql_bind, $str;
                 $sa->shift;
             }
-        } else {
-            push @sql_bind,$sa;
+        }
+        else {
+            push @sql_bind, $sa;
         }
     }
 
@@ -1139,7 +1194,7 @@ sub _xslt_dbi_select {
         my $i   = -1;
         foreach my $field (@$dbrow) {
             $i++;
-            my $col  = XML::LibXML::Element->new($col_names[$i]);
+            my $col = XML::LibXML::Element->new( $col_names[$i] );
             $col->appendText($field);
             $row->appendChild($col);
         }
@@ -1153,44 +1208,43 @@ sub _xslt_dbi_select {
     return $doc;
 }
 
-
-
-
-
 sub _xslt_dbi_select2 {
-    my $dbi_def   = shift;
-    my $user      = shift;
-    my $password  = shift;
-    my $sql       = shift;
-    my @sql_args  = @_;
+    my $dbi_def  = shift;
+    my $user     = shift;
+    my $password = shift;
+    my $sql      = shift;
+    my @sql_args = @_;
 
-    TWiki::Func::writeDebug("TWiki::Plugins::XmlQueryPlugin::_xslt_dbi_select  ") if $debug;
+    TWiki::Func::writeDebug(
+        "TWiki::Plugins::XmlQueryPlugin::_xslt_dbi_select  ")
+      if $debug;
 
-    my ($dbh,$error) = _dbi_connect( $dbi_def, $user, $password );
+    my ( $dbh, $error ) = _dbi_connect( $dbi_def, $user, $password );
     return $error if defined $error;
 
     # prepare select statement
     my $sth = $dbh->prepare_cached($sql)
       or return _import_dbi_data_warning(
-        "Error preparing statement $sql " . $dbh->errstr);
+        "Error preparing statement $sql " . $dbh->errstr );
 
-    # extract sql parameters from values passed in 
+    # extract sql parameters from values passed in
     my @sql_bind;
     foreach my $sa (@sql_args) {
-        if (ref $sa eq 'XML::LibXML::NodeList') {
-            while (my $str = $sa->string_value()) {
-                push @sql_bind,$str;
+        if ( ref $sa eq 'XML::LibXML::NodeList' ) {
+            while ( my $str = $sa->string_value() ) {
+                push @sql_bind, $str;
                 $sa->shift;
             }
-        } else {
-            push @sql_bind,$sa;
+        }
+        else {
+            push @sql_bind, $sa;
         }
     }
-    
+
     # execute, passing any args
     $sth->execute(@sql_bind)
       or return _import_dbi_data_warning( "Error executing statement $sql "
-          . join( ',', @sql_args ) . ' ' 
+          . join( ',', @sql_args ) . ' '
           . $dbh->errstr );
 
     #  build return doc
@@ -1210,7 +1264,7 @@ sub _xslt_dbi_select2 {
         my $i   = -1;
         foreach my $field (@$dbrow) {
             $i++;
-            $row->setAttribute( $col_names[$i], $field );        
+            $row->setAttribute( $col_names[$i], $field );
         }
         $root->appendChild($row);
     }
@@ -1218,7 +1272,7 @@ sub _xslt_dbi_select2 {
     #  cleanup
     $sth->finish;
     $dbh->disconnect;
-        
+
     return $doc;
 }
 
@@ -1229,63 +1283,66 @@ sub _xslt_dbi_block {
     my $password = shift;
     my @sql_args = @_;
 
-    TWiki::Func::writeDebug("TWiki::Plugins::XmlQueryPlugin::_xslt_dbi_block  ") if $debug;
+    TWiki::Func::writeDebug("TWiki::Plugins::XmlQueryPlugin::_xslt_dbi_block  ")
+      if $debug;
 
-    my ($dbh,$error) = _dbi_connect( $dbi_def, $user, $password );
+    my ( $dbh, $error ) = _dbi_connect( $dbi_def, $user, $password );
     return $error if defined $error;
 
     my $result = _xslt_dbi_block_exe( $dbh, @sql_args )
-      or return _import_dbi_data_warning( 'Error processing sql ' . $DBI::errstr );
+      or
+      return _import_dbi_data_warning( 'Error processing sql ' . $DBI::errstr );
 
     return $result;
 }
 
-
 # xslt function to execute a dbi->do statement
 sub _xslt_dbi_do {
-    my $dbi_def   = shift;
-    my $user      = shift;
-    my $password  = shift;
-    my $sql       = shift;
-    my @sql_args  = @_;
+    my $dbi_def  = shift;
+    my $user     = shift;
+    my $password = shift;
+    my $sql      = shift;
+    my @sql_args = @_;
 
-    TWiki::Func::writeDebug("TWiki::Plugins::XmlQueryPlugin::_xslt_dbi_do  ") if $debug;
+    TWiki::Func::writeDebug("TWiki::Plugins::XmlQueryPlugin::_xslt_dbi_do  ")
+      if $debug;
 
-    my ($dbh,$error) = _dbi_connect( $dbi_def, $user, $password );
+    my ( $dbh, $error ) = _dbi_connect( $dbi_def, $user, $password );
     return $error if defined $error;
 
     # prepare the do statement
     my $sth = $dbh->prepare_cached($sql)
       or return _import_dbi_data_warning(
-        "Error preparing statement $sql " . $dbh->errstr);
+        "Error preparing statement $sql " . $dbh->errstr );
 
     # execute the do statement with any args if available
     $sth->execute(@sql_args)
       or return _import_dbi_data_warning( "Error executing statement $sql "
-          . join( ',', @sql_args ) . ' ' 
+          . join( ',', @sql_args ) . ' '
           . $dbh->errstr );
-          
+
     # insert into return doc the number of updates made
-    my $doc  = XML::LibXML::NodeList->new();  
+    my $doc     = XML::LibXML::NodeList->new();
     my $updates = XML::LibXML::Element->new('updates');
-    my $text = XML::LibXML::Text->new( $sth->rows );
+    my $text    = XML::LibXML::Text->new( $sth->rows );
     $updates->appendChild($text);
-    $doc->push($updates);  
+    $doc->push($updates);
 
     # cleanup and return
     $sth->finish;
     $dbh->disconnect;
-    
+
     return $updates;
 }
-
 
 # Connect to the database returning a (connection,errormsg)
 sub _dbi_connect {
 
     my ( $dbi_def, $user, $password ) = @_;
 
-    TWiki::Func::writeDebug("TWiki::Plugins::XmlQueryPlugin::_dbi_connect $dbi_def $user ") if $debug;
+    TWiki::Func::writeDebug(
+        "TWiki::Plugins::XmlQueryPlugin::_dbi_connect $dbi_def $user ")
+      if $debug;
 
     # check if the dbi name actually maps to a predefined DBI connection setting
     if ( exists $dbi_connections->{$dbi_def} ) {
@@ -1299,24 +1356,34 @@ sub _dbi_connect {
             $password = $dbi_connections->{$dbi_def}->{'password'};
         }
         $dbi_def = $dbi_connections->{$dbi_def}->{'DBD'};
-    } elsif ($allow_user_to_specify_dbi_connection == 0) {
+    }
+    elsif ( $allow_user_to_specify_dbi_connection == 0 ) {
+
         # unauthorized connection do not allow to proceed
         return (
             undef,
-            _import_dbi_data_warning("Error DBI connection not authorized. Only the following connections are available: ". join(',',keys %$dbi_connections))
-            );
+            _import_dbi_data_warning(
+"Error DBI connection not authorized. Only the following connections are available: "
+                  . join( ',', keys %$dbi_connections )
+            )
+        );
     }
 
-
     # connect to DB
-    my $dbh = DBI->connect( $dbi_def, $user, $password ) or
-        return (undef,_import_dbi_data_warning('Error connecting to database ' . $DBI::errstr ));
+    my $dbh = DBI->connect( $dbi_def, $user, $password )
+      or return (
+        undef,
+        _import_dbi_data_warning(
+            'Error connecting to database ' . $DBI::errstr
+        )
+      );
 
-    TWiki::Func::writeDebug("TWiki::Plugins::XmlQueryPlugin::_dbi_connect connected") if $debug;
+    TWiki::Func::writeDebug(
+        "TWiki::Plugins::XmlQueryPlugin::_dbi_connect connected")
+      if $debug;
 
-    return ($dbh,undef);
+    return ( $dbh, undef );
 }
-
 
 # take a block of sql statements  and associated data set. Execute this
 # within a transaction block
@@ -1326,8 +1393,6 @@ sub _xslt_dbi_block_exe {
     my $affected = 0;
 
     my $doc = XML::LibXML::NodeList->new();
-
-
 
     # multiple statement execute
     foreach my $sql_arg (@sql_args) {
@@ -1352,7 +1417,7 @@ sub _xslt_dbi_block_exe {
                         $sth = $dbh->prepare_cached($sql)
                           or $dbh->rollback()
                           and return _import_dbi_data_warning(
-                            "Error preparing statement $sql " . $dbh->errstr);
+                            "Error preparing statement $sql " . $dbh->errstr );
                     }
                     else {
                         next;
@@ -1375,8 +1440,8 @@ sub _xslt_dbi_block_exe {
                           or $dbh->rollback()
                           and return _import_dbi_data_warning(
                                 "Error executing statement $sql "
-                              . join( ',', @args )
-                              . " " . $dbh->errstr );
+                              . join( ',', @args ) . " "
+                              . $dbh->errstr );
                         $affected += $sth->rows;
                     }
 
@@ -1386,7 +1451,7 @@ sub _xslt_dbi_block_exe {
                         $sth->execute()
                           or $dbh->rollback()
                           and return _import_dbi_data_warning(
-                            "Error executing statement $sql " . $dbh->errstr);
+                            "Error executing statement $sql " . $dbh->errstr );
                         $affected += $sth->rows;
                     }
                 }
@@ -1409,10 +1474,13 @@ sub _xslt_dbi_block_exe {
 }
 
 sub _import_dbi_data_warning {
-    # taking an error message return a XML doc with 1 element <error>message</error>
-    my $msg  = shift;
-        TWiki::Func::writeDebug("TWiki::Plugins::XmlQueryPlugin::_import_dbi_data_warning $msg ") if $debug;
-    
+
+# taking an error message return a XML doc with 1 element <error>message</error>
+    my $msg = shift;
+    TWiki::Func::writeDebug(
+        "TWiki::Plugins::XmlQueryPlugin::_import_dbi_data_warning $msg ")
+      if $debug;
+
     my $doc  = XML::LibXML::Document->new();
     my $root = $doc->createElement('error');
     $doc->setDocumentElement($root);
@@ -1423,7 +1491,8 @@ sub _import_dbi_data_warning {
 
 sub _escapeHTML {
     my $txt = $_[0];
-    $txt =~ s<([^\x20\x21\x23\x27-\x3b\x3d\x3F-\x5B\x5D-\x7E])><'&#'.(ord($1)).';'>seg;
+    $txt =~
+s<([^\x20\x21\x23\x27-\x3b\x3d\x3F-\x5B\x5D-\x7E])><'&#'.(ord($1)).';'>seg;
     return $txt;
 }
 
@@ -1453,7 +1522,7 @@ sub _ensureXMLUptodate {
             }
             else {
 
-                # generate xml if topic text is older than xml (within a couple of seconds)
+     # generate xml if topic text is older than xml (within a couple of seconds)
                 my @s1 = stat( $datadir . "/$web/$topic.txt" );
                 my @s2 = stat($xml_file);
                 if ( $s1[9] > $s2[9] + 1 ) {
@@ -1475,12 +1544,18 @@ sub _initialize {
 
     if ( !$initialized ) {
         foreach my $lib (
-            'XML::LibXML ()',      'XML::LibXSLT ()',
-            'XML::Simple ()',      'Benchmark',
-            'Text::ParseWords ()', 'Cache::SizeAwareFileCache ()',
-            'String::CRC ()',      'File::Basename ()',
-            'LWP::UserAgent ()',   'DBI',
-            'File::Path ()',       'IO::File ()'
+            'XML::LibXML ()',
+            'XML::LibXSLT ()',
+            'XML::Simple ()',
+            'Benchmark',
+            'Text::ParseWords ()',
+            'Cache::SizeAwareFileCache ()',
+            'String::CRC ()',
+            'File::Basename ()',
+            'LWP::UserAgent ()',
+            'DBI',
+            'File::Path ()',
+            'IO::File ()'
           )
         {
             eval "use $lib;";
@@ -1492,28 +1567,28 @@ sub _initialize {
 
         # one time register perl functions within the XSLT engine
         XML::LibXSLT->register_function( "http://twiki.org/xmlquery",
-            "dbiselect",  \&_xslt_dbi_select );
+            "dbiselect", \&_xslt_dbi_select );
         XML::LibXSLT->register_function( "http://twiki.org/xmlquery",
             "dbiselect2", \&_xslt_dbi_select2 );
-        XML::LibXSLT->register_function( "http://twiki.org/xmlquery", 
-            "dbido",      \&_xslt_dbi_do );
+        XML::LibXSLT->register_function( "http://twiki.org/xmlquery", "dbido",
+            \&_xslt_dbi_do );
         XML::LibXSLT->register_function( "http://twiki.org/xmlquery",
-            "dbiblock",   \&_xslt_dbi_block );
+            "dbiblock", \&_xslt_dbi_block );
         XML::LibXSLT->register_function( "http://twiki.org/xmlquery",
-            "cgiparam",   \&_xslt_cgi_param );
+            "cgiparam", \&_xslt_cgi_param );
         XML::LibXSLT->register_function( "http://twiki.org/xmlquery",
-            "readattachment",   \&_xslt_read_attachment );
+            "readattachment", \&_xslt_read_attachment );
         XML::LibXSLT->register_function( "http://twiki.org/xmlquery",
-            "readtopic",   \&_xslt_read_topic );
+            "readtopic", \&_xslt_read_topic );
 
         # enable the switch off of reading local files within xslt
         $XML::LibXML::match_cb = \&_callback_match_file_uri;
         $XML::LibXML::read_cb  = \&_callback_read_file_uri;
         $XML::LibXML::open_cb  = \&_callback_open_file_uri;
         $XML::LibXML::close_cb = \&_callback_close_file_uri;
-            
-        # Each of the following though useful once in a while for debug 
-        # are Very, Very Slow    
+
+        # Each of the following though useful once in a while for debug
+        # are Very, Very Slow
         #XML::LibXSLT->debug_callback(
         #    sub {
         #        $TWiki::Plugins::XmlQueryPlugin::libxslt_debug .=

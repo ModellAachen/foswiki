@@ -4,7 +4,7 @@
 # Copyright (C) 2001-2004 Peter Thoeny, peter@thoeny.com
 # Copyright (C) Vito Miliano, ZacharyHamm, JohannesMartin, DiabJerius
 # Copyright (C) 2004 Martin Cleaver, Martin.Cleaver@BCS.org.uk
-# Copyright (C) 2009 - 2011 Andrew Jones, http://andrew-jones.com 
+# Copyright (C) 2009 - 2011 Andrew Jones, http://andrew-jones.com
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -36,9 +36,10 @@ use vars qw(
 
 our $VERSION = '$Rev$';
 our $RELEASE = '1.3';
-our $SHORTDESCRIPTION = 'Attach multiple files at once by uploading a zip archive';
+our $SHORTDESCRIPTION =
+  'Attach multiple files at once by uploading a zip archive';
 our $NO_PREFS_IN_TOPIC = 1;
-our $pluginName = 'BatchUploadPlugin';
+our $pluginName        = 'BatchUploadPlugin';
 
 BEGIN {
 
@@ -59,11 +60,14 @@ sub initPlugin {
 
     $pluginEnabled = Foswiki::Func::getPluginPreferencesValue("ENABLED") || 0;
 
-    $importFileComments = Foswiki::Func::getPluginPreferencesFlag("IMPORTFILECOMMENTS") || 1;
-    $fileCommentFlags = Foswiki::Func::getPluginPreferencesFlag("FILECOMMENTFLAGS") || 1;
+    $importFileComments =
+      Foswiki::Func::getPluginPreferencesFlag("IMPORTFILECOMMENTS") || 1;
+    $fileCommentFlags =
+      Foswiki::Func::getPluginPreferencesFlag("FILECOMMENTFLAGS") || 1;
 
     # Plugin correctly initialized
-    Foswiki::Func::writeDebug("- ${pluginName}::initPlugin( $web.$topic ) is OK")
+    Foswiki::Func::writeDebug(
+        "- ${pluginName}::initPlugin( $web.$topic ) is OK")
       if $debug;
 
     return 1;
@@ -80,7 +84,7 @@ attachments get lost.
 sub beforeUploadHandler {
     my ( $attrHashRef, $meta ) = @_;
     my $topic = $meta->topic();
-    my $web = $meta->web();
+    my $web   = $meta->web();
 
     Foswiki::Func::writeDebug(
 "- ${pluginName}::beforeAttachmentSaveHandler( $_[2].$_[1] - attachment: $attrHashRef->{attachment})"
@@ -88,12 +92,13 @@ sub beforeUploadHandler {
 
     my $cgiQuery = Foswiki::Func::getCgiQuery();
     return if ( !$pluginEnabled );
-    
+
     my $batchupload = $cgiQuery->param('batchupload') || '';
-    
-    return if ( ( $Foswiki::cfg{Plugins}{$pluginName}{usercontrol} ) 
-                && ( $batchupload ne 'on' ) );
-    
+
+    return
+      if ( ( $Foswiki::cfg{Plugins}{$pluginName}{usercontrol} )
+        && ( $batchupload ne 'on' ) );
+
     my $attachmentName = $attrHashRef->{attachment};
 
     return if ( !isZip($attachmentName) );
@@ -105,12 +110,14 @@ sub beforeUploadHandler {
         "$pluginName - $attachmentName has stack depth $stackDepth")
       if $debug;
     $stackDepth++;
-    
+
     my $result = updateAttachment(
-        $web, $topic, $attachmentName,
+        $web,
+        $topic,
+        $attachmentName,
         $attrHashRef->{"stream"},
         $attrHashRef->{"comment"},
-        $cgiQuery->param('hidefile') || '',
+        $cgiQuery->param('hidefile')   || '',
         $cgiQuery->param('createlink') || ''
     );
 
@@ -120,13 +127,14 @@ sub beforeUploadHandler {
                 "$pluginName - Result stack: " . $stack->{$attachmentName} )
               if $debug;
             my $url = Foswiki::Func::getViewUrl( $web, $topic );
-            
+
             Foswiki::Func::redirectCgiQuery( undef, $url );
-            
-            # SMELL: bit of a hack?
-            # user won't see this, but if left out the zip file will be attached, overwriting the unzipped files
-            #exit 0; this just returns a blank page to the user, not very good...
-            throw Error::Simple( 'Do not save zip file!' ); # this seems to work fine, the user gets returned to their viewed page and the unzipped files do not get overwritten. Presumably it is caught somewhere higher up.
+
+# SMELL: bit of a hack?
+# user won't see this, but if left out the zip file will be attached, overwriting the unzipped files
+#exit 0; this just returns a blank page to the user, not very good...
+            throw Error::Simple('Do not save zip file!')
+              ; # this seems to work fine, the user gets returned to their viewed page and the unzipped files do not get overwritten. Presumably it is caught somewhere higher up.
         }
     }
 
@@ -183,7 +191,7 @@ sub updateAttachment {
     # Archive::Zip extractMemberWithoutPaths() ignores the path given to it and
     # tries to just write the file to the current directory.
     chdir($tempDir);
-      
+
     Foswiki::Func::writeDebug("$pluginName - Created temp dir $tempDir")
       if $debug;
 
@@ -191,7 +199,7 @@ sub updateAttachment {
 
     # Loop through processed files.
     foreach my $fileNameKey ( sort keys %processedFiles ) {
-        my $fileName = $processedFiles{$fileNameKey}->{name};
+        my $fileName    = $processedFiles{$fileNameKey}->{name};
         my $tmpFilename = $fileNameKey;
 
         my ( $fileSize, $fileUser, $fileDate, $fileVersion ) = "";
@@ -203,15 +211,16 @@ sub updateAttachment {
         # use current time for upload
         $fileDate = time();
 
-        # use the upload form values only if these settings have not been specified in the zip file comment
-        my $hideFile = $processedFiles{$fileNameKey}->{hide} || $hideFlag;
+# use the upload form values only if these settings have not been specified in the zip file comment
+        my $hideFile = $processedFiles{$fileNameKey}->{hide}       || $hideFlag;
         my $linkFile = $processedFiles{$fileNameKey}->{createlink} || $linkFlag;
 
-        # attachment inherits the zip file comment; if none given, the the upload form comment is used
-        # (last resort is a hardcoded, non-localized comment)
+# attachment inherits the zip file comment; if none given, the the upload form comment is used
+# (last resort is a hardcoded, non-localized comment)
         my $tmpFileComment = $processedFiles{$fileNameKey}->{comment};
         $tmpFileComment = $fileComment unless $tmpFileComment;
-        $tmpFileComment = "Extracted from $originalZipName" unless $tmpFileComment;
+        $tmpFileComment = "Extracted from $originalZipName"
+          unless $tmpFileComment;
 
         Foswiki::Func::writeDebug(
 "$pluginName - Trying to attach: fileName=$fileName, fileSize=$fileSize, fileDate=$fileDate, fileComment=$tmpFileComment, tmpFilename=$tmpFilename"
@@ -232,7 +241,8 @@ sub updateAttachment {
         );
 
         if ( $result eq $fileName ) {
-            Foswiki::Func::writeDebug("$pluginName - Attaching $fileName went OK")
+            Foswiki::Func::writeDebug(
+                "$pluginName - Attaching $fileName went OK")
               if $debug;
         }
         else {
@@ -264,7 +274,10 @@ sub doUnzip {
 
     my ( $tempDir, $zip ) = @_;
 
-    my ( @memberNames, $fileName, $fileComment, $hideFile, $linkFile, $member, $buffer, %good, $zipRet );
+    my (
+        @memberNames, $fileName, $fileComment, $hideFile, $linkFile,
+        $member,      $buffer,   %good,        $zipRet
+    );
 
     @memberNames = $zip->memberNames();
 
@@ -278,28 +291,33 @@ sub doUnzip {
 
         # Make filename safe:
         my $origFileName;
-        ( $fileName, $origFileName ) = Foswiki::Sandbox::sanitizeAttachmentName( $fileName );
+        ( $fileName, $origFileName ) =
+          Foswiki::Sandbox::sanitizeAttachmentName($fileName);
 
         $hideFile = undef;
         $linkFile = undef;
         if ( $importFileComments || $fileCommentFlags ) {
-            # determine file comment
-            # search comment for prefixes "-/+L", "-/+H" ((don't) insert link/hide attachment)
-            # NB we don't allow whitespace between flags, only last setting of each flag type counts
+
+# determine file comment
+# search comment for prefixes "-/+L", "-/+H" ((don't) insert link/hide attachment)
+# NB we don't allow whitespace between flags, only last setting of each flag type counts
             $fileComment = $member->fileComment();
-            if ($fileCommentFlags && ($fileComment =~ /^\s*([+-][hl])+(\s.+|$)/i)) {
+            if ( $fileCommentFlags
+                && ( $fileComment =~ /^\s*([+-][hl])+(\s.+|$)/i ) )
+            {
                 $fileComment =~ s/^\s+//;
-                while ($fileComment =~ /^([+-][hl])(.*)$/i) {
+                while ( $fileComment =~ /^([+-][hl])(.*)$/i ) {
                     my $options = $1;
                     $fileComment = $2;
 
-                    my $opval = substr($options, 0, 1);
-		    $opval =~ tr/+-/10/;
+                    my $opval = substr( $options, 0, 1 );
+                    $opval =~ tr/+-/10/;
 
-                    my $opkey = uc(substr($options, 1, 1));
-                    if ($opkey eq "H") {
+                    my $opkey = uc( substr( $options, 1, 1 ) );
+                    if ( $opkey eq "H" ) {
                         $hideFile = $opval;
-                    } else {
+                    }
+                    else {
                         $linkFile = $opval;
                     }
                 }
@@ -308,7 +326,7 @@ sub doUnzip {
             if ( !$importFileComments ) {
                 $fileComment = undef;
             }
-	    
+
         }
 
         if ( $debug && ( $fileName ne $origFileName ) ) {
@@ -350,7 +368,7 @@ sub openZipSanityCheck {
 
     my ( $archive, $webName, $topic, $realname ) = @_;
     my ( $lowerCase, $noSpaces, $noredirect ) = ( 0, 0, 0 );
-    bless $archive, 'IO::File'; # needs to be seekable, so bless into IO::File
+    bless $archive, 'IO::File';   # needs to be seekable, so bless into IO::File
     my $zip = Archive::Zip->new();
     my ( @memberNames, $fileName, $member, %dupCheck, $sizeLimit );
 

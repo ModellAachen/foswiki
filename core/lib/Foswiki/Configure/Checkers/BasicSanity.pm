@@ -152,7 +152,7 @@ HERE
     # 'uninitialised variable' alerts later.
     foreach my $var (
         qw( DataDir DefaultUrlHost PubUrlPath
-        PubDir TemplateDir ScriptUrlPath LocalesDir )
+        PubDir TemplateDir ScriptUrlPath LocalesDir SafeEnvPath )
       )
     {
 
@@ -160,22 +160,19 @@ HERE
         $Foswiki::cfg{$var} = 'NOT SET' unless defined $Foswiki::cfg{$var};
     }
 
-    # Make %ENV safer for CGI
+    # Make %ENV safer for CGI - Assign a safe default for SafeEnvPath
     $Foswiki::cfg{DETECTED}{originalPath} = $ENV{PATH} || '';
-    unless ( $Foswiki::cfg{SafeEnvPath} ) {
 
-        # Grab the current path
-        if ( defined( $ENV{PATH} ) ) {
-            $ENV{PATH} =~ /(.*)/;
-            $Foswiki::cfg{SafeEnvPath} = $1;
-        }
-        else {
+    if ( $Foswiki::cfg{SafeEnvPath} eq 'NOT SET' ) {
 
-            # Can't guess
-            $Foswiki::cfg{SafeEnvPath} = '';
-        }
+        # SMELL:  Untaint to get past the first run.  It will be
+        # Overridden to the SafeEnvPath after first save
+        ( $ENV{PATH} ) = $ENV{PATH} =~ m/^(.*)$/;
     }
-    $ENV{PATH} = $Foswiki::cfg{SafeEnvPath};
+    else {
+        $ENV{PATH} = $Foswiki::cfg{SafeEnvPath};
+    }
+
     delete @ENV{qw( IFS CDPATH ENV BASH_ENV )};
 
     return $result;

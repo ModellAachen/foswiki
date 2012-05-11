@@ -41,8 +41,6 @@ our $NO_PREFS_IN_TOPIC = 1;
 
 my $STORE_FILENAME = 'field_data.txt';
 
-
-
 my %sortInputTable = (
     'none' => $Foswiki::Plugins::TopicDataHelperPlugin::sortDirections{'NONE'},
     'ascending' =>
@@ -71,17 +69,19 @@ sub initPlugin {
 
     # Get plugin preferences
     $defaultFormat =
-         Foswiki::Func::getPreferencesValue('FORMFIELDLISTPLUGIN_DEFAULT_FORMAT')
+      Foswiki::Func::getPreferencesValue('FORMFIELDLISTPLUGIN_DEFAULT_FORMAT')
       || $defaultFormat;
     $defaultFormat =~ s/^[\\n]+//;    # Strip off leading \n
 
     # Get plugin debug flag
     $debug = Foswiki::Func::getPreferencesFlag('FORMFIELDLISTPLUGIN_DEBUG');
 
-    Foswiki::Func::registerTagHandler( 'FORMFIELDLIST', \&_handleFormFieldList );
+    Foswiki::Func::registerTagHandler( 'FORMFIELDLIST',
+        \&_handleFormFieldList );
 
     # Plugin correctly initialized
-    _debug("Foswiki::Plugins::${pluginName}::initPlugin( $inWeb.$inTopic ) is OK");
+    _debug(
+        "Foswiki::Plugins::${pluginName}::initPlugin( $inWeb.$inTopic ) is OK");
 
     return 1;
 }
@@ -121,7 +121,7 @@ sub _handleFormFieldList {
     my $properties = {};
     $properties->{includeMissingFields} = $inParams->{'doIncludeMissingFields'},
       $properties->{formFields}         = $formFieldsHash;
-      $properties->{sortParam}          = $inParams->{'sort'};
+    $properties->{sortParam} = $inParams->{'sort'};
 
     Foswiki::Plugins::TopicDataHelperPlugin::insertObjectData( $topicData,
         \&_createFormFieldData, $properties );
@@ -135,9 +135,10 @@ sub _handleFormFieldList {
     $fields = _sortFields( $fields, $inParams );
 
     # limit files if param limit is defined
-    if (defined $inParams->{'limit'}) {
-		splice @$fields, $inParams->{'limit'} if (scalar @$fields > $inParams->{'limit'});
-	} 
+    if ( defined $inParams->{'limit'} ) {
+        splice @$fields, $inParams->{'limit'}
+          if ( scalar @$fields > $inParams->{'limit'} );
+    }
 
     # format
     my $formatted = _formatFormFieldData( $fields, $inParams );
@@ -146,27 +147,27 @@ sub _handleFormFieldList {
 }
 
 sub _populateOrderingFromFormDefinition {
-  my ( $web, $topic, $existing ) = @_;
+    my ( $web, $topic, $existing ) = @_;
 
-  my $topicObject = Foswiki::Meta->load(
-      $Foswiki::Plugins::SESSION, $web, $topic);
-  my $startPosition = 1;
-  my %orderedFields = %$existing;
+    my $topicObject =
+      Foswiki::Meta->load( $Foswiki::Plugins::SESSION, $web, $topic );
+    my $startPosition = 1;
+    my %orderedFields = %$existing;
 
-  while ( my ($field, $order) = each %$existing ) {
-      if ($order >= $startPosition) {
-          $startPosition = $order + 1;
-      }
-  }
-  my @fields = $topicObject->find('FIELD');
-  my $index = $startPosition;
-  foreach my $fieldref (@fields) {
-      my %field = %$fieldref;
-      $orderedFields{$field{name}} = $index;
-      $index = $index + 1;
-  }
+    while ( my ( $field, $order ) = each %$existing ) {
+        if ( $order >= $startPosition ) {
+            $startPosition = $order + 1;
+        }
+    }
+    my @fields = $topicObject->find('FIELD');
+    my $index  = $startPosition;
+    foreach my $fieldref (@fields) {
+        my %field = %$fieldref;
+        $orderedFields{ $field{name} } = $index;
+        $index = $index + 1;
+    }
 
-  return \%orderedFields;
+    return \%orderedFields;
 }
 
 =pod
@@ -186,14 +187,16 @@ topic => {
 sub _createFormFieldData {
     my ( $inTopicHash, $inWeb, $inTopic, $inProperties ) = @_;
 
-	_debug("FormFieldListPlugin::_createFormFieldData");
-	
+    _debug("FormFieldListPlugin::_createFormFieldData");
+
     my $formFieldsHash       = $inProperties->{formFields};
     my $includeMissingFields = $inProperties->{includeMissingFields};
 
-    if ( defined $inProperties->{sortParam} and ($inProperties->{sortParam} eq '$fieldDefinition' ) ) {
-        $formFieldsHash = 
-            _populateOrderingFromFormDefinition($inWeb, $inTopic, $formFieldsHash);
+    if ( defined $inProperties->{sortParam}
+        and ( $inProperties->{sortParam} eq '$fieldDefinition' ) )
+    {
+        $formFieldsHash = _populateOrderingFromFormDefinition( $inWeb, $inTopic,
+            $formFieldsHash );
     }
 
     # define value for topic key only if topic
@@ -206,18 +209,21 @@ sub _createFormFieldData {
         foreach my $field (@$fields) {
             my $fd =
               _createFormFieldDataObject( $inWeb, $inTopic, $field,
-                $field->{name}, $formFieldsHash);
+                $field->{name}, $formFieldsHash );
             $inTopicHash->{$inTopic}{ $field->{name} } = $fd;
         }
     }
     else {
+
         # no META:FIELD, so remove from hash
         _debug("\t topic '$inTopic' has no META:FIELD, so remove from hash");
         delete $inTopicHash->{$inTopic};
     }
 
     if ($includeMissingFields) {
-        _debug("\t list empty values, even if they are not in the listed FIELDs");
+        _debug(
+            "\t list empty values, even if they are not in the listed FIELDs");
+
         # list empty values, even if they are not in the listed FIELDs
         # if so, create fields and mark as 'notfound'
         while ( ( my $expectedFieldName, my $expectedOrder ) =
@@ -226,7 +232,7 @@ sub _createFormFieldData {
             my $currentFd = $inTopicHash->{$inTopic}{$expectedFieldName};
             if ( !defined $currentFd ) {
                 my $fd = _createFormFieldDataObject( $inWeb, $inTopic, undef,
-                    $expectedFieldName, $inProperties);
+                    $expectedFieldName, $inProperties );
                 $$fd->{notfound}                             = 1;
                 $inTopicHash->{$inTopic}                     = ();
                 $inTopicHash->{$inTopic}{$expectedFieldName} = $fd;
@@ -244,16 +250,16 @@ Returns a reference to a new FormFieldData object.
 sub _createFormFieldDataObject {
     my ( $inWeb, $inTopic, $inField, $inName, $inFormFieldsHash ) = @_;
 
-    my $fd =
-      Foswiki::Plugins::FormFieldListPlugin::FormFieldData->new( $inWeb, $inTopic,
-        $inField, $inName );
+    my $fd = Foswiki::Plugins::FormFieldListPlugin::FormFieldData->new( $inWeb,
+        $inTopic, $inField, $inName );
 
     my $order = $$inFormFieldsHash{$inName} || 0;
     $fd->{order} = $order;
 
-    my ( $revDate, $author, $rev, $comment ) = Foswiki::Func::getRevisionInfo( $inWeb, $inTopic );
+    my ( $revDate, $author, $rev, $comment ) =
+      Foswiki::Func::getRevisionInfo( $inWeb, $inTopic );
     my $wikiUserName = Foswiki::Func::userToWikiName( $author, 1 );
-            
+
     $fd->{user} = $wikiUserName;
     $fd->setTopicDate($revDate);
 
@@ -270,22 +276,23 @@ Called function remove topic data references in the hash.
 sub _filterTopicData {
     my ( $inTopicData, $inParams ) = @_;
 
-	use Data::Dumper;
-	_debug("FormFieldListPlugin::_filterTopicData - inParams=" . Dumper($inParams));
+    use Data::Dumper;
+    _debug( "FormFieldListPlugin::_filterTopicData - inParams="
+          . Dumper($inParams) );
 
     # ----------------------------------------------------
     # filter included/excluded field names
     my $fields = $inParams->{'field'} || $inParams->{_DEFAULT} || undef;
-    
+
     if ( defined $fields || defined $inParams->{'excludefield'} ) {
-    	_debug("\t filter on 'field' or 'excludefield'");
+        _debug("\t filter on 'field' or 'excludefield'");
         Foswiki::Plugins::TopicDataHelperPlugin::filterTopicDataByProperty(
             $inTopicData, 'name', 1, $fields, $inParams->{'excludefield'} );
     }
     if (   defined $inParams->{'includefieldpattern'}
         || defined $inParams->{'excludefieldpattern'} )
     {
-    	_debug("\t filter on 'includefieldpattern' or 'excludefieldpattern'");
+        _debug("\t filter on 'includefieldpattern' or 'excludefieldpattern'");
         Foswiki::Plugins::TopicDataHelperPlugin::filterTopicDataByRegexMatch(
             $inTopicData, 'name',
             $inParams->{'includefieldpattern'},
@@ -295,7 +302,7 @@ sub _filterTopicData {
 
     # exclude fields with no value
     if ( $inParams->{'doExcludeEmptyValues'} ) {
-    	_debug("\t filter on 'value'");
+        _debug("\t filter on 'value'");
         Foswiki::Plugins::TopicDataHelperPlugin::filterTopicDataByProperty(
             $inTopicData,
             'value',
@@ -310,7 +317,7 @@ sub _filterTopicData {
     if (   defined $inParams->{'includevalue'}
         || defined $inParams->{'excludevalue'} )
     {
-    	_debug("\t filter on 'includevalue' or 'excludevalue'");
+        _debug("\t filter on 'includevalue' or 'excludevalue'");
         Foswiki::Plugins::TopicDataHelperPlugin::filterTopicDataByProperty(
             $inTopicData, 'value', 1,
             $inParams->{'includevalue'},
@@ -320,7 +327,7 @@ sub _filterTopicData {
     if (   defined $inParams->{'includevaluepattern'}
         || defined $inParams->{'excludevaluepattern'} )
     {
-    	_debug("\t filter on 'includevaluepattern' or 'excludevaluepattern'");
+        _debug("\t filter on 'includevaluepattern' or 'excludevaluepattern'");
         Foswiki::Plugins::TopicDataHelperPlugin::filterTopicDataByRegexMatch(
             $inTopicData, 'value',
             $inParams->{'includevaluepattern'},
@@ -331,7 +338,7 @@ sub _filterTopicData {
     # ----------------------------------------------------
     # filter fields by user
     if ( defined $inParams->{'user'} || defined $inParams->{'excludeuser'} ) {
-    	_debug("\t filter on 'user' or 'excludeuser'");
+        _debug("\t filter on 'user' or 'excludeuser'");
         Foswiki::Plugins::TopicDataHelperPlugin::filterTopicDataByProperty(
             $inTopicData, 'user', 1, $inParams->{'user'},
             $inParams->{'excludeuser'} );
@@ -340,14 +347,14 @@ sub _filterTopicData {
     # ----------------------------------------------------
     # filter fields by date range
     if ( defined $inParams->{'fromdate'} || defined $inParams->{'todate'} ) {
-    	_debug("\t filter on 'fromdate' or 'todate'");
+        _debug("\t filter on 'fromdate' or 'todate'");
         Foswiki::Plugins::TopicDataHelperPlugin::filterTopicDataByDateRange(
             $inTopicData, $inParams->{'fromdate'},
             $inParams->{'todate'} );
     }
 
-	use Data::Dumper;
-	_debug("\t inTopicData==" . Dumper($inTopicData));
+    use Data::Dumper;
+    _debug( "\t inTopicData==" . Dumper($inTopicData) );
 }
 
 =pod
@@ -360,7 +367,7 @@ sub _updateFieldDatesWithCache {
     my ($inFields) = @_;
 
     _debug("FormFieldListPlugin::_updateFieldDatesWithCache");
-    
+
     my @cacheList = split( "\n", _readWorkFile($STORE_FILENAME) );
     my $cacheNeedsUpdate = 0;
     if ( !scalar @cacheList ) {
@@ -369,7 +376,7 @@ sub _updateFieldDatesWithCache {
         _debug("\t no cache file exists yet");
         $cacheNeedsUpdate = 1;
 
-        foreach my $field (@{$inFields}) {
+        foreach my $field ( @{$inFields} ) {
             my $newFieldLine = $field->stringify();
             push @cacheList, $newFieldLine;
         }
@@ -396,7 +403,7 @@ sub _updateFieldDatesWithCache {
         }
 
         # now compare fields with cache
-        foreach my $field (@{$inFields}) {
+        foreach my $field ( @{$inFields} ) {
             my $web       = $field->{web};
             my $topic     = $field->{topic};
             my $fieldName = $field->{name};
@@ -406,7 +413,9 @@ sub _updateFieldDatesWithCache {
             if ( !defined $cachedValue ) {
 
                 # add entry to cache
-                _debug("\t add entry to cache for topic:$topic, field name:$fieldName");
+                _debug(
+"\t add entry to cache for topic:$topic, field name:$fieldName"
+                );
                 $cacheNeedsUpdate = 1;
                 my $newFieldLine = $field->stringify();
                 push @cacheList, $newFieldLine;
@@ -417,7 +426,9 @@ sub _updateFieldDatesWithCache {
                 if ( $cachedValue ne $field->{'value'} ) {
 
                     # value has changed, update cache
-                    _debug("\t value has changed, update cache for topic:$topic, field name:$fieldName, value:$cachedValue; new value:$field->{'value'}");
+                    _debug(
+"\t value has changed, update cache for topic:$topic, field name:$fieldName, value:$cachedValue; new value:$field->{'value'}"
+                    );
                     $field->setFieldDate( $field->{date} );
                     $cacheNeedsUpdate = 1;
                     my $updatedFieldLine = $field->stringify();
@@ -427,7 +438,9 @@ sub _updateFieldDatesWithCache {
                 else {
 
                     # value unchanged, use cached date
-                    _debug("\t value unchanged, use cached date for topic:$topic, field name:$fieldName, value:$cachedValue");
+                    _debug(
+"\t value unchanged, use cached date for topic:$topic, field name:$fieldName, value:$cachedValue"
+                    );
                     my $date = $lookup{$web}{$topic}{$fieldName}{'date'};
                     $field->{fieldDate} = $date;
                 }
@@ -490,9 +503,9 @@ sub _sortFields {
 
     # translate input to sort parameters
     my $sortOrderParam = $inParams->{'sortorder'} || 'none';
-    my $sortOrder = $sortInputTable{$sortOrderParam} ||
-        $Foswiki::Plugins::TopicDataHelperPlugin::sortDirections{'NONE'};
-    
+    my $sortOrder = $sortInputTable{$sortOrderParam}
+      || $Foswiki::Plugins::TopicDataHelperPlugin::sortDirections{'NONE'};
+
     # set default sort order for sort modes
     if ( $sortOrder ==
         $Foswiki::Plugins::TopicDataHelperPlugin::sortDirections{'NONE'} )
@@ -502,12 +515,15 @@ sub _sortFields {
         {
 
             # exception for dates: newest on top
-            $sortOrder = $Foswiki::Plugins::TopicDataHelperPlugin::sortDirections{
+            $sortOrder =
+              $Foswiki::Plugins::TopicDataHelperPlugin::sortDirections{
                 'DESCENDING'};
-        } else {
+        }
+        else {
 
             # otherwise sort by default ascending
-            $sortOrder = $Foswiki::Plugins::TopicDataHelperPlugin::sortDirections{
+            $sortOrder =
+              $Foswiki::Plugins::TopicDataHelperPlugin::sortDirections{
                 'ASCENDING'};
         }
     }
@@ -550,7 +566,7 @@ sub _formatFormFieldData {
 
     my $count = 0;
 
-    foreach my $field (@{$inFields}) {
+    foreach my $field ( @{$inFields} ) {
 
         my $s     = "$format";
         my $value = $field->{value};
@@ -629,10 +645,12 @@ sub _getFormFieldsInTopic {
 
     my ( $meta, $text ) = Foswiki::Func::readTopic( $inWeb, $inTopic );
     my @formFieldData = $meta->find('FIELD');
-    
+
     use Data::Dumper;
-    _debug("FormFieldListPlugin::_getFormFieldsInTopic - $inWeb.$inTopic; fields=" . Dumper(@formFieldData) );
-    
+    _debug(
+        "FormFieldListPlugin::_getFormFieldsInTopic - $inWeb.$inTopic; fields="
+          . Dumper(@formFieldData) );
+
     return ( \@formFieldData, $meta );
 }
 

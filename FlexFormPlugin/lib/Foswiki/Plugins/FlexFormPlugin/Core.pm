@@ -1,6 +1,6 @@
 # Plugin for Foswiki - The Free and Open Source Wiki, http://foswiki.org/
 # 
-# Copyright (C) 2009-2011 Michael Daum http://michaeldaumconsulting.com
+# Copyright (C) 2009-2012 Michael Daum http://michaeldaumconsulting.com
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -113,6 +113,7 @@ sub handleRENDERFORDISPLAY {
   ($thisWeb, $thisTopic) = Foswiki::Func::normalizeWebTopicName($thisWeb, $thisTopic);
   my $topicObj = getTopicObject($session, $thisWeb, $thisTopic); 
 
+  $theForm = $session->{request}->param('formtemplate') unless defined $theForm;
   $theForm = $topicObj->getFormName unless defined $theForm;
   return '' unless $theForm;
 
@@ -194,6 +195,23 @@ sub handleRENDERFORDISPLAY {
       }
     }
 
+    my $fieldOrigAllowedValues = '';
+    if ($field->can('getOptions')) {
+      #writeDebug("can getOptions");
+      my $options = $field->getOptions();
+      if ($options) {
+        #writeDebug("options=$options");
+        $fieldOrigAllowedValues = join($theValueSep, @$options);
+      }
+    } else {
+      #writeDebug("can't getOptions ... fallback to field->{value}");
+      # fallback to field->value
+      my $options = $field->{value};
+      if ($options) {
+        $fieldOrigAllowedValues = join($theValueSep, split(/\s*,\s*/, $options));
+      }
+    }
+
     my $fieldDefault = '';
     if ($field->can('getDefaultValue')) {
       $fieldDefault = $field->getDefaultValue() || '';
@@ -244,7 +262,7 @@ sub handleRENDERFORDISPLAY {
       $field = $fieldClone;
     } 
 
-    next if $theHideEmpty && !$fieldValue;
+    next if $theHideEmpty && (!defined($fieldValue) || $fieldValue eq '');
     $fieldValue = $fieldDefault unless defined $fieldValue;
     
     next if $theInclude && $fieldName !~ /^($theInclude)$/;
@@ -263,6 +281,7 @@ sub handleRENDERFORDISPLAY {
 
     # some must be expanded before renderForDisplay
     $line =~ s/\$values\b/$fieldAllowedValues/g;
+    $line =~ s/\$origvalues\b/$fieldOrigAllowedValues/g;
     $line =~ s/\$title\b/$fieldTitle/g;
 
     $line = $field->renderForDisplay($line, $fieldValue, {
@@ -322,6 +341,7 @@ sub handleRENDERFOREDIT {
   my $theHidden = $params->{hidden};
   my $theHiddenFormat = $params->{hiddenformat};
   my $theSort = Foswiki::Func::isTrue($params->{sort}, 0);
+  my $thePrefix = $params->{prefix};
 
   if (!defined($theFormat) && !defined($theHeader) && !defined($theFooter)) {
     $theHeader = '<div class=\'foswikiFormSteps\'>';
@@ -351,6 +371,7 @@ sub handleRENDERFOREDIT {
   $session->{plugins}->dispatch('beforeEditHandler', $text, $thisTopic, $thisWeb, $topicObj);
   $topicObj->text($text);
 
+  $theForm = $session->{request}->param('formtemplate') unless defined $theForm;
   $theForm = $topicObj->getFormName unless defined $theForm;
   return '' unless $theForm;
 
@@ -393,13 +414,18 @@ sub handleRENDERFOREDIT {
   #writeDebug("selectedFields=@selectedFields");
 
   my @result = ();
-  foreach my $field (@selectedFields) { 
+  foreach my $field (@selectedFields) {
     next unless $field;
 
     my $fieldExtra = '';
     my $fieldEdit = '';
 
     my $fieldName = $field->{name};
+    my $origFieldName = $field->{name};
+    if (defined $thePrefix) {
+      $field->{name} = $thePrefix.$fieldName;
+    }
+
     my $fieldType = $field->{type};
     my $fieldSize = $field->{size};
     my $fieldAttrs = $field->{attributes};
@@ -411,22 +437,40 @@ sub handleRENDERFOREDIT {
     my $fieldAllowedValues = '';
     # CAUTION: don't use field->getOptions() on a +values field as that won't return the full valueMap...only the value part, but not the title map
     if ($field->can('getOptions') && $field->{type} !~ /\+values/) {
-      #writeDebug("can getOptions");
+      #writeDebug("can getOptions for $fieldName");
       my $options = $field->getOptions();
       if ($options) {
-        #writeDebug("options=$options");
+        writeDebug("options=$options");
         $fieldAllowedValues = join($theValueSep, @$options);
       }
     } else {
-      #writeDebug("can't getOptions ... fallback to field->{value}");
+      #writeDebug("can't getOptions ... fallback to field->{value} for $fieldName");
       # fallback to field->value
       my $options = $field->{value};
       if ($options) {
         $fieldAllowedValues = join($theValueSep, split(/\s*,\s*/, $options));
       }
     }
-
     #writeDebug("fieldAllowedValues=$fieldAllowedValues");
+
+    # get the list of all allowed values without any +values mapping applied
+    my $fieldOrigAllowedValues = '';
+    if ($field->can('getOptions')) {
+      writeDebug("can getOptions for $fieldName");
+      my $options = $field->getOptions();
+      if ($options) {
+        #writeDebug("options=".join(";", @$options));
+        $fieldOrigAllowedValues = join($theValueSep, @$options);
+      }
+    } else {
+      writeDebug("can't getOptions ... fallback to field->{value} for $fieldName");
+      # fallback to field->value
+      my $options = $field->{value};
+      if ($options) {
+        $fieldOrigAllowedValues = join($theValueSep, split(/\s*,\s*/, $options));
+      }
+    }
+    writeDebug("fieldOrigAllowedValues=$fieldOrigAllowedValues");
 
     # get the default value
     my $fieldDefault = '';
@@ -500,7 +544,7 @@ sub handleRENDERFOREDIT {
     next if $theIncludeAttr && $fieldAttrs !~ /^($theIncludeAttr)$/;
     next if $theExcludeAttr && $fieldAttrs =~ /^($theExcludeAttr)$/;
 
-    unless ($fieldValue) {
+    unless (defined $fieldValue) {
       $fieldValue = "\0"; # prevent dropped value attr in CGI.pm
     }
 
@@ -562,6 +606,7 @@ sub handleRENDERFOREDIT {
     $line =~ s/\$size\b/$fieldSize/g;
     $line =~ s/\$attrs\b/$fieldAttrs/g;
     $line =~ s/\$values\b/$fieldAllowedValues/g;
+    $line =~ s/\$origvalues\b/$fieldOrigAllowedValues/g;
     $line =~ s/\$(orig)?value\b/$fieldValue/g;
     $line =~ s/\$default\b/$fieldDefault/g;
     $line =~ s/\$tooltip\b/$fieldDescription/g;
@@ -573,6 +618,7 @@ sub handleRENDERFOREDIT {
 
     # cleanup
     $fieldClone->finish() if defined $fieldClone;
+    $field->{name} = $origFieldName if defined $origFieldName;
   }
 
 
@@ -582,7 +628,9 @@ sub handleRENDERFOREDIT {
   $result =~ s/\$perce?nt/%/g;
   $result =~ s/\$dollar/\$/g;
 
-  return '<noautolink>'.$result.'</noautolink>';
+  #print STDERR "result=$result\n";
+
+  return '<literal><noautolink>'.$result.'</noautolink></literal>';
 }
 
 ##############################################################################

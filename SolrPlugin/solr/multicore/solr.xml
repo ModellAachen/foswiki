@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<solr persistent="false" sharedLib="lib">
+<solr persistent="false">
   <cores adminPath="/admin/cores" sharedSchema="true">
     <core name="foswiki" instanceDir="foswiki" />
   </cores>
