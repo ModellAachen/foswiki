@@ -1,0 +1,14 @@
+data/System/JQTweetContrib.txt 0644
+lib/Foswiki/Contrib/JQTweetContrib/Config.spec 0644
+lib/Foswiki/Contrib/JQTweetContrib/Core.pm 0644
+lib/Foswiki/Contrib/JQTweetContrib.pm 0644
+pub/System/JQTweetContrib/jquery.tweet.css 0644
+pub/System/JQTweetContrib/jquery.tweet.css.gz 0644
+pub/System/JQTweetContrib/jquery.tweet.init.js 0644
+pub/System/JQTweetContrib/jquery.tweet.init.js.gz 0644
+pub/System/JQTweetContrib/jquery.tweet.init.uncompressed.js 0644
+pub/System/JQTweetContrib/jquery.tweet.js 0644
+pub/System/JQTweetContrib/jquery.tweet.js.gz 0644
+pub/System/JQTweetContrib/jquery.tweet.uncompressed.css 0644
+pub/System/JQTweetContrib/jquery.tweet.uncompressed.js 0644
+pub/System/JQTweetContrib/Makefile 0644

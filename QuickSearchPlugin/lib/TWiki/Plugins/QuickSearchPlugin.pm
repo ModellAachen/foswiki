@@ -11,10 +11,9 @@
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details, published at 
+# GNU General Public License for more details, published at
 # http://www.gnu.org/copyleft/gpl.html
 #
-
 
 # =========================
 package TWiki::Plugins::QuickSearchPlugin;
@@ -23,8 +22,8 @@ use TWiki::Func;
 
 # =========================
 use vars qw(
-        $web $topic $user $installWeb $VERSION $RELEASE $debug
-    );
+  $web $topic $user $installWeb $VERSION $RELEASE $debug
+);
 
 # This should always be $Rev$ so that TWiki can determine the checked-in
 # status of the plugin. It is used by the build automation tools, so
@@ -36,35 +35,35 @@ $VERSION = '$Rev$';
 # of the version number in PLUGINDESCRIPTIONS.
 $RELEASE = 'Dakar';
 
-
 # =========================
-sub initPlugin
-{
+sub initPlugin {
     ( $topic, $web, $user, $installWeb ) = @_;
 
     # check for Plugins.pm versions
-    if( $TWiki::Plugins::VERSION < 1 ) {
-        &TWiki::Func::writeWarning( "Version mismatch between QuickSearchPlugin and Plugins.pm" );
+    if ( $TWiki::Plugins::VERSION < 1 ) {
+        &TWiki::Func::writeWarning(
+            "Version mismatch between QuickSearchPlugin and Plugins.pm");
         return 0;
     }
 
-    # Get plugin preferences, the variable defined by:          * Set EXAMPLE = ...
-    # $exampleCfgVar = &TWiki::Func::getPreferencesValue( "EMPTYPLUGIN_EXAMPLE" ) || "default";
+# Get plugin preferences, the variable defined by:          * Set EXAMPLE = ...
+# $exampleCfgVar = &TWiki::Func::getPreferencesValue( "EMPTYPLUGIN_EXAMPLE" ) || "default";
 
     # Get plugin debug flag
-    $debug = &TWiki::Func::getPreferencesFlag( "QUICKSEARCHPLUGIN_DEBUG" );
+    $debug = &TWiki::Func::getPreferencesFlag("QUICKSEARCHPLUGIN_DEBUG");
 
-    # Plugin correctly initialized
-    # &TWiki::Func::writeDebug( "- TWiki::Plugins::QuickSearchPlugin::initPlugin( $web.$topic ) is OK" ) if $debug;
+# Plugin correctly initialized
+# &TWiki::Func::writeDebug( "- TWiki::Plugins::QuickSearchPlugin::initPlugin( $web.$topic ) is OK" ) if $debug;
     return 1;
 }
 
 # =========================
-sub commonTagsHandler
-{
+sub commonTagsHandler {
 ### my ( $text, $topic, $web ) = @_;   # do not uncomment, use $_[0], $_[1]... instead
 
-    &TWiki::Func::writeDebug( "- QuickSearchPlugin::commonTagsHandler( $_[2].$_[1] )" ) if $debug;
+    &TWiki::Func::writeDebug(
+        "- QuickSearchPlugin::commonTagsHandler( $_[2].$_[1] )")
+      if $debug;
 
     # This is the place to define customized tags and variables
     # Called by sub handleCommonTags, after %INCLUDE:"..."%
@@ -73,22 +72,27 @@ sub commonTagsHandler
     $_[0] =~ s/%QUICKSEARCH{(.*?)}%/&handleQuickSearch($_[1],$_[2],$1)/geo;
 }
 
-
 # =========================
 # The following was hacked out of TWiki::searchWeb
-sub handleQuickSearch
-{
-    my ( $topicin, $web, $attributes) = @_;
+sub handleQuickSearch {
+    my ( $topicin, $web, $attributes ) = @_;
 
-    my $theWebName = TWiki::Func::extractNameValuePair( $attributes, "web" ) || $web || "";
-    my $theSearchVal = TWiki::Func::extractNameValuePair( $attributes, "search" ) || "";
-    my $theRegex = TWiki::Func::extractNameValuePair( $attributes, "regex" ) || "";
-    my $caseSensitive = TWiki::Func::extractNameValuePair( $attributes, "casesensitive" ) || "";
-    my $noTotal = TWiki::Func::extractNameValuePair( $attributes, "tototal" ) || "";
-    my $totalOnly = TWiki::Func::extractNameValuePair( $attributes, "totalonly" ) || "";
+    my $theWebName =
+         TWiki::Func::extractNameValuePair( $attributes, "web" )
+      || $web
+      || "";
+    my $theSearchVal =
+      TWiki::Func::extractNameValuePair( $attributes, "search" ) || "";
+    my $theRegex = TWiki::Func::extractNameValuePair( $attributes, "regex" )
+      || "";
+    my $caseSensitive =
+      TWiki::Func::extractNameValuePair( $attributes, "casesensitive" ) || "";
+    my $noTotal = TWiki::Func::extractNameValuePair( $attributes, "tototal" )
+      || "";
+    my $totalOnly =
+      TWiki::Func::extractNameValuePair( $attributes, "totalonly" ) || "";
 
-    my $searchResult = ""; 
-
+    my $searchResult = "";
 
     ## #############
     ## 0501 kk : vvv An entire new chunk devoted to setting up mult-web
@@ -103,12 +107,13 @@ sub handleQuickSearch
     # Search what webs?  "" current web, list gets the list, all gets
     # all (unless marked in WebPrefs as NOSEARCHALL)
 
-    if( ! $theWebName ) {
+    if ( !$theWebName ) {
 
         #default to current web
         push @webList, $TWiki::webName;
 
-    } elsif ($searchAllFlag) {
+    }
+    elsif ($searchAllFlag) {
 
         # get list of all webs by scanning $dataDir
         opendir DIR, TWiki::Func::getDataDir();
@@ -117,10 +122,10 @@ sub handleQuickSearch
 
         # this is not magic, it just looks like it.
         @webList = sort
-	           grep { s#^.+/([^/]+)$#$1# }
-                   grep { -d }
-	           map  { TWiki::Func::getDataDir()."/$_" }
-                   grep { ! /^[._]/ } @tmpList;
+          grep { s#^.+/([^/]+)$#$1# }
+          grep { -d }
+          map  { TWiki::Func::getDataDir() . "/$_" }
+          grep { !/^[._]/ } @tmpList;
 
         # what that does (looking from the bottom up) is take the file
         # list, filter out the dot directories and dot files, turn the
@@ -129,25 +134,27 @@ sub handleQuickSearch
         # whatever was left after all that (which should be merely a
         # list of directory's names.)
 
-    } else {
+    }
+    else {
 
         # use whatever the user sent
-        @webList = split(" ", $theWebName); # the web processing loop filters
-                                            # for valid web names, so don't
-                                            # do it here.
+        @webList = split( " ", $theWebName );  # the web processing loop filters
+                                               # for valid web names, so don't
+                                               # do it here.
     }
     ## 0501 kk : ^^^
     ## ##############
 
-    my $tempVal = "";
-    my $topicCount = 0; # JohnTalintyre
+    my $tempVal        = "";
+    my $topicCount     = 0;                    # JohnTalintyre
     my $originalSearch = $theSearchVal;
-    my $tmpl = &TWiki::Func::readTemplate( "quicksearch" );
-    my( $tmplTable, $tmplNumber ) = split( /%SPLIT%/, $tmpl );
+    my $tmpl = &TWiki::Func::readTemplate("quicksearch");
+    my ( $tmplTable, $tmplNumber ) = split( /%SPLIT%/, $tmpl );
 
-    if( ! $tmplTable ) {
+    if ( !$tmplTable ) {
         print "<html><body>";
         print "<h1>TWiki Installation Error</h1>";
+
         # Might not be search.tmpl FIXME
         print "Incorrect format of quicksearch.tmpl (missing %SPLIT% parts)";
         print "</body></html>";
@@ -155,103 +162,113 @@ sub handleQuickSearch
     }
 
     my $cmd = "";
-    $cmd = "%GREP% %SWITCHES% -l $TWiki::cmdQuote$theSearchVal$TWiki::cmdQuote *.txt";
+    $cmd =
+"%GREP% %SWITCHES% -l $TWiki::cmdQuote$theSearchVal$TWiki::cmdQuote *.txt";
 
-    if( $caseSensitive ) {
+    if ($caseSensitive) {
         $tempVal = "";
-    } else {
+    }
+    else {
         $tempVal = "-i";
     }
     $cmd =~ s/%SWITCHES%/$tempVal/go;
 
-    if( $theRegex ) {
+    if ($theRegex) {
         $tempVal = $TWiki::egrepCmd;
-    } else {
+    }
+    else {
         $tempVal = $TWiki::fgrepCmd;
     }
     $cmd =~ s/%GREP%/$tempVal/go;
-
 
     ## #############
     ## 0501 kk : vvv New web processing loop, does what the old straight
     ##               code did for each web the user requested.  Note that
     ##               '$theWebName' is mostly replaced by '$thisWebName'
 
-
     foreach my $thisWebName (@webList) {
 
         # PTh 03 Nov 2000: Add security check
         $thisWebName =~ s/$TWiki::securityFilter//go;
         $thisWebName =~ /(.*)/;
-        $thisWebName = $1;  # untaint variable
+        $thisWebName = $1;    # untaint variable
 
-        next unless &TWiki::Func::webExists( $thisWebName );  # can't process what ain't thar
+        next
+          unless &TWiki::Func::webExists($thisWebName)
+        ;                     # can't process what ain't thar
 
-        my $thisWebBGColor     = &TWiki::Func::getPreferencesValue( "WEBBGCOLOR", $thisWebName ) || "\#FF00FF";
-        my $thisWebNoSearchAll = &TWiki::Func::getPreferencesValue( "NOSEARCHALL", $thisWebName );
+        my $thisWebBGColor =
+          &TWiki::Func::getPreferencesValue( "WEBBGCOLOR", $thisWebName )
+          || "\#FF00FF";
+        my $thisWebNoSearchAll =
+          &TWiki::Func::getPreferencesValue( "NOSEARCHALL", $thisWebName );
 
         # make sure we can report this web on an 'all' search
         # DON'T filter out unless it's part of an 'all' search.
         # PTh 18 Aug 2000: Need to include if it is the current web
-        next if (   ( $searchAllFlag )
-                 && ( ( $thisWebNoSearchAll =~ /on/i ) || ( $thisWebName =~ /^[\.\_]/ ) )
-                 && ( $thisWebName ne $TWiki::webName ) );
+        next
+          if (
+            ($searchAllFlag)
+            && (   ( $thisWebNoSearchAll =~ /on/i )
+                || ( $thisWebName =~ /^[\.\_]/ ) )
+            && ( $thisWebName ne $TWiki::webName )
+          );
 
-        (my $baz = "foo") =~ s/foo//;  # reset search vars. defensive coding
+        ( my $baz = "foo" ) =~ s/foo//;    # reset search vars. defensive coding
 
         # 0501 kjk : vvv New var for accessing web dirs.
-        my $sDir = TWiki::Func::getDataDir()."/$thisWebName";
+        my $sDir      = TWiki::Func::getDataDir() . "/$thisWebName";
         my @topicList = "";
-        if( $theSearchVal ) {
+        if ($theSearchVal) {
+
             # do grep search
-            chdir( "$sDir" );
+            chdir("$sDir");
             $cmd =~ /(.*)/;
-            $cmd = $1;       # untaint variable (NOTE: Needs a better check!)
+            $cmd     = $1;      # untaint variable (NOTE: Needs a better check!)
             $tempVal = `$cmd`;
             @topicList = split( /\n/, $tempVal );
+
             # cut .txt extension
             my @tmpList = map { /(.*)\.txt$/; $_ = $1; } @topicList;
             @topicList = ();
             my $lastTopic = "";
-            foreach( @tmpList ) {
+            foreach (@tmpList) {
                 $tempVal = $_;
+
                 # make topic unique
-                if( $tempVal ne $lastTopic ) {
+                if ( $tempVal ne $lastTopic ) {
                     push @topicList, $tempVal;
                 }
             }
         }
-        
-        next if ( $noEmpty && ! @topicList ); # Nothing to show for this topic
 
+        next if ( $noEmpty && !@topicList );    # Nothing to show for this topic
 
         @topicList = map { $_->[1] }
-                     sort {$a->[0] cmp $b->[0] }
-                     map { [ $_, $_ ] }
-                     @topicList;
+          sort { $a->[0] cmp $b->[0] }
+          map { [ $_, $_ ] } @topicList;
 
         # output header of $thisWebName
-        my( $beforeText, $repeatText, $afterText ) = split( /%REPEAT%/, $tmplTable );
+        my ( $beforeText, $repeatText, $afterText ) =
+          split( /%REPEAT%/, $tmplTable );
 
         $beforeText =~ s/%WEBBGCOLOR%/$thisWebBGColor/o;
         $beforeText =~ s/%WEB%/$thisWebName/o;
         $searchResult = $beforeText;
 
-
         # output the list of topics in $thisWebName
         my $ntopics = 0;
-        my $topic = "";
-        my $head = "";
-        foreach( @topicList ) {
+        my $topic   = "";
+        my $head    = "";
+        foreach (@topicList) {
             $topic = $_;
-            if (! $totalOnly) {
+            if ( !$totalOnly ) {
 
                 my $meta = "";
                 my $text = "";
-            
-                
+
                 $tempVal = $repeatText;
-                
+
                 $tempVal =~ s/%WEB%/$thisWebName/go;
                 $tempVal =~ s/%TOPICNAME%/$topic/go;
 
@@ -259,13 +276,14 @@ sub handleQuickSearch
             }
             $ntopics += 1;
         }
-    
+
         $searchResult .= $afterText;
 
         if ($totalOnly) {
             $searchResult = $ntopics;
         }
-        elsif( ! $noTotal) {
+        elsif ( !$noTotal ) {
+
             # print "Number of topics:" part
             my $thisNumber = $tmplNumber;
             $thisNumber =~ s/%NTOPICS%/$ntopics/go;
@@ -275,12 +293,5 @@ sub handleQuickSearch
     return $searchResult;
 }
 
-
-
 1;
-
-
-
-
-
 

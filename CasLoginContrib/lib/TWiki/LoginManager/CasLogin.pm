@@ -52,11 +52,11 @@ Construct the CasLogin object
 =cut
 
 sub new {
-    my( $class, $session ) = @_;
+    my ( $class, $session ) = @_;
     my $this = $class->SUPER::new($session);
-    $session->enterContext( 'can_login' );
-    if ($TWiki::cfg{Sessions}{ExpireCookiesAfter}) {
-        $session->enterContext( 'can_remember_login' );
+    $session->enterContext('can_login');
+    if ( $TWiki::cfg{Sessions}{ExpireCookiesAfter} ) {
+        $session->enterContext('can_remember_login');
     }
     return $this;
 }
@@ -71,23 +71,23 @@ Triggered on auth fail
 =cut
 
 sub forceAuthentication {
-    my $this = shift;
+    my $this  = shift;
     my $twiki = $this->{twiki};
 
-    unless( $twiki->inContext( 'authenticated' )) {
+    unless ( $twiki->inContext('authenticated') ) {
         my $query = $twiki->{cgiQuery};
+
         # Redirect with passthrough so we don't lose the original query params
         my $twiki = $this->{twiki};
         my $topic = $twiki->{topicName};
-        my $web = $twiki->{webName};
-        my $url = $twiki->getScriptUrl( 0, 'login', $web, $topic);
-        $query->param( -name=>'origurl', -value=>$ENV{REQUEST_URI} );
+        my $web   = $twiki->{webName};
+        my $url   = $twiki->getScriptUrl( 0, 'login', $web, $topic );
+        $query->param( -name => 'origurl', -value => $ENV{REQUEST_URI} );
         $twiki->redirect( $url, 1 );
         return 1;
     }
     return undef;
 }
-
 
 =pod
 
@@ -99,12 +99,12 @@ Content of a login link
 =cut
 
 sub loginUrl {
-    my $this = shift;
+    my $this  = shift;
     my $twiki = $this->{twiki};
     my $topic = $twiki->{topicName};
-    my $web = $twiki->{webName};
+    my $web   = $twiki->{webName};
     return $twiki->getScriptUrl( 0, 'login', $web, $topic,
-                                 origurl => $ENV{REQUEST_URI} );
+        origurl => $ENV{REQUEST_URI} );
 }
 
 =pod
@@ -117,21 +117,22 @@ username.
 =cut
 
 sub login {
-    my( $this, $query, $twikiSession ) = @_;
-    my $twiki = $this->{twiki};
+    my ( $this, $query, $twikiSession ) = @_;
+    my $twiki  = $this->{twiki};
     my $casUrl = $TWiki::cfg{CAS}{casUrl};
     my $CAFile = $TWiki::cfg{CAS}{CAFile};
-    my $cas = new AuthCAS(casUrl => $casUrl,
-                          CAFile => $CAFile
-                         );
-    
-    my $origurl = $query->param( 'origurl' );
-    my $app_url = $TWiki::cfg{DefaultUrlHost};
-    my $remember = $query->param( 'remember' );
-    my $ticket = $query->param( 'ticket' );
+    my $cas    = new AuthCAS(
+        casUrl => $casUrl,
+        CAFile => $CAFile
+    );
+
+    my $origurl  = $query->param('origurl');
+    my $app_url  = $TWiki::cfg{DefaultUrlHost};
+    my $remember = $query->param('remember');
+    my $ticket   = $query->param('ticket');
 
     # Eat these so there's no risk of accidental passthrough
-    $query->delete('origurl', 'ticket');
+    $query->delete( 'origurl', 'ticket' );
 
     my $cgisession = $this->{_cgisession};
 
@@ -139,29 +140,32 @@ sub login {
 
     my $error = '';
 
-    if( $ticket ) {
+    if ($ticket) {
         my $validation = 1;
-        $origurl = $cgisession->param( 'my_orig' );
-        $cgisession->clear(['my_orig']);
+        $origurl = $cgisession->param('my_orig');
+        $cgisession->clear( ['my_orig'] );
 
-        my $loginName = $cas->validateST($app_url.$origurl, $ticket);
-        if( $loginName ) {
-            $this->userLoggedIn( $loginName );
+        my $loginName = $cas->validateST( $app_url . $origurl, $ticket );
+        if ($loginName) {
+            $this->userLoggedIn($loginName);
             $cgisession->param( 'VALIDATION', $validation ) if $cgisession;
+
             #SUCCESS our user is authenticated..
-            $query->delete('sudo'); #remove the sudo param - its only to tell TemplateLogin that we're using BaseMapper..
-            # Redirect with passthrough
-            $twikiSession->redirect($origurl, 1 );
+            $query->delete('sudo')
+              ; #remove the sudo param - its only to tell TemplateLogin that we're using BaseMapper..
+                # Redirect with passthrough
+            $twikiSession->redirect( $origurl, 1 );
             return;
         }
-    } else {
-     $cgisession->param( 'my_orig', $origurl ) if $cgisession;
-     ###
-     ### Redirect the User for login at CAS server
-     ###
-     my $login_url = $cas->getServerLoginURL($app_url.$origurl);
-     printf "Location: $login_url\n\n";
-     exit 0;
+    }
+    else {
+        $cgisession->param( 'my_orig', $origurl ) if $cgisession;
+        ###
+        ### Redirect the User for login at CAS server
+        ###
+        my $login_url = $cas->getServerLoginURL( $app_url . $origurl );
+        printf "Location: $login_url\n\n";
+        exit 0;
     }
 }
 

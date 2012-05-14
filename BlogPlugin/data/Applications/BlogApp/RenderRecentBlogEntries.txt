@@ -1,4 +1,4 @@
-%META:TOPICINFO{author="ProjectContributor" comment="reprev" date="1320867722" format="1.1" reprev="3" version="5"}%
+%META:TOPICINFO{author="ProjectContributor" comment="reprev" date="1328026513" format="1.1" reprev="6" version="6"}%
 %META:TOPICPARENT{name="TopicFunction"}%
 %TOC{depth="2"}%
 
@@ -17,7 +17,7 @@
 %STARTINCLUDE%<!-- -->
 <noautolink>
 %DBQUERY{
-  "TopicType=~'\bBlogEntry\b' AND State != 'unpublished' AND topic != 'WebTopicEditTemplate'
+  "TopicType=~'\bBlogEntry\b' AND State != 'unpublished' AND topic != 'WebTopicEditTemplate' AND topic != '%BASETOPIC%'
    %IF{"defined CAT and '%CAT%'!=''" then="AND topic ISA '%CAT%'"}% 
   " 
   order="createdate" 
@@ -26,8 +26,11 @@
   hidenull="on" 
   web="%BASEWEB%" 
   header="<div class='blogSideBarSection blogSideBarRecent'> 
-    <h2 >%MAKETEXT{"Latest"}%</h2> 
-    <ul>" 
+    <h2 >%IF{"defined CAT"
+        then="%MAKETEXT{"Other postings in [_1]" args="%CATINFO{cat="%CAT%" format="$title"}%"}%"
+        else="%MAKETEXT{"Latest"}%"
+      }%</h2>
+    <$nopdirtyarea><ul>"
   format="<li>
     <a href='%SCRIPTURLPATH{"view"}%/$web/$topic'>
       $percntDBCALL{\"Applications.RenderTopicThumbnail\" 
@@ -38,7 +41,7 @@
       <br /><span class='foswikiTopicInfo foswikiSmallish'>$formfield(Summary)</span>
       %CLEAR%
     </a></li>"
-  footer="</ul></div>" 
+  footer="</ul></$nopdirtyarea></div>"
 }% 
 </noautolink>
 <!-- -->%STOPINCLUDE%
@@ -50,7 +53,7 @@
 %DBCALL{"Applications.RenderFunctionCallers"}%
 
 ---++ Copyright
-&copy; 2005-2011 http://michaeldaumconsulting.com
+&copy; 2005-2012 http://michaeldaumconsulting.com
 
 %DBCALL{"Applications.GnuGeneralPublicLicense" section="notice"}%
 

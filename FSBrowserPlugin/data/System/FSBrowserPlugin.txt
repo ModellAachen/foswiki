@@ -1,0 +1,40 @@
+%META:TOPICPARENT{name="Plugins"}%
+<!--
+One line description, required for extensions repository catalog.
+   * Set SHORTDESCRIPTION = A plugin to enable browsing of a filesystem hierarchy.
+-->
+---+!! FS Browser Plugin
+
+---++ Summary
+
+%SHORTDESCRIPTION%
+
+---+++ Caveats
+
+%RED% *WARNING!* %ENDCOLOR% This plugin gives users the ability to _directly_ browse files on your Web server. The plugin is hard-coded to require users to specify paths within the $Foswiki::cfg{PubUrlPath} hierarchy, but users will be able to see *every* file in that hierarchy that's not a dot-file.
+
+This plugin is currently only designed to work on filesystems that use Unix-style file separators (i.e. '/').
+
+---++ Description
+
+The !FSBrowserPlugin provides the [[VarFSBROWSER][FSBROWSER]] macro. This macro can be used to create a nested Foswiki-style list of any part of the filesystem hierarchy under $Foswiki::cfg{PubUrlPath}. The resulting output can then be used by e.g. !TreeBrowserPlugin to produce a nicely-formatted filesystem tree.
+
+This plugin requires that the Web server root be specified in $Foswiki::cfg{Plugins}{FSBrowserPlugin}{ServerRoot}; it defaults to '/var/www'.
+
+Example usage:
+<verbatim>
+%FSBROWSER{"/Files" maxdepth="3"}%
+</verbatim>
+
+---++ Info
+
+|  Author: | AlexisHazell |
+|  Copyright: | &copy; 2011, Foswiki Contributors |
+|  License: | GPL ([[http://www.gnu.org/copyleft/gpl.html][GNU General Public License]]) |
+|  Release: | %$RELEASE% |
+|  Version: | %$VERSION% |
+|  Change&nbsp;History: | <!-- versions below in reverse order -->&nbsp; |
+|  0.1.0 (XX Mar 2012): | Initial version |
+|  Home: | http://foswiki.org/Extensions/%TOPIC% |
+|  Support: | http://foswiki.org/Support/%TOPIC% |
+

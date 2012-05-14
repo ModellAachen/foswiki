@@ -48,7 +48,6 @@ use Error qw( :try );
 
 use Foswiki::Users::X509UserMapping::Cert;
 
-
 #use Monitor;
 #Monitor::MonitorMethod('Foswiki::Users::X509UserMapping');
 
@@ -62,10 +61,11 @@ for any required Foswiki services.
 =cut
 
 sub new {
-    my( $class, $session ) = @_;
+    my ( $class, $session ) = @_;
 
-    if( $Foswiki::cfg{PasswordManager} ne 'Foswiki::Users::X509PasswdUser' ) {
-	die "X509UserMapping requires X509PasswdUser, not $Foswiki::cfg{PasswordManager}.  Please fix in configure.";
+    if ( $Foswiki::cfg{PasswordManager} ne 'Foswiki::Users::X509PasswdUser' ) {
+        die
+"X509UserMapping requires X509PasswdUser, not $Foswiki::cfg{PasswordManager}.  Please fix in configure.";
     }
 
     my $this = $class->SUPER::new( $session, 'X509' );
@@ -73,30 +73,34 @@ sub new {
     my $implPasswordManager = $Foswiki::cfg{PasswordManager};
     eval "require $implPasswordManager";
     die $@ if $@;
-    $this->{passwords} = $implPasswordManager->new( $session );
-    
-    #if password manager says sorry, we're read only today
-    #'none' is a special case, as it means we're not actually using the password manager for
-    # registration.
-    if ($this->{passwords}->readOnly()) {
-        $session->writeWarning( 'X509UserMapping has TURNED OFF EnableNewUserRegistration, because the password file is read only.' );
+    $this->{passwords} = $implPasswordManager->new($session);
+
+#if password manager says sorry, we're read only today
+#'none' is a special case, as it means we're not actually using the password manager for
+# registration.
+    if ( $this->{passwords}->readOnly() ) {
+        $session->writeWarning(
+'X509UserMapping has TURNED OFF EnableNewUserRegistration, because the password file is read only.'
+        );
         $Foswiki::cfg{Register}{EnableNewUserRegistration} = 0;
     }
 
     # Certificates aren't login names in the sense of things users can enter.
     # But some of the Foswiki infrastructure checks for this before calling us.
 
-    if (!$Foswiki::cfg{Register}{AllowLoginName}) {
-        $session->writeWarning( 'X509UserMapping has TURNED ON AllowLoginName, because it seems to be required for certificates.' );
+    if ( !$Foswiki::cfg{Register}{AllowLoginName} ) {
+        $session->writeWarning(
+'X509UserMapping has TURNED ON AllowLoginName, because it seems to be required for certificates.'
+        );
         $Foswiki::cfg{Register}{AllowLoginName} = 1;
     }
 
-	#SMELL: and this is a second user object
-	#TODO: combine with the one in Foswiki::Users
+    #SMELL: and this is a second user object
+    #TODO: combine with the one in Foswiki::Users
     #$this->{U2L} = {};
-    $this->{L2U} = {};
-    $this->{U2W} = {};
-    $this->{W2U} = {};
+    $this->{L2U}             = {};
+    $this->{U2W}             = {};
+    $this->{W2U}             = {};
     $this->{eachGroupMember} = {};
 
     return $this;
@@ -149,12 +153,12 @@ first, then login, then wikiname.
 =cut
 
 sub handlesUser {
-	my ($this, $cUID, $login, $wikiname) = @_;
-	
+    my ( $this, $cUID, $login, $wikiname ) = @_;
+
     return 1 if ( defined $cUID && $cUID =~ /^($this->{mapping_id})/ );
 
     # Check the login id to see if we know it
-     return 1 if ($login && $this->_userReallyExists( $login ));
+    return 1 if ( $login && $this->_userReallyExists($login) );
 
     # Or the wiki name
     if ($wikiname) {
@@ -164,7 +168,6 @@ sub handlesUser {
 
     return 0;
 }
-
 
 =begin TML
 
@@ -181,13 +184,13 @@ This is used for registration)
 =cut
 
 sub login2cUID {
-    my( $this, $login, $dontcheck ) = @_;
+    my ( $this, $login, $dontcheck ) = @_;
 
     unless ($dontcheck) {
-        return undef unless (_userReallyExists($this, $login));
+        return undef unless ( _userReallyExists( $this, $login ) );
     }
 
-    return $this->{mapping_id}.Foswiki::Users::mapLogin2cUID($login);
+    return $this->{mapping_id} . Foswiki::Users::mapLogin2cUID($login);
 }
 
 =begin TML
@@ -200,43 +203,48 @@ Converts an internal cUID to that user\'s login
 =cut
 
 sub getLoginName {
-    my( $this, $cUID ) = @_;
+    my ( $this, $cUID ) = @_;
     ASSERT($cUID) if DEBUG;
-	
-	#can't call userExists - its recursive
-	#return unless (userExists($this, $user));
-	
-    # Remove the mapping id 
+
+    #can't call userExists - its recursive
+    #return unless (userExists($this, $user));
+
+    # Remove the mapping id
     my @calls = caller(2);
-    @calls = @calls[0..4];
-    die "Not X509's cUID |$cUID|" . join( ' ', @calls)  unless( $cUID =~ s/^$this->{mapping_id}// );
+    @calls = @calls[ 0 .. 4 ];
+    die "Not X509's cUID |$cUID|" . join( ' ', @calls )
+      unless ( $cUID =~ s/^$this->{mapping_id}// );
 
     use bytes;
+
     # Reverse the encoding used to generate cUIDs in login2cUID
     # use bytes to ignore character encoding
     $cUID =~ s/_([0-9a-f][0-9a-f])/chr(hex($1))/gei;
     no bytes;
 
-    return undef unless _userReallyExists($this, $cUID);
+    return undef unless _userReallyExists( $this, $cUID );
 
     return $cUID;
 }
 
 # test if the login is in the the password file
 sub _userReallyExists {
-    my( $this, $login ) = @_;
+    my ( $this, $login ) = @_;
 
-    if ($this->{passwords}->canFetchUsers()) {
+    if ( $this->{passwords}->canFetchUsers() ) {
 
-        my $pass = $this->{passwords}->fetchPass( $login );
-        return undef unless (defined($pass));
-        return undef if ("$pass" eq "0"); # login invalid... (SMELL: We got a null login?
+        my $pass = $this->{passwords}->fetchPass($login);
+        return undef unless ( defined($pass) );
+        return undef
+          if ( "$pass" eq "0" ); # login invalid... (SMELL: We got a null login?
         return 1;
-     } else {
+    }
+    else {
+
         # passwd==none case generally assumes any login given exists...
-	 die "X509PasswdUser doesn't support FetchUsers";
+        die "X509PasswdUser doesn't support FetchUsers";
         return 1;
-     }
+    }
 
     return 0;
 }
@@ -266,123 +274,165 @@ sub addUser {
 
     ASSERT($login) if DEBUG;
 
-    $password = "xxj31ZMTZzkVA"; # Required for apache certificate authentication.
+    $password =
+      "xxj31ZMTZzkVA";    # Required for apache certificate authentication.
 
-    $wikiname='' if( $Foswiki::cfg{Plugins}{X509UserPlugin}{RequireWikinameFromCertificate} );
-    $wikiname = $this->wikinameFromDN( $login ) unless( $wikiname );
+    $wikiname = ''
+      if ( $Foswiki::cfg{Plugins}{X509UserPlugin}
+        {RequireWikinameFromCertificate} );
+    $wikiname = $this->wikinameFromDN($login) unless ($wikiname);
 
-    if( $this->{passwords}->fetchPass( $login )) {
-        # They exist; their password must match
-  #      unless( $this->{passwords}->checkPassword( $login, $password )) {
-  #          throw Error::Simple(
-  #              'New password did not match existing password for this user');
-  #      }
-        # User exists, and the password was good.  But why are we here?
-    } else {
+    if ( $this->{passwords}->fetchPass($login) ) {
+
+   # They exist; their password must match
+   #      unless( $this->{passwords}->checkPassword( $login, $password )) {
+   #          throw Error::Simple(
+   #              'New password did not match existing password for this user');
+   #      }
+   # User exists, and the password was good.  But why are we here?
+    }
+    else {
+
         # add a new user No need to generate a password.
 
-        unless( $this->{passwords}->addUser( $login, $wikiname, $password, $emails )) {
-        	#print STDERR "\n Failed to add user:  ".$this->{passwords}->error();
+        unless (
+            $this->{passwords}->addUser( $login, $wikiname, $password, $emails )
+          )
+        {
+
+           #print STDERR "\n Failed to add user:  ".$this->{passwords}->error();
             throw Error::Simple(
-                'Failed to add user: '.$this->{passwords}->error());
+                'Failed to add user: ' . $this->{passwords}->error() );
         }
     }
 
     # add to the mapping caches
     my $user = _cacheUser( $this, $wikiname, $login );
     ASSERT($user) if DEBUG;
-    
-    if( $Foswiki::cfg{Plugins}{X509UserPlugin}{RegisterInUsersTopic} ) {
-	my $store = $this->{session}->{store};
-	my( $meta, $text );
-	
-	if( $store->topicExists( $Foswiki::cfg{UsersWebName},
-				 $Foswiki::cfg{UsersTopicName} )) {
-	    ( $meta, $text ) = $store->readTopic(
-						 undef, $Foswiki::cfg{UsersWebName}, $Foswiki::cfg{UsersTopicName} );
-	} else {
-	    ( $meta, $text ) = $store->readTopic(
-						 undef, $Foswiki::cfg{SystemWebName}, 'WikiUsersTemplate' );
-	}
-	
-	my $result = '';
-	my $entry = "   * $wikiname - ";
-	
-	# X509 login names are cybercrud, shouldn't publish
-	$entry .= $login . " - " if( $login && $Foswiki::cfg{Plugins}{X509UserPlugin}{RegisterUsersWithLoginName} );
-	
-	require Foswiki::Time;
-	my $today = Foswiki::Time::formatTime(time(), $Foswiki::cfg{DefaultDateFormat}, 'gmtime');
-	
-	# add name alphabetically to list
-	
-	# insidelist is used to see if we are before the first record or after the last
-	# 0 before, 1 inside, 2 after
-	my $insidelist = 0;
-	foreach my $line ( split( /\r?\n/, $text) ) {
-	    # TODO: I18N fix here once basic auth problem with 8-bit user names is
-	    # solved
-	    if ( $entry ) {
-		my ( $web, $name, $odate ) = ( '', '', '' );
-		if ( $line =~ /^\s+\*\s($Foswiki::regex{webNameRegex}\.)?($Foswiki::regex{wikiWordRegex})\s*(?:-\s*\w+\s*)?-\s*(.*)/ ) {
-		    $web = $1 || $Foswiki::cfg{UsersWebName};
-		    $name = $2;
-		    $odate = $3;
-		    $insidelist = 1;
-		} elsif ( $line =~ /^\s+\*\s([A-Z]) - / ) {
-		    #	* A - <a name="A">- - - -</a>^M
-		    $name = $1;
-		    $insidelist = 1;
-		} elsif ( $insidelist == 1 ) {
-		    # After last entry we have a blank line or some comment
-		    # We assume no blank lines inside the list of users
-		    # We cannot look for last after Z because Z is not the last letter
-		    # in all alphabets
-		    $insidelist = 2;
-		    $name = '';
-		}
-		if ( ( $name && ( $wikiname le $name ) ) || $insidelist == 2 ) {
-		    # found alphabetical position or last record
-		    if( $wikiname eq $name) {
-			# adjusting existing user - keep original registration date
-			$entry .= $odate;
-		    } else {
-			$entry .= $today."\n".$line;
-		    }
-		    # don't adjust if unchanged
-		    return $user if( $entry eq $line );
-		    $line = $entry;
-		    $entry = '';
-		}
-	    }
 
-	    $result .= $line."\n";
-	}
-	if( $entry ) {
-	    # brand new file - add to end
-	    $result .= "$entry$today\n";
-	}
-	
-	try {
-	    $store->saveTopic(
-			      # SMELL: why is this Admin and not the RegoAgent??
-			      $this->{session}->{users}->getCanonicalUserID(
-									    $Foswiki::cfg{AdminUserLogin}),
-			      $Foswiki::cfg{UsersWebName},
-			      $Foswiki::cfg{UsersTopicName},
-			      $result, $meta );
-	} catch Error::Simple with {
-	    # Failed to add user; must remove them from the password system too,
-	    # otherwise their next registration attempt will be blocked
-	    my $e = shift;
-	    $this->{passwords}->removeUser($login);
-	    throw $e;
-	};
+    if ( $Foswiki::cfg{Plugins}{X509UserPlugin}{RegisterInUsersTopic} ) {
+        my $store = $this->{session}->{store};
+        my ( $meta, $text );
+
+        if (
+            $store->topicExists(
+                $Foswiki::cfg{UsersWebName},
+                $Foswiki::cfg{UsersTopicName}
+            )
+          )
+        {
+            ( $meta, $text ) = $store->readTopic(
+                undef,
+                $Foswiki::cfg{UsersWebName},
+                $Foswiki::cfg{UsersTopicName}
+            );
+        }
+        else {
+            ( $meta, $text ) =
+              $store->readTopic( undef, $Foswiki::cfg{SystemWebName},
+                'WikiUsersTemplate' );
+        }
+
+        my $result = '';
+        my $entry  = "   * $wikiname - ";
+
+        # X509 login names are cybercrud, shouldn't publish
+        $entry .= $login . " - "
+          if ( $login
+            && $Foswiki::cfg{Plugins}{X509UserPlugin}
+            {RegisterUsersWithLoginName} );
+
+        require Foswiki::Time;
+        my $today =
+          Foswiki::Time::formatTime( time(), $Foswiki::cfg{DefaultDateFormat},
+            'gmtime' );
+
+        # add name alphabetically to list
+
+ # insidelist is used to see if we are before the first record or after the last
+ # 0 before, 1 inside, 2 after
+        my $insidelist = 0;
+        foreach my $line ( split( /\r?\n/, $text ) ) {
+
+          # TODO: I18N fix here once basic auth problem with 8-bit user names is
+          # solved
+            if ($entry) {
+                my ( $web, $name, $odate ) = ( '', '', '' );
+                if ( $line =~
+/^\s+\*\s($Foswiki::regex{webNameRegex}\.)?($Foswiki::regex{wikiWordRegex})\s*(?:-\s*\w+\s*)?-\s*(.*)/
+                  )
+                {
+                    $web        = $1 || $Foswiki::cfg{UsersWebName};
+                    $name       = $2;
+                    $odate      = $3;
+                    $insidelist = 1;
+                }
+                elsif ( $line =~ /^\s+\*\s([A-Z]) - / ) {
+
+                    #	* A - <a name="A">- - - -</a>^M
+                    $name       = $1;
+                    $insidelist = 1;
+                }
+                elsif ( $insidelist == 1 ) {
+
+              # After last entry we have a blank line or some comment
+              # We assume no blank lines inside the list of users
+              # We cannot look for last after Z because Z is not the last letter
+              # in all alphabets
+                    $insidelist = 2;
+                    $name       = '';
+                }
+                if ( ( $name && ( $wikiname le $name ) ) || $insidelist == 2 ) {
+
+                    # found alphabetical position or last record
+                    if ( $wikiname eq $name ) {
+
+                     # adjusting existing user - keep original registration date
+                        $entry .= $odate;
+                    }
+                    else {
+                        $entry .= $today . "\n" . $line;
+                    }
+
+                    # don't adjust if unchanged
+                    return $user if ( $entry eq $line );
+                    $line  = $entry;
+                    $entry = '';
+                }
+            }
+
+            $result .= $line . "\n";
+        }
+        if ($entry) {
+
+            # brand new file - add to end
+            $result .= "$entry$today\n";
+        }
+
+        try {
+            $store->saveTopic(
+
+                # SMELL: why is this Admin and not the RegoAgent??
+                $this->{session}->{users}
+                  ->getCanonicalUserID( $Foswiki::cfg{AdminUserLogin} ),
+                $Foswiki::cfg{UsersWebName},
+                $Foswiki::cfg{UsersTopicName},
+                $result, $meta
+            );
+        }
+        catch Error::Simple with {
+
+            # Failed to add user; must remove them from the password system too,
+            # otherwise their next registration attempt will be blocked
+            my $e = shift;
+            $this->{passwords}->removeUser($login);
+            throw $e;
+        };
     }
 
-    #can't call setEmails here - user may be in the process of being registered
-    #TODO; when registration is moved into the mapping, setEmails will happen after the createUserTOpic
-    #$this->setEmails( $user, $emails );
+#can't call setEmails here - user may be in the process of being registered
+#TODO; when registration is moved into the mapping, setEmails will happen after the createUserTOpic
+#$this->setEmails( $user, $emails );
 
     return $user;
 }
@@ -447,74 +497,81 @@ any other \ is sent as-is to the s-command.
 =cut
 
 sub wikinameFromDN {
-    my $this = shift;
+    my $this     = shift;
     my $certname = shift;
 
     my $wikiname;
     my $cert = Foswiki::Users::X509UserMapping::Cert->parseDN($certname);
-    
-    # Keep the string parsing code in sync with lib/Foswiki/Configure/Checkers/Plugins/X509UserPlugin/System.pm
+
+# Keep the string parsing code in sync with lib/Foswiki/Configure/Checkers/Plugins/X509UserPlugin/System.pm
 
     my $mapstring = $Foswiki::Cfg{Plugins}{X509UserPlugin}{Cert2Wiki} || "^CN";
     my @mapstring;
-    while( $mapstring ) {
-	if( $mapstring =~ /^\s*\"((?>(?:(?>[^\"\\]+)|\\.)*))\"(.*)$/ ) {
-	    $mapstring = $2;
-	    my $ms = $1;
-	    $ms =~ s/\\\"/\"/g;
-	    push @mapstring, $ms;
-	} elsif( $mapstring =~ /^\s*\'((?>(?:(?>[^\'\\]+)|\\.)*))\'(.*)$/ ) {
-	    $mapstring = $2;
-	    my $ms = $1;
-	    $ms =~ s/\\\'/\'/g;
-	    push @mapstring, $ms;
-	}elsif( $mapstring =~ s/^\s*(\S+)\s*(.*)$/$2/ ) {
-	    push @mapstring, $1;
-	} else { die "error parsing mapstring $mapstring"; }
+    while ($mapstring) {
+        if ( $mapstring =~ /^\s*\"((?>(?:(?>[^\"\\]+)|\\.)*))\"(.*)$/ ) {
+            $mapstring = $2;
+            my $ms = $1;
+            $ms =~ s/\\\"/\"/g;
+            push @mapstring, $ms;
+        }
+        elsif ( $mapstring =~ /^\s*\'((?>(?:(?>[^\'\\]+)|\\.)*))\'(.*)$/ ) {
+            $mapstring = $2;
+            my $ms = $1;
+            $ms =~ s/\\\'/\'/g;
+            push @mapstring, $ms;
+        }
+        elsif ( $mapstring =~ s/^\s*(\S+)\s*(.*)$/$2/ ) {
+            push @mapstring, $1;
+        }
+        else { die "error parsing mapstring $mapstring"; }
     }
-    
+
     my $maxpass = 0;
   PASS:
-    for( my $pass = 0; 1 ; $pass++ ) {
-	$wikiname = '';
-	
-	foreach my $ele (@mapstring) {
-	    
-	    $ele =~ m/(\^)?(?:(\d+)?\?)?([A-Za-z]+(?:\.\d+)?)(.*)$/;
-	    my $eflags = $1 | '';
-	    my $pnum = $2 || 0;
-	    my $ename = $3;
-	    my $substr = $4;
-	    
-	    $maxpass = $pnum if( $pnum > $maxpass );
-	    
-	    if( $pass >= $pnum ) {
-		my $ev = $cert->element($ename) || '';
-		next unless( $ev );
-		
-		$ev = join( ' ', map { ucfirst $_ } (split( /\s+/, $ev )) ) if( $eflags =~ /\^/ );
-		
-		if( $substr ) {
-		    eval( "\$ev =~ s$substr;" );
-		    die "X509 eval failed: $@" if( $@ );
-		}
-		$ev = join( '', split( /\s+/, $ev ) );
-		$wikiname .= $ev;
-	    }
-	}
-	last PASS if( !$this->{passwords}->fetchPass( $wikiname ) || $pass >= $maxpass );
+    for ( my $pass = 0 ; 1 ; $pass++ ) {
+        $wikiname = '';
+
+        foreach my $ele (@mapstring) {
+
+            $ele =~ m/(\^)?(?:(\d+)?\?)?([A-Za-z]+(?:\.\d+)?)(.*)$/;
+            my $eflags = $1 | '';
+            my $pnum   = $2 || 0;
+            my $ename  = $3;
+            my $substr = $4;
+
+            $maxpass = $pnum if ( $pnum > $maxpass );
+
+            if ( $pass >= $pnum ) {
+                my $ev = $cert->element($ename) || '';
+                next unless ($ev);
+
+                $ev = join( ' ', map { ucfirst $_ } ( split( /\s+/, $ev ) ) )
+                  if ( $eflags =~ /\^/ );
+
+                if ($substr) {
+                    eval("\$ev =~ s$substr;");
+                    die "X509 eval failed: $@" if ($@);
+                }
+                $ev = join( '', split( /\s+/, $ev ) );
+                $wikiname .= $ev;
+            }
+        }
+        last PASS
+          if ( !$this->{passwords}->fetchPass($wikiname) || $pass >= $maxpass );
     }
 
-    unless( $wikiname && $wikiname =~ m/^$Foswiki::regex{wikiWordRegex}$/ ) {
-	throw Error::Simple( "X509: Unable to translate $certname to a wikiname: Produced $wikiname; check \{X509UserPlugin\}\{X509Cert2Wiki\}" );
+    unless ( $wikiname && $wikiname =~ m/^$Foswiki::regex{wikiWordRegex}$/ ) {
+        throw Error::Simple(
+"X509: Unable to translate $certname to a wikiname: Produced $wikiname; check \{X509UserPlugin\}\{X509Cert2Wiki\}"
+        );
     }
 
-    if( $this->{passwords}->fetchPass( $wikiname ) ) {
-	my $seq = 1;
-	while( $this->{passwords}->fetchPass( $wikiname . $seq ) ) {
-	    $seq++;
-	}
-	$wikiname .= $seq;
+    if ( $this->{passwords}->fetchPass($wikiname) ) {
+        my $seq = 1;
+        while ( $this->{passwords}->fetchPass( $wikiname . $seq ) ) {
+            $seq++;
+        }
+        $wikiname .= $seq;
     }
 
     return $wikiname;
@@ -531,15 +588,15 @@ topics, which may still be linked.
 =cut
 
 sub removeUser {
-    my( $this, $cUID ) = @_;
+    my ( $this, $cUID ) = @_;
 
-    my $ln = $this->getLoginName( $cUID );
+    my $ln = $this->getLoginName($cUID);
 
     my $result = $this->{passwords}->removeUser($ln);
 
-    if( exists $this->{U2W}->{$cUID} ) {
-	delete $this->{W2U}->{$this->{U2W}->{$cUID}};
-	delete $this->{U2W}->{$cUID};
+    if ( exists $this->{U2W}->{$cUID} ) {
+        delete $this->{W2U}->{ $this->{U2W}->{$cUID} };
+        delete $this->{U2W}->{$cUID};
     }
     delete $this->{L2U}->{$ln};
 
@@ -558,10 +615,10 @@ If there is no matching WikiName or LoginName, it returns undef.
 =cut
 
 sub getWikiName {
-    my ($this, $cUID) = @_;
+    my ( $this, $cUID ) = @_;
     ASSERT($cUID) if DEBUG;
-    ASSERT($cUID =~ /^$this->{mapping_id}/) if DEBUG;
-	
+    ASSERT( $cUID =~ /^$this->{mapping_id}/ ) if DEBUG;
+
     my $wikiname;
 
     $this->_loadMapping();
@@ -569,11 +626,12 @@ sub getWikiName {
     $wikiname = $this->{U2W}->{$cUID};
 
     unless ($wikiname) {
-	$wikiname = $this->getLoginName( $cUID );
-	if ($wikiname) {
-	    # sanitise the generated WikiName
-	    $wikiname =~ s/$Foswiki::cfg{NameFilter}//go;
-	}
+        $wikiname = $this->getLoginName($cUID);
+        if ($wikiname) {
+
+            # sanitise the generated WikiName
+            $wikiname =~ s/$Foswiki::cfg{NameFilter}//go;
+        }
     }
     return $wikiname;
 }
@@ -588,22 +646,22 @@ or not is determined by the password manager.
 =cut
 
 sub userExists {
-    my( $this, $cUID ) = @_;
+    my ( $this, $cUID ) = @_;
     ASSERT($cUID) if DEBUG;
 
     # Do this to avoid a password manager lookup
     return 1 if $cUID eq $this->{session}->{user};
 
-    my $loginName = $this->getLoginName( $cUID );
+    my $loginName = $this->getLoginName($cUID);
     return 0 unless defined($loginName);
 
-    return 1 if( $loginName eq $Foswiki::cfg{DefaultUserLogin} );
+    return 1 if ( $loginName eq $Foswiki::cfg{DefaultUserLogin} );
 
     # Foswiki allows *groups* to log in
-    return 1 if( $this->isGroup( $loginName ));
+    return 1 if ( $this->isGroup($loginName) );
 
     # Look them up in the password manager (can be slow).
-    return 1 if( $this->{passwords}->fetchPass( $loginName ));
+    return 1 if ( $this->{passwords}->fetchPass($loginName) );
 
 #    unless ( $this->{passwords}->canFetchUsers() ) {
 #        if (Foswiki::Func::topicExists($Foswiki::cfg{UsersWebName}, $loginName)) {
@@ -623,20 +681,23 @@ See baseclass for documentation
 =cut
 
 sub eachUser {
-    my( $this ) = @_;
+    my ($this) = @_;
 
-    _loadMapping( $this );
-    my @list = keys(%{$this->{U2W}});
+    _loadMapping($this);
+    my @list = keys( %{ $this->{U2W} } );
     require Foswiki::ListIterator;
     my $iter = new Foswiki::ListIterator( \@list );
     $iter->{filter} = sub {
+
         # don't claim users that are handled by the basemapping
-        my $cUID = $_[0] || '';
-        my $login = $this->{session}->{users}->getLoginName($cUID);
-        my $wikiname =  $this->{session}->{users}->getWikiName($cUID);
+        my $cUID     = $_[0] || '';
+        my $login    = $this->{session}->{users}->getLoginName($cUID);
+        my $wikiname = $this->{session}->{users}->getWikiName($cUID);
+
         #print STDERR "**** $cUID  $login  $wikiname \n";
         require Foswiki::Plugins;
-        return !($Foswiki::Plugins::SESSION->{users}->{basemapping}->handlesUser ( undef, $login, $wikiname) );
+        return !( $Foswiki::Plugins::SESSION->{users}->{basemapping}
+            ->handlesUser( undef, $login, $wikiname ) );
     };
     return $iter;
 }
@@ -652,28 +713,28 @@ See baseclass for documentation
 =cut
 
 sub eachGroupMember {
-    my $this = shift;
+    my $this  = shift;
     my $group = shift;
 
     return new Foswiki::ListIterator( $this->{eachGroupMember}->{$group} )
-            if (defined($this->{eachGroupMember}->{$group}));
+      if ( defined( $this->{eachGroupMember}->{$group} ) );
 
     my $store = $this->{session}->{store};
     my $users = $this->{session}->{users};
 
     my $members = [];
 
-    if( !$expanding{$group} &&
-          $store->topicExists( $Foswiki::cfg{UsersWebName}, $group )) {
+    if (  !$expanding{$group}
+        && $store->topicExists( $Foswiki::cfg{UsersWebName}, $group ) )
+    {
         $expanding{$group} = 1;
-        my $text =
-          $store->readTopicRaw( undef,
-                                $Foswiki::cfg{UsersWebName}, $group,
-                                undef );
+        my $text = $store->readTopicRaw( undef, $Foswiki::cfg{UsersWebName},
+            $group, undef );
 
-        foreach( split( /\r?\n/, $text ) ) {
-            if( /$Foswiki::regex{setRegex}GROUP\s*=\s*(.+)$/ ) {
-                next unless( $1 eq 'Set' );
+        foreach ( split( /\r?\n/, $text ) ) {
+            if (/$Foswiki::regex{setRegex}GROUP\s*=\s*(.+)$/) {
+                next unless ( $1 eq 'Set' );
+
                 # Note: if there are multiple GROUP assignments in the
                 # topic, only the last will be taken.
                 my $f = $2;
@@ -688,7 +749,6 @@ sub eachGroupMember {
     return new Foswiki::ListIterator( $this->{eachGroupMember}->{$group} );
 }
 
-
 =begin TML
 
 ---++ ObjectMethod isGroup ($user) -> boolean
@@ -698,7 +758,7 @@ See baseclass for documentation
 =cut
 
 sub isGroup {
-    my ($this, $user) = @_;
+    my ( $this, $user ) = @_;
 
     # Groups have the same username as wikiname as canonical name
     return 1 if $user eq $Foswiki::cfg{SuperAdminGroup};
@@ -715,12 +775,11 @@ See baseclass for documentation
 =cut
 
 sub eachGroup {
-    my ( $this ) = @_;
-    _getListOfGroups( $this );
+    my ($this) = @_;
+    _getListOfGroups($this);
     require Foswiki::ListIterator;
-    return new Foswiki::ListIterator( \@{$this->{groupsList}} );
+    return new Foswiki::ListIterator( \@{ $this->{groupsList} } );
 }
-
 
 =begin TML
 
@@ -731,13 +790,13 @@ See baseclass for documentation
 =cut
 
 sub eachMembership {
-    my ($this, $user) = @_;
+    my ( $this, $user ) = @_;
 
-    _getListOfGroups( $this );
+    _getListOfGroups($this);
     require Foswiki::ListIterator;
-    my $it = new Foswiki::ListIterator( \@{$this->{groupsList}} );
+    my $it = new Foswiki::ListIterator( \@{ $this->{groupsList} } );
     $it->{filter} = sub {
-        $this->isInGroup($user, $_[0]);
+        $this->isInGroup( $user, $_[0] );
     };
     return $it;
 }
@@ -753,12 +812,14 @@ True if the user is an admin
 =cut
 
 sub isAdmin {
-    my( $this, $cUID ) = @_;
+    my ( $this, $cUID ) = @_;
     my $isAdmin = 0;
+
     # TODO: this might not apply now that we have BaseUserMapping - test
-    if ($cUID eq $Foswiki::cfg{SuperAdminGroup}) {
+    if ( $cUID eq $Foswiki::cfg{SuperAdminGroup} ) {
         $isAdmin = 1;
-    } else {
+    }
+    else {
         my $sag = $Foswiki::cfg{SuperAdminGroup};
         $isAdmin = $this->isInGroup( $cUID, $sag );
     }
@@ -779,16 +840,16 @@ If it doesn\'t, then the user mapping manager is asked instead.
 =cut
 
 sub findUserByEmail {
-    my( $this, $email ) = @_;
+    my ( $this, $email ) = @_;
     ASSERT($email) if DEBUG;
     my @users;
 
-    my $logins = $this->{passwords}->findUserByEmail( $email );
-    if (defined $logins) {
-	foreach my $l ( @$logins ) {
-	    $l = $this->login2cUID( $l );
-	    push( @users, $l ) if $l;
-	}
+    my $logins = $this->{passwords}->findUserByEmail($email);
+    if ( defined $logins ) {
+        foreach my $l (@$logins) {
+            $l = $this->login2cUID($l);
+            push( @users, $l ) if $l;
+        }
     }
 
     return \@users;
@@ -809,29 +870,32 @@ Duplicates are removed from the list.
 =cut
 
 sub getEmails {
-    my( $this, $user, $seen ) = @_;
+    my ( $this, $user, $seen ) = @_;
 
     $seen ||= {};
 
     my %emails = ();
 
-    unless ($seen->{$user}) {
-      $seen->{$user} = 1;
+    unless ( $seen->{$user} ) {
+        $seen->{$user} = 1;
 
-      if ( $this->isGroup($user) ) {
-          my $it = $this->eachGroupMember( $user );
-          while( $it->hasNext() ) {
-              foreach ($this->getEmails( $it->next(), $seen )) {
-                  $emails{$_} = 1;
-              }
-          }
-      } else {
-	  # get emails from the password manager
-	  foreach ($this->{passwords}->getEmails(
-						 $this->getLoginName( $user ), $seen )) {
-	      $emails{$_} = 1;
-	  }
-      }
+        if ( $this->isGroup($user) ) {
+            my $it = $this->eachGroupMember($user);
+            while ( $it->hasNext() ) {
+                foreach ( $this->getEmails( $it->next(), $seen ) ) {
+                    $emails{$_} = 1;
+                }
+            }
+        }
+        else {
+
+            # get emails from the password manager
+            foreach ( $this->{passwords}
+                ->getEmails( $this->getLoginName($user), $seen ) )
+            {
+                $emails{$_} = 1;
+            }
+        }
     }
 
     return keys %emails;
@@ -850,9 +914,8 @@ sub setEmails {
     my $this = shift;
     my $user = shift;
 
-    $this->{passwords}->setEmails( $this->getLoginName( $user ), @_ );
+    $this->{passwords}->setEmails( $this->getLoginName($user), @_ );
 }
-
 
 =begin TML
 
@@ -868,25 +931,28 @@ from Foswiki topics.
 =cut
 
 sub mapper_getEmails {
-    my( $session, $user ) = @_;
+    my ( $session, $user ) = @_;
 
     die "Should not be called for X509 - is X509PasswdUser configured?";
 
-    my ($meta, $text) =
-      $session->{store}->readTopic(
-          undef, $Foswiki::cfg{UsersWebName},
-          $session->{users}->getWikiName($user) );
+    my ( $meta, $text ) = $session->{store}->readTopic(
+        undef,
+        $Foswiki::cfg{UsersWebName},
+        $session->{users}->getWikiName($user)
+    );
 
     my @addresses;
 
     # Try the form first
-    my $entry = $meta->get('FIELD', 'Email');
+    my $entry = $meta->get( 'FIELD', 'Email' );
     if ($entry) {
         push( @addresses, split( /;/, $entry->{value} ) );
-    } else {
+    }
+    else {
+
         # Now try the topic text
-        foreach my $l (split ( /\r?\n/, $text  )) {
-            if ($l =~ /^\s+\*\s+E-?mail:\s*(.*)$/mi) {
+        foreach my $l ( split( /\r?\n/, $text ) ) {
+            if ( $l =~ /^\s+\*\s+E-?mail:\s*(.*)$/mi ) {
                 push @addresses, split( /;/, $1 );
             }
         }
@@ -906,36 +972,40 @@ Only used if =passwordManager->isManagingEmails= = =false=.
 
 sub mapper_setEmails {
     my $session = shift;
-    my $cUID = shift;
+    my $cUID    = shift;
 
     die "Should not be called for X509 - is X509PasswdUser configured?";
     my $mails = join( ';', @_ );
 
-    my $user = $session->{users}->getWikiName( $cUID );
+    my $user = $session->{users}->getWikiName($cUID);
 
-    my ($meta, $text) =
-      $session->{store}->readTopic(
-          undef, $Foswiki::cfg{UsersWebName},
-          $user);
+    my ( $meta, $text ) =
+      $session->{store}->readTopic( undef, $Foswiki::cfg{UsersWebName}, $user );
 
-    if ($meta->get('FORM')) {
+    if ( $meta->get('FORM') ) {
+
         # use the form if there is one
-        $meta->putKeyed( 'FIELD',
-                         { name => 'Email',
-                           value => $mails,
-                           title => 'Email',
-                           attributes=> 'h' } );
-    } else {
+        $meta->putKeyed(
+            'FIELD',
+            {
+                name       => 'Email',
+                value      => $mails,
+                title      => 'Email',
+                attributes => 'h'
+            }
+        );
+    }
+    else {
+
         # otherwise use the topic text
-        unless( $text =~ s/^(\s+\*\s+E-?mail:\s*).*$/$1$mails/mi ) {
+        unless ( $text =~ s/^(\s+\*\s+E-?mail:\s*).*$/$1$mails/mi ) {
             $text .= "\n   * Email: $mails\n";
         }
     }
 
-    $session->{store}->saveTopic(
-        $cUID, $Foswiki::cfg{UsersWebName}, $user, $text, $meta );
+    $session->{store}
+      ->saveTopic( $cUID, $Foswiki::cfg{UsersWebName}, $user, $text, $meta );
 }
-
 
 =begin TML
 
@@ -950,24 +1020,29 @@ to avoid reading .htpasswd when checking group memberships).
 =cut
 
 sub findUserByWikiName {
-    my( $this, $wn, $skipExistanceCheck ) = @_;
+    my ( $this, $wn, $skipExistanceCheck ) = @_;
     my @users = ();
 
-    if( $this->isGroup( $wn )) {
-        push( @users, $wn);
-    } else {
+    if ( $this->isGroup($wn) ) {
+        push( @users, $wn );
+    }
+    else {
+
         # Add additional mappings defined in WikiUsers
-        _loadMapping( $this );
-        if( $this->{W2U}->{$wn} ) {
+        _loadMapping($this);
+        if ( $this->{W2U}->{$wn} ) {
+
             # Wikiname to UID mapping is defined
             push( @users, $this->{W2U}->{$wn} );
-        } else {
-            # Bloody compatibility!
-            # The wikiname is always a registered user for the purposes of this
-            # mapping. We have to do this because Foswiki defines access controls
-            # in terms of mapped users, and if a wikiname is *missing* from the
-            # mapping there is "no such user".
-            push( @users, $this->login2cUID( $wn ));
+        }
+        else {
+
+           # Bloody compatibility!
+           # The wikiname is always a registered user for the purposes of this
+           # mapping. We have to do this because Foswiki defines access controls
+           # in terms of mapped users, and if a wikiname is *missing* from the
+           # mapping there is "no such user".
+            push( @users, $this->login2cUID($wn) );
         }
     }
 
@@ -985,9 +1060,8 @@ Returns 1 on success, undef on failure.
 =cut
 
 sub checkPassword {
-    my( $this, $cUID, $pw ) = @_;
-    return $this->{passwords}->checkPassword(
-        $this->getLoginName($cUID), $pw );
+    my ( $this, $cUID, $pw ) = @_;
+    return $this->{passwords}->checkPassword( $this->getLoginName($cUID), $pw );
 }
 
 =begin TML
@@ -1014,9 +1088,9 @@ Otherwise returns 1 on success, undef on failure.
 =cut
 
 sub setPassword {
-    my( $this, $user, $newPassU, $oldPassU ) = @_;
-    return $this->{passwords}->setPassword(
-        $this->getLoginName( $user ), $newPassU, $oldPassU);
+    my ( $this, $user, $newPassU, $oldPassU ) = @_;
+    return $this->{passwords}
+      ->setPassword( $this->getLoginName($user), $newPassU, $oldPassU );
 }
 
 =begin TML
@@ -1031,13 +1105,13 @@ returns undef if no error
 =cut
 
 sub passwordError {
-    my( $this ) = @_;
+    my ($this) = @_;
     return $this->{passwords}->error();
 }
 
 # TODO: and probably flawed in light of multiple cUIDs mapping to one wikiname
 sub _cacheUser {
-    my($this, $wikiname, $login) = @_;
+    my ( $this, $wikiname, $login ) = @_;
     ASSERT($wikiname) if DEBUG;
 
     $login ||= $wikiname;
@@ -1054,43 +1128,43 @@ sub _cacheUser {
     return $cUID;
 }
 
-
 # callback for search function to collate results
 sub _collateGroups {
-    my $ref = shift;
+    my $ref   = shift;
     my $group = shift;
     return unless $group;
-    push (@{$ref->{list}}, $group);
+    push( @{ $ref->{list} }, $group );
 }
-
 
 # get a list of groups defined in this Foswiki
 sub _getListOfGroups {
     my $this = shift;
     ASSERT( $this->isa('Foswiki::Users::X509UserMapping') ) if DEBUG;
-#??
-    unless( $this->{groupsList} ) {
+
+    #??
+    unless ( $this->{groupsList} ) {
         my $users = $this->{session}->{users};
         $this->{groupsList} = [];
 
-        $this->{session}->search->searchWeb
-          (
-              _callback     => \&_collateGroups,
-              _cbdata       =>  { list => $this->{groupsList},
-                                  users => $users },
-              inline        => 1,
-              search        => "Set GROUP =",
-              web           => $Foswiki::cfg{UsersWebName},
-              topic         => "*Group",
-              type          => 'regex',
-              nosummary     => 'on',
-              nosearch      => 'on',
-              noheader      => 'on',
-              nototal       => 'on',
-              noempty       => 'on',
-              format	     => '$topic',
-              separator     => '',
-             );
+        $this->{session}->search->searchWeb(
+            _callback => \&_collateGroups,
+            _cbdata   => {
+                list  => $this->{groupsList},
+                users => $users
+            },
+            inline    => 1,
+            search    => "Set GROUP =",
+            web       => $Foswiki::cfg{UsersWebName},
+            topic     => "*Group",
+            type      => 'regex',
+            nosummary => 'on',
+            nosearch  => 'on',
+            noheader  => 'on',
+            nototal   => 'on',
+            noempty   => 'on',
+            format    => '$topic',
+            separator => '',
+        );
     }
     return $this->{groupsList};
 }
@@ -1103,40 +1177,46 @@ sub _loadMapping {
     $this->{CACHED} = 1;
 
     my $iter = $this->{passwords}->fetchUsers();
-    while ($iter->hasNext()) {
-	my $wikiname = $iter->next();
-	_cacheUser( $this, $wikiname, $this->{passwords}->wiki2Login( $wikiname, 1 ) );
+    while ( $iter->hasNext() ) {
+        my $wikiname = $iter->next();
+        _cacheUser( $this, $wikiname,
+            $this->{passwords}->wiki2Login( $wikiname, 1 ) );
     }
-    return
+    return;
 }
 
 # Get a list of *canonical user ids* from a text string containing a
 # list of user *wiki* names, *login* names, and *group ids*.
 sub _expandUserList {
-    my( $this, $names ) = @_;
+    my ( $this, $names ) = @_;
 
     $names ||= '';
+
     # comma delimited list of users or groups
     # i.e.: "%USERSWEB%.UserA, UserB, Main.UserC # something else"
-    $names =~ s/(<[^>]*>)//go;     # Remove HTML tags
+    $names =~ s/(<[^>]*>)//go;    # Remove HTML tags
 
     my @l;
-    foreach my $ident ( split( /[\,\s]+/, $names )) {
+    foreach my $ident ( split( /[\,\s]+/, $names ) ) {
+
         # Dump the web specifier if userweb
         $ident =~ s/^($Foswiki::cfg{UsersWebName}|%USERSWEB%|%MAINWEB%)\.//;
         next unless $ident;
-        if( $this->isGroup( $ident )) {
-            my $it = $this->eachGroupMember( $ident );
-            while( $it->hasNext() ) {
+        if ( $this->isGroup($ident) ) {
+            my $it = $this->eachGroupMember($ident);
+            while ( $it->hasNext() ) {
                 push( @l, $it->next() );
             }
-        } else {
+        }
+        else {
+
             # Might be a wiki name (wiki names may map to several cUIDs)
-            my %names = map { $_ => 1 }
-              @{$this->{session}->{users}->findUserByWikiName( $ident )};
+            my %names =
+              map { $_ => 1 }
+              @{ $this->{session}->{users}->findUserByWikiName($ident) };
+
             # May be a login name (login names map to a single cUID)
-            my $cUID = $this->{session}->{users}->getCanonicalUserID(
-                $ident );
+            my $cUID = $this->{session}->{users}->getCanonicalUserID($ident);
             $names{$cUID} = 1 if $cUID;
             push( @l, keys %names );
         }

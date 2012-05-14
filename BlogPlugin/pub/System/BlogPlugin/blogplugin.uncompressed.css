@@ -4,12 +4,14 @@
 .blogEntry {
   text-align:justify;
 }
-.blogEntry .foswikiTopicInfo {
-  text-align:left;
-}
 .blogEntriesSticky {
-  margin-bottom:2.7692em; /* 36px 36px */
-  padding:1em;
+  margin-bottom:1.5em; 
+  padding:1.5em;
+  background-color:#f5f5f5;
+  border:1px solid #e7e7e7;
+          border-radius: 5px;
+     -moz-border-radius: 5px; 
+  -webkit-border-radius: 5px; 
 }
 .blogEntriesSticky h2 {
   margin-top:0px;
@@ -47,8 +49,71 @@
 }
 .blogCategoryTitle {
   border:0px;
-  float:left;
-}
-.blogCategoryTitle h1 {
   margin-top:0px;
+  color:gray;
+}
+
+#patternScreen .blogEntry {
+  margin-top:1em;
+}
+#patternScreen .blogEntries {
+  margin-top:1em;
+  margin-bottom:1.5em;
+}
+#patternScreen .blogEntriesSticky > .blogEntry:first-child {
+  margin-top:0;
+}
+.patternContent {
+  margin-bottom:1em;
+}
+#patternMainContents .blogEntry h1,
+#patternMainContents .blogEntry .foswikiTopicInfo h2 {
+  line-height:normal;
+  border-bottom:1px solid #ddd;
+  margin-top:0px;
+}
+#patternMainContents .blogEntry .foswikiTopicInfo h2,
+#patternMainContents .blogEntry .foswikiTopicInfo h2 a {
+  color:#333;
+}
+#patternMainContents .foswikiTopicInfo {
+  margin:0 0 1.5em;
+}
+#patternScreen .foswikiTopicInfo,
+#patternScreen .foswikiTopicInfo a {
+  color:#808080;
+}
+#patternMainContents .foswikiTopicInfo h1,
+#patternMainContents .foswikiTopicInfo h1 a {
+  color:#333;
+}
+
+#patternMainContents h1 .foswikiTopicSummary,
+#patternMainContents h2 .foswikiTopicSummary {
+  font-size:13px;
+  color:#808080;
+}
+#patternSideBar .blogSideBarSection h2 {
+  margin:2em 0 0.5em;
+  font-size:15px;
+}
+#patternSideBar .blogAbout h2 {
+  margin-top:0;
+}
+#patternSideBar .blogSideBarSection ul {
+  border-top:1px solid #ddd;
+}
+#patternSideBar .blogSideBarSection li {
+  border-bottom:1px solid #ddd;
+  padding:6px 0 5px;
+}
+#patternScreen p {
+  margin-top:0;
+}
+.patternWebIndicator {
+  display:none;
+}
+#patternSideBarContents {
+  padding-right:0px;
+  padding-left:1.5em;
 }

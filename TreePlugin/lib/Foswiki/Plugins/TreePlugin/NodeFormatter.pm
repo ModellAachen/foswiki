@@ -25,7 +25,7 @@ Superclass for node types. Formatting functions are implemented by subclasses.
 
 sub new { }
 
-sub separator { return ""; } #no separator by default
+sub separator { return ""; }    #no separator by default
 
 sub initNode { _unimplemented( "initNode", @_ ); }
 
@@ -55,14 +55,14 @@ Checks if the current level is within bounds set by startlevel and stoplevel.
 
 sub isInsideLevelBounds {
     my ( $this, $level ) = @_;
-	
-	return 1 if not defined $level;
-         
+
+    return 1 if not defined $level;
+
     return 0 if ( $level < $this->data("startlevel") );
 
     return 0 if ( $level > $this->data("stoplevel") );
 
-    return 1; 
+    return 1;
 }
 
 =pod
@@ -75,14 +75,14 @@ Might not be the best way to solve this problem.
 
 sub isOneOffLevelBounds {
     my ( $this, $level ) = @_;
-	
-	return 1 if not defined $level;
 
-    return 0 if ( $level < ($this->data("startlevel") - 1) );
+    return 1 if not defined $level;
 
-    return 0 if ( $level > ($this->data("stoplevel") + 1) );
+    return 0 if ( $level < ( $this->data("startlevel") - 1 ) );
 
-    return 1; 
+    return 0 if ( $level > ( $this->data("stoplevel") + 1 ) );
+
+    return 1;
 }
 
 1;

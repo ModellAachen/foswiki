@@ -272,8 +272,9 @@ sub _addListItem {
         my $firstTime = 1;
         while ( $size < $depth ) {
             push( @{ $this->{LIST} }, { type => $type, element => $element } );
-            push( @$result, " <$element" . ($css ? " class='$css'" : "") .">\n" )
-		unless ($firstTime);
+            push( @$result,
+                " <$element" . ( $css ? " class='$css'" : "" ) . ">\n" )
+              unless ($firstTime);
             push( @$result, ' <' . $type . ">\n" ) if $type;
             $firstTime = 0;
             $size++;
@@ -282,14 +283,14 @@ sub _addListItem {
     else {
         while ( $size > $depth ) {
             my $tags = pop( @{ $this->{LIST} } );
-	    my $r = "\n</" . $tags->{element} . '>';
-	    $r .= '</' . $tags->{type} . '> ' if $tags->{type};
+            my $r    = "\n</" . $tags->{element} . '>';
+            $r .= '</' . $tags->{type} . '> ' if $tags->{type};
             push( @$result, $r );
             $size--;
         }
         if ($size) {
             push( @$result,
-              "\n</" . $this->{LIST}->[ $size - 1 ]->{element} . '> ' );
+                "\n</" . $this->{LIST}->[ $size - 1 ]->{element} . '> ' );
         }
         else {
             push( @$result, "\n" );
@@ -299,13 +300,12 @@ sub _addListItem {
     if ($size) {
         my $oldt = $this->{LIST}->[ $size - 1 ];
         if ( $oldt->{type} ne $type ) {
-	    my $r = '';
-	    $r .= ' </' . $oldt->{type} . '>' if $oldt->{type};
-	    $r .= '<' . $type . ">\n" if $type;
+            my $r = '';
+            $r .= ' </' . $oldt->{type} . '>' if $oldt->{type};
+            $r .= '<' . $type . ">\n" if $type;
             push( @$result, $r ) if $r;
             pop( @{ $this->{LIST} } );
-            push( @{ $this->{LIST} }, {
-		type => $type, element => $element } );
+            push( @{ $this->{LIST} }, { type => $type, element => $element } );
         }
     }
 }
@@ -451,8 +451,8 @@ sub _makeAnchorHeading {
 
     my $html =
         '<nop><h' 
-      . $level . '>'
-      . $anchors->makeHTMLTarget($text) . ' '
+      . $level . ' ' . 'id="'
+      . $anchors->makeHTMLTarget($text) . '"> '
       . $text . ' </h'
       . $level . '>';
 
@@ -509,7 +509,7 @@ sub _linkToolTipInfo {
         }
         $summary = $topicObject->summariseText();
         $summary =~
-          s/[\"\']//g;    # remove quotes (not allowed in title attribute)
+          s/[\"\']/<nop>/g;    # remove quotes (not allowed in title attribute)
         $tooltip =~ s/\$summary/$summary/g;
     }
     return $tooltip;
@@ -683,12 +683,14 @@ sub _renderExistingWikiWord {
     my $tooltip = _linkToolTipInfo( $this, $web, $topic );
     $attrs{title} = $tooltip if $tooltip;
 
+    my $aFlag = CGI::autoEscape(0);
     my $link = CGI::a( \%attrs, $text );
+    CGI::autoEscape($aFlag);
 
     # When we pass the tooltip text to CGI::a it may contain
     # <nop>s, and CGI::a will convert the < to &lt;. This is a
     # basic problem with <nop>.
-    $link =~ s/&lt;nop&gt;/<nop>/g;
+    #$link =~ s/&lt;nop&gt;/<nop>/g;
     return $link;
 }
 
@@ -1078,6 +1080,38 @@ sub renderFORMFIELD {
     return $text;
 }
 
+# Adjust heading levels
+# <h off="1"> will increase the indent level by 1
+# <h off="-1"> will decrease the indent level by 1
+sub _adjustH {
+    my ($text) = @_;
+
+    my @blocks = split( /(<ho(?:\s+off="(?:[-+]?\d+)")?\s*\/?>)/i, $text );
+
+    return $text unless scalar(@blocks) > 1;
+
+    sub _cap {
+        return 1 if ( $_[0] < 1 );
+        return 6 if ( $_[0] > 6 );
+        return $_[0];
+    }
+
+    my $off = 0;
+    my $out = '';
+    while ( scalar(@blocks) ) {
+        my $i = shift(@blocks);
+        if ( $i =~ /^<ho(?:\s+off="([-+]?\d+)")?\s*\/?>$/i && $1 ) {
+            $off += $1;
+        }
+        else {
+            $i =~ s/(<\/?h)(\d)((\s+.*?)?>)/$1 . _cap($2 + $off) . $3/gesi
+              if ($off);
+            $out .= $i;
+        }
+    }
+    return $out;
+}
+
 =begin TML
 
 ---++ ObjectMethod getRenderedVersion ( $text, $topicObject ) -> $html
@@ -1191,6 +1225,11 @@ sub getRenderedVersion {
         $text = $rt;
     }
 
+    # Remove input fields: Item11480
+    $text =
+      $this->_takeOutProtected( $text, qr/<input\b.*?\/>/si, 'input',
+        $removed );
+
     # Escape rendering: Change ' !AnyWord' to ' <nop>AnyWord',
     # for final ' AnyWord' output
     $text =~ s/$STARTWW\!(?=[\w\*\=])/<nop>/gm;
@@ -1237,8 +1276,8 @@ sub getRenderedVersion {
     # '#WikiName' anchors. Don't attempt to make these unique; renaming
     # user-defined anchors is not sensible.
     $text =~ s/^(\#$Foswiki::regex{wikiWordRegex})/
-      CGI::a({
-          name => $anchors->add( $1 )
+      CGI::span({
+          id => $anchors->add( $1 )
          }, '')/geom;
 
     # Headings
@@ -1421,6 +1460,9 @@ sub getRenderedVersion {
         Foswiki::putBackBlocks( \$text, $removed, 'noautolink' );
     }
 
+    # Restore input fields before calling the end/post handlers
+    $this->_putBackProtected( \$text, 'input', $removed );
+
     Foswiki::putBackBlocks( \$text, $removed, 'pre' );
 
     # DEPRECATED plugins hook after PRE re-inserted
@@ -1439,6 +1481,8 @@ sub getRenderedVersion {
     $this->_putBackProtected( \$text, 'comment',  $removed );
     $this->_putBackProtected( \$text, 'head',     $removed );
     $this->_putBackProtected( \$text, 'textarea', $removed );
+
+    $text = _adjustH($text);
 
     $this->{session}->getLoginManager()->endRenderingHandler($text);
 
@@ -1712,11 +1756,12 @@ Obtain and render revision info for a topic.
 sub renderRevisionInfo {
     my ( $this, $topicObject, $rrev, $format ) = @_;
     my $value = $format || 'r$rev - $date - $time - $wikiusername';
+    $value = Foswiki::expandStandardEscapes($value);
 
     # nop if there are no format tokens
     return $value
       unless $value =~
-/\$(year|ye|wikiusername|wikiname|week|web|wday|username|tz|topic|time|seconds|sec|rev|rcs|month|mo|minutes|min|longdate|isotz|iso|http|hours|hou|epoch|email|dow|day|date)/x;
+/\$(?:year|ye|wikiusername|wikiname|week|we|web|wday|username|tz|topic|time|seconds|sec|rev|rcs|month|mo|minutes|min|longdate|isotz|iso|http|hours|hou|epoch|email|dow|day|date)/x;
 
     my $users = $this->{session}->{users};
     if ($rrev) {
@@ -1793,7 +1838,7 @@ sub renderRevisionInfo {
       Foswiki::Time::formatTime($info->{date}, $1 )/ge;
 
     if ( $value =~
-/\$(year|ye|week|web|wday|username|tz|seconds|sec|rcs|month|mo|minutes|min|longdate|hours|hou|epoch|dow|day)/
+/\$(?:year|ye|week|we|web|wday|username|tz|seconds|sec|rcs|month|mo|minutes|min|longdate|hours|hou|epoch|dow|day)/
       )
     {
         $value = Foswiki::Time::formatTime( $info->{date}, $value );
@@ -2245,7 +2290,7 @@ sub renderIconImage {
 __END__
 Foswiki - The Free and Open Source Wiki, http://foswiki.org/
 
-Copyright (C) 2008-2011 Foswiki Contributors. Foswiki Contributors
+Copyright (C) 2008-2012 Foswiki Contributors. Foswiki Contributors
 are listed in the AUTHORS file in the root of this distribution.
 NOTE: Please extend that file, not this notice.
 

@@ -19,36 +19,38 @@
 
 # Standard preamble
 BEGIN {
-  foreach my $pc (split(/:/, $ENV{FOSWIKI_LIBS})) {
-    unshift @INC, $pc;
-  }
+    foreach my $pc ( split( /:/, $ENV{FOSWIKI_LIBS} ) ) {
+        unshift @INC, $pc;
+    }
 }
 
 use TWiki::Contrib::Build;
 
 # Declare our build package
-{ package SectionalEditPluginBuild;
+{
 
-  @SectionalEditPluginBuild::ISA = ( "TWiki::Contrib::Build" );
+    package SectionalEditPluginBuild;
 
-  sub new {
-    my $class = shift;
-    return bless( $class->SUPER::new( "SectionalEditPlugin" ), $class );
-  }
+    @SectionalEditPluginBuild::ISA = ("TWiki::Contrib::Build");
 
-  # Example: Override the build target
-  sub target_build {
-    my $this = shift;
+    sub new {
+        my $class = shift;
+        return bless( $class->SUPER::new("SectionalEditPlugin"), $class );
+    }
 
-    $this->SUPER::target_build();
+    # Example: Override the build target
+    sub target_build {
+        my $this = shift;
 
-    # Do other build stuff here
-  }
+        $this->SUPER::target_build();
+
+        # Do other build stuff here
+    }
 }
 
 # Create the build object
 $build = new SectionalEditPluginBuild();
 
 # Build the target on the command line, or the default target
-$build->build($build->{target});
+$build->build( $build->{target} );
 

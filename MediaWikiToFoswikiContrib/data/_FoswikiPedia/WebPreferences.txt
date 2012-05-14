@@ -20,7 +20,7 @@
    * WebTopicActions
 
 ---++ Application settings
-   * Set WEBFORMS = Applications.TWikiTopic, Applications.ClassificationApp.ClassifiedTopic, Applications.ClassificationApp.CategorizedTopic, Applications.ClassificationApp.TaggedTopic
+   * Set WEBFORMS = Applications.WikiTopic, Applications.ClassificationApp.ClassifiedTopic, Applications.ClassificationApp.CategorizedTopic, Applications.ClassificationApp.TaggedTopic
    * Set CLASSIFICATIONPLUGIN_AUTOREPARENT = 1
 
 ---++ Cache settings
@@ -39,5 +39,3 @@
    * Set ALLOWTOPICCHANGE = %MAINWEB%.AdminGroup
    * Set ALLOWTOPICRENAME = %MAINWEB%.AdminGroup
 
----++ Finalization
-   * Set FINALPREFERENCES = NOSEARCHALL, DENYWEBVIEW, ALLOWWEBVIEW, DENYWEBCHANGE, ALLOWWEBCHANGE, DENYWEBRENAME, ALLOWWEBRENAME

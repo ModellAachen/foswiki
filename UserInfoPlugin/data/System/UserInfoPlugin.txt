@@ -1,15 +1,7 @@
 %META:TOPICINFO{author="ProjectContributor" date="1140093931" format="1.1" version="1.1"}%
-<!--
-
-   PLEASE DO NOT EDIT THIS TOPIC
-
-   It is automatically generated from the subversion repository, and any changes
-   you make will simply be overwritten the next time a release is generated.
-
-   Instead, you could check your fix in, raise a bug in the Bugs web, or mail the author.
--->
----+!! <nop>UserInfoPlugin
+---+!! <nop>%TOPIC%
 %TOC%
+
 This plugin analyses the session files of your wiki and extracts useful
 information to be displayed on your site. %BR%
 Warning: please respect the privacy of your users and don't display too much information.
@@ -18,12 +10,12 @@ Warning: please respect the privacy of your users and don't display too much inf
 | *Tag* | *Description* |
 | %<nop>VISITORS{format="..." max="..." sep="..." header="..." footer="..."}% | list of users currently logged in %BR% \
   defaults: format="\t* $wikiusername" sep="$n" max="unlimited" |
-| %<nop>NRVISITORS% | number of users currently online |
+| %<nop>NRVISITORS% | number of users currently online %RED%(deprecated)%ENDCOLOR%|
 | %<nop>LASTVISITORS{format="..." max="..." sep="..." days="..." header="..." footer="..."}% | list of users that recently visited the site %BR% \
   defaults: format="\t* $date: $wikiusername" sep="$n" max="unlimited" days="1" |
 | %<nop>NRLASTVISITORS{days="..."}% | list of users that recently visited the site %BR% \
-  defaults: days="1" |
-| %<nop>NRUSERS% | number of registered users |
+  defaults: days="1" %RED%(deprecated)%ENDCOLOR%|
+| %<nop>NRUSERS% | number of registered users %RED%(deprecated)%ENDCOLOR% |
 | %<nop>NRGUESTS% | number of guest users currently online |
 | %<nop>NEWUSERS{format="..." max="..." sep="..." header="..." footer="..."}% | list of users that recently registerd %BR% \
   defaults: format="\t* date: $wikiusername" sep="$n" max="10" |
@@ -31,7 +23,9 @@ Warning: please respect the privacy of your users and don't display too much inf
 The format parameter might containt the following variables:
 
 | *Variable* | *Description* | *Valid in* |
-| =$counter= | enumeration | %<nop>VISITORS%, %<nop>LASTVISITORS%, %<nop>NEWUSERS% |
+| =$index= | enumeration | %<nop>VISITORS%, %<nop>LASTVISITORS%, %<nop>NEWUSERS% |
+| =$count= | number of items found | %<nop>VISITORS%, %<nop>LASTVISITORS%, %<nop>NEWUSERS% |
+| =$total= | number of total items | %<nop>VISITORS%, %<nop>LASTVISITORS%, %<nop>NEWUSERS% |
 | =$wikiname= | wikiname of the visitor | %<nop>VISITORS%, %<nop>LASTVISITORS%, %<nop>NEWUSERS% |
 | =$username= | username of the visitor | %<nop>VISITORS%, %<nop>LASTVISITORS%, %<nop>NEWUSERS% |
 | =$wikiusername= | wikiusername of the visitor | %<nop>VISITORS%, %<nop>LASTVISITORS%, %<nop>NEWUSERS% |
@@ -44,75 +38,66 @@ The format parameter might containt the following variables:
 | =$percnt= | percentage sign | %<nop>VISITORS%, %<nop>LASTVISITORS%, %<nop>NEWUSERS% |
 | =$dollar= | dollar sign | %<nop>VISITORS%, %<nop>LASTVISITORS%, %<nop>NEWUSERS% |
 
+---++ Test
+If the plugin is installed correctly then you should get valid output for the tags below:%BR%
+
+%STARTSECTION{"test"}%
+%VISITORS{
+  header="%MAKETEXT{"[_1] of [_2] registered user(s) currently online" args="$count, $total"}%:$n"
+}%
+
+%LASTVISITORS{
+  days="1" 
+  header="%MAKETEXT{"[_1] visitor(s) today" args="$count"}%:$n"
+  format="   * $wikiusername"
+}%
+
+Recently registered users: 
+%NEWUSERS{max="20"}%
+%ENDSECTION{"test"}%
+
+
 ---++ Plugin Settings
 <!--
-	* Set SHORTDESCRIPTION = %$SHORTDESCRIPTION%
+   * Set SHORTDESCRIPTION = %$SHORTDESCRIPTION%
 -->
+Use these settings in your %LOCALSITEPREFS%:
 
-	* add a list of host addresses to ignore users comming from them
-		* Set IGNORE_HOSTS = 
-	* add a list of users to ignore
-		* Set IGNORE_USERS = %MAINWEB%.TestUser
+   * add a list of host addresses to ignore users comming from them
+      * Set IGNORE_HOSTS = 
+   * add a list of users to ignore
+      * Set IGNORE_USERS = %USERSWEB%.TestUser
 
 ---++ Plugin Installation Instructions
 %$INSTALL_INSTRUCTIONS%
 
----++ Test
-If the plugin is installed correctly then you should get valid output for the tags below:%BR%
-
-<blockquote>
-<table border="0" cellspacing="5px"><tr>
-<td valign="top">
-%NRVISITORS% of %NRUSERS% registered user(s), %NRGUESTS% guest(s) currently online: %BR%
-%VISITORS% %BR%
-</td>
-<td valign="top" rowspan="2">
-%NRLASTVISITORS{days="1"}% visitor(s) today (%SERVERTIME{"$day $month $year"}%): %BR%
-%LASTVISITORS{days="1" format="   * $wikiusername"}%
-</td>
-<tr>
-<td valign="top">
-Recently registered users: %BR%
-%NEWUSERS{max="20"}%
-</td>
-</tr></table>
-</blockquote>
-
-
 ---++ Plugin Info
 
-|  Plugin Author: | Foswiki:Main/MichaelDaum |
-|  Copyright &copy;: | 2005-2006, Michael Daum |
+|  Author: | Foswiki:Main/MichaelDaum |
+|  Copyright &copy;: | 2005-2012, Michael Daum |
 |  License: | GPL ([[http://www.gnu.org/copyleft/gpl.html][GNU General Public License]]) |
 |  Release: | %$RELEASE% |
 |  Version: | %$VERSION% |
+|  Home: | Foswiki:Extensions/%TOPIC% |
+|  Support: | Foswiki:Support/%TOPIC% |
 |  Change History: | <!-- versions below in reverse order -->&nbsp; |
+|  05 Apr 2012: | modernized |
 |  24 Feb 2010: | modified to use Foswiki 1.1 Func API |
 |  12 Jan 2009: | ported to Foswiki (Foswiki:Main.WillNorris) | 
 |  09 Jun 2006: | fixed duplicate users in LASTVISITORS; \
                    use IGNORE_USERS in LASTVISITORS |
 |  27 May 2006: | fixed error computing the number of last visitors (TWiki:Main.DavidBright); \
                   exclude the <no>AdminGroup "user" from the statistics; \
-		  check back if the user found in the logs already approved his account;\
-		  fixed use of non-numerical value in comparison |
+                  check back if the user found in the logs already approved his account;\
+                  fixed use of non-numerical value in comparison |
 |  17 Feb 2006: | optimized tag parsing; \
                   using Time::Local instead of Date::Parse; \
-		  added =header= and =footer= format strings; \
-		  fixed error restricting seen visitors by days |
+                  added =header= and =footer= format strings; \
+                  fixed error restricting seen visitors by days |
 |  16 Feb 2006: | OO-ified the plugin to compile on demand; \
                   added IGNORE_USER plugin parameter |
 |  14 Feb 2006: | fixed detection of the session directory |
 |  02 Feb 2006: | fixed numerical comparison of dates (TWiki:Main/AntonAylward) |
 |  05 Aug 2005: | removed dependency on the <nop>SessionPlugin |
 |  27 Apr 2005: | fixed getting guests + some minor glitches | 
-|  12 Apr 2005: | initial release |
-|  &nbsp; | fixed =sep= handling, fixed =$host= parsing |
-|  Foswiki Dependency: | $TWiki::Plugins::VERSION 1.1 |
-|  CPAN Dependencies: | CPAN:Time::Local |
-|  Perl Version: | 5.8 |
-|  Plugin Home: | http://foswiki.org/Extensions/%TOPIC% |
-|  Support: | http://foswiki.org/Support/%TOPIC% |
-
-
--- Foswiki:Main/MichaelDaum - 09 June 2006
-
+|  12 Apr 2005: | initial release; fixed =sep= handling, fixed =$host= parsing |

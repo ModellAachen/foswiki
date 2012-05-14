@@ -1,7 +1,7 @@
 %TMPL:INCLUDE{"edit"}%<!-- template: edit.chapter.tmpl -->
 %TMPL:INCLUDE{"editjavascript"}%<!-- editjavascript// -->
 
-%TMPL:DEF{"dialog"}%<div class="jqUIDialog {alsoResize:'textarea[name=chapter]', modal:true, resizable:true, autoCenter:true, width:800}" title="%MAKETEXT{"Edit chapter '[_1]'" args="%URLPARAM{"title" default="%URLPARAM{"from"}%"}%"}%">
+%TMPL:DEF{"dialog"}%<div class="jqUIDialog {alsoResize:'textarea[name=chapter]', modal:true, draggable:true, resizable:true, width:800}" title="%MAKETEXT{"Edit chapter '[_1]'" args="%URLPARAM{"title" default="%URLPARAM{"from"}%"}%"}%">
   <form name="EditForm" action="%SCRIPTURLPATH{"save"}%" method="post" class="ecpForm">
   <input type="hidden" name="topic" value="%WEB%.%TOPIC%" />
   <input type="hidden" name="t" value="%GMTIME{"$epoch"}%" />
@@ -9,14 +9,11 @@
   <textarea name="beforetext" style="display:none" >%EXTRACTCHAPTER{before="%URLPARAM{"from" default="0"}%" encode="on"}%</textarea>
   <textarea name="chapter" class="jqFocus foswikiTextarea natEditTextArea natedit" rows="%EDITBOXHEIGHT%" cols="%EDITBOXWIDTH%" wrap="virtual">%EXTRACTCHAPTER{from="%URLPARAM{"from" default="0"}%" to="%URLPARAM{"to"}%" encode="on"}%</textarea>
   <textarea name="aftertext" style="display:none">%EXTRACTCHAPTER{after="%URLPARAM{"to"}%" encode="on"}%</textarea>
-  <textarea name="text" style="display:none" >%EXTRACTCHAPTER%</textarea>
+  <textarea name="text" style="display:none" >%EXTRACTCHAPTER{encode="on"}%</textarea>
   <input type="hidden" name="from" value="%URLPARAM{"from" default="0"}%" />
   <input type="hidden" name="to" value="%URLPARAM{"to"}%" />
   </form>
-  <link rel="stylesheet" href="%PUBURLPATH%/%SYSTEMWEB%/NatEditPlugin/styles.css" media="all" />
-  <link rel="stylesheet" href="%PUBURLPATH%/%SYSTEMWEB%/NatEditPlugin/default/styles.css" media="all" />
-  <script src="%PUBURLPATH%/%SYSTEMWEB%/NatEditPlugin/jquery.natedit.js"></script>
   <a class="jqUIDialogButton jqUIDialogSubmit {icon:'ui-icon-disk'}">%MAKETEXT{"OK"}%</a>
-  <a class="jqUIDialogButton {icon:'ui-icon-cancel', click: function() {$(this).trigger('cancel');}}">%MAKETEXT{"Cancel"}%</a>
+  <a class="jqUIDialogButton jqUIDialogClose {icon:'ui-icon-cancel'}">%MAKETEXT{"Cancel"}%</a>
   <a class="jqUIDialogButton {icon:'ui-icon-pencil'}" href="%SCRIPTURL{"edit"}%/%WEB%/%TOPIC%?t=%GMTIME{"$epoch"}%">%MAKETEXT{"Edit all"}%</a>
 </div>%TMPL:END%

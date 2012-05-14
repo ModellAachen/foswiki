@@ -17,7 +17,6 @@
 #
 # As per the GPL, removal of this notice is prohibited.
 
-
 package Foswiki::Users::X509UserMapping::Cert;
 
 use strict;
@@ -33,7 +32,7 @@ sub elements($);
 #
 sub parseDN($$) {
     my $class = shift;
-    my $dn = shift;
+    my $dn    = shift;
 
     my $self = {};
     bless $self, $class;
@@ -51,19 +50,19 @@ sub parseDN($$) {
 
     @parts = split m|/|, $dn;
 
-    foreach my $p  (@parts) {
+    foreach my $p (@parts) {
         my $key;
         my $val = '';
 
-        ($key, $val) = split m/=/, $p, 2;
-        if( $key ) {
-            if( $self->{$key} ) {
+        ( $key, $val ) = split m/=/, $p, 2;
+        if ($key) {
+            if ( $self->{$key} ) {
                 my $i = 1;
                 my $k;
                 do {
                     $i++;
                     $k = "$key.$i";
-                } while( $self->{$k} );
+                } while ( $self->{$k} );
                 $key = $k;
             }
             $self->{$key} = $val;
@@ -77,7 +76,7 @@ sub parseDN($$) {
 # Return named element of a DN
 #
 sub element($$) {
-    my $self = shift;
+    my $self    = shift;
     my $element = shift;
 
     return $self->{$element} || '';
@@ -91,11 +90,12 @@ sub dumpDN($) {
 
     my $result;
 
-    foreach my $e (sort $self->elements) {
-        $result .= sprintf( "%15s = '%s'\n", $e, ($self->{$e} || '') );
+    foreach my $e ( sort $self->elements ) {
+        $result .= sprintf( "%15s = '%s'\n", $e, ( $self->{$e} || '' ) );
     }
     return $result;
 }
+
 #
 # Return list of element names
 #

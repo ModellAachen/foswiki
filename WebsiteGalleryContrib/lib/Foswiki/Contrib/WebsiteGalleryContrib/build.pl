@@ -12,13 +12,16 @@ $build = new Foswiki::Contrib::Build('WebsiteGalleryContrib');
 
 # name of web to upload to
 $build->{UPLOADTARGETWEB} = 'Extensions';
+
 # Full URL of pub directory
 $build->{UPLOADTARGETPUB} = 'http://www.biohack.net/wiki/pub';
+
 # Full URL of bin directory
 $build->{UPLOADTARGETSCRIPT} = 'http://www.biohack.net/wiki/bin';
+
 # Script extension
 $build->{UPLOADTARGETSUFFIX} = '';
 
 # Build the target on the command line, or the default target
-$build->build($build->{target});
+$build->build( $build->{target} );
 

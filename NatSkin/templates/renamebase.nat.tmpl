@@ -8,78 +8,144 @@
 %TMPL:DEF{"meta"}% <meta name="robots" content="noindex, nofollow" /> %TMPL:END%
 %TMPL:DEF{"titleaction"}%%MAKETEXT{"rename"}%%TMPL:END%
 %TMPL:DEF{"contenttitle"}%<h1>%MAKETEXT{"Rename or move [_1]"  args="<nop>%TOPIC%"}%</h1>%TMPL:END%
-%TMPL:DEF{"trashcheckbox"}%
-    <input type="checkbox" class="foswikiCheckbox" name="totrash" id="totrash" onclick="document.rename.newweb.value = (this.checked)?'%TRASHWEB%':'%WEB%';this.blur()">
-    <label for="totrash">%MAKETEXT{"Move to [_1]" args="%TRASHWEB%"}%</label>
-%TMPL:END%
+%TMPL:DEF{"backlinks::checked"}%checked%TMPL:END%
 
 %{ ################################################################################ }%
 %TMPL:DEF{"buttons"}%<!-- buttons -->
 %BUTTON{type="save" "%MAKETEXT{"Rename"}%" icon="tick"}%
 %BUTTON{"%MAKETEXT{"Cancel"}%" icon="cross" target="%WEB%.%TOPIC%"}%
-%IF{"$'URLPARAM{currentwebonly}'='on'"
+%IF{"$'URLPARAM{currentwebonly}'='on' and not context SolrPluginEnabled"
   then="$percntBUTTON{\"%MAKETEXT{"Search in all webs"}%\" icon=\"find\" target=\"%SCRIPTURLPATH{"rename"}%/%WEB%/%TOPIC%\" title=\"%MAKETEXT{"Search for backlinks in all webs"}%\"}$percnt"
 }%
 <!-- //buttons -->%TMPL:END%
 
 %{ ################################################################################ }%
-%TMPL:DEF{"content"}%<!-- content -->
-%TMPL:P{"contenttitle"}%<!-- contenttitle// -->
-<form method="POST" name="rename" action="%SCRIPTURLPATH{"rename"}%/%WEB%/%TOPIC%" method="post">
+%TMPL:DEF{"content"}%<!-- -->
+%TMPL:P{"contenttitle"}%<!-- -->
+%TMPL:P{"formstart"}%<!-- -->
+%TMPL:P{"changefromstep"}%<!-- -->
+%TMPL:P{"changetostep"}%<!-- -->
+%TMPL:P{"titlestep"}%<!-- -->
+%TMPL:P{"backlinksstep"}%<!-- -->
+%TMPL:P{"formend"}%<!-- -->
+%TMPL:P{"rename::javascript"}%
+<!-- -->%TMPL:END%
+
+%{ ################################################################################ }%
+%TMPL:DEF{"formstart"}%<!-- -->
+<form name="rename" action="%SCRIPTURLPATH{"rename"}%/%WEB%/%TOPIC%" method="post">
+<input type="hidden" name="nonwikiword" value="on" />
+<input type="hidden" name="oldtopic" value="%TOPIC%" />
 <!--input type="hidden" name="confirm" value="on"-->
 <div class="foswikiFormSteps">
-  <div class="foswikiFormStep">
-    <h3>%MAKETEXT{"Change from"}%</h3>
-    <nop>%WEB%.%TOPIC%
-  </div>
----
-  <div class="foswikiFormStep">
-    <h3>%MAKETEXT{"To web"}%:</h3>
-    %TMPL:P{"newweb"}%
-    %IF{"$'URLPARAM{newweb}'!='%TRASHWEB%'" then="$percntTMPL:P{\"trashcheckbox\"}$percnt"}%
-  </div>
-  <div class="foswikiFormStep">
-    <h3>%MAKETEXT{"To topic"}%:</h3>
-    %TMPL:P{"newtopic"}%
+<!-- -->%TMPL:END%
 
-    <input type="checkbox" class="foswikiCheckbox" name="nonwikiword" id="nonwikiword" %IF{"$ 'URLPARAM{nonwikiword}'='on'" then="checked='checked'"}% />
-    <label for="nonwikiword">%MAKETEXT{"Allow non-<nop>WikiWord for the new topic name"}%</label>
-  </div>
+%{ ################################################################################ }%
+%TMPL:DEF{"changefromstep"}%<!-- -->
+<div class="foswikiFormStep">
+  <h3>%MAKETEXT{"From"}%:</h3>
+  <nop>%WEB%.%TOPIC%
+</div>
 ---
-  <div class="natSearchBacklinks" %IF{"'%SEARCH_COUNT%'='0'" then="style='display:none'"}%>
+<!-- -->%TMPL:END%
+
+%{ ################################################################################ }%
+%TMPL:DEF{"changetostep"}%<!-- -->
+<div class="foswikiFormStep">
+  <h3>%MAKETEXT{"To web"}%:</h3>
+  %TMPL:P{"newweb"}%
+</div>
+<div class="foswikiFormStep">
+  <h3>%MAKETEXT{"To topic"}%:</h3>
+  %TMPL:P{"newtopic"}%
+</div>
+<!-- -->%TMPL:END%
+
+%{ ################################################################################ }%
+%TMPL:DEF{"titlestep"}%<!-- -->
+<div class="foswikiFormStep">
+  <h3>%MAKETEXT{"Title"}%:</h3>
+  <input type="text" class="foswikiInputField" id="topictitle" name="TopicTitle" value="%TOPICTITLE%" size="40" />
+
+  <div class="foswikiFormDescription">
+    %MAKETEXT{"Specify a new topic title while renaming/moving the topic."}%
+
+    %MAKETEXT{"Note that you may change the title from within the editor as well."}%
+  </div>
+</div>
+---
+<!-- -->%TMPL:END%
+
+%{ ################################################################################ }%
+%TMPL:DEF{"backlinksstep"}%<!-- -->
+  <div class="foswikiFormStep natSearchBacklinks">
+    %TMPL:P{"backlinks"}%
     <div class="foswikiFormStep">
-      <h3>%MAKETEXT{"Update links in the '[_1]' web" args="<nop>%WEB%"}%:</h3>
-      <div class="natSearchRenameContents">
-        %LOCAL_SEARCH%
-      </div>
-    </div>
-    <div class='foswikiFormStep'>
-      <h3>%MAKETEXT{"Update links in all webs"}%:</h3>
-      <div class='natSearchRenameContents'>
-        %GLOBAL_SEARCH%
-      </div>
-    </div>
-    <div class="foswikiFormStep foswikiFormButtons">
-      %BUTTON{"%MAKETEXT{"Set all"}%" icon="add" class="natRenameSetAll" title="%MAKETEXT{"Select all topics"}%"}%
-      %BUTTON{"%MAKETEXT{"Clear all"}%" icon="delete" class="natRenameClearAll" title="%MAKETEXT{"Clear selection"}%"}%
+      %BUTTON{"%MAKETEXT{"Set all"}%" icon="add" class="natRenameSetAll simple" title="%MAKETEXT{"Select all topics"}%"}%
+      %BUTTON{"%MAKETEXT{"Clear all"}%" icon="delete" class="natRenameClearAll simple" title="%MAKETEXT{"Clear selection"}%"}%
       %CLEAR%
     </div>
 ---
   </div>
+  <literal>%IF{"'%TMPL:P{"backlinks::count"}%'=~'^0?$'" then="<style>.natSearchBacklinks {display:none}</style>"}%</literal>
   <div class="foswikiFormStep foswikiFormButtons">
     %TMPL:P{"buttons"}%
     %CLEAR%
   </div>
-</div>
-</form>
-%TMPL:P{"rename::javascript"}%
-<!-- //content -->%TMPL:END%
+<!-- -->%TMPL:END%
+
+%TMPL:DEF{"formend"}%</div></form>%TMPL:END%
 
 %{ ################################################################################ }%
 %TMPL:DEF{"rename::javascript"}%<!-- -->
+%JQREQUIRE{"wikiword"}%<!-- -->
 %ADDTOZONE{
   "script"
   tag="NATSKIN::RENAME"
   text="<script src='%PUBURLPATH%/%SYSTEMWEB%/NatSkin/rename.js'></script>"
-  requires="JQUERYPLUGIN"
+  requires="JQUERYPLUGIN, JQUERYPLUGIN::WIKIWORD"
 }%<!-- -->%TMPL:END%
+
+%{ ################################################################################ }%
+%TMPL:DEF{"backlinks"}%%TMPL:P{context="SolrPluginEnabled" then="backlinks::solr" else="backlinks::default"}%%TMPL:END%
+
+%TMPL:DEF{"backlinks::default"}%<!-- -->
+<div class="foswikiFormStep">
+  <h3>%MAKETEXT{"Update links in the '[_1]' web" args="<nop>%WEB%"}%:</h3>
+  <div class="natSearchRenameContents">
+    %LOCAL_SEARCH%
+  </div>
+</div>
+<div class='foswikiFormStep'>
+  <h3>%MAKETEXT{"Update links in all webs"}%:</h3>
+  <div class='natSearchRenameContents'>
+    %GLOBAL_SEARCH%
+  </div>
+</div>
+<!-- -->%TMPL:END%
+
+%{ ################################################################################ }%
+%TMPL:DEF{"backlinks::solr"}%<!-- -->
+<div class="foswikiFormStep">
+  <h3>%MAKETEXT{"Update links in all webs"}%:</h3>
+  <div class="natSearchRenameContents">
+%SOLRSEARCH{
+  id="solr1"
+  "outgoing:%BASEWEB%.%BASETOPIC%"
+  header="$percntCALC{\"$SET(total,$count)\"}$percnt"
+  format="<div class='foswikiTopRow'>
+            <input type='checkbox' name='referring_topics' class='foswikiGlobalCheckable foswikiCheckBox' value='$web.$topic' %IF{"'%TMPL:P{"backlinks::checked"}%'='checked'" then="checked='checked'"}% />
+            [[$web.$topic]]
+          </div>"
+  sort="title"
+  separator="$n"
+  rows="9999999"
+}%
+  </div>
+</div>
+<!-- -->%TMPL:END%
+
+%{ ################################################################################ }%
+%TMPL:DEF{"backlinks::count"}%%TMPL:P{context="SolrPluginEnabled" then="backlinks::count::solr" else="backlinks::count::default"}%%TMPL:END%
+%TMPL:DEF{"backlinks::count::default"}%%SEARCH_COUNT%%TMPL:END%
+%TMPL:DEF{"backlinks::count::solr"}%%CALC{"$GET(total)"}%%TMPL:END%

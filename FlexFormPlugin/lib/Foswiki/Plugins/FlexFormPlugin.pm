@@ -1,6 +1,6 @@
 # Plugin for Foswiki - The Free and Open Source Wiki, http://foswiki.org/
 # 
-# Copyright (C) 2009-2011 Michael Daum http://michaeldaumconsulting.com
+# Copyright (C) 2009-2012 Michael Daum http://michaeldaumconsulting.com
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -18,8 +18,8 @@ package Foswiki::Plugins::FlexFormPlugin;
 use strict;
 
 our $VERSION = '$Rev: 1340 $';
-our $RELEASE = '2.50';
-our $SHORTDESCRIPTION = 'Flexible way to render %SYSTEMWEB%.DataForms';
+our $RELEASE = '2.60';
+our $SHORTDESCRIPTION = 'Flexible way to render <nop>DataForms';
 our $NO_PREFS_IN_TOPIC = 1;
 our $doneInit;
 our $baseWeb;
@@ -29,8 +29,15 @@ our $baseTopic;
 sub initPlugin {
   ($baseTopic, $baseWeb) = @_;
 
-  Foswiki::Func::registerTagHandler('RENDERFOREDIT', \&handleRENDERFOREDIT);
-  Foswiki::Func::registerTagHandler('RENDERFORDISPLAY', \&handleRENDERFORDISPLAY);
+  Foswiki::Func::registerTagHandler('RENDERFOREDIT', sub {
+    init();
+    return Foswiki::Plugins::FlexFormPlugin::Core::handleRENDERFOREDIT(@_);
+  });
+
+  Foswiki::Func::registerTagHandler('RENDERFORDISPLAY', sub {
+    init();
+    return Foswiki::Plugins::FlexFormPlugin::Core::handleRENDERFORDISPLAY(@_);
+  });
   Foswiki::Func::registerTagHandler('RENDERFIELD', \&handleRENDERFIELD);
 
   $doneInit = 0;
@@ -45,16 +52,16 @@ sub init {
   Foswiki::Plugins::FlexFormPlugin::Core::init($baseWeb, $baseTopic);
 }
 
-##############################################################################
-sub handleRENDERFOREDIT {
+###############################################################################
+# deprecated to be used as a finish handler
+sub modifyHeaderHandler {
   init();
-  Foswiki::Plugins::FlexFormPlugin::Core::handleRENDERFOREDIT(@_);
+  return Foswiki::Plugins::FlexFormPlugin::Core::finish(@_);
 }
 
-##############################################################################
-sub handleRENDERFORDISPLAY {
-  init();
-  Foswiki::Plugins::FlexFormPlugin::Core::handleRENDERFORDISPLAY(@_);
+###############################################################################
+sub completePageHandler {
+  $_[0] =~ s/<\/?literal>//g;
 }
 
 ##############################################################################
@@ -75,13 +82,6 @@ sub handleRENDERFIELD {
 	
 }
 
-
-###############################################################################
-# deprecated to be used as a finish handler
-sub modifyHeaderHandler {
-  init();
-  Foswiki::Plugins::FlexFormPlugin::Core::finish(@_);
-}
 
 
 1;

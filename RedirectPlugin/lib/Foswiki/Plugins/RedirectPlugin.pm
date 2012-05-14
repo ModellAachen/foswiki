@@ -1,6 +1,5 @@
 # Foswiki RedirectPlugin
 #
-# Copyright (C) 2010 Modell Aachen, stoffers@modell-aachen.de
 # Copyright (C) 2008 - 2009 Andrew Jones, andrewjones86@gmail.com
 # Copyright (C) 2006 Motorola, thomas.weigert@motorola.com
 # Copyright (C) 2006 Meredith Lesly, msnomer@spamcop.net
@@ -55,97 +54,96 @@ sub REDIRECT {
     my $anchor      = '';
     my $queryString = '';
     my $dest        = $params->{'newtopic'} || $params->{_DEFAULT};
+    my $dontCheckDestinationExists = $params->{'dontcheck'} || 0;
     my $group		= $params->{'group'} || 0;
     my $user		= Foswiki::Func::getWikiUserName();
-    my $dontCheckDestinationExists = $params->{'dontcheck'} || 0; 
 
     my $webNameRegex  = Foswiki::Func::getRegularExpression('webNameRegex');
     my $wikiWordRegex = Foswiki::Func::getRegularExpression('wikiWordRegex');
     my $anchorRegex   = Foswiki::Func::getRegularExpression('anchorRegex');
 
-	# Redirect only if user is in user group and group is existing
-	if(!$group || Foswiki::Func::isGroupMember($group) )
-	{
 
-    # Redirect only on view 
+    # Modac: Redirect only if user is in user group and group is existing
+    # Redirect only on view
     # Support Codev.ShorterURLs: do not redirect on edit
-	    if (   $dest
-	        && !$context->{'edit'}
-	        && !$context->{'save'}
-	        && !$context->{'preview'} )
-	    {
-	
-	        my $query = Foswiki::Func::getCgiQuery();
-	
-	        my $queryString = "";
-	        my $param;
-	        foreach my $param ( $query->param ) {
-	            foreach my $value ( $query->param("$param") ) {
-	                $queryString .= "&" if $queryString;
-	                $queryString .= "$param=" . $value;
-	            }
-	        }
-	
-	        # do not redirect when param "redirect=no" is passed
-	        my $noredirect = $query->param( -name => 'noredirect' ) || '';
-	        return '' if $noredirect eq 'on';
-	
-	        $dest = Foswiki::Func::expandCommonVariables( $dest, $topic, $web );
-	
-	        # redirect to URL
-	        if ( $dest =~ m/^http/ ) {
-	
-	            return "%BR% %RED% Cannot redirect to current topic %ENDCOLOR%"
-	              if ( $dest eq Foswiki::Func::getViewUrl( $web, $topic ) );
-	            Foswiki::Func::redirectCgiQuery( $query, $dest );
-	            return '';
-	        }
-	
-	        # else: "topic" or "web.topic" notation
-	        # get the components and check if the topic exists
-	        my $topicLocation = "";
-	        if ( $dest =~ /^((.*?)\.)*(.*?)(\#.*|\?.*|$)$/ ) {
-	            $newWeb = $2 || $web || '';
-	            $newTopic = $3 || '';
-	
-	            # ignore anchor and params here
-	            $topicLocation = "$newWeb.$newTopic";
-	        }
-	
-	        return "%BR% %RED% Cannot redirect to current topic %ENDCOLOR%"
-	          if ( $topicLocation eq "$web.$topic" );
-	        return "%BR% %RED% Cannot redirect to an already visited topic %ENDCOLOR%"
-	          if ( $queryString =~ /redirectedfrom=$topicLocation/ );
-	
-	        unless ($dontCheckDestinationExists) { 
-		    if ( !Foswiki::Func::topicExists( undef, $topicLocation ) ) {
-			return
-			    "%RED% Could not redirect to topic $topicLocation (the topic does not seem to exist) %ENDCOLOR%";
-		    }
-		}
-	
-	        if ( $dest =~ /($anchorRegex)/ ) {
-	            $anchor = $1;
-	        }
-	
-	        if ( $dest =~ /(\?.*)/ ) {
-	
-	            #override url params
-	            $queryString = $1;
-	        }
-	
-	        # AndrewJones: allow us to use %<nop>URLPARAM{redirectfrom}%
-	        # in destination topic to display Wikipedia like "Redirected
-	        # from ..." text
-	        my $q = "?redirectedfrom=$web.$topic";
-	        $q .= "&" . $queryString if $queryString;
-	
-	        # topic exists
-	        Foswiki::Func::redirectCgiQuery( $query,
-	            Foswiki::Func::getViewUrl( $newWeb, $newTopic ) . $anchor . $q );
-	
-	    }
-	}
+    if ( (!$group || Foswiki::Func::isGroupMember($group))
+        && $dest
+        && !$context->{'edit'}
+        && !$context->{'save'}
+        && !$context->{'preview'} )
+    {
+
+        my $query = Foswiki::Func::getCgiQuery();
+
+        my $queryString = "";
+        my $param;
+        foreach my $param ( $query->param ) {
+            foreach my $value ( $query->param("$param") ) {
+                $queryString .= "&" if $queryString;
+                $queryString .= "$param=" . $value;
+            }
+        }
+
+        # do not redirect when param "redirect=no" is passed
+        my $noredirect = $query->param( -name => 'noredirect' ) || '';
+        return '' if $noredirect eq 'on';
+
+        $dest = Foswiki::Func::expandCommonVariables( $dest, $topic, $web );
+
+        # redirect to URL
+        if ( $dest =~ m/^http/ ) {
+
+            return "%BR% %RED% Cannot redirect to current topic %ENDCOLOR%"
+              if ( $dest eq Foswiki::Func::getViewUrl( $web, $topic ) );
+            Foswiki::Func::redirectCgiQuery( $query, $dest );
+            return '';
+        }
+
+        # else: "topic" or "web.topic" notation
+        # get the components and check if the topic exists
+        my $topicLocation = "";
+        if ( $dest =~ /^((.*?)\.)*(.*?)(\#.*|\?.*|$)$/ ) {
+            $newWeb = $2 || $web || '';
+            $newTopic = $3 || '';
+
+            # ignore anchor and params here
+            $topicLocation = "$newWeb.$newTopic";
+        }
+
+        return "%BR% %RED% Cannot redirect to current topic %ENDCOLOR%"
+          if ( $topicLocation eq "$web.$topic" );
+        return
+          "%BR% %RED% Cannot redirect to an already visited topic %ENDCOLOR%"
+          if ( $queryString =~ /redirectedfrom=$topicLocation/ );
+
+        unless ($dontCheckDestinationExists) {
+            if ( !Foswiki::Func::topicExists( undef, $topicLocation ) ) {
+                return
+"%RED% Could not redirect to topic $topicLocation (the topic does not seem to exist) %ENDCOLOR%";
+            }
+        }
+
+        if ( $dest =~ /($anchorRegex)/ ) {
+            $anchor = $1;
+        }
+
+        if ( $dest =~ /(\?.*)/ ) {
+
+            #override url params
+            $queryString = $1;
+        }
+
+        # AndrewJones: allow us to use %<nop>URLPARAM{redirectfrom}%
+        # in destination topic to display Wikipedia like "Redirected
+        # from ..." text
+        my $q = "?redirectedfrom=$web.$topic";
+        $q .= "&" . $queryString if $queryString;
+
+        # topic exists
+        Foswiki::Func::redirectCgiQuery( $query,
+            Foswiki::Func::getViewUrl( $newWeb, $newTopic ) . $anchor . $q );
+
+    }
 
     return '';
 

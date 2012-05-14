@@ -17,7 +17,7 @@ package Foswiki::Plugins::DelayMacroPlugin;
 # Always use strict to enforce variable scoping
 use strict;
 
-use Foswiki::Func ();       # The plugins API
+use Foswiki::Func    ();    # The plugins API
 use Foswiki::Plugins ();    # For the API version
 
 # $VERSION is referred to by Foswiki, and is the only global variable that
@@ -81,9 +81,9 @@ sub initPlugin {
             __PACKAGE__, ' and Plugins.pm' );
         return 0;
     }
-    
+
     Foswiki::Func::registerTagHandler( 'DELAY', \&_delayMacro );
-    
+
     Foswiki::Func::registerTagHandler( 'DELAYSEARCH', \&_delayMacro );
 
     # Plugin correctly initialized
@@ -92,9 +92,10 @@ sub initPlugin {
 
 # delayMacro expands %DELAY.. and returns
 # DELAY hidden by $percnt and $quot if delay > 0
-# The macro specified by macro parameter if delay = 0 
+# The macro specified by macro parameter if delay = 0
 sub _delayMacro {
-    my($session, $params, $theTopic, $theWeb) = @_;
+    my ( $session, $params, $theTopic, $theWeb ) = @_;
+
     # $session  - a reference to the Foswiki session object (if you don't know
     #             what this is, just ignore it)
     # $params=  - a reference to a Foswiki::Attrs object containing
@@ -110,7 +111,7 @@ sub _delayMacro {
     # For example, %EXAMPLETAG{'hamburger' sideorder="onions"}%
     # $params->{_DEFAULT} will be 'hamburger'
     # INPUT will be 'onions'
-    
+
     my $delay = defined $params->{delay} ? $params->{delay} : 1;
     $delay = 1 unless $delay =~ /\d+/;
     my $macro = $params->{macro} || 'SEARCH';
@@ -123,8 +124,8 @@ sub _delayMacro {
         $result .= "delay=\$quot$delay\$quot ";
 
         foreach my $key ( keys %$params ) {
-            next if ($key eq '_RAW' || $key eq '_DEFAULT' || $key eq 'delay');
-            
+            next if ( $key eq '_RAW' || $key eq '_DEFAULT' || $key eq 'delay' );
+
             $result .= "$key=\$quot" . $params->{$key} . "\$quot ";
         }
         $result .= "}\$percnt";
@@ -132,21 +133,23 @@ sub _delayMacro {
     else {
         $result = "%" . $macro . "{";
         $result .= "\"$default\" ";
-        
+
         foreach my $key ( keys %$params ) {
-            next if ($key eq '_RAW' || $key eq '_DEFAULT' ||
-                     $key eq 'macro' || $key eq 'delay' );
-            
+            next
+              if ( $key eq '_RAW'
+                || $key eq '_DEFAULT'
+                || $key eq 'macro'
+                || $key eq 'delay' );
+
             $result .= $key . "=\"" . $params->{$key} . "\" ";
         }
-        
+
         $result .= "}%";
     }
 
     return $result;
-    
-}
 
+}
 
 1;
 __END__

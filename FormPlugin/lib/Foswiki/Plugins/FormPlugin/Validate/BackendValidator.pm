@@ -374,12 +374,12 @@ sub validate_multiemail {
 
     my @addresses = split( /\s*[[\s,;]]*\s*/, $value );
     my $isValid = 0;
-    
+
     foreach my $address (@addresses) {
-    	print STDERR "$address:" . valid($address) . "\n";
+        print STDERR "$address:" . valid($address) . "\n";
         $isValid ||= valid($address);
     }
-    
+
     my $message =
       $isValid
       ? ''

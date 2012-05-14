@@ -1,20 +1,10 @@
 %META:TOPICINFO{author="ProjectContributor" date="1185724430" format="1.1" reprev="1.1" version="$Rev$"}%
 %META:TOPICPARENT{name="TopicType"}%
----+!! %TOPIC%
-%FORMFIELD{"Summary"}%
-%DBCALL{"%FORMFIELD{"Target"}%" remote="on" section="%FORMFIELD{"Section"}%"}%
-<!--
-   * Set EDIT_TEMPLATE = Applications.FormEdit
-   * Set VIEW_TEMPLATE = Applications.HiddenFormView
--->
-See also: [[%FORMFIELD{"Target"}%]]
-
-
 
 %META:FORM{name="Applications.TopicStub"}%
 %META:FIELD{name="TopicType" attributes="" title="TopicType" value="TopicStub, TopicType"}%
 %META:FIELD{name="TopicTitle" attributes="" title="<nop>TopicTitle" value="Categorized Topics"}%
 %META:FIELD{name="Summary" attributes="" title="Summary" value=""}%
-%META:FIELD{name="TWikiApplication" attributes="" title="TWikiApplication" value="ClassificationApp"}%
+%META:FIELD{name="WikiApplication" attributes="" title="WikiApplication" value="ClassificationApp"}%
 %META:FIELD{name="Target" attributes="" title="Target" value="Applications/ClassificationApp.CategorizedTopic"}%
 %META:FIELD{name="Section" attributes="" title="Section" value=""}%

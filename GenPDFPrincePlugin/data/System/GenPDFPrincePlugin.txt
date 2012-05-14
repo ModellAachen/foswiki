@@ -45,11 +45,13 @@ Note, that !ZonePlugin is not required anymore in newer Foswiki engines > 1.1.0.
    * Set SHORTDESCRIPTION = 'Generate PDF using Prince XML';
 -->
 |  Author: | Foswiki:Main.MichaelDaum |
-|  Copyright: | &copy; 2009-2010, Michael Daum http://michaeldaumconsulting.com |
+|  Copyright: | &copy; 2009-2012, Michael Daum http://michaeldaumconsulting.com |
 |  License: | GPL ([[http://www.gnu.org/copyleft/gpl.html][GNU General Public License]]) |
 |  Release: | %$RELEASE% |
 |  Version: | %$VERSION% |
 |  Change History: | <!-- versions below in reverse order -->&nbsp; |
+|  08 Mar 2012 | fixed encoding of charset fed to prince xml; \
+                 rewrite img urls from http: to file: urls while prince works on the local filesystem generating pdf |
 |  17 Nov 2010 | using legacy interface =mkpath= to =make_path= to please older perl versions |
 |  11 Nov 2010 | fixing incomplete image data in pdf |
 |  07 Jun 2010 | added content-disposition to ease saving the pdf to disk |

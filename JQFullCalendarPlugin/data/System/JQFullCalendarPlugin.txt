@@ -1,4 +1,4 @@
-%META:TOPICINFO{author="ProjectContributor" comment="reprev" date="1269623992" format="1.1" reprev="1.2" version="1.2"}%
+%META:TOPICINFO{author="micha" comment="reprev" date="1322828677" format="1.1" reprev="4" version="4"}%
 ---+ %TOPIC%
 
 %STARTSECTION{"summary"}%
@@ -15,16 +15,14 @@ Homepage: http://arshaw.com/fullcalendar/ %BR%
 Author(s): Adam Shaw %BR%
 Version: 1.4.3 
 
-
 ---++ Example
 %JQREQUIRE{"fullcalendar"}%
-%ADDTOZONE{"body" topic="%WEB%.%TOPIC%" section="init" requires="JQUERYPLUGIN::FULLCALENDAR"}%
+%ADDTOZONE{"script" topic="%WEB%.%TOPIC%" section="init" requires="JQUERYPLUGIN::FULLCALENDAR"}%
 
 <div id='loading' class="foswikiTipMessage" style='display:none;position:absolute;top:5px;right:5px;'>
   loading...
 </div>
 <div id="calendar2" style="width:650px"></div>
-
 
 ---++ !JavaScript initialisation
 %TWISTY%
@@ -182,6 +180,9 @@ jQuery(function($) {
 </pre>
 
 ---++ Plugin Info
+<!--
+   * Set SHORTDESCRIPTION = <nop>FullCalendar jQuery widget for Foswiki
+-->
 |  Author(s): | Michael Daum |
 |  Copyright: | 2009-2010 Michael Daum http://michaeldaumconsulting.com |
 |  License: | GPL |

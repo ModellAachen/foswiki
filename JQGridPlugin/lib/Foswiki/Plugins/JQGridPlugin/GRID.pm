@@ -366,6 +366,7 @@ EOT
         $connectorWeb, $connectorTopic, 'view',
         web => $theWeb,
         skin => 'text',
+        cache_ignore => 'nd',
         contenttype => 'text/xml',
         section => 'grid',
         query => $theQuery,
@@ -376,8 +377,9 @@ EOT
       if (defined $Foswiki::cfg{JQGridPlugin}{Connector}{$theConnector}) {
         $gridConnectorUrl = Foswiki::Func::getScriptUrl(
           'JQGridPlugin', 'gridconnector', 'rest',
-          topic => $baseWeb . '.' . $baseTopic,
           web => $theWeb,
+          topic => $baseWeb . '.' . $baseTopic,
+          cache_ignore => 'nd',
           query => $theQuery,
           columns => join(',', @selectedFields),
           connector => $theConnector,
@@ -386,7 +388,10 @@ EOT
         throw Error::Simple("unknown grid connector $theConnector"); # SMELL: where's the catch
       }
     }
+    #print STDERR "gridConnectorUrl=$gridConnectorUrl\n";
+
     $gridConnectorUrl =~ s/'/\\'/g;
+
 
     push @metadata, "url:'$gridConnectorUrl'";
     push @metadata, "datatype: 'xml'";

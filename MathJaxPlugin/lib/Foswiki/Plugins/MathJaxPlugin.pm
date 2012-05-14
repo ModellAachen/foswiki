@@ -17,7 +17,6 @@
 
 =cut
 
-
 package Foswiki::Plugins::MathJaxPlugin;
 
 # Always use strict to enforce variable scoping
@@ -34,7 +33,8 @@ use vars qw(
 our $VERSION = '$Rev: 2083 (2010-10-27) $';
 our $RELEASE = '0.9.1';
 
-our $SHORTDESCRIPTION = 'Macros for embedding <nop>MathJax (an open source <nop>JavaScript display engine for mathematics)';
+our $SHORTDESCRIPTION =
+'Macros for embedding <nop>MathJax (an open source <nop>JavaScript display engine for mathematics)';
 our $NO_PREFS_IN_TOPIC = 1;
 $FoswikiCompatibility{endRenderingHandler} = 1.1;
 
@@ -44,16 +44,17 @@ sub initPlugin {
     undef $core;
 
     # Tell WyswiygPlugin to protect <latex>...</latex> markup
-    if (defined &Foswiki::Plugins::WysiwygPlugin::addXMLTag) {
-	Foswiki::Plugins::WysiwygPlugin::addXMLTag('latex', sub { 1 } );
+    if ( defined &Foswiki::Plugins::WysiwygPlugin::addXMLTag ) {
+        Foswiki::Plugins::WysiwygPlugin::addXMLTag( 'latex', sub { 1 } );
     }
 
     Foswiki::Func::registerTagHandler( 'MATHMODE', \&_MATHMODE );
-#    Foswiki::Func::registerTagHandler( '$', \&_MATHMODE );
+
+    #    Foswiki::Func::registerTagHandler( '$', \&_MATHMODE );
 
     # Allow a sub to be called from the REST interface
     # using the provided alias
-#    Foswiki::Func::registerRESTHandler( 'example', \&restExample );
+    #    Foswiki::Func::registerRESTHandler( 'example', \&restExample );
 
     # Plugin correctly initialized
     return 1;
@@ -63,43 +64,38 @@ sub initPlugin {
 sub commonTagsHandler {
 ### my ( $text, $topic, $web ) = @_;
 
-  $_[0] =~ s/%\\\[(.*?)\\\]%/&handleMath($1,0)/geo;
-  $_[0] =~ s/%\$(.*?)\$%/&handleMath($1,1)/geo;
-  $_[0] =~ s/<latex(?: (.*?))?>(.*?)<\/latex>/&handleMath($2,2,$1)/geos;
+    $_[0] =~ s/%\\\[(.*?)\\\]%/&handleMath($1,0)/geo;
+    $_[0] =~ s/%\$(.*?)\$%/&handleMath($1,1)/geo;
+    $_[0] =~ s/<latex(?: (.*?))?>(.*?)<\/latex>/&handleMath($2,2,$1)/geos;
 }
 
 ################################################################################
 sub getCore {
-  return $core if $core;
-  
-  require Foswiki::Plugins::MathJaxPlugin::Core;
-  $core = new Foswiki::Plugins::MathJaxPlugin::Core;
+    return $core if $core;
 
-  return $core;
+    require Foswiki::Plugins::MathJaxPlugin::Core;
+    $core = new Foswiki::Plugins::MathJaxPlugin::Core;
 
-  # try:
-  require Foswiki::Plugins::MathJaxPlugin::Core;
-  return $core
+    return $core;
+
+    # try:
+    require Foswiki::Plugins::MathJaxPlugin::Core;
+    return $core
       || new Foswiki::Plugins::MathJaxPlugin::Core;
 }
 
 ###############################################################################
-sub handleMath { 
-  return getCore()->handleMath($web, $topic, @_); 
+sub handleMath {
+    return getCore()->handleMath( $web, $topic, @_ );
 }
 
 ###############################################################################
-sub postRenderingHandler { 
-  return unless $core; # no math
-  $core->postRenderingHandler($web, $topic, @_)
-}
-	
-###############################################################################
 sub _MATHMODE {
-    my($session, $params, $theTopic, $theWeb) = @_;
+    my ( $session, $params, $theTopic, $theWeb ) = @_;
+
     # $session  - a reference to the Foswiki session object
     #             (you probably won't need it, but documented in Foswiki.pm)
-    # $params=  - a reference to a Foswiki::Attrs object containing 
+    # $params=  - a reference to a Foswiki::Attrs object containing
     #             parameters.
     #             This can be used as a simple hash that maps parameter names
     #             to values, with _DEFAULT being the name for the default
@@ -110,8 +106,9 @@ sub _MATHMODE {
     # macro call in the final text.
 
     my $math = $params->{_DEFAULT};
+
     #Foswiki::Func::writeDebug( "MathJaxPlugin MATHMODE{$math}" );
-    return handleMath( $math, my $inlineFlag=0, $params );
+    return handleMath( $math, my $inlineFlag = 0, $params );
 }
 
 1;

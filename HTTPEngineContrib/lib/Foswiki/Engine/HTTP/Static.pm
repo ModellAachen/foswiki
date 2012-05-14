@@ -36,15 +36,15 @@ sub send_response {
     $this->_translateUri();
     if ( -e $this->{file} && -r _ && !-d _ ) {
         my ( $size, $mtime ) = ( stat(_) )[ 7, 9 ];
-        
+
         guess_media_type( $this->{file}, $headers );
-        
+
         my $lmtime = str2time( $this->{headers}->header('If-Modified-Since') );
         if ( $this->{method} eq 'GET' && $lmtime && $mtime <= $lmtime ) {
             $this->_write( $sock, 304, $headers );
             return 304;
         }
-        
+
         $headers->header( 'Last-Modified' => time2str($mtime) );
         $headers->content_length($size);
         $headers->header( Connection => 'close' )

@@ -37,8 +37,8 @@ sub manage {
     my $action = $session->{request}->param('action');
 
     # Dispatch to action function
-    if ( defined $action ) {
-        my $method = 'Foswiki::UI::Manage::_action_' . $action;
+    if ( defined $action && $action =~ /^([a-z]+)$/i ) {
+        my $method = 'Foswiki::UI::Manage::_action_' . $1;
 
         if ( defined &$method ) {
             no strict 'refs';
@@ -342,6 +342,8 @@ sub _action_create {
         }
     );
 
+    Foswiki::UI::checkValidationKey($session);
+
     # user must have change access
     my $topicObject = Foswiki::Meta->new( $session, $newWeb, $newTopic );
     Foswiki::UI::checkAccess( $session, 'CHANGE', $topicObject );
@@ -360,12 +362,76 @@ sub _action_editSettings {
     my $session = shift;
     my $topic   = $session->{topicName};
     my $web     = $session->{webName};
+    my $query   = $session->{request};
+    my $user    = $session->{user};
+    my $users   = $session->{users};
 
     my $topicObject = Foswiki::Meta->load( $session, $web, $topic );
     Foswiki::UI::checkAccess( $session, 'VIEW',   $topicObject );
     Foswiki::UI::checkAccess( $session, 'CHANGE', $topicObject );
 
+    # Check lease, unless we have been instructed to ignore it
+    # or if we are using the 10X's or AUTOINC topic name for
+    # dynamic topic names.
+    my $breakLock = $query->param('breaklock') || '';
+    unless ($breakLock) {
+        my $lease = $topicObject->getLease();
+        if ($lease) {
+            my $who = $users->webDotWikiName( $lease->{user} );
+
+            if ( $who ne $users->webDotWikiName($user) ) {
+
+                # redirect; we are trying to break someone else's lease
+                my ( $future, $past );
+                my $why = $lease->{message};
+                my $def;
+                my $t = time();
+                require Foswiki::Time;
+
+                if ( $t > $lease->{expires} ) {
+
+                    # The lease has expired, but see if we are still
+                    # expected to issue a "less forceful' warning
+                    if (   $Foswiki::cfg{LeaseLengthLessForceful} < 0
+                        || $t < $lease->{expires} +
+                        $Foswiki::cfg{LeaseLengthLessForceful} )
+                    {
+                        $def = 'lease_old';
+                        $past =
+                          Foswiki::Time::formatDelta( $t - $lease->{expires},
+                            $session->i18n );
+                        $future = '';
+                    }
+                }
+                else {
+
+                    # The lease is active
+                    $def  = 'lease_active';
+                    $past = Foswiki::Time::formatDelta( $t - $lease->{taken},
+                        $session->i18n );
+                    $future =
+                      Foswiki::Time::formatDelta( $lease->{expires} - $t,
+                        $session->i18n );
+                }
+                if ($def) {
+
+                    # use a 'keep' redirect to ensure we pass parameter
+                    # values in the query on to the oops script
+                    throw Foswiki::OopsException(
+                        'leaseconflict',
+                        def    => $def,
+                        web    => $web,
+                        topic  => $topic,
+                        keep   => 1,
+                        params => [ $who, $past, $future, 'manage' ]
+                    );
+                }
+            }
+        }
+    }
+
     my $settings = "";
+    $topicObject->setLease( $Foswiki::cfg{LeaseLength} );
 
     my @fields = $topicObject->find('PREFERENCE');
     foreach my $field (@fields) {
@@ -399,56 +465,82 @@ sub _action_saveSettings {
     my $topic   = $session->{topicName};
     my $web     = $session->{webName};
     my $cUID    = $session->{user};
+    my $query   = $session->{request};
 
-    # set up editing session
-    require Foswiki::Meta;
-    my $newTopicObject = Foswiki::Meta->load( $session, $web, $topic );
+    if ( defined $query->param('action_cancel')
+        && $query->param('action_cancel') ne '' )
+    {
+        my $topicObject = Foswiki::Meta->new( $session, $web, $topic );
 
-    Foswiki::UI::checkAccess( $session, 'CHANGE', $newTopicObject );
-
-    my $query       = $session->{request};
-    my $settings    = $query->param('text');
-    my $originalrev = $query->param('originalrev');
-
-    $newTopicObject->remove('PREFERENCE');    # delete previous settings
-        # Note: $Foswiki::regex{setVarRegex} cannot be used as it requires
-        # use in code that parses multiline settings line by line.
-    $settings =~
-s(^(?:\t|   )+\*\s+(Set|Local)\s+($Foswiki::regex{tagNameRegex})\s*=\s*?(.*)$)
-        (_parsePreferenceValue($newTopicObject, $1, $2, $3))mgeo;
-
-    my $saveOpts = {};
-    $saveOpts->{minor}            = 1;    # don't notify
-    $saveOpts->{forcenewrevision} = 1;    # always new revision
-
-    # Merge changes in meta data
-    if ($originalrev) {
-        my $info = $newTopicObject->getRevisionInfo();
-
-        # If the last save was by me, don't merge
-        if (   $info->{version} ne $originalrev
-            && $info->{author} ne $session->{user} )
-        {
-            my $currTopicObject = Foswiki::Meta->load( $session, $web, $topic );
-            $newTopicObject->merge($currTopicObject);
+        my $lease = $topicObject->getLease();
+        if ( $lease && $lease->{user} eq $session->{user} ) {
+            $topicObject->clearLease();
         }
     }
+    elsif ( defined $query->param('action_save')
+        && $query->param('action_save') ne '' )
+    {
 
-    try {
-        $newTopicObject->save( minor => 1, forcenewrevision => 1 );
+        # set up editing session
+        require Foswiki::Meta;
+        my $newTopicObject = Foswiki::Meta->load( $session, $web, $topic );
+
+        Foswiki::UI::checkAccess( $session, 'VIEW',   $newTopicObject );
+        Foswiki::UI::checkAccess( $session, 'CHANGE', $newTopicObject );
+        Foswiki::UI::checkValidationKey($session);
+
+        my $settings    = $query->param('text');
+        my $originalrev = $query->param('originalrev');
+
+        $newTopicObject->remove('PREFERENCE');    # delete previous settings
+            # Note: $Foswiki::regex{setVarRegex} cannot be used as it requires
+            # use in code that parses multiline settings line by line.
+        $settings =~
+s(^(?:\t|   )+\*\s+(Set|Local)\s+($Foswiki::regex{tagNameRegex})\s*=\s*?(.*)$)
+            (_parsePreferenceValue($newTopicObject, $1, $2, $3))mgeo;
+
+        my $saveOpts = {};
+        $saveOpts->{minor}            = 1;    # don't notify
+        $saveOpts->{forcenewrevision} = 1;    # always new revision
+
+        # Merge changes in meta data
+        if ($originalrev) {
+            my $info = $newTopicObject->getRevisionInfo();
+
+            # If the last save was by me, don't merge
+            if (   $info->{version} ne $originalrev
+                && $info->{author} ne $session->{user} )
+            {
+                my $currTopicObject =
+                  Foswiki::Meta->load( $session, $web, $topic );
+                $newTopicObject->merge($currTopicObject);
+            }
+        }
+
+        try {
+            $newTopicObject->save( minor => 1, forcenewrevision => 1 );
+        }
+        catch Error::Simple with {
+            throw Foswiki::OopsException(
+                'attention',
+                def    => 'save_error',
+                web    => $web,
+                topic  => $topic,
+                params => [ shift->{-text} ]
+            );
+        };
     }
-    catch Error::Simple with {
+    else {
         throw Foswiki::OopsException(
             'attention',
-            def    => 'save_error',
+            def    => 'invalid_field',
             web    => $web,
             topic  => $topic,
-            params => [ shift->{-text} ]
+            params => ['action_save or action_cancel']
         );
-    };
+    }
 
-    my $viewURL = $session->getScriptUrl( 0, 'view', $web, $topic );
-    $session->redirect( $session->redirectto($viewURL) );
+    $session->redirect( $session->redirectto("$web.$topic") );
 }
 
 sub _parsePreferenceValue {
@@ -515,6 +607,8 @@ sub _action_restoreRevision {
         );
     }
 
+    Foswiki::UI::checkValidationKey($session);
+
     foreach my $k ( sort keys %$meta ) {
         next if $k =~ m/^_/;
         next if $k eq 'TOPICINFO';         # Don't revert topicinfo
@@ -535,8 +629,7 @@ sub _action_restoreRevision {
 
     $session->{cgiQuery}->delete('action');
 
-    my $viewURL = $session->getScriptUrl( 0, 'view', $web, $topic );
-    $session->redirect( $session->redirectto($viewURL) );
+    $session->redirect( $session->redirectto("$web.$topic") );
 
     #require Foswiki::UI::Edit;
     #Foswiki::UI::Edit::edit($session);

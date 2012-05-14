@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 BEGIN {
-	unshift @INC, split( /:/, $ENV{FOSWIKI_LIBS} );
+    unshift @INC, split( /:/, $ENV{FOSWIKI_LIBS} );
 }
 use TWiki::Contrib::Build;
 

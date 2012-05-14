@@ -1,4 +1,4 @@
-// (c)opyright 2008-2011 Michael Daum http://michaeldaumconsulting.com
+// (c)opyright 2008-2012 Michael Daum http://michaeldaumconsulting.com
 /* helper for oopshistory */
 /* updates the radio buttons in a way to prevent illegal selections */
 

@@ -1,27 +1,23 @@
 %TMPL:INCLUDE{"page"}%<!-- template: view.nat.tmpl -->
-%TMPL:INCLUDE{"viewbody"}%<!-- viewbody// -->
-%TMPL:INCLUDE{"viewtopicactions"}%<!-- viewtopicactions// -->
-%TMPL:INCLUDE{"viewsidebar"}%<!-- viewsidebar// -->
-%TMPL:INCLUDE{"searchbox"}%<!-- searchbox// -->
-%TMPL:INCLUDE{"metadata"}%<!-- metadata// -->
-%TMPL:INCLUDE{"metacomments"}%<!-- metacomments// -->
+%TMPL:INCLUDE{"viewbody"}%<!-- -->
+%TMPL:INCLUDE{"viewtopicactions"}%<!-- -->
+%TMPL:INCLUDE{"viewsidebar"}%<!-- -->
+%TMPL:INCLUDE{"searchbox"}%<!-- -->
+%TMPL:INCLUDE{"metadata"}%<!-- -->
+%TMPL:INCLUDE{"metacomments"}%<!-- -->
 
 %{ ################################################################################ }%
 %TMPL:DEF{"bodyclass"}%natViewBody %IF{"context 'natskin_history_1'" then="natViewHistoryBody"}%%TMPL:END%
 %TMPL:DEF{"bottombar"}%%WEBCOMPONENT{"BottomBar"}%%TMPL:END%
+%TMPL:DEF{"scrolltop"}%<a href="#" class="natScrollTop jqScrollToLink {'target':'0', 'duration':500}" title="%MAKETEXT{"scroll to the top"}%">&uarr;</a>%TMPL:END%
 
 %{ ################################################################################ }%
 %TMPL:DEF{"meta"}%%TMPL:P{"metatitle"}%
 %TMPL:P{"metadescription"}%
 %TMPL:P{"metakeywords"}%
 %TMPL:P{"metaauthor"}%
-%TMPL:P{"dublincore"}%
 %TMPL:P{"metaedit"}%
 %HTTP_EQUIV_ON_VIEW% %TMPL:END%
-
-%TMPL:DEF{"dublincore"}%<link rel="schema.DC" href= "http://purl.org/DC/elements/1.1/">
-<meta name="DC.Date.Created" content="%REVINFO{rev="1" format="$year-$mo-$day"}%" />
-<meta name="DC.Date.Modified" content="%REVINFO{"$year-$mo-$day"}%" />%TMPL:END%
 
 %TMPL:DEF{"metatitle"}%<meta name='title' content='%ENCODE{
   "%IF{"'%WEB%.%TOPIC%'/MetaTitle" 
@@ -87,17 +83,19 @@
 <!-- -->%TMPL:END%
 
 %{ ################################################################################ }%
-%TMPL:DEF{"revinfo"}%<div class="natRevision">%MAKETEXT{"Changed by [_1] on [_2]" args="<span class='natRevisionAuthor'> %REVINFO{"[[$wikiusername][$wikiname]]" rev="%CURREV%"}% </span>, <a class='natRevisionDate' ref='nofollow' href='%TMPL:P{context="CompareRevisionsAddonPluginEnabled" then="compare" else="rdiff"}%' title='%MAKETEXT{"show last change"}%'>%REVINFO{"$date - $hour:$min - r$rev" rev="%CURREV%"}%</a>"}%</div>%TMPL:END%
+%TMPL:DEF{"revinfo"}%<div class="natRevision">%MAKETEXT{"Last modified by [_1] on [_2]" args="<span class='natRevisionAuthor'> %REVINFO{"[[$wikiusername][$wikiname]]" rev="%CURREV%"}% </span>, <a class='natRevisionDate' rel='nofollow' href='%TMPL:P{context="CompareRevisionsAddonPluginEnabled" then="compare" else="rdiff"}%' title='%MAKETEXT{"show last change"}%'>%REVINFO{"$date - $hour:$min - r$rev" rev="%CURREV%"}%</a>"}%</div>%TMPL:END%
 %TMPL:DEF{"rdiff"}%%SCRIPTURLPATH{"rdiff"}%/%WEB%/%TOPIC%?type=last;render=sequential%TMPL:END%
 %TMPL:DEF{"compare"}%%SCRIPTURLPATH{"compare"}%/%WEB%/%TOPIC%?type=last;render=interweave%TMPL:END%
 %TMPL:DEF{"broadcast"}%%IF{"not isempty 'BROADCASTMESSAGE'" then="<div class='foswikiBroadcastMessage'> $percntBROADCASTMESSAGE$percnt </div>"}%%TMPL:END%
 
 %{ ################################################################################ }%
-%TMPL:DEF{"comments"}% %IF{
+%TMPL:DEF{"comments"}%%IF{
   "$DISPLAYCOMMENTS='on' and $COMMENTFORMAT!='insidetab' and not context save and not context preview and not context edit"
-  then="<div>$percntTMPL:P{\"metacomments\"}$percnt</div>" 
-  else="<!-- -->" 
-}%%TMPL:END%
+  then="$percntJQREQUIRE{\"loader\"}$percnt
+    <div class=\"jqLoader {url:'%SCRIPTURLPATH{"rest"}%/RenderPlugin/template?name=metacomments;expand=metacomments;render=on;topic=%WEB%.%TOPIC%'}\"></div>" 
+}%<!-- -->
+%TMPL:P{"metacomments::init"}%<!-- -->
+<!-- -->%TMPL:END%
 
 %{ ################################################################################ }%
 %TMPL:DEF{"editsettingsform"}%<!-- -->

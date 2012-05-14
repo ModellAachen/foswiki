@@ -4,23 +4,24 @@
 
 # Standard preamble
 BEGIN {
-  foreach my $pc (split(/:/, $ENV{FOSWIKI_LIBS} || '')) {
-    unshift @INC, $pc;
-  }
+    foreach my $pc ( split( /:/, $ENV{FOSWIKI_LIBS} || '' ) ) {
+        unshift @INC, $pc;
+    }
 }
 
 use TWiki::Contrib::Build;
 
 package WebDAVPluginBuild;
 
-@WebDAVPluginBuild::ISA = ( "TWiki::Contrib::Build" );
+@WebDAVPluginBuild::ISA = ("TWiki::Contrib::Build");
 
 sub new {
     my $class = shift;
-    return bless( $class->SUPER::new( "WebDAVPlugin" ), $class );
+    return bless( $class->SUPER::new("WebDAVPlugin"), $class );
 }
 
 # override to build C program in test dir
+
 =pod
 
 sub target_test {
@@ -65,4 +66,4 @@ sub target_test {
 
 $build = new WebDAVPluginBuild();
 
-$build->build($build->{target});
+$build->build( $build->{target} );

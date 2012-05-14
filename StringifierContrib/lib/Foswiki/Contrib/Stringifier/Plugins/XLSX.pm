@@ -53,7 +53,8 @@ sub stringForFile {
         }
     }
 
-    return $self->fromUtf8($text);
+    $text = $self->decode($text, $Foswiki::cfg{StringifierContrib}{CharSet}{xlsx} || 'utf-8');
+    return $self->encode($text);
 }
 
 1;

@@ -241,7 +241,9 @@ sub _urlParams {
         foreach my $part (@parts) {
             if ( $part =~ m/^(.*?)\=(.*?)$/ ) {
                 my $key = $1;
-                next if ( $key eq 'validation_key' ); # Don't pass through the previous validation_key
+                next
+                  if ( $key eq 'validation_key' )
+                  ;    # Don't pass through the previous validation_key
 
                 # retrieve value from param
                 my $value = $query->url_param($key);

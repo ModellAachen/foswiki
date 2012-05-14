@@ -1,7 +1,7 @@
 # Test for XLS.pm
 package XlsTests;
-use FoswikiFnTestCase;
-our @ISA = qw( FoswikiFnTestCase );
+use StringifierTest;
+our @ISA = qw( StringifierTest );
 
 use strict;
 use utf8;
@@ -46,13 +46,13 @@ sub test_SpecialCharacters {
     my $stringifier = Foswiki::Contrib::Stringifier::Plugins::XLS->new();
 
     my $text  = $stringifier->stringForFile($this->{attachmentDir}.'Simple_example.xls');
-    
-    $this->assert($text =~ m\Größer\, "Text Größer not found.");
+
+    $this->assert_matches($this->encode('Größer'), $text, "Text Größer not found.");
 		  
     $text  = $stringifier->stringForFile($this->{attachmentDir}.'Portuguese_example.xls');
 
     # print "Text = $text\n";
-    $this->assert($text =~ m\Formatação\, "Text Formatação not found.");		  
+    $this->assert_matches($this->encode('Formatação'), $text, "Text Formatação not found.");
     $this->assert(!($text =~ m\GENERAL\), "Bad string GENERAL appeares.");
 }
 

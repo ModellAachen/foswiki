@@ -5,7 +5,6 @@ use warnings;
 use FoswikiFnTestCase;
 our @ISA = qw( FoswikiFnTestCase );
 
-use Foswiki::Meta;
 use File::Temp;
 use Benchmark ':hireswallclock';
 
@@ -50,10 +49,13 @@ sub set_up {
     Foswiki::Func::saveTopic( $this->{test_web}, "WebPreferences", undef,
         <<'HERE' );
    * Set WEBFORMS = InitializationForm
+   * Set SKIN = pattern
 HERE
 
-    my $meta =
-      Foswiki::Meta->new( $this->{session}, $this->{test_web}, $testtopic1 );
+    # Force reload to pick up WebPreferences
+    $this->createNewFoswikiSession( undef, $this->{session}->{cgiQuery} );
+
+    my ($meta) = Foswiki::Func::readTopic( $this->{test_web}, $testtopic1 );
     $meta->put( 'FORM', { name => 'InitializationForm' } );
     $meta->putKeyed(
         'FIELD',
@@ -166,8 +168,8 @@ HERE
 
     Foswiki::Func::saveTopic( $this->{test_web}, $testtopic1, $meta, 'TT1' );
 
-    $meta =
-      Foswiki::Meta->new( $this->{session}, $this->{test_web}, $testtopic2 );
+    $meta->finish();
+    ($meta) = Foswiki::Func::readTopic( $this->{test_web}, $testtopic2 );
     $meta->put( 'FORM', { name => 'InitializationForm', } );
     $meta->putKeyed(
         'FIELD',
@@ -305,8 +307,7 @@ HERE
 sub test_render_formfield_raw {
 
     my $this = shift;
-    my $meta =
-      Foswiki::Meta->load( $this->{session}, $this->{test_web}, $testtopic2 );
+    my ($meta) = Foswiki::Func::readTopic( $this->{test_web}, $testtopic2 );
     my $text   = $meta->text;
     my $render = $this->{session}->renderer;
     my $res;
@@ -360,10 +361,9 @@ sub test_render_formfield_with_form {
 
     $this->setForm();
 
-    my $meta =
-      Foswiki::Meta->load( $this->{session}, $this->{test_web}, $testtopic2 );
-    my $text = $meta->text;
-    my $res  = $meta->renderFormForDisplay();
+    my ($meta) = Foswiki::Func::readTopic( $this->{test_web}, $testtopic2 );
+    my $text   = $meta->text;
+    my $res    = $meta->renderFormForDisplay();
     $this->assert_html_equals( <<"HERE", $res );
 <div class="foswikiForm foswikiFormStep">%IF{"context preview" then="<noautolink><h3>TemporaryRenderFormTestsTestWebRenderFormTests.InitializationForm</h3></noautolink> " else="<h3> TemporaryRenderFormTestsTestWebRenderFormTests.InitializationForm <span class='foswikiSmall'><a href='%SCRIPTURL{edit}%/%WEB%/%TOPIC%?t=%GMTIME{\$epoch}%;action=form'>%MAKETEXT{"edit"}%</a></span></h3>"}%<table class='foswikiFormTable' border='1' summary='%MAKETEXT{"Form data"}%'>%IF{"context preview" then="<noautolink>"}%<tr valign='top'><td class='foswikiFormTableRow foswikiFirstCol' align='right'> Issue Name </td><td>
 _An issue_
@@ -380,8 +380,8 @@ Foo, Baz
 </td></tr>%IF{"context preview" then="</noautolink>"}%%IF{"context preview" then="<noautolink>"}%<tr valign='top'><td class='foswikiFormTableRow foswikiFirstCol' align='right'> Issue 6 </td><td>
 Three </td></tr>%IF{"context preview" then="</noautolink>"}%</table></div>
 HERE
-    $meta =
-      Foswiki::Meta->load( $this->{session}, $this->{test_web}, $testtopic1 );
+    $meta->finish();
+    ($meta) = Foswiki::Func::readTopic( $this->{test_web}, $testtopic1 );
     $text = $meta->text;
     $res  = $meta->renderFormForDisplay();
 
@@ -420,8 +420,7 @@ sub test_render_for_edit {
     $Foswiki::cfg{RequireCompatibleAnchors} = 0;
 
     $this->setForm();
-    my $meta =
-      Foswiki::Meta->load( $this->{session}, $this->{test_web}, $testtopic1 );
+    my ($meta) = Foswiki::Func::readTopic( $this->{test_web}, $testtopic1 );
     my $text = $meta->text;
     my $formDef =
       Foswiki::Form->new( $this->{session}, $this->{test_web},
@@ -435,8 +434,8 @@ sub test_render_for_edit {
 
 <tr><th>Issue Name</th><td align="left"><input type="text" name="IssueName" value="_An issue_" size="40" class="foswikiInputField" /></td></tr>
 <tr><th>State</th><td align="left"><table><tr><td><label><input type="radio" name="State" value="none"  title="none" class="foswikiRadioButton"/>none</label></td></tr></table></td></tr>
-<tr><th>Issue Description</th><td align="left"><input type="hidden" name="IssueDescription" value="---+ Example problem"  /><div><nop><h1>
-<a name="Example_problem"> </a> Example problem </h1></div></td></tr>
+<tr><th>Issue Description</th><td align="left"><input type="hidden"
+name="IssueDescription" value="---+ Example problem"  /><div class="foswikiFormLabel"><nop><h1 id="Example_problem"> Example problem </h1></div></td></tr>
 <tr><th>Issue 1</th><td align="left"><select name="Issue1" class="foswikiSelect" size="1"></select></td></tr>
 <tr><th>Issue 2EXTRA</th><td align="left">SWEET</td></tr>
 <tr><th>Issue 3</th><td align="left"><table></table><input type="hidden" name="Issue3" value="" /></td></tr>
@@ -461,8 +460,7 @@ HERE
 sub test_render_hidden {
     my $this = shift;
     $this->setForm();
-    my $meta =
-      Foswiki::Meta->load( $this->{session}, $this->{test_web}, $testtopic1 );
+    my ($meta) = Foswiki::Func::readTopic( $this->{test_web}, $testtopic1 );
     my $text = $meta->text;
     my $formDef =
       Foswiki::Form->new( $this->{session}, $this->{test_web},
@@ -494,9 +492,9 @@ TOPIC
 
     Foswiki::Func::saveTopic( $web, $topic, undef, $rawtext );
 
-    my $meta = Foswiki::Meta->load( $this->{session}, $web, $topic );
-    my $text = $meta->text;
-    my $res  = $meta->renderFormForDisplay();
+    my ($meta) = Foswiki::Func::readTopic( $web, $topic );
+    my $text   = $meta->text;
+    my $res    = $meta->renderFormForDisplay();
 
     $this->assert_html_equals( <<'HERE', $res );
 <span class='foswikiAlert'>
@@ -604,6 +602,28 @@ HERE
 Timing for $numcycles cycles of %META{"form"}%
     $timestr
 HERE
+
+    return;
+}
+
+# Item11527 - test that %macros in the WEBFORMS pref are expanded
+sub test_getAvailableForms {
+    my ($this) = @_;
+    $this->createNewFoswikiSession();
+    my ($topicObj) =
+      Foswiki::Func::readTopic( $this->{test_web},
+        $Foswiki::cfg{WebPrefsTopicName} );
+    my $pref         = '%SYSTEMWEB%.UserForm';
+    my $expandedpref = Foswiki::Func::expandCommonVariables($pref);
+
+    $topicObj->text( $topicObj->text() . "\n    * Set WEBFORMS = $pref\n" );
+    $topicObj->putKeyed( 'PREFERENCE',
+        { name => 'WEBFORMS', type => 'Set', value => $pref } );
+    $topicObj->save();
+    require Foswiki::Form;
+    my @forms = Foswiki::Form::getAvailableForms($topicObj);
+    $this->assert_str_equals( $expandedpref, join( ',', @forms ) );
+    $topicObj->finish();
 
     return;
 }

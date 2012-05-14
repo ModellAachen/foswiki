@@ -50,7 +50,7 @@ sub doInit {
   $isInitialized = 1;
 
   Foswiki::Func::addToHEAD("IMAGEGALLERYPLUGIN", <<'HERE');
-<link rel="stylesheet" href="%PUBURL%/%SYSTEMWEB%/ImageGalleryPlugin/style.css" type="text/css" media="all" />
+<link rel="stylesheet" href="%PUBURLPATH%/%SYSTEMWEB%/ImageGalleryPlugin/style.css" type="text/css" media="all" />
 HERE
 
   require Foswiki::Plugins::ImageGalleryPlugin::Core;

@@ -20,7 +20,7 @@
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details, published at 
+# GNU General Public License for more details, published at
 # http://www.gnu.org/copyleft/gpl.html
 #
 # =========================
@@ -30,131 +30,142 @@ use strict;
 use TWiki::Plugins::XpTrackerPlugin;
 use TWiki::Func;
 
-my %cachedProjectTeams=();
-my %cachedTeamIterations=();
-my %cachedIterationStories=();
-my $loadedWeb="";
+my %cachedProjectTeams     = ();
+my %cachedTeamIterations   = ();
+my %cachedIterationStories = ();
+my $loadedWeb              = "";
 
-my @cachedProjects=();
+my @cachedProjects = ();
 
-my $cacheFile=".xpcache";
-my $projectsCacheFile=".xpprojectcache";
+my $cacheFile         = ".xpcache";
+my $projectsCacheFile = ".xpprojectcache";
 
 #(RAF)
-#If this module is load using the "use" directive before the plugin is 
+#If this module is load using the "use" directive before the plugin is
 #initialized, $debug will be 0
 #(CC) this will not work in Dakar; TWiki::Func methods cannot be called before initPlugin.
 my $debug;
+
 #my $debug = &TWiki::Func::getPreferencesFlag( "XPTRACKERPLUGIN_DEBUG" );
 #&TWiki::Func::writeDebug( "- TWiki::Plugins::XpTrackerPlugin::Cache is loaded" ) if $debug;
 
 #-------------------------------------------------------------------------------
 sub initCache {
-	my $web = shift;
-	
+    my $web = shift;
 
-	my $cacheFileName = &getCacheFileName($web,$cacheFile);
+    my $cacheFileName = &getCacheFileName( $web, $cacheFile );
 
     # if there is no disk cache file, build one
-    if (! (-e "$cacheFileName")) {
-       &TWiki::Func::writeDebug( "NO CACHE, BUILDING DISK CACHE" ) if $debug;
+    if ( !( -e "$cacheFileName" ) ) {
+        &TWiki::Func::writeDebug("NO CACHE, BUILDING DISK CACHE") if $debug;
         buildCache($web);
-    } elsif (! $web eq $loadedWeb) {
+    }
+    elsif ( !$web eq $loadedWeb ) {
         _readCache($cacheFileName);
-        $loadedWeb=$web;    
-        
+        $loadedWeb = $web;
+
     }
 }
 
 #-------------------------------------------------------------------------------
 
 sub _readCache {
-	my $cacheFileName= shift;	     
-    my $cacheText = &TWiki::Func::readFile($cacheFileName);
-	_cleanCache();
+    my $cacheFileName = shift;
+    my $cacheText     = &TWiki::Func::readFile($cacheFileName);
+    _cleanCache();
 
-    while($cacheText =~ s/PROJ : (.*?) : (.*?)\n//) {
+    while ( $cacheText =~ s/PROJ : (.*?) : (.*?)\n// ) {
         $cachedProjectTeams{$1} = "$2";
     }
 
-    while($cacheText =~ s/TEAM : (.*?) : (.*?)\n//) {
+    while ( $cacheText =~ s/TEAM : (.*?) : (.*?)\n// ) {
         $cachedTeamIterations{$1} = "$2";
     }
 
-    while($cacheText =~ s/ITER : (.*?) : (.*?)\n//) {
+    while ( $cacheText =~ s/ITER : (.*?) : (.*?)\n// ) {
         $cachedIterationStories{$1} = "$2";
     }
 }
-	
+
 #-------------------------------------------------------------------------------
 sub _cleanCache {
-	# Clean the current cache;
-	%cachedProjectTeams=();
-	%cachedTeamIterations=();
-	%cachedIterationStories=();
+
+    # Clean the current cache;
+    %cachedProjectTeams     = ();
+    %cachedTeamIterations   = ();
+    %cachedIterationStories = ();
 }
 
 #-----------------------------------------------------------------------------
 sub buildCache {
-	my $web = shift;
+    my $web = shift;
     _cleanCache();
 
-    my @topics=&TWiki::Func::getTopicList($web);
+    my @topics = &TWiki::Func::getTopicList($web);
     foreach my $topic (@topics) {
-        #TWiki::Func::writeDebug( "- TWiki::Plugins::XpTrackerPlugin::Cache::buildCache $topic" );
-        my $topicText = &TWiki::Func::readTopicText($web, $topic);
-        
+
+#TWiki::Func::writeDebug( "- TWiki::Plugins::XpTrackerPlugin::Cache::buildCache $topic" );
+        my $topicText = &TWiki::Func::readTopicText( $web, $topic );
+
         #Found a Story
-        my $iteration = TWiki::Plugins::XpTrackerPlugin::xpGetValue("\\*Iteration\\*", $topicText, "storyiter");
-        $cachedIterationStories{$iteration} .= "$topic " if (_isValidTopic($web,$iteration));
-        
+        my $iteration =
+          TWiki::Plugins::XpTrackerPlugin::xpGetValue( "\\*Iteration\\*",
+            $topicText, "storyiter" );
+        $cachedIterationStories{$iteration} .= "$topic "
+          if ( _isValidTopic( $web, $iteration ) );
+
         #Found an Iteration
-        my $team = TWiki::Plugins::XpTrackerPlugin::xpGetValue("\\*Team\\*", $topicText, "notagsforthis");
-        $cachedTeamIterations{$team} .= "$topic " if (_isValidTopic($web,$team));;
-        
+        my $team =
+          TWiki::Plugins::XpTrackerPlugin::xpGetValue( "\\*Team\\*", $topicText,
+            "notagsforthis" );
+        $cachedTeamIterations{$team} .= "$topic "
+          if ( _isValidTopic( $web, $team ) );
+
         #Found a team
-        my $project = TWiki::Plugins::XpTrackerPlugin::xpGetValue("\\*Project\\*", $topicText, "notagsforthis");
-        $cachedProjectTeams{$project} .= "$topic " if (_isValidTopic($web,$project));;
+        my $project =
+          TWiki::Plugins::XpTrackerPlugin::xpGetValue( "\\*Project\\*",
+            $topicText, "notagsforthis" );
+        $cachedProjectTeams{$project} .= "$topic "
+          if ( _isValidTopic( $web, $project ) );
     }
-    
 
     # dump information to disk cache file
     my $projCache = "";
     my $teamCache = "";
     my $iterCache = "";
-    my @projects = getAllProjects($web);
+    my @projects  = getAllProjects($web);
 
     foreach my $project (@projects) {
 
-        my @teams = getProjectTeams($project,$web);
+        my @teams = getProjectTeams( $project, $web );
         $projCache .= "PROJ : $project : @teams \n";
         foreach my $team (@teams) {
 
-            my @teamIters = getTeamIterations($team,$web);
+            my @teamIters = getTeamIterations( $team, $web );
             $teamCache .= "TEAM : $team : @teamIters \n";
             foreach my $iter (@teamIters) {
-				
-                my @iterStories = getIterStories($iter,$web);
+
+                my @iterStories = getIterStories( $iter, $web );
                 $iterCache .= "ITER : $iter : @iterStories \n";
             }
         }
     }
-	
-    my $cacheText = $projCache.$teamCache.$iterCache;
-    &TWiki::Func::saveFile(getCacheFileName($web,".xpcache"), $cacheText);
-}    
+
+    my $cacheText = $projCache . $teamCache . $iterCache;
+    &TWiki::Func::saveFile( getCacheFileName( $web, ".xpcache" ), $cacheText );
+}
 
 sub _isValidTopic {
-    my ($web,$topic) = @_;
-    return ($topic && TWiki::Func::topicExists( $web, $topic));
+    my ( $web, $topic ) = @_;
+    return ( $topic && TWiki::Func::topicExists( $web, $topic ) );
 }
 
 #-----------------------------------------------------------------------------
 sub getCacheFileName {
-	my ($web, $cacheFile) = @_;
-	
-	# SMELL: update to use getWorkArea()
-	return TWiki::Func::getDataDir()."/".$web."/".$cacheFile;
+    my ( $web, $cacheFile ) = @_;
+
+    # SMELL: update to use getWorkArea()
+    return TWiki::Func::getDataDir() . "/" . $web . "/" . $cacheFile;
 }
 
 #-------------------------------------------------------------------------------
@@ -164,23 +175,31 @@ sub getAllProjects {
 
 #-------------------------------------------------------------------------------
 sub getProjectTeams {
-	my ($project, $web) = @_;
-    return defined($cachedProjectTeams{$project}) ? split( /\s+/, $cachedProjectTeams{$project} ) : ();
-	
+    my ( $project, $web ) = @_;
+    return
+      defined( $cachedProjectTeams{$project} )
+      ? split( /\s+/, $cachedProjectTeams{$project} )
+      : ();
+
 }
 
 #-------------------------------------------------------------------------------
 sub getTeamIterations {
-	my ($team, $web) = @_;
-    return defined($cachedTeamIterations{$team}) ? split( /\s+/, $cachedTeamIterations{$team} ) : ();
+    my ( $team, $web ) = @_;
+    return
+      defined( $cachedTeamIterations{$team} )
+      ? split( /\s+/, $cachedTeamIterations{$team} )
+      : ();
 }
 
 #-------------------------------------------------------------------------------
 sub getIterStories {
-	my ($iteration,$web) = @_;
-    return defined($cachedIterationStories{$iteration}) ? split( /\s+/, $cachedIterationStories{$iteration} ) : ();
+    my ( $iteration, $web ) = @_;
+    return
+      defined( $cachedIterationStories{$iteration} )
+      ? split( /\s+/, $cachedIterationStories{$iteration} )
+      : ();
 }
 
-	
 1;
 

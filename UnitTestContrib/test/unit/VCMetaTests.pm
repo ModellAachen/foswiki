@@ -11,7 +11,6 @@ use FoswikiStoreTestCase();
 our @ISA = qw( FoswikiStoreTestCase );
 
 use Foswiki();
-use Foswiki::Meta();
 use Foswiki::Func();
 use Foswiki::OopsException();
 use Error qw( :try );
@@ -157,7 +156,7 @@ sub verify_checkin_attachment {
 
     # Save again and check version number goes up by 1
     $this->assert(
-        open( my $FILE, '>', "$Foswiki::cfg{TempfileDir}/$attachment" ) );
+        open( $FILE, '>', "$Foswiki::cfg{TempfileDir}/$attachment" ) );
     print $FILE "Test attachment\nAnd a second line";
     $this->assert( close($FILE) );
 
@@ -211,7 +210,7 @@ sub verify_rename {
     $this->{session}->{user} = $user;
 
     #$Foswiki::Sandbox::_trace = 1;
-    my $nmeta = Foswiki::Meta->new( $this->{session}, $newWeb, $newTopic );
+    my ($nmeta) = Foswiki::Func::readTopic( $newWeb, $newTopic );
     $this->{session}->{store}->moveTopic( $meta, $nmeta, $user );
 
     #$Foswiki::Sandbox::_trace = 0;
@@ -256,7 +255,7 @@ sub verify_releaselocksonsave {
     };
 
     # get the date
-    my $m = Foswiki::Meta->load( $this->{session}, $this->{test_web}, $topic );
+    my ($m) = Foswiki::Func::readTopic( $this->{test_web}, $topic );
     my $t1 = $m->getRevisionInfo()->{date};
 
     # create rev 2 as TestUser1

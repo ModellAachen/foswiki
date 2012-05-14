@@ -59,7 +59,7 @@ There are one or more *auth scripts found in $Foswiki::cfg{ScriptDir} that are m
 from <tt>{AuthScripts}</tt>.  For best security,
 any script ending in "auth" should be included in the list of <tt>{AuthScripts}</tt>.
 EOF
-    );
+        );
     }
     return $msg;
 }
@@ -78,10 +78,15 @@ HERE
 
         #  Verify that scripts are executable
         if (   $script !~ /\.cfg$/
+            && $script !~ /^login/
+            && $script !~ /^logon/
             && $script !~ /^configure/
             && $Foswiki::cfg{AuthScripts} !~ m/\b$script\b/ )
         {
-            $unauth .= $script . ' ';
+
+            #use commas so users can 'just cut and paste'
+            $unauth .= ', ' if ( $unauth ne '' );
+            $unauth .= $script;
         }
     }
     closedir(D);

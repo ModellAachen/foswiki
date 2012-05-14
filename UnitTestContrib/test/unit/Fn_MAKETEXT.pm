@@ -1,8 +1,8 @@
-use strict;
-
 # tests for the correct expansion of MAKETEXT
 
 package Fn_MAKETEXT;
+use strict;
+use warnings;
 
 use FoswikiFnTestCase;
 our @ISA = qw( FoswikiFnTestCase );
@@ -35,8 +35,7 @@ sub set_up {
 
     $this->SUPER::set_up();
 
-    $topicObject =
-      Foswiki::Meta->new( $this->{session}, $this->{test_web}, 'WebHome' );
+    ($topicObject) = Foswiki::Func::readTopic( $this->{test_web}, 'WebHome' );
 }
 
 sub loadExtraConfig {
@@ -48,6 +47,7 @@ sub loadExtraConfig {
 sub setLocalSite {
     $Foswiki::cfg{WebMasterEmail}                    = 'a.b@c.org';
     $Foswiki::cfg{UserInterfaceInternationalisation} = 1;
+    $Foswiki::cfg{Languages}{de}{Enabled}            = 1;
 }
 
 sub test_simple {

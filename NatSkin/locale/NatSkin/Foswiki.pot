@@ -11,7 +11,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language: \n"
 
-#: templates/edit.nat.tmpl:166
+#: templates/edit.nat.tmpl:260
 msgid "$1"
 msgstr "$1"
 
@@ -193,7 +193,7 @@ msgid ""
 "All possible forms are defined in the WEBFORM variable in the WebPreferences."
 msgstr ""
 
-#: templates/copytopic.nat.tmpl:35 templates/renamebase.nat.tmpl:46
+#: templates/copytopic.nat.tmpl:35
 msgid "Allow non-<nop>WikiWord for the new topic name"
 msgstr ""
 
@@ -248,7 +248,7 @@ msgid "Attachment move failed"
 msgstr ""
 
 #: templates/attach.nat.tmpl:13 templates/attachtables.nat.tmpl:44
-#: templates/edit.nat.tmpl:103
+#: templates/edit.nat.tmpl:197
 msgid "Attachments"
 msgstr ""
 
@@ -264,7 +264,7 @@ msgstr ""
 msgid "Author"
 msgstr ""
 
-#: templates/view.nat.tmpl:70
+#: templates/view.nat.tmpl:65
 msgid "Back to view mode"
 msgstr ""
 
@@ -301,7 +301,7 @@ msgstr ""
 msgid "Both"
 msgstr ""
 
-#: templates/edit.nat.tmpl:139
+#: templates/edit.nat.tmpl:233
 msgid "Breadcrumbs navigation"
 msgstr ""
 
@@ -323,12 +323,12 @@ msgstr ""
 #: data/System/NatSkinWebSearchViewTemplate.txt:115
 #: templates/actionform.nat.tmpl:18 templates/attachagain.nat.tmpl:28
 #: templates/changeform.nat.tmpl:31 templates/copytopic.nat.tmpl:38
-#: templates/kinosearch.nat.tmpl:8 templates/languageselector.nat.tmpl:35
-#: templates/loginbase.nat.tmpl:81 templates/managetags.nat.tmpl:32
+#: templates/kinosearch.nat.tmpl:8 templates/languageselector.nat.tmpl:36
+#: templates/loginbase.nat.tmpl:81 templates/managetags.nat.tmpl:33
 #: templates/messages.nat.tmpl:281 templates/moveattachment.nat.tmpl:68
 #: templates/newtopic.nat.tmpl:19 templates/oopsleaseconflict.nat.tmpl:56
-#: templates/renamebase.nat.tmpl:19 templates/renameconfirm.nat.tmpl:7
-#: templates/renamedelete.nat.tmpl:9 templates/renamewebbase.nat.tmpl:13
+#: templates/renamebase.nat.tmpl:16 templates/renameconfirm.nat.tmpl:7
+#: templates/renamedelete.nat.tmpl:14 templates/renamewebbase.nat.tmpl:13
 #: templates/renamewebconfirm.nat.tmpl:7 templates/search.nat.tmpl:31
 msgid "Cancel"
 msgstr ""
@@ -357,11 +357,7 @@ msgstr ""
 msgid "Change e-mail address"
 msgstr ""
 
-#: templates/renamebase.nat.tmpl:32
-msgid "Change from"
-msgstr ""
-
-#: templates/foswiki.nat.tmpl:134 templates/languageselector.nat.tmpl:40
+#: templates/foswiki.nat.tmpl:134 templates/languageselector.nat.tmpl:4
 #: templates/oopslanguagechanged.nat.tmpl:2
 #: templates/oopslanguagechanged.nat.tmpl:3 templates/oopsmore.nat.tmpl:61
 msgid "Change interface language"
@@ -381,10 +377,6 @@ msgstr ""
 
 #: templates/changes.nat.tmpl:12
 msgid "Changed"
-msgstr ""
-
-#: templates/view.nat.tmpl:90
-msgid "Changed by %1 on %2"
 msgstr ""
 
 #: data/System/SiteSideBar.txt:14
@@ -409,7 +401,7 @@ msgstr ""
 msgid "Children"
 msgstr ""
 
-#: templates/edit.nat.tmpl:23
+#: templates/edit.nat.tmpl:22
 msgid "Chinese"
 msgstr ""
 
@@ -434,13 +426,11 @@ msgid ""
 "Chose a topic name that is a %1 or check the allow non-<nop>WikiWord box."
 msgstr ""
 
-#: templates/renamebase.nat.tmpl:64 templates/renamedelete.nat.tmpl:47
-#: templates/renamewebbase.nat.tmpl:52
+#: templates/renamebase.nat.tmpl:85 templates/renamewebbase.nat.tmpl:52
 msgid "Clear all"
 msgstr ""
 
-#: templates/renamebase.nat.tmpl:64 templates/renamedelete.nat.tmpl:47
-#: templates/renamewebbase.nat.tmpl:52
+#: templates/renamebase.nat.tmpl:85 templates/renamewebbase.nat.tmpl:52
 msgid "Clear selection"
 msgstr ""
 
@@ -468,11 +458,11 @@ msgstr ""
 msgid "Comment"
 msgstr ""
 
-#: templates/edit.nat.tmpl:149
-msgid "Comment preferences"
+#: templates/edit.nat.tmpl:243
+msgid "Comment settings"
 msgstr ""
 
-#: templates/edit.nat.tmpl:112
+#: templates/edit.nat.tmpl:206
 msgid "Comments"
 msgstr ""
 
@@ -496,7 +486,7 @@ msgstr ""
 msgid "Contact %1 if you have any questions."
 msgstr ""
 
-#: templates/edit.nat.tmpl:48
+#: templates/edit.nat.tmpl:41
 msgid "Content language"
 msgstr ""
 
@@ -566,11 +556,11 @@ msgstr ""
 msgid "Currently being edited"
 msgstr ""
 
-#: templates/edit.nat.tmpl:24
+#: templates/edit.nat.tmpl:23
 msgid "Danish"
 msgstr ""
 
-#: templates/edit.nat.tmpl:94
+#: templates/edit.nat.tmpl:188
 msgid "Data form"
 msgstr ""
 
@@ -578,8 +568,7 @@ msgstr ""
 msgid "Date"
 msgstr ""
 
-#: templates/edit.nat.tmpl:220 templates/edit.nat.tmpl:258
-#: templates/languageselector.nat.tmpl:15 templates/newtopic.nat.tmpl:46
+#: templates/languageselector.nat.tmpl:17 templates/newtopic.nat.tmpl:46
 #: templates/newtopic.nat.tmpl:76
 msgid "Default"
 msgstr ""
@@ -596,8 +585,8 @@ msgstr ""
 msgid "Default topic as defined in WebTopicEditTemplate"
 msgstr ""
 
-#: templates/foswiki.nat.tmpl:103 templates/renamedelete.nat.tmpl:6
-#: templates/renamedelete.nat.tmpl:8 templates/renamewebdelete.nat.tmpl:3
+#: templates/foswiki.nat.tmpl:103 templates/renamedelete.nat.tmpl:13
+#: templates/renamedelete.nat.tmpl:6 templates/renamewebdelete.nat.tmpl:3
 msgid "Delete"
 msgstr ""
 
@@ -626,6 +615,10 @@ msgstr ""
 msgid "Deleting topics"
 msgstr ""
 
+#: templates/rename.nat.tmpl:7
+msgid "Derive from title"
+msgstr ""
+
 #: data/System/SiteMenu.txt:42
 msgid "Developer docs"
 msgstr ""
@@ -650,6 +643,10 @@ msgstr ""
 
 #: templates/rdiff.nat.tmpl:19 templates/rdiff.nat.tmpl:9
 msgid "Difference"
+msgstr ""
+
+#: templates/edit.nat.tmpl:65
+msgid "Display settings"
 msgstr ""
 
 #: data/System/MySideBar.txt:34
@@ -700,7 +697,7 @@ msgstr ""
 msgid "During save of %1 an error was found by the version control system."
 msgstr ""
 
-#: templates/edit.nat.tmpl:25
+#: templates/edit.nat.tmpl:24
 msgid "Dutch"
 msgstr ""
 
@@ -757,7 +754,7 @@ msgstr ""
 msgid "Edit wiki markup"
 msgstr ""
 
-#: templates/edit.nat.tmpl:26
+#: templates/edit.nat.tmpl:25
 msgid "English"
 msgstr ""
 
@@ -825,10 +822,6 @@ msgstr ""
 msgid "Errors"
 msgstr ""
 
-#: templates/edit.nat.tmpl:223
-msgid "Everybody"
-msgstr ""
-
 #: templates/attachnew.nat.tmpl:36
 msgid "Existing files"
 msgstr ""
@@ -862,7 +855,7 @@ msgstr ""
 msgid "Find child topics"
 msgstr ""
 
-#: templates/edit.nat.tmpl:27
+#: templates/edit.nat.tmpl:26
 msgid "Finnish"
 msgstr ""
 
@@ -886,7 +879,7 @@ msgstr ""
 msgid "Form-based input"
 msgstr ""
 
-#: templates/edit.nat.tmpl:157
+#: templates/edit.nat.tmpl:251
 msgid "Format"
 msgstr ""
 
@@ -900,15 +893,15 @@ msgid ""
 "title automatically."
 msgstr ""
 
-#: templates/edit.nat.tmpl:28
+#: templates/edit.nat.tmpl:27
 msgid "French"
 msgstr ""
 
-#: templates/managetags.nat.tmpl:17
+#: templates/managetags.nat.tmpl:18 templates/renamebase.nat.tmpl:46
 msgid "From"
 msgstr ""
 
-#: templates/edit.nat.tmpl:29
+#: templates/edit.nat.tmpl:28
 msgid "German"
 msgstr ""
 
@@ -916,8 +909,8 @@ msgstr ""
 msgid "Get a fresh page of the topic %1"
 msgstr ""
 
-#: templates/body.nat.tmpl:94
-msgid "Get a fresh version <a href='%1'>here</a>."
+#: templates/body.nat.tmpl:93
+msgid "Get a fresh version <a href='%1' rel='nofollow'>here</a>."
 msgstr ""
 
 #: templates/renamesidebar.nat.tmpl:10
@@ -1065,27 +1058,23 @@ msgstr ""
 msgid "Invalid e-mail address"
 msgstr ""
 
-#: templates/edit.nat.tmpl:30
+#: templates/edit.nat.tmpl:29
 msgid "Italian"
 msgstr ""
 
-#: templates/edit.nat.tmpl:31
+#: templates/edit.nat.tmpl:30
 msgid "Japanese"
-msgstr ""
-
-#: templates/edit.nat.tmpl:229 templates/edit.nat.tmpl:264
-msgid "Just me"
 msgstr ""
 
 #: data/System/SiteMenu.txt:10
 msgid "Knowledge"
 msgstr ""
 
-#: templates/edit.nat.tmpl:32
+#: templates/edit.nat.tmpl:31
 msgid "Korean"
 msgstr ""
 
-#: templates/foswiki.nat.tmpl:133 templates/languageselector.nat.tmpl:12
+#: templates/foswiki.nat.tmpl:133 templates/languageselector.nat.tmpl:14
 msgid "Language"
 msgstr ""
 
@@ -1093,7 +1082,11 @@ msgstr ""
 msgid "Last"
 msgstr ""
 
-#: data/System/NatSkinStyleBrowser.txt:33
+#: templates/view.nat.tmpl:85
+msgid "Last modified by %1 on %2"
+msgstr ""
+
+#: data/System/NatSkinStyleBrowser.txt:33 templates/edit.nat.tmpl:110
 msgid "Layout"
 msgstr ""
 
@@ -1168,7 +1161,7 @@ msgstr ""
 msgid "Managing webs"
 msgstr ""
 
-#: data/System/NatSkinStyleBrowser.txt:46
+#: data/System/NatSkinStyleBrowser.txt:46 templates/edit.nat.tmpl:164
 msgid "Menu"
 msgstr ""
 
@@ -1180,7 +1173,7 @@ msgstr ""
 msgid "Missing fields =<span class='foswikiAlert'>**</span>="
 msgstr ""
 
-#: templates/edit.nat.tmpl:179
+#: templates/edit.nat.tmpl:273
 msgid "Moderation"
 msgstr ""
 
@@ -1200,11 +1193,11 @@ msgstr ""
 msgid "Move attachment '%1'"
 msgstr ""
 
-#: templates/renamedelete.nat.tmpl:25
+#: templates/renamedelete.nat.tmpl:33
 msgid "Move this topic into the %1 web"
 msgstr ""
 
-#: templates/renamebase.nat.tmpl:13 templates/renamewebbase.nat.tmpl:33
+#: templates/renamewebbase.nat.tmpl:33
 msgid "Move to %1"
 msgstr ""
 
@@ -1287,10 +1280,6 @@ msgstr ""
 msgid "No, thanks"
 msgstr ""
 
-#: templates/edit.nat.tmpl:232 templates/edit.nat.tmpl:267
-msgid "Nobody"
-msgstr ""
-
 #: templates/messages.nat.tmpl:253
 msgid "Note"
 msgstr ""
@@ -1301,7 +1290,11 @@ msgid ""
 "move."
 msgstr ""
 
-#: templates/languageselector.nat.tmpl:30
+#: templates/renamebase.nat.tmpl:73
+msgid "Note that you may change the title from within the editor as well."
+msgstr ""
+
+#: templates/languageselector.nat.tmpl:32
 msgid ""
 "Note this will _only_ change the interface language, but not the default "
 "language of your content."
@@ -1387,10 +1380,6 @@ msgstr ""
 msgid "Parent"
 msgstr ""
 
-#: templates/edit.nat.tmpl:44
-msgid "Parent topic"
-msgstr ""
-
 #: data/Main/WebLinks.txt:11
 #: data/System/NatSkinChangeEmailAddressViewTemplate.txt:110
 #: templates/loginbase.nat.tmpl:51
@@ -1407,10 +1396,6 @@ msgstr ""
 
 #: templates/messages.nat.tmpl:126
 msgid "Passwords do not match"
-msgstr ""
-
-#: templates/edit.nat.tmpl:203 templates/edit.nat.tmpl:205
-msgid "Permissions"
 msgstr ""
 
 #: templates/messages.nat.tmpl:94
@@ -1446,11 +1431,11 @@ msgstr ""
 msgid "Please try again."
 msgstr ""
 
-#: templates/edit.nat.tmpl:33
+#: templates/edit.nat.tmpl:32
 msgid "Portuguese"
 msgstr ""
 
-#: templates/foswiki.nat.tmpl:85
+#: data/System/SiteSideBar.txt:17 templates/foswiki.nat.tmpl:85
 msgid "Preferences"
 msgstr ""
 
@@ -1516,10 +1501,6 @@ msgstr ""
 msgid "Register"
 msgstr ""
 
-#: templates/edit.nat.tmpl:226 templates/edit.nat.tmpl:261
-msgid "Registered users"
-msgstr ""
-
 #: data/Main/WebLinks.txt:8 data/System/UserRegistrationViewTemplate.txt:38
 msgid "Registration"
 msgstr ""
@@ -1532,7 +1513,7 @@ msgstr ""
 msgid "Remember your password?"
 msgstr ""
 
-#: templates/rename.nat.tmpl:10 templates/renamebase.nat.tmpl:18
+#: templates/rename.nat.tmpl:22 templates/renamebase.nat.tmpl:15
 #: templates/renameweb.nat.tmpl:5 templates/renamewebbase.nat.tmpl:12
 msgid "Rename"
 msgstr ""
@@ -1619,7 +1600,7 @@ msgstr ""
 msgid "Revision history of %1"
 msgstr ""
 
-#: templates/edit.nat.tmpl:130
+#: templates/edit.nat.tmpl:224
 msgid "Revision information"
 msgstr ""
 
@@ -1627,7 +1608,7 @@ msgstr ""
 msgid "Right"
 msgstr ""
 
-#: templates/edit.nat.tmpl:34
+#: templates/edit.nat.tmpl:33
 msgid "Russian"
 msgstr ""
 
@@ -1661,15 +1642,15 @@ msgstr ""
 msgid "Search all webs for topics that link to here"
 msgstr ""
 
-#: templates/renamebase.nat.tmpl:21 templates/renamedelete.nat.tmpl:11
+#: templates/renamebase.nat.tmpl:18 templates/renamedelete.nat.tmpl:16
 #: templates/renamewebbase.nat.tmpl:76
 msgid "Search for backlinks in all webs"
 msgstr ""
 
 #: data/System/NatSkinTopicDoesNotExistViewTemplate.txt:44
 #: data/System/NatSkinWebSearchViewTemplate.txt:130
-#: templates/backlinks.nat.tmpl:49 templates/renamebase.nat.tmpl:21
-#: templates/renamedelete.nat.tmpl:11 templates/renamewebbase.nat.tmpl:76
+#: templates/backlinks.nat.tmpl:49 templates/renamebase.nat.tmpl:18
+#: templates/renamedelete.nat.tmpl:16 templates/renamewebbase.nat.tmpl:76
 msgid "Search in all webs"
 msgstr ""
 
@@ -1681,18 +1662,17 @@ msgstr ""
 msgid "See also"
 msgstr ""
 
-#: templates/languageselector.nat.tmpl:28
+#: templates/languageselector.nat.tmpl:30
 msgid ""
 "Select 'Default' to switch to the default language configured in your "
 "browser."
 msgstr ""
 
-#: templates/renamebase.nat.tmpl:63 templates/renamedelete.nat.tmpl:46
-#: templates/renamewebbase.nat.tmpl:51
+#: templates/renamebase.nat.tmpl:84 templates/renamewebbase.nat.tmpl:51
 msgid "Select all topics"
 msgstr ""
 
-#: templates/managetags.nat.tmpl:21
+#: templates/managetags.nat.tmpl:22
 msgid "Select one or more existing tags to be renamed."
 msgstr ""
 
@@ -1704,7 +1684,7 @@ msgstr ""
 msgid "Select the groups you want to join."
 msgstr ""
 
-#: templates/managetags.nat.tmpl:28
+#: templates/managetags.nat.tmpl:29
 msgid ""
 "Select the tag to rename the above tags to. Leaving this empty will delete "
 "them."
@@ -1718,8 +1698,7 @@ msgstr ""
 msgid "Select which template to use while creating this topic."
 msgstr ""
 
-#: templates/renamebase.nat.tmpl:63 templates/renamedelete.nat.tmpl:46
-#: templates/renamewebbase.nat.tmpl:51
+#: templates/renamebase.nat.tmpl:84 templates/renamewebbase.nat.tmpl:51
 msgid "Set all"
 msgstr ""
 
@@ -1735,11 +1714,7 @@ msgstr ""
 msgid "Show advanced options"
 msgstr ""
 
-#: templates/edit.nat.tmpl:67
-msgid "Show on screen"
-msgstr ""
-
-#: data/System/NatSkinStyleBrowser.txt:39 templates/edit.nat.tmpl:85
+#: data/System/NatSkinStyleBrowser.txt:39 templates/edit.nat.tmpl:173
 msgid "Sidebar"
 msgstr ""
 
@@ -1771,6 +1746,10 @@ msgstr ""
 msgid "Size"
 msgstr ""
 
+#: templates/edit.nat.tmpl:84
+msgid "Skin settings"
+msgstr ""
+
 #: templates/messages.nat.tmpl:257
 msgid "Some characters such as =&#126;=, =$=, =@=, =%= are removed"
 msgstr ""
@@ -1787,19 +1766,19 @@ msgstr ""
 msgid "Spaces are replaced by underscores"
 msgstr ""
 
-#: templates/edit.nat.tmpl:35
+#: templates/edit.nat.tmpl:34
 msgid "Spanish"
 msgstr ""
 
-#: templates/edit.nat.tmpl:240 templates/edit.nat.tmpl:275
-msgid "Specific users/groups"
+#: templates/renamebase.nat.tmpl:71
+msgid "Specify a new topic title while renaming/moving the topic."
 msgstr ""
 
 #: data/System/NatSkinChangeEmailAddressViewTemplate.txt:139
 msgid "Specify one or more space separated emails."
 msgstr ""
 
-#: templates/edit.nat.tmpl:172
+#: templates/edit.nat.tmpl:266
 msgid "State"
 msgstr ""
 
@@ -1807,7 +1786,7 @@ msgstr ""
 msgid "Statistics"
 msgstr ""
 
-#: data/System/NatSkinStyleBrowser.txt:17
+#: data/System/NatSkinStyleBrowser.txt:17 templates/edit.nat.tmpl:89
 msgid "Style"
 msgstr ""
 
@@ -1815,7 +1794,7 @@ msgstr ""
 #: data/Sandbox/NatSkinTest.txt:488
 #: data/System/NatSkinWebCreateNewTopicTemplate.txt:234
 #: data/System/WebCreateNewWeb.txt:67 templates/attachnew.nat.tmpl:4
-#: templates/languageselector.nat.tmpl:34 templates/managetags.nat.tmpl:31
+#: templates/languageselector.nat.tmpl:35 templates/managetags.nat.tmpl:32
 #: templates/messages.nat.tmpl:113 templates/messages.nat.tmpl:199
 #: templates/newtopic.nat.tmpl:18 templates/oopsmore.nat.tmpl:71
 msgid "Submit"
@@ -1833,7 +1812,7 @@ msgstr ""
 msgid "Summary"
 msgstr ""
 
-#: templates/edit.nat.tmpl:36
+#: templates/edit.nat.tmpl:35
 msgid "Swedish"
 msgstr ""
 
@@ -1938,7 +1917,7 @@ msgid ""
 "filled in."
 msgstr ""
 
-#: templates/renamedelete.nat.tmpl:28
+#: templates/renamedelete.nat.tmpl:36
 msgid "The topic will be renamed to %1."
 msgstr ""
 
@@ -1977,15 +1956,16 @@ msgstr ""
 msgid "This is an automated e-mail from %1."
 msgstr ""
 
-#: templates/body.nat.tmpl:93
-msgid "This page has been cached at %1."
+#: templates/body.nat.tmpl:92
+msgid "This page was cached on %1."
 msgstr ""
 
 #: data/System/NatSkinWebCreateNewTopicTemplate.txt:102
+#: templates/renamebase.nat.tmpl:67
 msgid "Title"
 msgstr ""
 
-#: templates/copytopic.nat.tmpl:27 templates/managetags.nat.tmpl:25
+#: templates/copytopic.nat.tmpl:27 templates/managetags.nat.tmpl:26
 msgid "To"
 msgstr ""
 
@@ -2005,11 +1985,11 @@ msgstr ""
 msgid "To see if they have finished their edit yet, click 'Try Again'"
 msgstr ""
 
-#: templates/moveattachment.nat.tmpl:59 templates/renamebase.nat.tmpl:42
+#: templates/moveattachment.nat.tmpl:59 templates/renamebase.nat.tmpl:59
 msgid "To topic"
 msgstr ""
 
-#: templates/moveattachment.nat.tmpl:55 templates/renamebase.nat.tmpl:37
+#: templates/moveattachment.nat.tmpl:55 templates/renamebase.nat.tmpl:55
 msgid "To web"
 msgstr ""
 
@@ -2026,7 +2006,7 @@ msgstr ""
 msgid "Topic %1 does not exist"
 msgstr ""
 
-#: templates/edit.nat.tmpl:121
+#: templates/edit.nat.tmpl:215
 msgid "Topic actions"
 msgstr ""
 
@@ -2042,10 +2022,6 @@ msgstr ""
 msgid "Topic name the new page is associated with, preferably a <nop>WikiWord."
 msgstr ""
 
-#: templates/edit.nat.tmpl:41
-msgid "Topic preferences"
-msgstr ""
-
 #: templates/messages.nat.tmpl:209
 msgid "Topic save error"
 msgstr ""
@@ -2058,7 +2034,7 @@ msgstr ""
 msgid "Try again"
 msgstr ""
 
-#: templates/edit.nat.tmpl:37
+#: templates/edit.nat.tmpl:36
 msgid "Turkish"
 msgstr ""
 
@@ -2090,13 +2066,12 @@ msgstr ""
 msgid "Update attachment %1 on %2"
 msgstr ""
 
-#: templates/renamebase.nat.tmpl:57 templates/renamedelete.nat.tmpl:40
+#: templates/renamebase.nat.tmpl:120 templates/renamebase.nat.tmpl:130
 #: templates/renamewebbase.nat.tmpl:45
 msgid "Update links in all webs"
 msgstr ""
 
-#: templates/renamebase.nat.tmpl:51 templates/renamedelete.nat.tmpl:34
-#: templates/renamewebbase.nat.tmpl:39
+#: templates/renamebase.nat.tmpl:114 templates/renamewebbase.nat.tmpl:39
 msgid "Update links in the '%1' web"
 msgstr ""
 
@@ -2148,19 +2123,11 @@ msgstr ""
 msgid "Users directory"
 msgstr ""
 
-#: templates/edit.nat.tmpl:256
-msgid "Users who may edit"
-msgstr ""
-
-#: templates/edit.nat.tmpl:218
-msgid "Users who may view"
-msgstr ""
-
 #: templates/changeformsidebar.nat.tmpl:6
 msgid "Variables"
 msgstr ""
 
-#: data/System/NatSkinStyleBrowser.txt:28
+#: data/System/NatSkinStyleBrowser.txt:28 templates/edit.nat.tmpl:103
 msgid "Variation"
 msgstr ""
 
@@ -2177,7 +2144,7 @@ msgid "Versions"
 msgstr ""
 
 #: data/System/SiteBottomBar.txt:51 templates/foswiki.nat.tmpl:31
-#: templates/history.nat.tmpl:76 templates/view.nat.tmpl:70
+#: templates/history.nat.tmpl:76 templates/view.nat.tmpl:65
 msgid "View"
 msgstr ""
 
@@ -2420,20 +2387,24 @@ msgstr ""
 msgid "backlinks"
 msgstr ""
 
+#: templates/edit.nat.tmpl:120
+msgid "bordered"
+msgstr ""
+
+#: templates/edit.nat.tmpl:181
+msgid "both"
+msgstr ""
+
 #: templates/changes.nat.tmpl:6
 msgid "changes"
 msgstr ""
 
-#: templates/edit.nat.tmpl:176
+#: templates/edit.nat.tmpl:270
 msgid "closed"
 msgstr ""
 
-#: templates/edit.nat.tmpl:160
+#: templates/edit.nat.tmpl:254
 msgid "default"
-msgstr ""
-
-#: templates/edit.nat.tmpl:220 templates/edit.nat.tmpl:258
-msgid "default as defined in the %1"
 msgstr ""
 
 #: templates/renamedelete.nat.tmpl:4
@@ -2452,6 +2423,14 @@ msgstr ""
 msgid "edit text"
 msgstr ""
 
+#: templates/edit.nat.tmpl:116
+msgid "fixed"
+msgstr ""
+
+#: templates/edit.nat.tmpl:118
+msgid "fluid"
+msgstr ""
+
 #: templates/kinosearch.nat.tmpl:8 templates/search.nat.tmpl:31
 msgid "go back to %1"
 msgstr ""
@@ -2462,6 +2441,10 @@ msgstr ""
 
 #: templates/form.nat.tmpl:3
 msgid "indicates mandatory fields"
+msgstr ""
+
+#: templates/edit.nat.tmpl:177
+msgid "left"
 msgstr ""
 
 #: templates/kinosearch.nat.tmpl:23
@@ -2490,17 +2473,19 @@ msgstr ""
 msgid "nothing found"
 msgstr ""
 
-#: templates/edit.nat.tmpl:107 templates/edit.nat.tmpl:116
-#: templates/edit.nat.tmpl:125 templates/edit.nat.tmpl:134
-#: templates/edit.nat.tmpl:143 templates/edit.nat.tmpl:183
-#: templates/edit.nat.tmpl:89 templates/edit.nat.tmpl:98
+#: templates/edit.nat.tmpl:168 templates/edit.nat.tmpl:183
+#: templates/edit.nat.tmpl:192 templates/edit.nat.tmpl:201
+#: templates/edit.nat.tmpl:210 templates/edit.nat.tmpl:219
+#: templates/edit.nat.tmpl:228 templates/edit.nat.tmpl:237
+#: templates/edit.nat.tmpl:277
 msgid "off"
 msgstr ""
 
-#: templates/edit.nat.tmpl:105 templates/edit.nat.tmpl:114
-#: templates/edit.nat.tmpl:123 templates/edit.nat.tmpl:132
-#: templates/edit.nat.tmpl:141 templates/edit.nat.tmpl:181
-#: templates/edit.nat.tmpl:87 templates/edit.nat.tmpl:96
+#: templates/edit.nat.tmpl:166 templates/edit.nat.tmpl:175
+#: templates/edit.nat.tmpl:190 templates/edit.nat.tmpl:199
+#: templates/edit.nat.tmpl:208 templates/edit.nat.tmpl:217
+#: templates/edit.nat.tmpl:226 templates/edit.nat.tmpl:235
+#: templates/edit.nat.tmpl:275
 msgid "on"
 msgstr ""
 
@@ -2508,7 +2493,7 @@ msgstr ""
 msgid "oops"
 msgstr ""
 
-#: templates/edit.nat.tmpl:174
+#: templates/edit.nat.tmpl:268
 msgid "open"
 msgstr ""
 
@@ -2528,10 +2513,6 @@ msgstr ""
 msgid "printable"
 msgstr ""
 
-#: templates/edit.nat.tmpl:223
-msgid "public view access"
-msgstr ""
-
 #: templates/changeform.nat.tmpl:25
 msgid "remove the current form (caution: possible data loss)"
 msgstr ""
@@ -2544,25 +2525,12 @@ msgstr ""
 msgid "rename web"
 msgstr ""
 
-#: data/System/UserRegistrationViewTemplate.txt:287
-#: data/System/UserRegistrationViewTemplate.txt:288
-msgid "required"
-msgstr ""
-
 #: templates/edit.nat.tmpl:15
 msgid "restore"
 msgstr ""
 
-#: templates/edit.nat.tmpl:229 templates/edit.nat.tmpl:264
-msgid "restrict access to %1"
-msgstr ""
-
-#: templates/edit.nat.tmpl:226
-msgid "restrict read access to users that have an account on this site"
-msgstr ""
-
-#: templates/edit.nat.tmpl:261
-msgid "restrict write access to users that have an account on this site"
+#: templates/edit.nat.tmpl:179
+msgid "right"
 msgstr ""
 
 #: templates/searchbase.nat.tmpl:7 templates/searchbox.nat.tmpl:7
@@ -2573,7 +2541,7 @@ msgstr ""
 msgid "search in all webs"
 msgstr ""
 
-#: templates/view.nat.tmpl:90
+#: templates/view.nat.tmpl:85
 msgid "show last change"
 msgstr ""
 
@@ -2588,18 +2556,6 @@ msgstr ""
 
 #: templates/messages.nat.tmpl:177
 msgid "single character last name"
-msgstr ""
-
-#: templates/edit.nat.tmpl:240 templates/edit.nat.tmpl:275
-msgid "specify a list of users and/or groups"
-msgstr ""
-
-#: templates/edit.nat.tmpl:232
-msgid "strictly deny any access to this topic"
-msgstr ""
-
-#: templates/edit.nat.tmpl:267
-msgid "strictly deny write access to this topic"
 msgstr ""
 
 #: data/System/NatSkinWebSearchViewTemplate.txt:114

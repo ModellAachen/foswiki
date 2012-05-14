@@ -163,10 +163,8 @@ sub getTextPattern {
 # Format an array as a table according to the formatting
 # instructions in {format}
 sub formatTable {
-    my (
-        $this, $entries, $theSeparator, $newLine, $sr,
-        $rc,   $topic,   $web
-    ) = @_;
+    my ( $this, $entries, $theSeparator, $newLine, $sr, $rc, $topic, $web ) =
+      @_;
     return CGI::span( { class => 'twikiAlert' }, 'Empty table' )
       if ( $entries->size() == 0 );
     my $mixedAlpha = $Foswiki::regex{mixedAlpha};
@@ -396,7 +394,7 @@ sub toTable {
       if ( $entries->size() == 0 );
 
     # Initialize SpreadSheetPlugin
-    use Foswiki::Plugins::SpreadSheetPlugin ();
+    use Foswiki::Plugins::SpreadSheetPlugin       ();
     use Foswiki::Plugins::SpreadSheetPlugin::Calc ();
     Foswiki::Plugins::SpreadSheetPlugin::initPlugin( $topic, $web );
     @Foswiki::Plugins::SpreadSheetPlugin::Calc::tableMatrix = ();

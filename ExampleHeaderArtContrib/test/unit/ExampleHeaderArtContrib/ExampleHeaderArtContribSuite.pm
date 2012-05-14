@@ -3,8 +3,8 @@ package ExampleHeaderArtContribSuite;
 use Unit::TestSuite;
 our @ISA = qw( Unit::TestSuite );
 
-sub name { 'ExampleHeaderArtContribSuite' };
+sub name { 'ExampleHeaderArtContribSuite' }
 
-sub include_tests { qw(ExampleHeaderArtContribTests) };
+sub include_tests { qw(ExampleHeaderArtContribTests) }
 
 1;

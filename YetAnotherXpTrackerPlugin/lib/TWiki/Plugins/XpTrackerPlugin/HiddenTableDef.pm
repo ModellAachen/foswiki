@@ -23,26 +23,30 @@ sub new {
 
     my $this = bless( {}, $class );
     my $inBlock = 0;
-    $text =~ s/\\\r?\n//go; # remove trailing '\' and join continuation lines
+    $text =~ s/\\\r?\n//go;    # remove trailing '\' and join continuation lines
 
     # | *Name* | *Type* | *Size* | *Value*  | *Tooltip message* | *Attributes* |
     # Tooltip and attributes are optional
-    foreach( split( /\n/, $text ) ) {
-      if( /^\s*\|.*Name[^|]*\|.*Type[^|]*\|.*Size[^|]*\|/ ) {
-	$inBlock = 1;
-      } else {
-	# Only insist on first field being present FIXME - use oops page instead?
-	if( $inBlock && s/^\s*\|//o ) {
-	  my( $title, $type, $size, $vals, $tooltip, $attributes ) = split( /\|/ );
-	  if ( $title =~ /\s*\[\[.*?\]\[\s*(\w*)\s*\]\]/o ) {
-	    $title = $1;
-	  }
-	  $title =~ s/\W//go;
-	  push( @{$this->{fields}}, $title );
-	} else {
-	  $inBlock = 0;
-	}
-      }
+    foreach ( split( /\n/, $text ) ) {
+        if (/^\s*\|.*Name[^|]*\|.*Type[^|]*\|.*Size[^|]*\|/) {
+            $inBlock = 1;
+        }
+        else {
+
+       # Only insist on first field being present FIXME - use oops page instead?
+            if ( $inBlock && s/^\s*\|//o ) {
+                my ( $title, $type, $size, $vals, $tooltip, $attributes ) =
+                  split(/\|/);
+                if ( $title =~ /\s*\[\[.*?\]\[\s*(\w*)\s*\]\]/o ) {
+                    $title = $1;
+                }
+                $title =~ s/\W//go;
+                push( @{ $this->{fields} }, $title );
+            }
+            else {
+                $inBlock = 0;
+            }
+        }
     }
 
     return $this;
@@ -56,9 +60,9 @@ sub loadRow {
     my ( $this, $line, $rowmaker ) = @_;
 
     my $row = $rowmaker->new();
-    foreach my $fld ( @{$this->{fields}} ) {
-      my $val = $line->{$fld};
-      $row->set( $fld, $val );
+    foreach my $fld ( @{ $this->{fields} } ) {
+        my $val = $line->{$fld};
+        $row->set( $fld, $val );
     }
     return $row;
 }

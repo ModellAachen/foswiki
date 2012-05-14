@@ -72,33 +72,35 @@ sub toHTMLFormat {
     my $num       = shift || 0;
     my $level     = shift || 0;
 
-    #&Foswiki::Func::writeDebug("toHTMLFormat: ".$this->name()) if $Foswiki::Plugins::TreePlugin::debug;   
+#&Foswiki::Func::writeDebug("toHTMLFormat: ".$this->name()) if $Foswiki::Plugins::TreePlugin::debug;
 
     #This make sure we don't render a node more than once
-    #thus preventing endless loop when dealing with inconsitant relationship 
-    if ($this->{_rendered})
-        {
-        return "";        
-        }
-    #Mark this node as being rendered 
-    $this->{_rendered}=1;
+    #thus preventing endless loop when dealing with inconsitant relationship
+    if ( $this->{_rendered} ) {
+        return "";
+    }
 
+    #Mark this node as being rendered
+    $this->{_rendered} = 1;
 
     $formatter->initNode( $this, $num, $level );
 
     my $childrenText = "";
     if ( scalar( @{ $this->children() } ) ) {
         my $count = 0;
-        foreach my $node ( @{ $this->children() } )
-            {
-            #SL: Append delimiter
-            #$childrenText .= "," unless ($count==0 && $level==0 && $this->name() eq ' '); #BAD: Test to prevent Web tree to append delimiter before first item    
+        foreach my $node ( @{ $this->children() } ) {
+
+#SL: Append delimiter
+#$childrenText .= "," unless ($count==0 && $level==0 && $this->name() eq ' '); #BAD: Test to prevent Web tree to append delimiter before first item
             $childrenText .= $formatter->separator();
+
             # accumulate childrens' format
             $node->data( "count", $count++ );
+
             # remember this node's sibling order
-            $childrenText .= $formatter->formatChild( $node, $count, $level + 1 );
-            }
+            $childrenText .=
+              $formatter->formatChild( $node, $count, $level + 1 );
+        }
     }
     return ($childrenText)
       ? $formatter->formatBranch( $this, $childrenText, $num, $level )

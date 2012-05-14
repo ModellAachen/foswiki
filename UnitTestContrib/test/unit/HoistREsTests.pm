@@ -1,5 +1,7 @@
 # Test for hoisting REs from query expressions
 package HoistREsTests;
+use strict;
+use warnings;
 
 use FoswikiFnTestCase;
 our @ISA = qw( FoswikiFnTestCase );
@@ -7,14 +9,27 @@ our @ISA = qw( FoswikiFnTestCase );
 use Foswiki::Query::Parser;
 use Foswiki::Query::HoistREs;
 use Foswiki::Query::Node;
-use Foswiki::Meta;
-use strict;
+
+sub skip {
+    my ( $this, $test ) = @_;
+
+    return $this->SUPER::skip_test_if(
+        $test,
+        {
+            condition => { with_dep => 'Foswiki,<,1.2' },
+            tests     => {
+                'HoistREsTests::test_hoist_mixed_or' =>
+                  'n-ary query nodes are Foswiki 1.2+ only',
+            }
+        }
+    );
+}
 
 sub set_up {
     my $this = shift;
     $this->SUPER::set_up();
 
-    my $meta = Foswiki::Meta->new( $this->{session}, 'Web', 'Topic' );
+    my ($meta) = Foswiki::Func::readTopic( 'Web', 'Topic' );
     $meta->putKeyed(
         'FILEATTACHMENT',
         {
@@ -531,8 +546,6 @@ sub test_hoist_mixed_or {
     my $query       = $queryParser->parse($s);
 
     my $filter = $this->_hoist($query);
-    $this->expect_failure( 'n-ary query nodes are Foswiki 1.2+ only',
-        with_dep => 'Foswiki,<,1.2' );
     $this->assert_num_equals( 0, $this->_getFilterNumElements($filter) );
 }
 

@@ -72,15 +72,13 @@ our $tt;
 
 # Defaults can be overridden by configuration settings
 #    1 TT preferences - only used once on object creation
-my %tt_defaults  =  (START_TAG => '(?:(?<=\[{2})|(?<=\]\[)|(?<![\[\]]))\[%',
-                    );
-my %tt_params    =  ();
+my %tt_defaults = ( START_TAG => '(?:(?<=\[{2})|(?<=\]\[)|(?<![\[\]]))\[%', );
+my %tt_params = ();
+
 # Variables which need to be recorded between different callbacks
 # *Must* be initialized per-request for mod_perl compliance
 my $process_tt;
 my $process_tt_default = 0;
-
-
 
 =pod
 
@@ -97,22 +95,25 @@ The initialisation performs the following steps:
 =cut
 
 sub initPlugin {
-    my( $topic, $web, $user, $installWeb ) = @_;
+    my ( $topic, $web, $user, $installWeb ) = @_;
 
     # check for Plugins.pm versions
-    if( $TWiki::Plugins::VERSION < 1.026 ) {
-        TWiki::Func::writeWarning( "Version mismatch between $pluginName and Plugins.pm" );
+    if ( $TWiki::Plugins::VERSION < 1.026 ) {
+        TWiki::Func::writeWarning(
+            "Version mismatch between $pluginName and Plugins.pm");
         return 0;
     }
 
     # Pick our own subset of %TWiki::cfg for easier reference
-    my $config  =  $TWiki::cfg{Plugins}{TemplateToolkitPlugin};
+    my $config = $TWiki::cfg{Plugins}{TemplateToolkitPlugin};
 
     # Initialize request specific data to be passed to the handlers
-    $process_tt  =  defined $config->{UseTT}
-                 ?  _isTrue($config->{UseTT}) : $process_tt_default;
-    $tt_defaults{INCLUDE_PATH}  =  "$TWiki::cfg{PubDir}/$installWeb/$pluginName";
-    %tt_params  =  ();
+    $process_tt =
+      defined $config->{UseTT}
+      ? _isTrue( $config->{UseTT} )
+      : $process_tt_default;
+    $tt_defaults{INCLUDE_PATH} = "$TWiki::cfg{PubDir}/$installWeb/$pluginName";
+    %tt_params = ();
 
     $debug = $config->{Debug} || 0;
 
@@ -123,13 +124,13 @@ sub initPlugin {
     return 1;
 }
 
-
 # ----------------------------------------------------------------------
 # Purpose:          Handle the %TEMPLATETOOLKIT{...} tag
 # Parameters:       See below
 # Returns:          Empty string
 sub _TT {
-    my($session, $params, $theTopic, $theWeb) = @_;
+    my ( $session, $params, $theTopic, $theWeb ) = @_;
+
     # $session  - a reference to the TWiki session object (if you don't know
     #             what this is, just ignore it)
     # $params=  - a reference to a TWiki::Attrs object containing parameters.
@@ -141,9 +142,10 @@ sub _TT {
     # Return: The empty string - this variable is just an invisible trigger
     #         to control TT processing
 
-    $process_tt  =  _isTrue($params->{_DEFAULT})  if  (defined $params->{_DEFAULT});
-    if ($params->{WRAPPER}) {
-        $tt_params{WRAPPER}  =  $params->{WRAPPER};
+    $process_tt = _isTrue( $params->{_DEFAULT} )
+      if ( defined $params->{_DEFAULT} );
+    if ( $params->{WRAPPER} ) {
+        $tt_params{WRAPPER} = $params->{WRAPPER};
     }
     return '';
 }
@@ -164,23 +166,23 @@ would be interpreted by the TML parser.
 =cut
 
 sub DISABLE_preRenderingHandler {
-    my ($text,$pMap) = @_;
+    my ( $text, $pMap ) = @_;
 
     return unless TWiki::Func::getContext()->{body_text};
     if ($process_tt) {
         return unless _create_TT();
 
         my $out;
-        if ($tt->process(\$_[0],{},\$out)) {
-            $_[0]  =  $out;
+        if ( $tt->process( \$_[0], {}, \$out ) ) {
+            $_[0] = $out;
         }
         else {
-            TWiki::Func::writeWarning("TT processing error - see web server log for details");
+            TWiki::Func::writeWarning(
+                "TT processing error - see web server log for details");
             warn $tt->error();
         }
     }
 }
-
 
 =pod
 
@@ -200,11 +202,12 @@ sub postRenderingHandler {
         return unless _create_TT();
 
         my $out;
-        if ($tt->process(\$_[0],{},\$out)) {
-            $_[0]  =  $out;
+        if ( $tt->process( \$_[0], {}, \$out ) ) {
+            $_[0] = $out;
         }
         else {
-            TWiki::Func::writeWarning("TT processing error - see web server log for details");
+            TWiki::Func::writeWarning(
+                "TT processing error - see web server log for details");
             warn $tt->error();
         }
     }
@@ -223,13 +226,14 @@ sub postRenderingHandler {
 #    Conf defaults: %tt_defaults
 #    TT object:     $tt
 sub _create_TT {
+
     # The TT object may have been created before in a persistent interpreter,
     # so check for existence before doing it for this particular request
     if ($tt) {
         return $tt;
     }
 
-    eval {require Template;};
+    eval { require Template; };
     if ($@) {
         TWiki::Func::writeWarning("Failed to use the Template Toolkit module");
         return undef;
@@ -238,21 +242,21 @@ sub _create_TT {
     # Initialize TT options from the defaults hash
     # override with values from the configuration if present
     # override with params as obtained from the %TEMPLATETOOLKIT{....}% tag
-    my $tt_config   =  $TWiki::cfg{Plugins}{TemplateToolkitPlugin}{TTOptions};
-    my %tt_options  =  (defined $tt_config  and  ref $tt_config  eq  'HASH')
-                    ?  (%tt_defaults,%$tt_config,%tt_params)
-                    :  (%tt_defaults,%tt_params);
+    my $tt_config = $TWiki::cfg{Plugins}{TemplateToolkitPlugin}{TTOptions};
+    my %tt_options =
+        ( defined $tt_config and ref $tt_config eq 'HASH' )
+      ? ( %tt_defaults, %$tt_config, %tt_params )
+      : ( %tt_defaults, %tt_params );
 
     # Create the TT object
-    $tt = Template->new(\%tt_options);
-    if (! $tt) {
+    $tt = Template->new( \%tt_options );
+    if ( !$tt ) {
         TWiki::Func::writeWarning("Failed to create the TT object");
         return undef;
     }
 
     return $tt;
 }
-
 
 # ----------------------------------------------------------------------
 # Purpose:          Detect various indicators for "true"

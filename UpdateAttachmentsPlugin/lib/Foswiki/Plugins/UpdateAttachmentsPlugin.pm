@@ -2,7 +2,7 @@ package Foswiki::Plugins::UpdateAttachmentsPlugin;
 use strict;
 
 our $VERSION = '$Rev$';
-our $RELEASE = '2.0.2';
+our $RELEASE = '2.0.3';
 our $SHORTDESCRIPTION =
   'A batched alternative to AutoAttachments (adds and removes attachements)';
 our $NO_PREFS_IN_TOPIC = 1;
@@ -362,7 +362,7 @@ sub _constructAttributesForAutoAttached {
 __END__
 Foswiki - The Free and Open Source Wiki, http://foswiki.org/
 
-Copyright (C) 2007-2009 SvenDowideit@fosiki.com
+Copyright (C) 2007-2012 SvenDowideit@fosiki.com
 
 Copyright (C) 2010 Foswiki Contributors. Foswiki Contributors
 are listed in the AUTHORS file in the root of this distribution.
@@ -373,7 +373,6 @@ file as follows:
 Copyright (C) 2001-2006 TWiki Contributors. All Rights Reserved.
 TWiki Contributors are listed in the AUTHORS file in the root
 of this distribution. NOTE: Please extend that file, not this notice.
-Copyright (C) 2004-2008 Crawford Currie
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License

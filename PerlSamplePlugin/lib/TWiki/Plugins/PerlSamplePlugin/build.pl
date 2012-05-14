@@ -20,19 +20,19 @@ use TWiki::Contrib::Build;
 # Declare our build package
 package BuildBuild;
 
-@BuildBuild::ISA = ( "TWiki::Contrib::Build" );
+@BuildBuild::ISA = ("TWiki::Contrib::Build");
 
 sub new {
     my $class = shift;
-    return bless( $class->SUPER::new( "PerlSamplePlugin" ), $class );
+    return bless( $class->SUPER::new("PerlSamplePlugin"), $class );
 }
 
 # Example: Override the build target
 sub target_build {
     my $this = shift;
-    
+
     $this->SUPER::target_build();
-    
+
     # Do other build stuff here
 }
 
@@ -40,5 +40,5 @@ sub target_build {
 $build = new BuildBuild();
 
 # Build the target on the command line, or the default target
-$build->build($build->{target});
+$build->build( $build->{target} );
 

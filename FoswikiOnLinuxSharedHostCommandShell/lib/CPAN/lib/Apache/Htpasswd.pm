@@ -48,7 +48,7 @@ sub new {
     $self->{'LOCK'}     = 0;
     $self->{'OPEN'}     = 0;
     $self->{'READONLY'} = $args->{'ReadOnly'} if ref $args eq 'HASH';
-    $self->{'USEMD5'} = $args->{'UseMD5'} if ref $args eq 'HASH';
+    $self->{'USEMD5'}   = $args->{'UseMD5'} if ref $args eq 'HASH';
     $self->{'USEPLAIN'} = $args->{'UsePlain'} if ref $args eq 'HASH';
 
     return $self;
@@ -64,39 +64,45 @@ sub error {
 #-----------------------------------------------------------#
 
 sub htCheckPassword {
-    my $self = shift;
-    my $Id   = shift;
-    my $pass = shift;
-    my $MD5Magic = '$apr1$';
+    my $self      = shift;
+    my $Id        = shift;
+    my $pass      = shift;
+    my $MD5Magic  = '$apr1$';
     my $SHA1Magic = '{SHA}';
 
     my $cryptPass = $self->fetchPass($Id);
     if ( !$cryptPass ) { return undef; }
 
-    if (index($cryptPass, $MD5Magic) == 0) {
+    if ( index( $cryptPass, $MD5Magic ) == 0 ) {
+
         # This is an MD5 password
         require Crypt::PasswdMD5;
         my $salt = $cryptPass;
-        $salt =~ s/^\Q$MD5Magic//;      # Take care of the magic string if present
-        $salt =~ s/^(.*)\$/$1/;         # Salt can have up to 8 chars...
-        $salt = substr( $salt, 0, 8 );  # That means no more than 8 chars too.
-        return 1 if Crypt::PasswdMD5::apache_md5_crypt( $pass, $salt ) eq $cryptPass;
+        $salt =~ s/^\Q$MD5Magic//;    # Take care of the magic string if present
+        $salt =~ s/^(.*)\$/$1/;       # Salt can have up to 8 chars...
+        $salt = substr( $salt, 0, 8 );    # That means no more than 8 chars too.
+        return 1
+          if Crypt::PasswdMD5::apache_md5_crypt( $pass, $salt ) eq $cryptPass;
     }
-    elsif (index($cryptPass, $SHA1Magic) == 0) {
+    elsif ( index( $cryptPass, $SHA1Magic ) == 0 ) {
+
         # This is an SHA1 password
         require Digest::SHA1;
         require MIME::Base64;
-        return 1 if '{SHA}'.MIME::Base64::encode_base64( Digest::SHA1::sha1( $pass ), '' ) eq $cryptPass;
+        return 1
+          if '{SHA}'
+              . MIME::Base64::encode_base64( Digest::SHA1::sha1($pass), '' ) eq
+              $cryptPass;
     }
 
     # See if it is encrypted using crypt
-    return 1 if crypt($pass, $cryptPass) eq $cryptPass;
+    return 1 if crypt( $pass, $cryptPass ) eq $cryptPass;
 
     # See if it is a plain, unencrypted password
     return 1 if $self->{USEPLAIN} && $pass eq $cryptPass;
-    
+
     $self->{'ERROR'} =
-        __PACKAGE__ . "::htCheckPassword - Passwords do not match.";
+      __PACKAGE__ . "::htCheckPassword - Passwords do not match.";
     carp $self->error() unless caller ne $self;
     return 0;
 }
@@ -108,7 +114,7 @@ sub htpasswd {
     my $Id      = shift;
     my $newPass = shift;
     my $oldPass = shift;
-    my $noOld = 0;
+    my $noOld   = 0;
 
     if ( $self->{READONLY} ) {
         $self->{'ERROR'} =
@@ -117,12 +123,12 @@ sub htpasswd {
         return undef;
     }
 
-    if ( !defined($oldPass) ) { 
-			$noOld = 1; 
-		}
+    if ( !defined($oldPass) ) {
+        $noOld = 1;
+    }
 
     if ( defined($oldPass) && ref $oldPass eq 'HASH' ) {
-        if ($oldPass->{'overwrite'}) {
+        if ( $oldPass->{'overwrite'} ) {
             $newPass = $Id unless $newPass;
             my $newEncrypted = $self->CryptPasswd($newPass);
             return $self->writePassword( $Id, $newEncrypted );
@@ -204,7 +210,7 @@ sub htDelete {
             $return = 1;
         }
         else {
-            push ( @cache, $_ );
+            push( @cache, $_ );
         }
     }
 
@@ -216,7 +222,7 @@ sub htDelete {
         seek( FH, 0, SEEK_SET );
 
         while (@cache) {
-            print FH shift (@cache);
+            print FH shift(@cache);
         }
 
         # Cut everything beyond current position
@@ -247,7 +253,7 @@ sub fetchPass {
 
     while (<FH>) {
         chop;
-        my @tmp = split ( /:/, $_, 3 );
+        my @tmp = split( /:/, $_, 3 );
         if ( $tmp[0] eq $Id ) {
             $passwd = $tmp[1];
             last;
@@ -275,16 +281,16 @@ sub writePassword {
 
     while (<FH>) {
 
-        my @tmp = split ( /:/, $_, 3 );
+        my @tmp = split( /:/, $_, 3 );
         if ( $tmp[0] eq $Id ) {
             my $info = $tmp[2] ? $tmp[2] : "";
             chomp $info;
-            push ( @cache, "$Id\:$newPass\:$info\n" );
+            push( @cache, "$Id\:$newPass\:$info\n" );
             $return = 1;
 
         }
         else {
-            push ( @cache, $_ );
+            push( @cache, $_ );
         }
     }
 
@@ -296,7 +302,7 @@ sub writePassword {
         seek( FH, 0, SEEK_SET );
 
         while (@cache) {
-            print FH shift (@cache);
+            print FH shift(@cache);
         }
 
         # Cut everything beyond current position
@@ -327,7 +333,7 @@ sub fetchInfo {
 
     while (<FH>) {
         chop;
-        my @tmp = split ( /:/, $_, 3 );
+        my @tmp = split( /:/, $_, 3 );
         if ( $tmp[0] eq $Id ) {
             $info = $tmp[2];
             last;
@@ -351,8 +357,8 @@ sub fetchUsers {
 
     while (<FH>) {
         chop;
-        my @tmp = split ( /:/, $_, 3 );
-        push ( @users, $tmp[0] ) unless !$tmp[0];
+        my @tmp = split( /:/, $_, 3 );
+        push( @users, $tmp[0] ) unless !$tmp[0];
     }
 
     $self->_close();
@@ -377,16 +383,16 @@ sub writeInfo {
 
     while (<FH>) {
 
-        my @tmp = split ( /:/, $_, 3 );
+        my @tmp = split( /:/, $_, 3 );
 
         if ( $tmp[0] eq $Id ) {
             chomp $tmp[1] if ( @tmp == 2 );   # Cut out EOL if there was no info
-            push ( @cache, "$Id\:$tmp[1]\:$newInfo\n" );
+            push( @cache, "$Id\:$tmp[1]\:$newInfo\n" );
             $return = 1;
 
         }
         else {
-            push ( @cache, $_ );
+            push( @cache, $_ );
         }
     }
 
@@ -398,7 +404,7 @@ sub writeInfo {
         seek( FH, 0, SEEK_SET );
 
         while (@cache) {
-            print FH shift (@cache);
+            print FH shift(@cache);
         }
 
         # Cut everything beyond current position
@@ -424,7 +430,7 @@ sub CryptPasswd {
     my $salt   = shift;
     my @chars  = ( '.', '/', 0 .. 9, 'A' .. 'Z', 'a' .. 'z' );
     my $Magic = '$apr1$';    # Apache specific Magic chars
-    my $cryptType = (  $^O =~ /^MSWin/i || $self->{'USEMD5'} ) ? "MD5" : "crypt";
+    my $cryptType = ( $^O =~ /^MSWin/i || $self->{'USEMD5'} ) ? "MD5" : "crypt";
 
     if ( $salt && $cryptType =~ /MD5/i && $salt =~ /^\Q$Magic/ ) {
 
@@ -435,30 +441,32 @@ sub CryptPasswd {
                                           # For old crypt only
     }
     elsif ( $salt && $cryptType =~ /crypt/i ) {
-        if ($salt =~ /\$2a\$\d+\$(.{23})/) {
+        if ( $salt =~ /\$2a\$\d+\$(.{23})/ ) {
             $salt = $1;
-        } else {
+        }
+        else {
+
             # Make sure only use 2 chars
             $salt = substr( $salt, 0, 2 );
-        }  
+        }
     }
     else {
 
-# If we use MD5, create apache MD5 with 8 char salt: 3 randoms, 5 dots
+        # If we use MD5, create apache MD5 with 8 char salt: 3 randoms, 5 dots
         if ( $cryptType =~ /MD5/i ) {
             $salt =
-              join ( '', map { $chars[ int rand @chars ] } ( 0 .. 2 ) )
+              join( '', map { $chars[ int rand @chars ] } ( 0 .. 2 ) )
               . "." x 5;
 
             # Otherwise fallback to standard archaic crypt
         }
         else {
-            $salt = join ( '', map { $chars[ int rand @chars ] } ( 0 .. 1 ) );
+            $salt = join( '', map { $chars[ int rand @chars ] } ( 0 .. 1 ) );
         }
     }
 
     if ( $cryptType =~ /MD5/i ) {
-				require Crypt::PasswdMD5;
+        require Crypt::PasswdMD5;
         return Crypt::PasswdMD5::apache_md5_crypt( $passwd, $salt );
     }
     else {
@@ -468,7 +476,7 @@ sub CryptPasswd {
 
 #-----------------------------------------------------------#
 
-sub DESTROY { close(FH); };
+sub DESTROY { close(FH); }
 
 #-----------------------------------------------------------#
 

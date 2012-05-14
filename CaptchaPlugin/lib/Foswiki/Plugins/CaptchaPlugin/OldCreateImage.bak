@@ -1,0 +1,92 @@
+# =========================
+sub OLDcreateImage {
+  my $this = shift;
+
+  return if $this->{txt};
+
+  $this->{txt} = '';
+  for my $i (0 .. $this->{numChars} -1) {
+    $this->{txt} .= substr($this->{chars}, rand() * (length($this->{chars})), 1);
+  }
+
+  $this->{hash} = Digest::MD5::md5_hex($this->{txt} . time() . rand());
+
+  my $pubUrlPath = Foswiki::Func::getPubUrlPath();
+  my $imgFile = $this->{hash} . ".png";
+
+  $this->{imgPath} = $this->{imgDir} . "/" . $imgFile;
+  $this->{imgUrl} = $pubUrlPath . "/System/CaptchaPlugin/img/" . $imgFile;
+
+  # create a new image
+  my $im = GD::Image->newTrueColor($this->{imgWidth}, $this->{imgHeight});
+
+  # we need background colour
+  my $background;
+
+  if ($this->{colourSafe}) {
+    # ColourSafe please
+    $background = $im->colorAllocate(255, 255, 255);
+  } else {
+    my $grey = int(rand(255));
+    my @bgcolour;
+
+    for my $i (0 .. 2) {
+      push(@bgcolour, $grey);
+      $i++;
+    }
+
+    $background = $im->colorAllocate($bgcolour[0], $bgcolour[1], $bgcolour[2]);
+  }
+
+  $im->fill(0, 0, $background);
+
+  # random angles
+  my @rndangle = ();
+  my $len = length($this->{txt});
+
+  for my $i (0 .. $len - 1) {
+    my $rndvalues = rand(-0.4 + rand(0.4 - (rand(-0.4))));
+    push(@rndangle, $rndvalues);
+  }
+
+  # add crazy text
+  for my $i (0 .. $len - 1) {
+
+    # we need some values
+    my $fontcolours;
+    my @fonts = glob($this->{fontsDir}."/*.ttf");
+    my $rndfont = rand @fonts;
+    my $rndsize = int(rand($this->{maxFontSize})) + $this->{minFontSize};
+    my $x = ($this->{imgWidth} / ($len + 1)) * $i + $this->{imgWidth} / $len - 10;
+    my $y = $this->{imgHeight} / (rand(1.1) + 1);
+
+    # are we ColourSafe?
+    if ($this->{colourSafe}) {
+
+      # we only need light colours against the black
+      my $shade = int(rand(155)) + 100;
+      my @shadecolours;
+      for my $i (0 .. 2) {
+        push(@shadecolours, $shade);
+        $i++;
+      }
+
+      $fontcolours = $im->colorAllocate($shadecolours[0], $shadecolours[1], $shadecolours[2]);
+    } else {
+      $fontcolours = $im->colorAllocate(int(rand(255)), int(rand(255)), int(rand(255)));
+    }
+
+    # let's boogey
+    $im->stringFT($fontcolours, $fonts[$rndfont], $rndsize, $rndangle[$i], $x, $y, substr($this->{txt}, $i, 1));
+  }
+
+  # write out image file
+  open(IMGFILE, ">".$this->{imgPath});
+  binmode IMGFILE;
+  print IMGFILE $im->png;
+  close(IMGFILE);
+
+  # remember hash
+  $this->storeHash();
+}
+

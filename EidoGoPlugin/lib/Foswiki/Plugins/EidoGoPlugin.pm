@@ -32,7 +32,6 @@ the text had been included from another topic.
 
 =cut
 
-
 package Foswiki::Plugins::EidoGoPlugin;
 
 # Always use strict to enforce variable scoping
@@ -41,14 +40,15 @@ use strict;
 require Foswiki::Func;       # The plugins API
 require Foswiki::Plugins;    # For the API version
 
-use vars qw( $VERSION $RELEASE $SHORTDESCRIPTION $INSTALL_INSTRUCTIONS $debug $pluginName $NO_PREFS_IN_TOPIC );
+use vars
+  qw( $VERSION $RELEASE $SHORTDESCRIPTION $INSTALL_INSTRUCTIONS $debug $pluginName $NO_PREFS_IN_TOPIC );
 
-$VERSION = '$Rev: 2957 $';
-$RELEASE = '$Date: 2009-03-10 19:21:06 +0100 (Tue, 10 Mar 2009) $';
-$SHORTDESCRIPTION = 'Plugin to enable the Eidogo Javascript viewer in FosWiki';
+$VERSION           = '$Rev: 2957 $';
+$RELEASE           = '$Date: 2009-03-10 19:21:06 +0100 (Tue, 10 Mar 2009) $';
+$SHORTDESCRIPTION  = 'Plugin to enable the Eidogo Javascript viewer in FosWiki';
 $NO_PREFS_IN_TOPIC = 1;
 $INSTALL_INSTRUCTIONS = 'instructions...';
-$pluginName = 'EidoGoPlugin';
+$pluginName           = 'EidoGoPlugin';
 
 =begin TML
 
@@ -88,8 +88,8 @@ sub initPlugin {
 
     $debug = $TWiki::cfg{Plugins}{EidoGoPlugin}{Debug} || 0;
 
-    TWiki::Func::registerTagHandler( 'EIDOGO', \&_EIDOGO);
-    TWiki::Func::registerTagHandler( 'FILELIST', \&_FILELIST);
+    TWiki::Func::registerTagHandler( 'EIDOGO',   \&_EIDOGO );
+    TWiki::Func::registerTagHandler( 'FILELIST', \&_FILELIST );
 
     # Plugin correctly initialized
     return 1;
@@ -100,54 +100,69 @@ sub initPlugin {
 =cut
 
 sub _EIDOGO {
-  my($session, $params, $theTopic, $theWeb) = @_;
-  my $mode = $Foswiki::cfg{Plugins}{EidoGoPlugin}{DefaultMode};
-  $mode = $params->{mode} if ($params->{mode} =~ /\S+/);
+    my ( $session, $params, $theTopic, $theWeb ) = @_;
+    my $mode = $Foswiki::cfg{Plugins}{EidoGoPlugin}{DefaultMode};
+    $mode = $params->{mode} if ( $params->{mode} =~ /\S+/ );
 
-  my $game = $params->{_DEFAULT};
-  $game = $params->{game} if ($params->{game} =~ /\S+/); 
-  
-  my $config = $Foswiki::cfg{Plugins}{EidoGoPlugin}{Config};
-  $config = $params->{config} if ($params->{config} =~ /\S+/); 
+    my $game = $params->{_DEFAULT};
+    $game = $params->{game} if ( $params->{game} =~ /\S+/ );
 
-  my $EIDOGOROOT = $Foswiki::cfg{Plugins}{EidoGoPlugin}{RootDir};
-  
-  Foswiki::Func::writeDebug( "- ${pluginName}::_EIDOGO( ) mode($mode) game($game) config($config) " ) if $debug;
+    my $config = $Foswiki::cfg{Plugins}{EidoGoPlugin}{Config};
+    $config = $params->{config} if ( $params->{config} =~ /\S+/ );
 
-  Foswiki::Func::addToHEAD("eidogohead", "<script type=\"text/javascript\"> eidogoConfig = {${config}};</script>\n<script type=\"text/javascript\" src=\"${EIDOGOROOT}/player/js/all.compressed.js\"></script>");
+    my $EIDOGOROOT = $Foswiki::cfg{Plugins}{EidoGoPlugin}{RootDir};
 
-  return "<div class=\"${mode}\" sgf=\"${game}\"></div>";
+    Foswiki::Func::writeDebug(
+        "- ${pluginName}::_EIDOGO( ) mode($mode) game($game) config($config) ")
+      if $debug;
+
+    Foswiki::Func::addToHEAD( "eidogohead",
+"<script type=\"text/javascript\"> eidogoConfig = {${config}};</script>\n<script type=\"text/javascript\" src=\"${EIDOGOROOT}/player/js/all.compressed.js\"></script>"
+    );
+
+    return "<div class=\"${mode}\" sgf=\"${game}\"></div>";
 }
 
 sub _FILELIST {
-  my($session, $params, $theTopic, $theWeb) = @_;
+    my ( $session, $params, $theTopic, $theWeb ) = @_;
 
-  TWiki::Func::writeDebug( "- ${pluginName}::filelist( ) for $params->{path} " ) if $debug;
+    TWiki::Func::writeDebug("- ${pluginName}::filelist( ) for $params->{path} ")
+      if $debug;
 
-  open (FILE, "cd " . $params->{path} . " && /usr/bin/find . -type f -name '*sgf' |" );
-  my $formattedlist;
+    open( FILE,
+            "cd "
+          . $params->{path}
+          . " && /usr/bin/find . -type f -name '*sgf' |" );
+    my $formattedlist;
 
-  while (my $buffer = <FILE>) {
-    TWiki::Func::writeDebug( "- ${pluginName}::filelist( ) read line $buffer" ) if $debug;
-    my $line = $params->{format};
-    TWiki::Func::writeDebug( "- ${pluginName}::filelist( ) read parameter $line" ) if $debug;
-    $buffer = trim($buffer);
-    $buffer =~ s/^\.\///g;
-    $line =~ s/\$file/$buffer/g;
-    TWiki::Func::writeDebug( "- ${pluginName}::filelist( ) read sub line $buffer" ) if $debug;
-    $formattedlist .= "\n" . $line ;
-    TWiki::Func::writeDebug( "- ${pluginName}::filelist( ) new list $formattedlist" ) if $debug;
-  }
+    while ( my $buffer = <FILE> ) {
+        TWiki::Func::writeDebug(
+            "- ${pluginName}::filelist( ) read line $buffer")
+          if $debug;
+        my $line = $params->{format};
+        TWiki::Func::writeDebug(
+            "- ${pluginName}::filelist( ) read parameter $line")
+          if $debug;
+        $buffer = trim($buffer);
+        $buffer =~ s/^\.\///g;
+        $line   =~ s/\$file/$buffer/g;
+        TWiki::Func::writeDebug(
+            "- ${pluginName}::filelist( ) read sub line $buffer")
+          if $debug;
+        $formattedlist .= "\n" . $line;
+        TWiki::Func::writeDebug(
+            "- ${pluginName}::filelist( ) new list $formattedlist")
+          if $debug;
+    }
 
-  return $formattedlist;
+    return $formattedlist;
 }
 
-sub trim($)
-{
-  my $string = shift;
-  $string =~ s/^\s+//;
-  $string =~ s/\s+$//;
-  return $string;
+sub trim($) {
+    my $string = shift;
+    $string =~ s/^\s+//;
+    $string =~ s/\s+$//;
+    return $string;
 }
 1;
 __END__

@@ -41,27 +41,28 @@ use File::Path;
 use File::Spec;
 use File::Temp;
 
-my @dirs_created   =  ();
-my @files_created  =  ();
+my @dirs_created  = ();
+my @files_created = ();
 
 sub import {
     my $self = shift;
-    my $tempdir  =  File::Temp::tempdir( CLEANUP => 1 );
+    my $tempdir = File::Temp::tempdir( CLEANUP => 1 );
     eval "use lib '$tempdir'";
     for my $module (@_) {
-        my @split = split /::/,$module;
-        my $path = File::Spec->catfile($tempdir, @split) . '.pm';
+        my @split = split /::/, $module;
+        my $path = File::Spec->catfile( $tempdir, @split ) . '.pm';
         pop @split;
-        File::Path::mkpath(File::Spec->catdir($tempdir, @split));
-        if (open FAKE,">",$path) {
+        File::Path::mkpath( File::Spec->catdir( $tempdir, @split ) );
+        if ( open FAKE, ">", $path ) {
             print FAKE qq(die "Can't locate $module in \\\@FAKE");
             close FAKE;
         }
         else {
-            Carp::croak("Can't create fake module '$module' in '$path': '$!'.\nTerminating.");
+            Carp::croak(
+"Can't create fake module '$module' in '$path': '$!'.\nTerminating."
+            );
         }
     }
 }
-
 
 1;

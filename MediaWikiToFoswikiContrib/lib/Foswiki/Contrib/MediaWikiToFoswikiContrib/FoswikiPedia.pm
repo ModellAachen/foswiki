@@ -1,10 +1,10 @@
 # Plugin for mediawiki2foswiki
 #
-# Copyright (C) 2007-2008 Michael Daum http://michaeldaumconsulting.com
+# Copyright (C) 2007-2012 Michael Daum http://michaeldaumconsulting.com
 
-package Foswiki::Contrib::FoswikiPediaAddOn::Converter;
+package Foswiki::Contrib::MediaWikiToFoswikiContrib::FoswikiPedia;
 use strict;
-use Unicode::MapUTF8 qw(from_utf8 to_utf8);
+use utf8;
 
 use vars qw(%seenCategories 
   $topicFormTemplate $categoryTemplate 
@@ -43,16 +43,12 @@ HERE
 #   * %categories%
 #   * %text%
 $categoryTemplate = <<'HERE';
-%META:TOPICINFO{author="%author%" date="%date%" format="1.1" version="1.1"}%
 %META:TOPICPARENT{name="%parent%"}%
 %DBCALL{"Applications.ClassificationApp.RenderCategory"}%
 
-%text%
-
-
 %META:FORM{name="Applications.ClassificationApp.Category"}%
 %META:FIELD{name="TopicType" attributes="" title="TopicType" value="Category, CategorizedTopic"}%
-%META:FIELD{name="Title" attributes="" title="Title" value="%title%"}%
+%META:FIELD{name="TopicTitle" attributes="" title="Title" value="%title%"}%
 %META:FIELD{name="Summary" attributes="" title="Summary" value="%summary%"}%
 %META:FIELD{name="Category" attributes="" title="Category" value="%categories%"}%
 %META:FIELD{name="Usage" attributes="" title="Usage" value="ALL"}%
@@ -87,13 +83,13 @@ sub handleTitle {
   #$converter->writeDebug("before, title=$_[0]");
 
   # remove umlaute
-  $_[0] =~ s/ä/ae/go;
-  $_[0] =~ s/ö/oe/go;
-  $_[0] =~ s/ü/ue/go;
-  $_[0] =~ s/Ä/Ae/go;
-  $_[0] =~ s/Ö/Oe/go;
-  $_[0] =~ s/Ü/Ue/go;
-  $_[0] =~ s/ß/ss/go;
+  $_[0] =~ s/Ã¤/ae/go;
+  $_[0] =~ s/Ã¶/oe/go;
+  $_[0] =~ s/Ã¼/ue/go;
+  $_[0] =~ s/Ã„/Ae/go;
+  $_[0] =~ s/Ã–/Oe/go;
+  $_[0] =~ s/Ãœ/Ue/go;
+  $_[0] =~ s/ÃŸ/ss/go;
 
   #$converter->writeDebug("after, title=$_[0]");
 }
@@ -115,15 +111,17 @@ sub handleBefore {
   } else {
     unless ($unknownUsers{$name}) {
       $unknownUsers{$name} = $name;
-      $converter->writeWarning("unknown user $name");
+      #$converter->writeWarning("unknown user $name");
     }
   }
   
   # remove internal category links
   $_[0] =~ s/\[\[$converter->{language}{Category}:.+?\]\]//g;
+  $_[0] =~ s/\[\[$Foswiki::Contrib::MediaWikiToFoswikiContrib::Converter::language{en}{Category}:.+?\]\]//g;
 
   # own image handler
-  $_[0] =~ s/\[\[$this->{language}{Image}:(.+?)\]\]/$converter->handleImage($page, $1)/ge;
+  $_[0] =~ s/\[\[$converter->{language}{Image}:(.+?)\]\]/$converter->handleImage($page, $1)/ge;
+  $_[0] =~ s/\[\[$Foswiki::Contrib::MediaWikiToFoswikiContrib::Converter::language{en}{Image}:(.+?)\]\]/$converter->handleImage($page, $1)/ge;
 }
 
 ##############################################################################
@@ -168,6 +166,7 @@ sub handleAfter {
   my $page = shift;
   #my $text = shift; # use $_[0];
 
+
   my $pageTitle = join('.',$converter->getTitle($page));
 
 #print STDERR "DEBUG: postprocessing $pageTitle\n";
@@ -192,24 +191,29 @@ sub handleAfter {
       my $catName = $converter->getCategoryName($cat);
       $topicParent = $catName;
     }
+  } else {
+    #print STDERR "no categories at $pageTitle\n";
   }
 
   # move h1 to title
-  my $summary = '';
+  my $title = '';
   if ($_[0] =~ s/^\s*---\++(?:!!)?\s*(.*?)\s*$//m) {
-    $summary = $1;
-    $summary =~ s/\[\[.*?\]\[(.*)\]\]/$1/g;
+    $title = $1;
+    $title =~ s/\[\[.*?\]\[(.*)\]\]/$1/g;
   }
+
+  # summary
+  my $summary = ''; # TODO
 
   # encode the formfield values
   my $form = $topicFormTemplate;
-  $summary = urlEncode($summary);
   $form =~ s/%cats%/$catNames/g;
+  $form =~ s/%title%/$title/g;
   $form =~ s/%summary%/$summary/g;
   $_[0] .= "\n".$form;
 
   # add backlink to origin
-  if (1) {
+  if (0) {
     my $mwTitle = $page->title;
     $_[0] = 
       '<div style="float:right;margin:10px">'.
@@ -283,11 +287,17 @@ sub createCategory {
 
   # get summary
   my $summary = $cat->{summary} || '';
-  $summary = urlEncode($summary);
+  $summary = $converter->fromUtf8($summary);
+  $summary = $converter->toUtf8($summary);
+  $summary =~ s/^\s*==\s*(.*?)\s*==\s*$/$1/m;
+  $summary =~ s/\<br\>\s*$//g;
+  $summary =~ s/:\s*$//g;
 
   # get title
   my $title = $cat->{title} || $cat->{topic};
-  $title = urlEncode($title);
+  $title = $converter->fromUtf8($title);
+  $title = $converter->toUtf8($title);
+  $title =~ s/Category$//;
 
   # get text
   my $text = $cat->{text} || '';
@@ -309,24 +319,6 @@ sub createCategory {
   # save it
   $converter->saveTopic($cat->{page}, $template, $converter->{targetWeb}, $cat->{topic});
 
-}
-
-###############################################################################
-sub urlEncode {
-  my $text = shift;
-
-  $text =~ s/([^0-9a-zA-Z-_.:~!*'\/%])/'%'.sprintf('%02x',ord($1))/ge;
-
-  return $text;
-}
-
-###############################################################################
-sub urlDecode {
-  my $text = shift;
-
-  $text =~ s/%([\da-f]{2})/chr(hex($1))/gei;
-
-  return $text;
 }
 
 1;

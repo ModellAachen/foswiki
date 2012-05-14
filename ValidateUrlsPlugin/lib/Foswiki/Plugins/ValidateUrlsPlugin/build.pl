@@ -16,7 +16,7 @@ our @ISA = qw( Foswiki::Contrib::Build );
 
 sub new {
     my $class = shift;
-    return bless( $class->SUPER::new( "ValidateUrlsPlugin" ), $class );
+    return bless( $class->SUPER::new("ValidateUrlsPlugin"), $class );
 }
 
 # Example: Override the build target
@@ -34,5 +34,5 @@ package main;
 my $build = new BuildBuild();
 
 # Build the target on the command line, or the default target
-$build->build($build->{target});
+$build->build( $build->{target} );
 

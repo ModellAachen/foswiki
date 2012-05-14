@@ -19,7 +19,7 @@ use strict;
 # *must* exist in this package. This should always be in the format
 # $Rev: 3193 $ so that Foswiki can determine the checked-in status of the
 # extension.
-our $VERSION = '$Rev$'; # version of *this file*.
+our $VERSION = '$Rev$';    # version of *this file*.
 
 # $RELEASE is used in the "Find More Extensions" automation in configure.
 # It is a manually maintained string used to identify functionality steps.
@@ -31,8 +31,7 @@ our $VERSION = '$Rev$'; # version of *this file*.
 # date    - a date in 1 Jun 2009 format. Three letter English month names only.
 # Note: it's important that this string is exactly the same in the extension
 # topic - if you use %$RELEASE% with BuildContrib this is done automatically.
-our $RELEASE = '0.1.1';
+our $RELEASE = '0.1.2';
 
 our $SHORTDESCRIPTION = 'JQuery Superfish Menu Skin';
-
 

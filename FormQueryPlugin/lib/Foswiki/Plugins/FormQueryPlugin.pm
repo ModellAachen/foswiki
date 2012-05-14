@@ -7,20 +7,21 @@ package Foswiki::Plugins::FormQueryPlugin;
 
 use strict;
 
-use Foswiki ();
-use Foswiki::Func ();
+use Foswiki        ();
+use Foswiki::Func  ();
 use Foswiki::Attrs ();
 use Error qw( :try );
 use Assert;
 
 our $VERSION = '$Rev$';
 our $RELEASE = '17 Nov 2009';
-our $SHORTDESCRIPTION = 'Provides query capabilities across a database defined using forms and embedded tables in Foswiki topics.';
+our $SHORTDESCRIPTION =
+'Provides query capabilities across a database defined using forms and embedded tables in Foswiki topics.';
 
-our $quid    = 0;         # Unique query id
+our $quid        = 0;     # Unique query id
 our $initialised = 0;     # flag whether _lazyInit has been called
 our %db          = ();    # hash of loaded DBs, keyed on web name
-our $moan = 0;            # Preference value
+our $moan        = 0;     # Preference value
 
 sub initPlugin {
     my ( $topic, $web, $user, $installWeb ) = @_;
@@ -29,7 +30,7 @@ sub initPlugin {
         'context-free' );
     Foswiki::Func::registerTagHandler(
         'DOANDSHOWQUERY',
-        \&_DOQUERY,    # Deprecated
+        \&_DOQUERY,       # Deprecated
         'context-free'
     );
     Foswiki::Func::registerTagHandler( 'DOQUERY', \&_DOQUERY, 'context-free' );

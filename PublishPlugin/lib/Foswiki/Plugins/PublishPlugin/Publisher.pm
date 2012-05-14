@@ -338,14 +338,14 @@ sub publish {
         ( $header, $footer ) = $this->_getPageTemplate();
     }
 
-    $this->logInfo( '', "<h1>Publishing Details</h1>" );
+    $this->logInfo( '',          "<h1>Publishing Details</h1>" );
     $this->logInfo( "Publisher", $this->{publisher} );
     $this->logInfo( "Date",      Foswiki::Func::formatTime( time() ) );
     $this->logInfo( "Dir",
         "$Foswiki::cfg{PublishPlugin}{Dir}$this->{relativedir}" );
     $this->logInfo( "URL",
         "$Foswiki::cfg{PublishPlugin}{URL}$this->{relativeurl}" );
-    $this->logInfo( "Web(s)",            join( ', ', @webs ) );
+    $this->logInfo( "Web(s)", join( ', ', @webs ) );
     $this->logInfo( "Versions topic", $this->{versions} )
       if $this->{versions};
     $this->logInfo( "Content Generator", $this->{format} );
@@ -394,7 +394,7 @@ TEXT
     $this->{history} = "$hw.$ht";
 
     foreach my $web (@webs) {
-	$this->_publishWeb($web);
+        $this->_publishWeb($web);
     }
 
     my ( $meta, $text ) = Foswiki::Func::readTopic( $hw, $ht );
@@ -435,7 +435,7 @@ TEXT
 }
 
 sub _publishWeb {
-    my ($this, $web) = @_;
+    my ( $this, $web ) = @_;
 
     $this->{web} = $web;
 

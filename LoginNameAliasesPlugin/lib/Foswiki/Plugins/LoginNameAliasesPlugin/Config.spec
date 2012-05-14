@@ -3,13 +3,15 @@
 # see the plugin topic for documentation on these settings
 # **BOOLEAN**
 $Foswiki::cfg{LoginNameAliasesPlugin}{USE_ALIASES} = $FALSE;
-# **Text**
+# **STRING**
 $Foswiki::cfg{LoginNameAliasesPlugin}{REMOVE_PREFIX} = '';
-# **Text**
+# **STRING**
 $Foswiki::cfg{LoginNameAliasesPlugin}{REMOVE_SUFFIX} = '';
-# **Text**
+# **SELECT none,upper,lower,uppercasefirst **
+$Foswiki::cfg{LoginNameAliasesPlugin}{CHANGE_CASE} = 'none';
+# **STRING**
 $Foswiki::cfg{LoginNameAliasesPlugin}{MAP_BLANK_USER} = '';
-# **Text**
+# **STRING**
 $Foswiki::cfg{LoginNameAliasesPlugin}{MAP_UNREGISTERED} = '';
 # **BOOLEAN**
 $Foswiki::cfg{LoginNameAliasesPlugin}{RETURN_NOTHING_IF_UNCHANGED} = $TRUE;

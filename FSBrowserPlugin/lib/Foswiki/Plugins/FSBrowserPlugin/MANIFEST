@@ -1,0 +1,6 @@
+!noci
+data/System/FSBrowserPlugin.txt 0644 Documentation page
+data/System/VarFSBROWSER.txt 0644 Tag documentation
+data/Sandbox/PluginTestFSBrowserPlugin.txt 0644 Examples
+lib/Foswiki/Plugins/FSBrowserPlugin.pm 0444 Perl module
+lib/Foswiki/Plugins/FSBrowserPlugin/Config.spec 0444 Configuration

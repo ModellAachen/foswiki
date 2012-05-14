@@ -38,24 +38,26 @@ $VERSION = '$Rev: 8670$';
 # It is *not* used by the build automation tools, but is reported as part
 # of the version number in PLUGINDESCRIPTIONS.
 $RELEASE = 'Foswiki';
- 
-$REVISION = '1.017'; #dro# added hidettcm attribute requested by TWiki:Main.StevenCorfman; fixed line breakes in rotated tables;
+
+$REVISION = '1.017'
+  ; #dro# added hidettcm attribute requested by TWiki:Main.StevenCorfman; fixed line breakes in rotated tables;
+
 #$REVISION = '1.016'; #dro# added overflow:auto style; fixed unknownparamsmsg bug;
 #$REVISION = '1.015'; #dro# fixed rotated table bugs (tooltips, showweekend="off")
-#$REVISION = '1.014'; #dro# added documentation requested by TWiki:Main.PeterThoeny; added rotated table feature requested by TWiki:Main.VickiBrown; fixed doc bug reported by TWiki:Main.JoeGainey 
+#$REVISION = '1.014'; #dro# added documentation requested by TWiki:Main.PeterThoeny; added rotated table feature requested by TWiki:Main.VickiBrown; fixed doc bug reported by TWiki:Main.JoeGainey
 #$REVISION = '1.013'; #dro# fixed major time parsing bug reported by Foswiki:Main.LarsEik; fixed major bug: events with a time range before start time should not be displayed; fixed major TTCM bug reported by Foswiki:Main.ArthurClemens; added URL parameter feature; added new attributes (tableborder, tablewidth, tablecell...); added browser based text wrapping feature requested by Foswiki:Main.ArthurClemens
 #$REVISION = '1.012'; #dro# fixed readTopicText bug reported TWiki:Main.JoachimRahn; added month header feature (attributes: showmonthheader, monthheader...); added new tooltip feature (clicktooltip...)
 #$REVISION = '1.011'; #dro# added fontsize attribute; fixed HTML bug (validation);
 #$REVISION = '1.010'; #dro# added tablecolumnwidth and tabledatacellwidth attributes requested by TWiki:Main.VickiBrown;  added tooltip feature (tooltip... attributes);
 #$REVISION = '1.009'; #dro# added duration feature; added time zone abbreviations; improved performance; fixed conflict rendering bug; fixed time zone bugs (whole-time event handling, topic include)
-#$REVISION = '1.008'; #dro# added timezone feature requested by TWiki:Main.BenWatts; fixed major midday/midnight (12pm/12am) bug reported by TWiki:Main.BenWatts; fixed overlapping day bug; fixed periodic event bug; fixed minor bugs (stylesheet bug: annyoing JavaScript errors; empty event row) 
+#$REVISION = '1.008'; #dro# added timezone feature requested by TWiki:Main.BenWatts; fixed major midday/midnight (12pm/12am) bug reported by TWiki:Main.BenWatts; fixed overlapping day bug; fixed periodic event bug; fixed minor bugs (stylesheet bug: annyoing JavaScript errors; empty event row)
 #$REVISION = '1.007'; #dro# fixed major bug (wholetimerow: empty column)
 #$REVISION = '1.006'; #dro# fixed major mod_perl bug (paging in compatmode); added whole-time row feature; fixed minor bug (empty column color; cutted text)
 #$REVISION = '1.005'; #dro# fixed typos (documentation); added new features (compatmode only): inline time range feature and navigation; minor improvements (table header, ...)
 #$REVISION = '1.004'; #dro# fixed typos (documentation, timeformat); added new attributes (days, forcestartdate, nowfgcolor, nowbgcolor); fixed minor bug (periodic repeater); added new event type (list)
-#$REVISION = '1.003'; #dro# added compatibility mode (CalendarPlugin event types); added documentation and new attributes; fixed bugs (bgcolor bug; conflict rendering; documentation; error logs; warnings); 
-#$REVISION = '1.002'; #dro# fixed major bugs (conflict handling, preferences); added documentation; 
-#$REVISION = '1.001'; #dro# fixed some major bugs (conflict entries, parameter handling, long descriptions); added documentation; 
+#$REVISION = '1.003'; #dro# added compatibility mode (CalendarPlugin event types); added documentation and new attributes; fixed bugs (bgcolor bug; conflict rendering; documentation; error logs; warnings);
+#$REVISION = '1.002'; #dro# fixed major bugs (conflict handling, preferences); added documentation;
+#$REVISION = '1.001'; #dro# fixed some major bugs (conflict entries, parameter handling, long descriptions); added documentation;
 #$REVISION = '1.000'; #dro# initial version
 
 # Name of this Plugin, only used in this module
@@ -89,11 +91,12 @@ and highly dangerous!
 =cut
 
 sub initPlugin {
-    my( $topic, $web, $user, $installWeb ) = @_;
+    my ( $topic, $web, $user, $installWeb ) = @_;
 
     # check for Plugins.pm versions
-    if( $Foswiki::Plugins::VERSION < 1.021 ) {
-        Foswiki::Func::writeWarning( "Version mismatch between $pluginName and Plugins.pm" );
+    if ( $Foswiki::Plugins::VERSION < 1.021 ) {
+        Foswiki::Func::writeWarning(
+            "Version mismatch between $pluginName and Plugins.pm");
         return 0;
     }
 
@@ -109,13 +112,13 @@ sub initPlugin {
     # register the _EXAMPLETAG function to handle %EXAMPLETAG{...}%
     ####Foswiki::Func::registerTagHandler( 'TIMETABLE', \&_TIMETABLE);
 
-    # Allow a sub to be called from the REST interface 
+    # Allow a sub to be called from the REST interface
     # using the provided alias
     ####Foswiki::Func::registerRESTHandler('example', \&restExample);
 
     eval {
-       require Foswiki::Plugins::TimeTablePlugin::TimeTable;
-       &Foswiki::Plugins::TimeTablePlugin::TimeTable::initPlugin;
+        require Foswiki::Plugins::TimeTablePlugin::TimeTable;
+        &Foswiki::Plugins::TimeTablePlugin::TimeTable::initPlugin;
     };
 
     # Plugin correctly initialized
@@ -124,8 +127,9 @@ sub initPlugin {
 
 # The function used to handle the %EXAMPLETAG{...}% tag
 # You would have one of these for each tag you want to process.
-sub _TIMETABLE{
-    my($session, $params, $theTopic, $theWeb) = @_;
+sub _TIMETABLE {
+    my ( $session, $params, $theTopic, $theWeb ) = @_;
+
     # $session  - a reference to the Foswiki session object (if you don't know
     #             what this is, just ignore it)
     # $params=  - a reference to a Foswiki::Attrs object containing parameters.
@@ -173,10 +177,13 @@ __Since:__ Foswiki::Plugins::VERSION = '1.010'
 =cut
 
 sub DISABLE_initializeUserHandler {
+
     # do not uncomment, use $_[0], $_[1]... instead
     ### my ( $loginName, $url, $pathInfo ) = @_;
 
-    Foswiki::Func::writeDebug( "- ${pluginName}::initializeUserHandler( $_[0], $_[1] )" ) if $debug;
+    Foswiki::Func::writeDebug(
+        "- ${pluginName}::initializeUserHandler( $_[0], $_[1] )")
+      if $debug;
 }
 
 =pod
@@ -193,10 +200,13 @@ __Since:__ Foswiki::Plugins::VERSION = '1.010'
 =cut
 
 sub DISABLE_registrationHandler {
+
     # do not uncomment, use $_[0], $_[1]... instead
     ### my ( $web, $wikiName, $loginName ) = @_;
 
-    Foswiki::Func::writeDebug( "- ${pluginName}::registrationHandler( $_[0], $_[1] )" ) if $debug;
+    Foswiki::Func::writeDebug(
+        "- ${pluginName}::registrationHandler( $_[0], $_[1] )")
+      if $debug;
 }
 
 =pod
@@ -228,29 +238,37 @@ handler.
 =cut
 
 sub commonTagsHandler {
+
     # do not uncomment, use $_[0], $_[1]... instead
     ### my ( $text, $topic, $web ) = @_;
 
-    Foswiki::Func::writeDebug( "- ${pluginName}::commonTagsHandler( $_[2].$_[1] )" ) if $debug;
+    Foswiki::Func::writeDebug(
+        "- ${pluginName}::commonTagsHandler( $_[2].$_[1] )")
+      if $debug;
 
     # do custom extension rule, like for example:
     # $_[0] =~ s/%XYZ%/&handleXyz()/ge;
     # $_[0] =~ s/%XYZ{(.*?)}%/&handleXyz($1)/ge;
 
     eval {
-	    require Foswiki::Plugins::TimeTablePlugin::TimeTable;
-             
-	    $_[0] =~ s/<\/head>/<script src="%PUBURL%\/%SYSTEMWEB%\/$pluginName\/timetabletooltips.js" language="javascript" type="text\/javascript"><\/script><\/head>/is unless ($_[0]=~/timetabletooltips.js/);
-	    $_[0] =~ s/%TIMETABLE%/&Foswiki::Plugins::TimeTablePlugin::TimeTable::expand("",$_[0],$_[1],$_[2])/ge;
-	    $_[0] =~ s/%TIMETABLE{(.*?)}%/&Foswiki::Plugins::TimeTablePlugin::TimeTable::expand($1, $_[0], $_[1], $_[2])/ge;
-	    $_[0] =~ s/%TTCM{(.*?)}%/&Foswiki::Plugins::TimeTablePlugin::TimeTable::inflate($1, $_[0],$_[1],$_[2])/ge;
-	    $_[0] =~ s/%TTCM%//g;
+        require Foswiki::Plugins::TimeTablePlugin::TimeTable;
 
-	    $_[0] =~ s/%TTTOPICSETUP%//g;
-	    $_[0] =~ s/%TTTOPICSETUP{.*?}%//g;
+        $_[0] =~
+s/<\/head>/<script src="%PUBURL%\/%SYSTEMWEB%\/$pluginName\/timetabletooltips.js" language="javascript" type="text\/javascript"><\/script><\/head>/is
+          unless ( $_[0] =~ /timetabletooltips.js/ );
+        $_[0] =~
+s/%TIMETABLE%/&Foswiki::Plugins::TimeTablePlugin::TimeTable::expand("",$_[0],$_[1],$_[2])/ge;
+        $_[0] =~
+s/%TIMETABLE{(.*?)}%/&Foswiki::Plugins::TimeTablePlugin::TimeTable::expand($1, $_[0], $_[1], $_[2])/ge;
+        $_[0] =~
+s/%TTCM{(.*?)}%/&Foswiki::Plugins::TimeTablePlugin::TimeTable::inflate($1, $_[0],$_[1],$_[2])/ge;
+        $_[0] =~ s/%TTCM%//g;
 
-	    $_[0] =~ s/%TTSETUP%//g;
-	    $_[0] =~ s/%TTSETUP{.*?}%//g;
+        $_[0] =~ s/%TTTOPICSETUP%//g;
+        $_[0] =~ s/%TTTOPICSETUP{.*?}%//g;
+
+        $_[0] =~ s/%TTSETUP%//g;
+        $_[0] =~ s/%TTSETUP{.*?}%//g;
     };
     &Foswiki::Func::writeWarning($@) if $@;
 }
@@ -276,10 +294,13 @@ handler.
 =cut
 
 sub DISABLE_beforeCommonTagsHandler {
+
     # do not uncomment, use $_[0], $_[1]... instead
     ### my ( $text, $topic, $web ) = @_;
 
-    Foswiki::Func::writeDebug( "- ${pluginName}::beforeCommonTagsHandler( $_[2].$_[1] )" ) if $debug;
+    Foswiki::Func::writeDebug(
+        "- ${pluginName}::beforeCommonTagsHandler( $_[2].$_[1] )")
+      if $debug;
 }
 
 =pod
@@ -302,10 +323,13 @@ handler.
 =cut
 
 sub DISABLE_afterCommonTagsHandler {
+
     # do not uncomment, use $_[0], $_[1]... instead
     ### my ( $text, $topic, $web ) = @_;
 
-    Foswiki::Func::writeDebug( "- ${pluginName}::afterCommonTagsHandler( $_[2].$_[1] )" ) if $debug;
+    Foswiki::Func::writeDebug(
+        "- ${pluginName}::afterCommonTagsHandler( $_[2].$_[1] )")
+      if $debug;
 }
 
 =pod
@@ -349,6 +373,7 @@ Since Foswiki::Plugins::VERSION = '1.026'
 =cut
 
 sub DISABLE_preRenderingHandler {
+
     # do not uncomment, use $_[0], $_[1]... instead
     #my( $text, $pMap ) = @_;
 }
@@ -368,6 +393,7 @@ Since Foswiki::Plugins::VERSION = '1.026'
 =cut
 
 sub DISABLE_postRenderingHandler {
+
     # do not uncomment, use $_[0], $_[1]... instead
     #my $text = shift;
 }
@@ -388,10 +414,13 @@ __Since:__ Foswiki::Plugins::VERSION = '1.010'
 =cut
 
 sub DISABLE_beforeEditHandler {
+
     # do not uncomment, use $_[0], $_[1]... instead
     ### my ( $text, $topic, $web ) = @_;
 
-    Foswiki::Func::writeDebug( "- ${pluginName}::beforeEditHandler( $_[2].$_[1] )" ) if $debug;
+    Foswiki::Func::writeDebug(
+        "- ${pluginName}::beforeEditHandler( $_[2].$_[1] )")
+      if $debug;
 }
 
 =pod
@@ -413,10 +442,13 @@ __Since:__ Foswiki::Plugins::VERSION = '1.010'
 =cut
 
 sub DISABLE_afterEditHandler {
+
     # do not uncomment, use $_[0], $_[1]... instead
     ### my ( $text, $topic, $web ) = @_;
 
-    Foswiki::Func::writeDebug( "- ${pluginName}::afterEditHandler( $_[2].$_[1] )" ) if $debug;
+    Foswiki::Func::writeDebug(
+        "- ${pluginName}::afterEditHandler( $_[2].$_[1] )")
+      if $debug;
 }
 
 =pod
@@ -436,10 +468,13 @@ __Since:__ Foswiki::Plugins::VERSION = '1.010'
 =cut
 
 sub DISABLE_beforeSaveHandler {
+
     # do not uncomment, use $_[0], $_[1]... instead
     ### my ( $text, $topic, $web ) = @_;
 
-    Foswiki::Func::writeDebug( "- ${pluginName}::beforeSaveHandler( $_[2].$_[1] )" ) if $debug;
+    Foswiki::Func::writeDebug(
+        "- ${pluginName}::beforeSaveHandler( $_[2].$_[1] )")
+      if $debug;
 }
 
 =pod
@@ -461,10 +496,13 @@ __Since:__ Foswiki::Plugins::VERSION = '1.020'
 =cut
 
 sub DISABLE_afterSaveHandler {
+
     # do not uncomment, use $_[0], $_[1]... instead
     ### my ( $text, $topic, $web, $error, $meta ) = @_;
 
-    Foswiki::Func::writeDebug( "- ${pluginName}::afterSaveHandler( $_[2].$_[1] )" ) if $debug;
+    Foswiki::Func::writeDebug(
+        "- ${pluginName}::afterSaveHandler( $_[2].$_[1] )")
+      if $debug;
 }
 
 =pod
@@ -486,9 +524,12 @@ __Since:__ Foswiki::Plugins::VERSION = '1.023'
 =cut
 
 sub DISABLE_beforeAttachmentSaveHandler {
+
     # do not uncomment, use $_[0], $_[1]... instead
     ###   my( $attrHashRef, $topic, $web ) = @_;
-    Foswiki::Func::writeDebug( "- ${pluginName}::beforeAttachmentSaveHandler( $_[2].$_[1] )" ) if $debug;
+    Foswiki::Func::writeDebug(
+        "- ${pluginName}::beforeAttachmentSaveHandler( $_[2].$_[1] )")
+      if $debug;
 }
 
 =pod
@@ -509,9 +550,12 @@ __Since:__ Foswiki::Plugins::VERSION = '1.023'
 =cut
 
 sub DISABLE_afterAttachmentSaveHandler {
+
     # do not uncomment, use $_[0], $_[1]... instead
     ###   my( $attrHashRef, $topic, $web ) = @_;
-    Foswiki::Func::writeDebug( "- ${pluginName}::afterAttachmentSaveHandler( $_[2].$_[1] )" ) if $debug;
+    Foswiki::Func::writeDebug(
+        "- ${pluginName}::afterAttachmentSaveHandler( $_[2].$_[1] )")
+      if $debug;
 }
 
 =pod
@@ -567,7 +611,8 @@ __Since:__ Foswiki::Plugins::VERSION 1.026
 sub DISABLE_modifyHeaderHandler {
     my ( $headers, $query ) = @_;
 
-    Foswiki::Func::writeDebug( "- ${pluginName}::modifyHeaderHandler()" ) if $debug;
+    Foswiki::Func::writeDebug("- ${pluginName}::modifyHeaderHandler()")
+      if $debug;
 }
 
 =pod
@@ -587,10 +632,13 @@ __Since:__ Foswiki::Plugins::VERSION = '1.010'
 =cut
 
 sub DISABLE_redirectCgiQueryHandler {
+
     # do not uncomment, use $_[0], $_[1] instead
     ### my ( $query, $url ) = @_;
 
-    Foswiki::Func::writeDebug( "- ${pluginName}::redirectCgiQueryHandler( query, $_[1] )" ) if $debug;
+    Foswiki::Func::writeDebug(
+        "- ${pluginName}::redirectCgiQueryHandler( query, $_[1] )")
+      if $debug;
 }
 
 =pod
@@ -611,7 +659,6 @@ Return HTML text that renders this field. If false, form rendering continues by 
 sub DISABLE_renderFormFieldForEditHandler {
 }
 
-
 =pod
 
 
@@ -627,8 +674,9 @@ For more information, check Foswiki:System.CommandAndCGIScripts#rest
 =cut
 
 sub restExample {
-   #my ($session) = @_;
-   return "This is an example of a REST invocation\n\n";
+
+    #my ($session) = @_;
+    return "This is an example of a REST invocation\n\n";
 }
 
 1;

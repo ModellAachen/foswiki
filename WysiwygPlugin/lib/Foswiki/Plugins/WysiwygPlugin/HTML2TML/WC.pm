@@ -37,6 +37,7 @@ our $BR2NL         = 1 << 5;
 our $KEEP_WS       = 1 << 6;
 our $PROTECTED     = 1 << 7;
 our $KEEP_ENTITIES = 1 << 8;
+our $IN_TABLE      = 1 << 9;
 
 our $BLOCK_TML = $NO_BLOCK_TML;
 
@@ -86,16 +87,16 @@ process.
 
 =cut
 
-our $CHECKn = chr( $cc{CHECKn} );
-our $CHECKs = chr( $cc{CHECKs} );
-our $CHECKw = chr( $cc{CHECKw} );
-our $CHECK1 = chr( $cc{CHECK1} );
-our $CHECK2 = chr( $cc{CHECK2} );
-our $TAB    = chr( $cc{TAB} );
-our $PON    = chr( $cc{PON} );
-our $POFF   = chr( $cc{POFF} );
+our $CHECKn   = chr( $cc{CHECKn} );
+our $CHECKs   = chr( $cc{CHECKs} );
+our $CHECKw   = chr( $cc{CHECKw} );
+our $CHECK1   = chr( $cc{CHECK1} );
+our $CHECK2   = chr( $cc{CHECK2} );
+our $TAB      = chr( $cc{TAB} );
+our $PON      = chr( $cc{PON} );
+our $POFF     = chr( $cc{POFF} );
 our $WS_NOTAB = qr/[$NBSP$NBBR$CHECKn$CHECKs$CHECKw$CHECK1$CHECK2\s]*/;
-our $WS     = qr/[$NBSP$NBBR$CHECKn$CHECKs$CHECKw$CHECK1$CHECK2$TAB\s]*/;
+our $WS       = qr/[$NBSP$NBBR$CHECKn$CHECKs$CHECKw$CHECK1$CHECK2$TAB\s]*/;
 
 =pod
 

@@ -12,10 +12,10 @@
        =root="Web.SomeTopic"=           | 'Root', or starting topic. The initial value of =$super= in the =query= param on the first iteration. | =%<nop>BASETOPIC%= (current topic) |
      | =query="&lt;= [[%SYSTEMWEB%.QuerySearch][QuerySearch expression]] =&gt;"= | %SYSTEMWEB%.QuerySearch expression to apply at each recursion step; may be thought of as generating a list of children for a given parent. See [[#QueryTokens][query tokens]] for a list of special tokens allowed in the query string. | =parent.name='$supertopic'= |
      | =header="..."= %BR% \
-       =footer="..."=                   | Custom format results: see [[FormattedSearch]] for usage &amp; examples | =*Search: '$rootquery'*$n= %BR% =*Total: $ntopics*= |
+       =footer="..."=                   | Custom format results: see [[FormattedSearch]] for usage &amp; examples | =<verbatim class="tml">*Search: <code class="tml">$rootquery</code> from <nop>$root* $n</verbatim>= %BR% =$n*Total: $ntopics*$n= |
      | =format="..."= %BR% \
-       =formatbranch="..."= %BR% \
-       =formatleaf="..."=               | Custom format results: see [[FormattedSearch]] for usage &amp; examples; "branch" format is for nodes which have descendents; "leaf" format is for terminating nodes for which there are no others below. | =$indent* [<nop>[$web.<nop>$topic][$topic]]= |
+       =branchformat="..."= %BR% \
+       =leafformat="..."=               | Custom format results: see [[FormattedSearch]] for usage &amp; examples; "branch" format is for nodes which have descendents; "leaf" format is for terminating nodes for which there are no others below. | =$indent* [<nop>[$web.<nop>$topic][$topic]]= |
      | =branchheader="..."= %BR% \
        =branchfooter="..."=                   | Custom format results: see [[FormattedSearch]] for usage &amp; examples | |
      | =separator="..."= | Separator _between_ search hits. See [[#FormatTokens]] | =$n= |

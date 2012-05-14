@@ -44,10 +44,13 @@ sub stringForFile {
 
     unlink($tmp_file);
 
+    $text = $self->decode($text, $Foswiki::cfg{StringifierContrib}{CharSet}{abiword} || 'utf-8');
+    $text = $self->encode($text);
+
     $text =~ s/^\s+//g;
     $text =~ s/\s+$//g;
 
-    return $self->fromUtf8($text);
+    return $text;
 }
 
 1;

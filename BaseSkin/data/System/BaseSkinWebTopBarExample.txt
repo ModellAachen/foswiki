@@ -1,7 +1,9 @@
 <noautolink>%TMPL:P{"startsection" class="foswikiBar foswikiTopBar foswikiColorNavigationPrimary"}%
 	<nav>
-		<a class='foswikiLogo' href='%SCRIPTURL{view}%/%BASEWEB%/%HOMETOPIC%'></a>
 		<ul class='foswikiNavigation' data-dropdown='dropdown'>
+			<li class='foswikiLogo'>
+				<a href='%SCRIPTURL{view}%/%BASEWEB%/%HOMETOPIC%'></a>	
+			</li>
 			<li>
 				<a href='%SCRIPTURL{view}%/%BASEWEB%/%HOMETOPIC%'>%MAKETEXT{"Home"}%</a>
 			</li>
@@ -14,7 +16,11 @@
 					<li>[[WebChanges][%MAKETEXT{"Changes"}%]]</li>
 					<li>[[WebNotify][%MAKETEXT{"Notifications"}%]]</li>
 					<li>[[WebRss][%MAKETEXT{"RSS Feed"}%]]</li>
-					<li>[[%STATISTICSTOPIC%][%MAKETEXT{"Statistics"}%]]</li>
+					<li>%IF{
+"istopic '%STATISTICSTOPIC%'"
+then="[[$percntSTATISTICSTOPIC$percnt][$percntMAKETEXT{\"Statistics\"}$percnt]]"
+else="$percntMAKETEXT{\"Statistics\"}$percnt" 
+						}%</li>
 					<li>[[WebPreferences][%MAKETEXT{"Preferences"}%]]</li>
 					<li class='divider'></li>
 					<li><p>Test</p></li>

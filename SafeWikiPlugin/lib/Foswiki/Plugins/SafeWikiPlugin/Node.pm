@@ -15,14 +15,14 @@ use Assert;
 use Foswiki::Func ();
 
 sub new {
-    my( $class, $tag, $attrs ) = @_;
+    my ( $class, $tag, $attrs ) = @_;
 
     my $this = {};
 
-    $this->{tag} = lc($tag);
+    $this->{tag}   = lc($tag);
     $this->{attrs} = {};
-    if( $attrs ) {
-        while (my ($k, $v) = each %$attrs) {
+    if ($attrs) {
+        while ( my ( $k, $v ) = each %$attrs ) {
             $this->{attrs}->{$k} = $v;
         }
     }
@@ -33,26 +33,27 @@ sub new {
 
 # debug generate the parse tree as HTML
 sub stringify {
-    my( $this, $shallow ) = @_;
+    my ( $this, $shallow ) = @_;
     my $r = '';
-    if( $this->{tag} ) {
-        $r .= '<'.$this->{tag};
-        foreach my $attr ( keys %{$this->{attrs}} ) {
-            if ($attr =~ /^\w+$/) {
-                $r .= " ".$attr."='".$this->{attrs}->{$attr}."'";
+    if ( $this->{tag} ) {
+        $r .= '<' . $this->{tag};
+        foreach my $attr ( keys %{ $this->{attrs} } ) {
+            if ( $attr =~ /^\w+$/ ) {
+                $r .= " " . $attr . "='" . $this->{attrs}->{$attr} . "'";
             }
         }
         $r .= '>';
     }
-    if( $shallow ) {
+    if ($shallow) {
         $r .= '...';
-    } else {
-        foreach my $kid ( @{$this->{children}} ) {
+    }
+    else {
+        foreach my $kid ( @{ $this->{children} } ) {
             $r .= $kid->stringify();
         }
     }
-    if( $this->{tag} ) {
-        $r .= '</'.lc($this->{tag}).'>';
+    if ( $this->{tag} ) {
+        $r .= '</' . lc( $this->{tag} ) . '>';
     }
     return $r;
 }
@@ -63,21 +64,26 @@ sub isLeaf {
 
 # Called by the parser
 sub addChild {
-    my( $this, $node ) = @_;
-    push( @{$this->{children}}, $node );
+    my ( $this, $node ) = @_;
+    push( @{ $this->{children} }, $node );
 }
 
 # generate the parse tree, applying filters
 sub generate {
-    my ($this, $filterURI, $filterHandler) = @_;
+    my ( $this, $filterURI, $filterHandler, $filterInline ) = @_;
     my $tag = $this->{tag};
 
     # make the names of the function versions
-    my $f = '_'.uc( $tag );
-    $f =~ s/[^\w]//; # clean up !DOCTYPE etc
+    my $f = uc($tag);
+    $f =~ s/[^\w]//;    # clean up !DOCTYPE etc
+
+    # See if we have a simple attributes filter for this tag
+    $this->_filterURIs( $f, $filterURI );
 
     # See if we have a tag-specific function for this tag type
-    if ($this->can($f)) {
+    $f = "_$f";
+    if ( $this->can($f) ) {
+
         # if the fn returns false, filter the entire tag and all children
         return '' unless $this->$f($filterURI);
     }
@@ -87,168 +93,70 @@ sub generate {
 
     # Process children
     my $text = '';
-    foreach my $kid ( @{$this->{children}} ) {
-        $text .= $kid->generate($filterURI, $filterHandler);
+    foreach my $kid ( @{ $this->{children} } ) {
+        $text .= $kid->generate( $filterURI, $filterHandler, $filterInline );
     }
 
     # Rebuild the tag parameters
     my @params;
-    while (my ($k, $v) = each %{$this->{attrs}} ) {
+    while ( my ( $k, $v ) = each %{ $this->{attrs} } ) {
         next unless $k && $k =~ /^\w+$/;
         my $q = $v =~ m/"/ ? "'" : '"';
-        push( @params, $k.'='.$q.$v.$q );
+        push( @params, $k . '=' . $q . $v . $q );
     }
     my $p = join( ' ', @params );
-    $p = ' '.$p if $p;
+    $p = ' ' . $p if $p;
+
+    if ( $tag =~ m/^script$/ && $text ) {
+        my $holdtext = $text;
+        $text = &$filterInline($text);
+        return '' unless ($text);
+    }
 
     # Rebuild the tag
-    if ($text eq '' && $tag =~ /^(p|br|img|hr|input|meta|link)$/i) {
+    if ( $text eq '' && $tag =~ /^(p|br|img|hr|input|meta|link)$/i ) {
         return "<$tag$p />";
-    } else {
+    }
+    else {
         return "<$tag$p>$text</$tag>";
     }
 }
 
 # remove the event handlers named in the parameters from the tag
 sub _filterHandlers {
-    my ($this, $filter) = @_;
+    my ( $this, $filter ) = @_;
 
-    foreach my $attr (keys %{$this->{attrs}}) {
+    foreach my $attr ( keys %{ $this->{attrs} } ) {
         next unless $attr =~ /^on[a-z]+$/i;
-        $this->{attrs}->{$attr} = &$filter($this->{attrs}->{$attr});
-        ASSERT(defined $this->{attrs}->{$attr}) if DEBUG;
+        $this->{attrs}->{$attr} = &$filter( $this->{attrs}->{$attr} );
+        ASSERT( defined $this->{attrs}->{$attr} ) if DEBUG;
     }
 }
 
 sub _filterURIs {
-    my $this = shift;
-    my $filter = shift;
-
-    foreach my $attr (@_) {
-        if (defined($this->{attrs}->{$attr})) {
-            $this->{attrs}->{$attr} = &$filter($this->{attrs}->{$attr});
-            ASSERT(defined $this->{attrs}->{$attr}) if DEBUG;
+    my ( $this, $tag, $filter ) = @_;
+    if ( exists $Foswiki::cfg{Plugins}{SafeWikiPlugin}{Tags}{$tag} ) {
+        foreach
+          my $attr ( @{ $Foswiki::cfg{Plugins}{SafeWikiPlugin}{Tags}{$tag} } )
+        {
+            if ( defined( $this->{attrs}->{$attr} ) ) {
+                $this->{attrs}->{$attr} = &$filter( $this->{attrs}->{$attr} );
+                ASSERT( defined $this->{attrs}->{$attr} ) if DEBUG;
+            }
         }
     }
-    return 1;
 }
 
 # The following functions are each called when the tag with the same name
 # is being generated. If the function returns 0, the tag is completely
-# removed. For the most part these functions just filter the URI-valued
-# attributes of the tags.
-
-sub _A {
-    my ($this, $filter) = @_;
-    $this->_filterURIs($filter, 'href')
-      if $Foswiki::cfg{Plugins}{SafeWikiPlugin}{FilterAll};
-    return 1;
-}
-
-sub _APPLET {
-    my ($this, $filter) = @_;
-    $this->_filterURIs($filter, 'archive', 'code', 'codebase');
-    return 1;
-}
-
-sub _AREA {
-    my ($this, $filter) = @_;
-    $this->_filterURIs($filter, 'href')
-      if $Foswiki::cfg{Plugins}{SafeWikiPlugin}{FilterAll};
-    return 1;
-}
-
-sub _BASE {
-    my ($this, $filter) = @_;
-    $this->_filterURIs($filter, 'href')
-      if $Foswiki::cfg{Plugins}{SafeWikiPlugin}{FilterAll};
-    return 1;
-}
-
-sub _BLOCKQUOTE {
-    my ($this, $filter) = @_;
-    $this->_filterURIs($filter, 'cite')
-      if $Foswiki::cfg{Plugins}{SafeWikiPlugin}{FilterAll};
-    return 1;
-}
-
-sub _BODY {
-    my ($this, $filter) = @_;
-    $this->_filterURIs($filter, 'background')
-      if $Foswiki::cfg{Plugins}{SafeWikiPlugin}{FilterAll};
-    return 1;
-}
-
-sub _DEL {
-    my ($this, $filter) = @_;
-    $this->_filterURIs($filter, 'cite')
-      if $Foswiki::cfg{Plugins}{SafeWikiPlugin}{FilterAll};
-    return 1;
-}
-
-sub _EMBED {
-    my ($this, $filter) = @_;
-    $this->_filterURIs($filter, 'pluginspace', 'pluginurl', 'src');
-    $this->_filterURIs($filter, 'href', 'target', 'src')
-      if $Foswiki::cfg{Plugins}{SafeWikiPlugin}{FilterAll};
-    return 1;
-}
+# removed. Tags where we just want to filter the URI-valued
+# attributes of the tags can be added to $filterAttrs; these functions
+# are for "special cases" e.g. rewriting FORM action methods to always
+# use POST.
 
 sub _FORM {
-    my ($this, $filter) = @_;
-    $this->_filterURIs($filter, 'action')
-      if $Foswiki::cfg{Plugins}{SafeWikiPlugin}{FilterAll};
+    my ($this) = @_;
     $this->{attrs}->{method} = 'POST';
-    return 1;
-}
-
-sub _FRAME {
-    my ($this, $filter) = @_;
-    $this->_filterURIs($filter, 'src', 'longdesc')
-      if $Foswiki::cfg{Plugins}{SafeWikiPlugin}{FilterAll};
-    return 1;
-}
-
-sub _IFRAME {
-    my ($this, $filter) = @_;
-    $this->_filterURIs($filter, 'src', 'longdesc')
-      if $Foswiki::cfg{Plugins}{SafeWikiPlugin}{FilterAll};
-    return 1;
-}
-
-sub _IMG {
-    my ($this, $filter) = @_;
-    $this->_filterURIs($filter, 'src', 'longdesc', 'usemap')
-      if $Foswiki::cfg{Plugins}{SafeWikiPlugin}{FilterAll};
-    return 1;
-}
-
-sub _INPUT {
-    my ($this, $filter) = @_;
-    $this->_filterURIs($filter, 'src', 'usemap')
-      if $Foswiki::cfg{Plugins}{SafeWikiPlugin}{FilterAll};
-    return 1;
-}
-
-sub _LINK {
-    my ($this, $filter) = @_;
-    $this->_filterURIs($filter, 'href')
-      if $Foswiki::cfg{Plugins}{SafeWikiPlugin}{FilterAll};
-    return 1;
-}
-
-sub _OBJECT {
-    my ($this, $filter) = @_;
-    $this->_filterURIs($filter, 'archive', 'codebase');
-    $this->_filterURIs($filter, 'data', 'usemap')
-      if $Foswiki::cfg{Plugins}{SafeWikiPlugin}{FilterAll};
-    return 1;
-}
-
-sub _SCRIPT {
-    my ($this, $filter) = @_;
-    return 0 unless (defined($this->{attrs}->{src}));
-    $this->_filterURIs($filter, 'src');
     return 1;
 }
 

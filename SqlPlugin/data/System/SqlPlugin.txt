@@ -79,6 +79,9 @@ The first sets up a connection to a mysql database called "foswiki" on the local
 %$INSTALL_INSTRUCTIONS%
 
 ---++ Info
+<!--
+   * Set SHORTDESCRIPTION = SQL interface for Foswiki
+-->
 
 |  Author(s): | Foswiki:MichaelDaum|
 |  Copyright: | &copy; 2009-2010 Michael Daum http://michaeldaumconsulting.com |

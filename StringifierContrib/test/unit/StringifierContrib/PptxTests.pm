@@ -1,13 +1,13 @@
 # Test for PPTX.pm
 package PptxTests;
-use FoswikiFnTestCase;
-our @ISA = qw( FoswikiFnTestCase );
+use StringifierTest;
+our @ISA = qw( StringifierTest );
 
 use strict;
+use utf8;
 
 use Foswiki::Contrib::Stringifier::Base();
 use Foswiki::Contrib::Stringifier();
-use utf8;
 
 sub set_up {
     my $this = shift;
@@ -48,7 +48,7 @@ sub test_SpecialCharacters {
 
     my $text  = $stringifier->stringForFile($this->{attachmentDir}.'Simple_example.pptx');
 
-    $this->assert_matches('Übergang', $text, "Text Übergang not found.");
+    $this->assert_matches($this->encode('Übergang'), $text, "Text Größer not found.");
 }
 
 # test for Passworded_example.pptx

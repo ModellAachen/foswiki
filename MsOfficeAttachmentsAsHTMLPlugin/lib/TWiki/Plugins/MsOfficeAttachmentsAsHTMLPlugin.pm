@@ -28,6 +28,7 @@ my $pluginName = 'MsOfficeAttachmentsAsHTMLPlugin';
 our $afterSaveHandlerSemaphore;
 
 sub initPlugin {
+
     #my ( $topic, $web, $user, $installWeb ) = @_;
     undef $afterSaveHandlerSemaphore;
     return 1;
@@ -44,14 +45,14 @@ sub afterAttachmentSaveHandler {
 
     my $htmlName = "$attachmentName.html";
 
-    my $cmd =
-      $TWiki::cfg{Plugins}{MsOfficeAttachmentsAsHTMLPlugin}{doc2html};
+    my $cmd = $TWiki::cfg{Plugins}{MsOfficeAttachmentsAsHTMLPlugin}{doc2html};
 
-    my ($data, $exit) = $TWiki::sandbox->sysCommand(
+    my ( $data, $exit ) = $TWiki::sandbox->sysCommand(
         $cmd,
         ATTACHDIR => TWiki::Func::getPubDir() . "/$web/$topic",
-        SRC => TWiki::Func::getPubDir() . "/$web/$topic/$attachmentName$ext",
-        DEST => "$attachmentName.html");
+        SRC  => TWiki::Func::getPubDir() . "/$web/$topic/$attachmentName$ext",
+        DEST => "$attachmentName.html"
+    );
 
     die "$cmd failed with exit code $exit: $data" if $exit;
 
@@ -65,13 +66,12 @@ sub afterAttachmentSaveHandler {
 sub afterSaveHandler {
     return unless $afterSaveHandlerSemaphore;
 
-    my ($text, $topic, $web, $error, $meta) = @_;
+    my ( $text, $topic, $web, $error, $meta ) = @_;
 
     my $attachmentName = $afterSaveHandlerSemaphore;
     undef $afterSaveHandlerSemaphore;
 
-    $text =
-      TWiki::Func::getPreferencesValue("\U$pluginName\E_REPLACEMENTNOTE")
+    $text = TWiki::Func::getPreferencesValue("\U$pluginName\E_REPLACEMENTNOTE")
       || <<'DEFAULT';
 This text was automatically generated from the attachment $attachment
 %INCLUDE{%ATTACHURL%/$convertedAttachmentPath}%

@@ -1,4 +1,4 @@
-%META:TOPICINFO{author="ProjectContributor" date="1271175261" format="1.1" version="1.10"}%
+%META:TOPICINFO{author="ProjectContributor" date="1328265483" format="1.1" version="12"}%
 %META:TOPICPARENT{name="TopicFunction"}%
 %TOC{depth="2"}%
 
@@ -95,16 +95,19 @@ TODO: what do we display for topics that are not categorized?
 <!-- //rendersidebar -->%STOPINCLUDE%
 </verbatim>
 
+---++ Test
+%DBCALL{"%TOPIC%"}%
+
 %DBCALL{"Applications.RenderFunctionCallers"}%
 
 ---++ Copyright
-&copy; 2008-2010 Michael Daum http://michaeldaumconsulting.com
+&copy; 2008-2012 Michael Daum http://michaeldaumconsulting.com
 
 %DBCALL{"Applications.GnuGeneralPublicLicense" section="notice"}%
 
 
 %META:FORM{name="Applications.ApplicationTopic"}%
 %META:FIELD{name="TopicType" title="TopicType" value="DocuTopic, TopicFunction"}%
-%META:FIELD{name="TopicTitle" attributes="" title="<nop>TopicTitle" value="RenderSideBar"}%
-%META:FIELD{name="Summary" attributes="" title="Summary" value="Render tools to handle categories"}%
+%META:FIELD{name="TopicTitle" attributes="" title="<nop>TopicTitle" value=""}%
+%META:FIELD{name="Summary" attributes="c" title="Summary" value="Render tools to handle categories"}%
 %META:FIELD{name="WikiApplication" attributes="" title="WikiApplication" value="ClassificationApp"}%

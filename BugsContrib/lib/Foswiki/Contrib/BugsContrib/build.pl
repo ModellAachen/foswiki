@@ -5,7 +5,7 @@
 package BugsContribBuild;
 
 BEGIN {
-    foreach my $pc (split(/:/, $ENV{FOSWIKI_LIBS})) {
+    foreach my $pc ( split( /:/, $ENV{FOSWIKI_LIBS} ) ) {
         unshift @INC, $pc;
     }
 }
@@ -15,8 +15,8 @@ our @ISA = qw( Foswiki::Contrib::Build );
 
 sub new {
     my $class = shift;
-    return bless( $class->SUPER::new( "BugsContrib" ), $class );
+    return bless( $class->SUPER::new("BugsContrib"), $class );
 }
 
 $build = new BugsContribBuild();
-$build->build($build->{target});
+$build->build( $build->{target} );

@@ -10,7 +10,7 @@
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details, published at 
+# GNU General Public License for more details, published at
 # http://www.gnu.org/copyleft/gpl.html
 #
 ###############################################################################
@@ -39,10 +39,10 @@ sub convert {
 
   $this->{session} = $session || $Foswiki::Plugins::SESSION;
 
-  throw Error::Simple("no source web specified") 
+  throw Error::Simple("no source web specified")
     unless $sourceWeb;
 
-  throw Error::Simple("no such web $sourceWeb") 
+  throw Error::Simple("no such web $sourceWeb")
     unless Foswiki::Func::webExists($sourceWeb);
 
   $this->{sourceWeb} = $sourceWeb;
@@ -69,7 +69,7 @@ sub convert {
 
   #print STDERR "### sourceWeb=$sourceWeb\n";
   #print STDERR "### targetWeb=$targetWeb\n";
-  
+
   # 1. create the target web
   $this->createTargetWeb();
 
@@ -80,26 +80,28 @@ sub convert {
   $this->convertBlogEntries;
 
   # 4. convert BlogPage topics
-#  $this->convertBlogPages;
+  #  $this->convertBlogPages;
 
   # 5. copy the BlogImages topic
   $this->copyBlogImages;
 
   # 6. merge BlogComment topics
-  $this->convertBlogComments
+  $this->convertBlogComments;
 }
 
 ###############################################################################
 sub createTargetWeb {
   my $this = shift;
 
-  my $webSummary = 
-    Foswiki::Func::getPreferencesValue("SITEMAPUSETO", $this->{sourceWeb}) ||
-    Foswiki::Func::getPreferencesValue("SITEMAPWHAT", $this->{sourceWeb}) ||
-    Foswiki::Func::getPreferencesValue("WEBSUMMARY", $this->{sourceWeb}) || '';
+  my $webSummary =
+       Foswiki::Func::getPreferencesValue("SITEMAPUSETO", $this->{sourceWeb})
+    || Foswiki::Func::getPreferencesValue("SITEMAPWHAT", $this->{sourceWeb})
+    || Foswiki::Func::getPreferencesValue("WEBSUMMARY", $this->{sourceWeb})
+    || '';
 
   my $targetWebObj = new Foswiki::Meta($this->{session}, $this->{targetWeb});
-  $targetWebObj->populateNewWeb($this->{templateWeb},
+  $targetWebObj->populateNewWeb(
+    $this->{templateWeb},
     {
       WEBSUMMARY => $webSummary,
       WEBBGCOLOR => Foswiki::Func::getPreferencesValue("WEBBGCOLOR", $this->{sourceWeb}),
@@ -116,10 +118,14 @@ sub convertCategories {
   my $this = shift;
 
   # search all SubjectCategory topics in the source web
-  my $matches = Foswiki::Func::query('TopicType=~".*SubjectCategory.*"', undef, {
-    type => 'query',
-    web => $this->{sourceWeb},
-  });
+  my $matches = Foswiki::Func::query(
+    'TopicType=~".*SubjectCategory.*"',
+    undef,
+    {
+      type => 'query',
+      web => $this->{sourceWeb},
+    }
+  );
 
   my $count = 0;
   while ($matches->hasNext) {
@@ -139,7 +145,6 @@ sub convertCategory {
 
   my ($oldTopic, $text) = Foswiki::Func::readTopic($web, $topic);
 
-
   my $newTopicTitle = $topic;
   $newTopicTitle =~ s/^(.+)(Category)?$/$1/g;
   my $newTopicName = $newTopicTitle . 'Category';
@@ -150,30 +155,33 @@ sub convertCategory {
   my $newText = '%DBCALL{"Applications.ClassificationApp.RenderCategory"}%';
   my $newTopic = new Foswiki::Meta($this->{session}, $this->{targetWeb}, $newTopicName, $newText);
 
-  $newTopic->putKeyed('FORM', { name => "Applications.ClassificationApp.Category" } );
+  $newTopic->putKeyed('FORM', { name => "Applications.ClassificationApp.Category" });
 
   my @fields = ();
 
-  push @fields, {
+  push @fields,
+    {
     name => "TopicType",
     title => "TopicType",
     value => "Category, CategorizedTopic",
-  };
+    };
 
-  my $topicTitle =  $oldTopic->get("FIELD", "TopicTitle");
-  $topicTitle = defined( $topicTitle)?$topicTitle->{value}:$newTopicTitle;
+  my $topicTitle = $oldTopic->get("FIELD", "TopicTitle");
+  $topicTitle = defined($topicTitle) ? $topicTitle->{value} : $newTopicTitle;
 
-  push @fields, {
+  push @fields,
+    {
     name => "TopicTitle",
     title => "<nop>TopicTitle",
     value => $topicTitle,
-  };
+    };
 
-  push @fields, {
+  push @fields,
+    {
     name => "Summary",
     title => "Summary",
     value => $oldTopic->get("FIELD", "Summary")->{value},
-  };
+    };
 
   $newTopic->putAll("FIELD", @fields);
   $newTopic->save;
@@ -204,20 +212,25 @@ sub copyBlogImages {
 sub convertBlogComments {
   my $this = shift;
 
-  my $matches = Foswiki::Func::query('TopicType=~".*BlogComment.*"', undef, {
-    type => 'query',
-    web => $this->{sourceWeb},
-  });
+  my $matches = Foswiki::Func::query(
+    'TopicType=~".*BlogComment.*"',
+    undef,
+    {
+      type => 'query',
+      web => $this->{sourceWeb},
+    }
+  );
 
   my $count = 0;
   my @comments = ();
   while ($matches->hasNext) {
     my $webTopic = $matches->next;
     my ($web, $topic) = Foswiki::Func::normalizeWebTopicName($this->{sourceWeb}, $webTopic);
-    push @comments, {
+    push @comments,
+      {
       web => $web,
       topic => $topic,
-    };
+      };
     my ($comment) = Foswiki::Func::readTopic($web, $topic);
     my $number = $comment->get('FIELD', 'Nr');
     if ($number) {
@@ -270,25 +283,25 @@ sub convertBlogComment {
   my ($baseMeta) = Foswiki::Func::readTopic($this->{targetWeb}, $baseRef);
 
   my $name = $comment->get('FIELD', 'Nr');
-  $name = convertCommentNumberToName($name?$name->{value}:'0');
+  $name = convertCommentNumberToName($name ? $name->{value} : '0');
 
   my $title = $comment->get('FIELD', 'TopicTitle');
-  $title = $title?$title->{value}:"";
+  $title = $title ? $title->{value} : "";
 
   my $text = $comment->get('FIELD', 'Text');
-  $text = $text?$text->{value}:"";
+  $text = $text ? $text->{value} : "";
   $text =~ s/\%CITEBLOG{\"?(.*?)\"}\%/[[$1]]/g;
 
   my ($date, $revAuthor) = $comment->getRevisionInfo();
 
   my $author => $comment->get('FIELD', 'Name');
-  $author = Foswiki::Func::getWikiName($author?$author->{value}:$revAuthor);
-  
+  $author = Foswiki::Func::getWikiName($author ? $author->{value} : $revAuthor);
+
   $author = 'WikiGuest' if $author eq 'TWikiGuest';
   $author = 'AdminUser' if $author eq 'TWikiAdmin';
 
   my $ref = $comment->get('FIELD', 'BlogRef');
-  $ref = $ref?$ref->{value}:'';
+  $ref = $ref ? $ref->{value} : '';
 
   $ref = '' if $ref eq $topic;
   if ($this->{nameOfComment}{$ref}) {
@@ -297,19 +310,22 @@ sub convertBlogComment {
     $ref = '';
   }
 
-  $baseMeta->putKeyed('COMMENT', {
-    name => $name,
-    ref => $ref,
-    author => $author,
-    date => $date,
-    text => $text,
-    title => $title,
-    state => "approved", #default
-  });
+  $baseMeta->putKeyed(
+    'COMMENT',
+    {
+      name => $name,
+      ref => $ref,
+      author => $author,
+      date => $date,
+      text => $text,
+      title => $title,
+      state => "approved",    #default
+    }
+  );
 
   $baseMeta->save();
 
-  return 1; # success
+  return 1;                   # success
 }
 
 ###############################################################################
@@ -329,10 +345,14 @@ sub convertBlogEntries {
   my $this = shift;
 
   # search all BlogEntry topics in the source web
-  my $matches = Foswiki::Func::query('TopicType=~".*BlogEntry.*"', undef, {
-    type => 'query',
-    web => $this->{sourceWeb},
-  });
+  my $matches = Foswiki::Func::query(
+    'TopicType=~".*BlogEntry.*"',
+    undef,
+    {
+      type => 'query',
+      web => $this->{sourceWeb},
+    }
+  );
 
   my $count = 0;
   while ($matches->hasNext) {
@@ -358,64 +378,63 @@ sub convertBlogEntry {
   $newText =~ s/\%CITEBLOG{\"?(.*?)\"}\%/[[$1]]/g;
 
   my $newTopic = new Foswiki::Meta($this->{session}, $this->{targetWeb}, $topic, $newText);
-  $newTopic->putKeyed('FORM', { name => "Applications.BlogApp.BlogEntry" } );
+  $newTopic->putKeyed('FORM', { name => "Applications.BlogApp.BlogEntry" });
 
   my @fields = ();
 
-  push @fields, {
+  push @fields,
+    {
     name => "TopicType",
     title => "TopicType",
     value => "BlogEntry, ClassifiedTopic, CategorizedTopic, TaggedTopic",
-  };
-  
-  push @fields, {
+    };
+
+  push @fields,
+    {
     name => "TopicTitle",
     title => "<nop>TopicTitle",
     value => $meta->get("FIELD", "TopicTitle")->{value},
-  };
+    };
 
   my $tags = join(", ", split(/[\s,]+/, $meta->get("FIELD", "BlogTag")->{value}));
   print STDERR "### ... tags=$tags\n";
 
-  push @fields, {
+  push @fields,
+    {
     name => "Tag",
     title => "Tag",
     value => $tags,
-  };
+    };
 
-  my $categories = join(", ", map($_ = (defined $this->{renamedCategories}{$_})?$this->{renamedCategories}{$_}:$_, split(/\s*,\s*/, $meta->get("FIELD", "SubjectCategory")->{value})));
+  my $categories = join(", ", map($_ = (defined $this->{renamedCategories}{$_}) ? $this->{renamedCategories}{$_} : $_, split(/\s*,\s*/, $meta->get("FIELD", "SubjectCategory")->{value})));
 
   print STDERR "### ... categories = $categories\n";
 
-  push @fields, {
+  push @fields,
+    {
     name => "Category",
     title => "Category",
     value => $categories,
-  };
+    };
 
   my $blogState = $meta->get("FIELD", "State")->{value};
-  push @fields, {
+  push @fields,
+    {
     name => "State",
     title => "State",
     value => $blogState,
-  };
+    };
 
   if ($blogState ne 'published') {
-    $newTopic->putAll("PREFERENCE", 
-      { name => "ALLOWTOPICVIEW", title => "ALLOWTOPICVIEW", type => "Set", value => "BlogAuthorGroup" },
-      { name => "PERMSET_VIEW", title => "PERMSET_VIEW", type => "Local", value => "details" },
-      { name => "PERMSET_VIEW_DETAILS", title => "PERMSET_VIEW_DETAILS", type => "Local", value => "BlogAuthorGroup" },
-    );
+    $newTopic->putAll("PREFERENCE", { name => "ALLOWTOPICVIEW", title => "ALLOWTOPICVIEW", type => "Set", value => "BlogAuthorGroup" }, { name => "PERMSET_VIEW", title => "PERMSET_VIEW", type => "Local", value => "details" }, { name => "PERMSET_VIEW_DETAILS", title => "PERMSET_VIEW_DETAILS", type => "Local", value => "BlogAuthorGroup" },);
   }
 
-  $newTopic->putKeyed("PREFERENCE", 
-      { name => "DISPLAYCOMMENTS", title => "DISPLAYCOMMENTS", type => "Local", value => "on" }
-  );
+  $newTopic->putKeyed("PREFERENCE", { name => "DISPLAYCOMMENTS", title => "DISPLAYCOMMENTS", type => "Local", value => "on" });
 
   $newTopic->putAll("FIELD", @fields);
 
   my $author = $meta->get("FIELD", "BlogAuthor")->{value};
-  $author =~ s/^.*\.//g; # strip web
+  $author =~ s/^.*\.//g;    # strip web
   $author = Foswiki::Func::getCanonicalUserID($author) || $author;
 
   #print STDERR "author=$author\n";
@@ -424,10 +443,10 @@ sub convertBlogEntry {
   $date = Foswiki::Time::parseTime($date);
 
   # save it once, and then ...
-  $newTopic->save(forcedate=>$date, author=>$author);
+  $newTopic->save(forcedate => $date, author => $author);
 
   # ... force a second revision to freeze the create time and author
-  $newTopic->save(forcedate=>$date, author=>$author, forcenewrevision=>1);
+  $newTopic->save(forcedate => $date, author => $author, forcenewrevision => 1);
 
   foreach my $attachment ($meta->find('FILEATTACHMENT')) {
     print STDERR "### copying attachment $attachment->{name}\n";

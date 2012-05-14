@@ -90,7 +90,8 @@ contentsCss : [
   "%PUBURLPATH%/%SYSTEMWEB%/CKEditorPlugin/ckeditor/modacContents%IF{"$CKEditorPlugin_DEBUG='1'" then="_source"}%.css",
   "%PUBURLPATH%/%SYSTEMWEB%/SkinTemplates/base.css",
   "%FOSWIKI_STYLE_URL%",
-  "%FOSWIKI_COLORS_URL%"
+  "%FOSWIKI_COLORS_URL%",
+  "%FOSWIKI_PROJECT_URL%"
 ]
 %ENDSECTION{"CKEPLUGIN_INIT"}%
 </verbatim>

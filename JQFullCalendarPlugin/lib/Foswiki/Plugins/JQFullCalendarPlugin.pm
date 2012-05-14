@@ -27,6 +27,8 @@ sub initPlugin {
   my ($topic, $web, $user) = @_;
 
   Foswiki::Plugins::JQueryPlugin::registerPlugin('fullcalendar', 'Foswiki::Plugins::JQFullCalendarPlugin::FULLCALENDAR');
+
+  return 1;
 }
 
 1;

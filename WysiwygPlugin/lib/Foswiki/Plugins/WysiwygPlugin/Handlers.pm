@@ -784,6 +784,7 @@ sub _restUpload {
         return;
     }
     my ( $web, $topic ) = ( $session->{webName}, $session->{topicName} );
+    my $relativePath = $query->param('relativepath') || '';
     my $hideFile    = $query->param('hidefile')    || '';
     my $fileComment = $query->param('filecomment') || '';
     my $createLink  = $query->param('createlink')  || '';
@@ -879,7 +880,6 @@ sub _restUpload {
     }
     
     # Dateipfad auslesen und zur weiteren Bearbeitung zurückgeben
-    # Dateipfad auslesen und zur weiteren Bearbeitung zurückgeben
     my $url = '';
     $url .= Foswiki::Func::getPubUrlPath();
     if ( $url !~ /^[a-z]+:/ ) {
@@ -890,7 +890,7 @@ sub _restUpload {
         # $url = Foswiki::Func::getUrlHost() . $url;
     }
     if ( $web || $topic || $fileName ) {
-        my $path = '/' . $web . '/' . $topic;
+        my $path = $web . '/' . $topic;
         if ($fileName) {
             $path .= '/' . $fileName;
 
@@ -901,7 +901,11 @@ sub _restUpload {
         else {
             #$url .= Foswiki::Func::urlEncode($path);
         }
-        $url .= $path;
+        if ($relativePath) {
+            $url = $path;
+        } else {
+            $url .= "/$path";
+        }
     }
 
     # Otherwise allow the rest dispatcher to write a 200

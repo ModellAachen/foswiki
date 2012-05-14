@@ -13,14 +13,14 @@
 # character set, it becomes impossible to change the character set in
 # the wiki, as the character set is associated with the wiki, and not
 # with individual topic revisions.
-# 
+#
 # The solution to this problem is to convert your wiki to use the
 # international UTF-8 encoding. That's what this module does. Even if
 # you don't have an immediate need for non-western character sets this
 # is worth doing, as Foswiki is moving in the direction of standardising
 # on UTF-8 for all data. Using UTF-8 resolves many problems of character
 # set conversion, most notably with WYSIWYG, so is highly recommended.
-# 
+#
 # Note that this module converts all the histories of all your topics,
 # as well as the latest version of the topic. It also maps all web,
 # topic and attachment names. It does not, however, touch the content of
@@ -40,15 +40,16 @@ use Foswiki::Contrib::CharsetConvertorContrib;
 
 # Parse command-line arguments
 my %args;
-while (my $a = shift @ARGV) {
-    if ($a =~ /(.*?)=(.*)/) {
-	$args{$1} = $2;
-    } else {
-	$args{$a} = 1;
+while ( my $a = shift @ARGV ) {
+    if ( $a =~ /(.*?)=(.*)/ ) {
+        $args{$1} = $2;
+    }
+    else {
+        $args{$a} = 1;
     }
 }
 
-unless ($args{-i}) {
+unless ( $args{-i} ) {
     local $/ = undef;
     print <<'INFORM';
 
@@ -80,15 +81,22 @@ Note that no conversion is performed on
 
 Once conversion is complete you must change your {Site}{CharSet} to 'utf-8'
 INFORM
-    die 'Cannot proceed without backup confirmation' unless
-	ask( "Have you backed up your data ($Foswiki::cfg{DataDir}) and pub ($Foswiki::cfg{PubDir}) directories" );
-    die 'Cannot proceed without confirmation of access permissions' unless
-	ask( "Do you have write permission on all files and directories in $Foswiki::cfg{DataDir} and $Foswiki::cfg{PubDir}" );
-    die 'Cannot proceed until you confirm that data is consistent with this setting' unless
-	ask( "\$Foswiki::cfg{Site}{CharSet} is set to '$Foswiki::cfg{Site}{CharSet}'. Is that correct for the data in your Foswiki database" );
+    die 'Cannot proceed without backup confirmation'
+      unless ask(
+"Have you backed up your data ($Foswiki::cfg{DataDir}) and pub ($Foswiki::cfg{PubDir}) directories"
+      );
+    die 'Cannot proceed without confirmation of access permissions'
+      unless ask(
+"Do you have write permission on all files and directories in $Foswiki::cfg{DataDir} and $Foswiki::cfg{PubDir}"
+      );
+    die
+'Cannot proceed until you confirm that data is consistent with this setting'
+      unless ask(
+"\$Foswiki::cfg{Site}{CharSet} is set to '$Foswiki::cfg{Site}{CharSet}'. Is that correct for the data in your Foswiki database"
+      );
 }
 
-Foswiki::Contrib::CharsetConvertorContrib::convertCollection('', %args);
+Foswiki::Contrib::CharsetConvertorContrib::convertCollection( '', %args );
 
 # Prompt user for a confirmation
 sub ask {

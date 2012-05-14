@@ -1,7 +1,7 @@
 %META:TOPICINFO{author="ProjectContributor" date="1212998722" format="1.1" version="1.2"}%
 %INCLUDE{"%SYSTEMWEB%.%TOPIC%"}%
 
-%META:FORM{name="Applications.TWikiTopic"}%
-%META:FIELD{name="TopicType" attributes="" title="TopicType" value="Applications.WebTool"}%
+%META:FORM{name="Applications.WikiTopic"}%
+%META:FIELD{name="TopicType" attributes="" title="TopicType" value="WebTool"}%
 %META:FIELD{name="TopicTitle" attributes="" title="<nop>TopicTitle" value=""}%
 %META:FIELD{name="Summary" attributes="" title="Summary" value="Index of all topics in this web"}%

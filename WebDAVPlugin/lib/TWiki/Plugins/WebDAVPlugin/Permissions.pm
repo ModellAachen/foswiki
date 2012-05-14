@@ -9,7 +9,7 @@
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details, published at 
+# GNU General Public License for more details, published at
 # http://www.gnu.org/copyleft/gpl.html
 #
 use strict;
@@ -24,7 +24,7 @@ use TWiki::Func;
 package TWiki::Plugins::WebDAVPlugin::Permissions;
 
 my $setGroupRE = qr/^\s+\*\s+Set\s+GROUP\s+=\s+(.+?)\s*$/;
-my $setWebRE = qr/^\s+\*\s+Set\s+(ALLOW|DENY)WEB([A-Z]+?)\s+=\s+(.+?)\s*$/;
+my $setWebRE   = qr/^\s+\*\s+Set\s+(ALLOW|DENY)WEB([A-Z]+?)\s+=\s+(.+?)\s*$/;
 my $setTopicRE = qr/^\s+\*\s+Set\s+(ALLOW|DENY)TOPIC([A-Z]+?)\s+=\s+(.+?)\s*$/;
 my $twikiPrefsTopic;
 my $webPrefsTopic;
@@ -37,17 +37,18 @@ sub new {
 
     $dbdir ||= $TWiki::cfg{Plugins}{WebDAVPlugin}{DAVLockDB};
 
-    if( defined( $TWiki::cfg{SitePrefsTopicName} )) {
+    if ( defined( $TWiki::cfg{SitePrefsTopicName} ) ) {
         $twikiPrefsTopic = $TWiki::cfg{SitePrefsTopicName};
-        $webPrefsTopic = $TWiki::cfg{WebPrefsTopicName};
-    } else {
+        $webPrefsTopic   = $TWiki::cfg{WebPrefsTopicName};
+    }
+    else {
         $twikiPrefsTopic = $TWiki::wikiPrefsTopicname;
-        $webPrefsTopic = $TWiki::webPrefsTopicname;
-        $isCairo = 1;
-    };
+        $webPrefsTopic   = $TWiki::webPrefsTopicname;
+        $isCairo         = 1;
+    }
 
-    $this->{dbfile} = $dbdir.'/TWiki';
-    $this->{db} = undef;
+    $this->{dbfile} = $dbdir . '/TWiki';
+    $this->{db}     = undef;
 
     return bless( $this, $class );
 }
@@ -57,16 +58,18 @@ sub recache {
     my ( $this, $web, $topic ) = @_;
     if ( !$web ) {
         my @webs;
-        if( $isCairo ) {
+        if ($isCairo) {
             @webs = TWiki::Store::getAllWebs();
-        } else {
-            @webs = TWiki::Func::getListOfWebs( 'user' );
+        }
+        else {
+            @webs = TWiki::Func::getListOfWebs('user');
         }
 
-        foreach my $web ( @webs ) {
+        foreach my $web (@webs) {
             $this->_processWeb( $web, undef );
         }
-    } else {
+    }
+    else {
         $this->_processWeb( $web, $topic );
     }
 }
@@ -80,9 +83,8 @@ sub recache {
 sub _processWeb {
     my ( $this, $web, $topic ) = @_;
     my $npr = 0;
-    my @topics = $topic ?
-      ( $topic ) : TWiki::Func::getTopicList( $web );
-    foreach my $topic ( @topics ) {
+    my @topics = $topic ? ($topic) : TWiki::Func::getTopicList($web);
+    foreach my $topic (@topics) {
         $this->_processTopic( $web, $topic );
         $npr++;
     }
@@ -110,31 +112,36 @@ sub processText {
 
     # If this is a group def topic, extract the group
     if ( $web eq TWiki::Func::getMainWebname() && $topic =~ /Group$/ ) {
-        my ( $firstLine ) = grep { /$setGroupRE/ } @lines;
+        my ($firstLine) = grep { /$setGroupRE/ } @lines;
         if ( $firstLine && $firstLine =~ m/$setGroupRE/o ) {
             my @users;
-            foreach my $who ( split( /[,\s]+/, $1 )) {
+            foreach my $who ( split( /[,\s]+/, $1 ) ) {
                 $who = TWiki::Func::wikiToUserName($who) || $who;
                 push( @users, $who );
             }
-            if ( @users ) {
-                $this->_defineGroup( $topic, '|' . join( '|', @users ) . '|');
+            if (@users) {
+                $this->_defineGroup( $topic, '|' . join( '|', @users ) . '|' );
             }
         }
     }
 
     my $path = '';
-    if ( $topic eq $twikiPrefsTopic && (
-        $web eq TWiki::Func::getTwikiWebname() ||
-          $web eq TWiki::Func::getMainWebname())) {
+    if (
+        $topic eq $twikiPrefsTopic
+        && (   $web eq TWiki::Func::getTwikiWebname()
+            || $web eq TWiki::Func::getMainWebname() )
+      )
+    {
         $path = '/';
-    } elsif ( $topic eq $webPrefsTopic ) {
+    }
+    elsif ( $topic eq $webPrefsTopic ) {
         $path = "/$web/";
     }
 
     if ($path) {
+
         # first handle (ALLOW|DENY)WEB... (only if it's a XXXPreference topic)
-        $this->_clearPath( $path );
+        $this->_clearPath($path);
         map {
             /$setWebRE/;
             $this->_defineAccessRights( $path, $1, $2, $3 )
@@ -142,9 +149,10 @@ sub processText {
     }
 
     $path = "/$web/$topic";
+
     # then handle (ALLOW|DENY)TOPIC...
-    $this->_clearPath( $path );
-    map  {
+    $this->_clearPath($path);
+    map {
         /$setTopicRE/;
         $this->_defineAccessRights( $path, $1, $2, $3 )
     } grep { /$setTopicRE/ } @lines;
@@ -156,22 +164,24 @@ sub _defineAccessRights {
 
     # ALLOW => A, DENY => D
     $ad =~ s/^(\w).*$/$1/o;
+
     # CHANGE => C, VIEW => V, RENAME => R
     $action =~ s/^(\w).*$/$1/o;
 
     my @users;
-    foreach my $who ( split( /[,\s]+/, $names )) {
+    foreach my $who ( split( /[,\s]+/, $names ) ) {
         my $whow = TWiki::Func::wikiToUserName($who);
         if ($whow) {
             $who = $whow;
-        } else {
+        }
+        else {
             $who =~ s/^\w+\.(\w+)$/$1/o;
         }
         push( @users, $who );
     }
 
     $this->_setAccessRights( '|' . join( '|', @users ) . '|',
-                             $path, $ad, $action );
+        $path, $ad, $action );
 }
 
 # Clear the database entries for a path; we are about to re-define them.
@@ -179,14 +189,15 @@ sub _clearPath {
     my ( $this, $path ) = @_;
 
     my %db;
-    $this->_tieDB(\%db);
+    $this->_tieDB( \%db );
+
     #print STDERR "Clear P:$path\n";
-    delete($db{"P:$path:V:D"});
-    delete($db{"P:$path:V:A"});
-    delete($db{"P:$path:C:D"});
-    delete($db{"P:$path:C:A"});
-    delete($db{"P:$path:R:D"});
-    delete($db{"P:$path:R:A"});
+    delete( $db{"P:$path:V:D"} );
+    delete( $db{"P:$path:V:A"} );
+    delete( $db{"P:$path:C:D"} );
+    delete( $db{"P:$path:C:A"} );
+    delete( $db{"P:$path:R:D"} );
+    delete( $db{"P:$path:R:A"} );
     untie(%db);
 }
 
@@ -198,8 +209,9 @@ sub _setAccessRights {
     my ( $this, $users, $path, $allow, $action ) = @_;
     my $key = "P:${path}:${action}:${allow}";
     my %db;
-    $this->_tieDB(\%db);
+    $this->_tieDB( \%db );
     $db{$key} = $users;
+
     #print STDERR "Stored $key => $users\n";
     untie(%db);
 }
@@ -209,8 +221,9 @@ sub _defineGroup {
     my ( $this, $group, $members ) = @_;
     my $key = "G:$group";
     my %db;
-    $this->_tieDB(\%db);
+    $this->_tieDB( \%db );
     $db{$key} = $members;
+
     #print STDERR "Stored $key => $members\n";
     untie(%db);
 }
@@ -225,9 +238,9 @@ sub _defineGroup {
 sub _tieDB {
     my ( $this, $hash ) = @_;
 
-    tie(%$hash,'TDB_File', $this->{dbfile}, TDB_File::TDB_DEFAULT,
-        Fcntl::O_RDWR | Fcntl::O_CREAT, 0770) ||
-            die $this->{dbfile} . " $this->{dbfile} open failure: $!";
+    tie( %$hash, 'TDB_File', $this->{dbfile}, TDB_File::TDB_DEFAULT,
+        Fcntl::O_RDWR | Fcntl::O_CREAT, 0770 )
+      || die $this->{dbfile} . " $this->{dbfile} open failure: $!";
 }
 
 1;

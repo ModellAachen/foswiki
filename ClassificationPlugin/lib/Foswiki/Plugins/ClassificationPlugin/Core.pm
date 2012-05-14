@@ -635,10 +635,8 @@ sub handleTAGINFO {
     my $line = $theFormat;
     my $url;
     if ($context->{SolrPluginEnabled}) {
-      $url = Foswiki::Func::getScriptUrl($thisWeb, "WebSearch", "view", 
-        filter=>"tag:\"$tag\"",
-        origtopic=>$baseWeb.".".$baseTopic,
-      );
+      # SMELL: WikiWords are autolinked in parameter position ... wtf
+      $url = '<noautolink>%SOLRSCRIPTURL{topic="'.$thisWeb.'.'.$thisTopic.'"tag="'.$tag.'" web="'.$baseWeb.'" union="web" separator="&&"}%</noautolink>'; # && to please MAKETEXT :(
     } else {
       $url = Foswiki::Func::getScriptUrl($thisWeb, "WebTagCloud", "view", tag=>$tag);
     }
@@ -673,7 +671,7 @@ sub handleTAGINFO {
 sub beforeSaveHandler {
   my ($text, $topic, $web, $meta) = @_;
 
-  #writeDebug("beforeSaveHandler($web, $topic)");
+  writeDebug("beforeSaveHandler($web, $topic)");
 
   my $doAutoReparent = Foswiki::Func::getPreferencesFlag('CLASSIFICATIONPLUGIN_AUTOREPARENT', $web);
 
@@ -698,7 +696,7 @@ sub beforeSaveHandler {
     };
     if ($formDef) {
       foreach my $fieldDef (@{$formDef->getFields()}) {
-        writeDebug("formDef field $fieldDef->{name} type=$fieldDef->{type}");
+        #writeDebug("formDef field $fieldDef->{name} type=$fieldDef->{type}");
         $isCatField{$fieldDef->{name}} = 1 if $fieldDef->{type} eq 'cat';
         $isTagField{$fieldDef->{name}} = 1 if $fieldDef->{type} eq 'tag';
       }
@@ -924,7 +922,7 @@ sub afterSaveHandler {
   my $topic = $_[1];
   my $web = $_[2];
 
-  #writeDebug("afterSaveHandler($web, $topic)");
+  writeDebug("afterSaveHandler($web, $topic)");
 
   my $trashWeb = $Foswiki::cfg{TrashWebName};
   if ($web eq $trashWeb) {
@@ -1116,8 +1114,9 @@ sub renameTag {
 
       my ($meta, $text) = Foswiki::Func::readTopic($web, $topic);
       $meta->putKeyed( 'FIELD', { name => 'Tag', title => 'Tag', value =>$newTags});
+      #print STDERR "saving $web.$topic\n";
       Foswiki::Func::saveTopic($web, $topic, $meta, $text);
-      #print STDERR "saved $web.$topic\n";
+      #print STDERR "...done\n";
 
       $count++;
     }

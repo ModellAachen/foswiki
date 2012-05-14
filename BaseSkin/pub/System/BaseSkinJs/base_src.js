@@ -10,78 +10,69 @@ Base script. Handles:
 */
 
 
-foswiki.base = (function () {
+foswiki.base = (function ($) {
 
 	"use strict";
 
-	var getIdFromAnchorUrl,
-		DEFAULT_SCROLL_OFFSET = 30,
-		DEFAULT_SCROLL_DURATION = 300,
-		DEFAULT_SCROLL_EFFECT = 'easeInOutSine',
+	var calculateStickyOffset,
+		DEFAULT_SCROLL_OFFSET = -20,
+		GOOD_DEFAULT_SCROLL_SPEED = 900,
+		GOOD_DEFAULT_SCROLL_MAX_DURATION = 550,
+		DEFAULT_SCROLL_EASING = 'easeInOutQuart',
+		PREVENT_ANCHOR_JUMP_AT_PAGE_LOAD = true,
 		STICKY_CLASS_SELECTOR = '.foswikiMakeSticky';
-		
-	getIdFromAnchorUrl = function (url) {
-		return url.replace(/^[^#]*#?!?(.*)$/, '$1');
+			
+	/*
+	Calculate offset when sticky elements are around. 
+	*/
+	calculateStickyOffset = function(stickySelector) {
+		var $fixedElements = $(stickySelector),
+			offsetY = 0,
+			i;
+		for (i = 0; i < $fixedElements.length; i = i + 1) {
+			offsetY -= $($fixedElements[i]).outerHeight();
+		}
+		return offsetY;
 	};
-
+	
 	return {
 
-		/**
-		opts: hash with id, duration, offset, effect, callback
-		*/
-		scrollToAnchor: function ($, opts) {
-			var el = document.getElementById(opts.id);
-			if (!el) {
-				return;
-			}
-			var duration = opts.duration || DEFAULT_SCROLL_DURATION,
-				offset = opts.offset || 0,
-				top = offset + $(el).offset().top,
-				effect = opts.effect || DEFAULT_SCROLL_EFFECT;
-
-			$('html, body').animate({
-				scrollTop: top
-			}, {
-				duration: duration,
-				easing: effect,
-				complete: opts.callback
-			});
-		},
+		handleLocalScroll: function() {
 		
-		/*
-		Calculate offset when sticky elements are around. Pass value to scroll options and call scrollToAnchor.
-		*/
-		smartScrollDealWithStickys: function ($, opts) {
-			var $fixedElements = $(STICKY_CLASS_SELECTOR),
-				offsetY = -DEFAULT_SCROLL_OFFSET,
-				i;
+			$("a[href*='#']").pageScroll({
+				speed: GOOD_DEFAULT_SCROLL_SPEED,
+				maxDuration: GOOD_DEFAULT_SCROLL_MAX_DURATION,
+				easing: DEFAULT_SCROLL_EASING,
+				mayScroll: function(opts) {
+					opts.offset = DEFAULT_SCROLL_OFFSET + calculateStickyOffset(STICKY_CLASS_SELECTOR)
+				}
+			});
+
+			if (PREVENT_ANCHOR_JUMP_AT_PAGE_LOAD && location.hash) {
+				// hide body before forcing to top
+				$('body').hide();
+				// secretly go to top
+				window.scrollTo(0, 0);
+			}
 			
-			for (i = 0; i < $fixedElements.length; i = i + 1) {
-				offsetY -= $($fixedElements[i]).outerHeight();
-			}			
-			opts.offset = offsetY;
-			this.scrollToAnchor($, opts);
-		},
-		
-		handleLocalScroll: function($) {
-			var that = this,
-				id,
-				opts;
-
-			// all links with anchors
-			$("a[href*='#']").click(function() {
-				id = getIdFromAnchorUrl(this.href);
-				that.smartScrollDealWithStickys($, {id: id});
+			$(window).pageScroll({
+				id: location.hash,
+				event: 'load hashchange',
+				speed: GOOD_DEFAULT_SCROLL_SPEED,
+				maxDuration: GOOD_DEFAULT_SCROLL_MAX_DURATION,
+				mayScroll: function(opts) {
+					opts.offset = DEFAULT_SCROLL_OFFSET + calculateStickyOffset(STICKY_CLASS_SELECTOR)
+				},
+				willScroll: function(opts) {
+					if ($('body').is(':hidden')) {
+						$('body').show();
+					}
+				},
+				willScrollDelay: 500
 			});
-
-			// also scroll on page load
-			id = getIdFromAnchorUrl(location.href);
-			if (id) {
-				that.smartScrollDealWithStickys($, {id: id});
-			}
 		},
 		
-		removeYellowFromInputs: function($) {
+		removeYellowFromInputs: function() {
 			if (navigator.userAgent.toLowerCase().indexOf('chrome') >= 0) {
 				var chromechk_watchdog = 0,
 					chromechk;
@@ -102,57 +93,76 @@ foswiki.base = (function () {
 			}
 		},
 		
-		manageDisplay: function($) { 
-			var setDisplay = function(classname) {
-				$('body').removeClass('foswikiDisplaySpatious').removeClass('foswikiDisplayAverage').removeClass('foswikiDisplayMaxscreen');
-				$('body').addClass(classname);
-				if (foswiki.Pref) {
-					foswiki.Pref.setPref('skinDisplay', classname);
-				}
+		/*
+		Manage display 'views' - spatious, average and maximise.
+		*/
+		manageDisplaySettings: function() { 
+			
+			var setDisplay,
+				parseMode;
+				
+			setDisplay = function(viewClass) {
+				$('body').removeClass('foswikiViewDisplayRoomy').removeClass('foswikiViewDisplayCosy').removeClass('foswikiViewDisplayTight');
+				$('body').addClass(viewClass);
 			};
-			$('a.foswikiDisplaySpatious,a.foswikiDisplayAverage,a.foswikiDisplayMaxscreen').livequery('click', function (e) {
-				var $this = $(this);
-				switch ($(this).attr('class')) {
-					case 'foswikiDisplaySpatious':
-						setDisplay('foswikiDisplaySpatious');
+			
+			parseMode = function(mode) {
+				if (!mode) {
+					return;
+				}
+				switch (mode) {
+					case 'foswikiDisplayRoomy':
+						setDisplay('foswikiViewDisplayRoomy');
 						break;
-					case 'foswikiDisplayAverage':
-						setDisplay('foswikiDisplayAverage');
+					case 'foswikiDisplayCosy':
+						setDisplay('foswikiViewDisplayCosy');
 						break;
-					case 'foswikiDisplayMaxscreen':
-						setDisplay('foswikiDisplayMaxscreen');
+					case 'foswikiDisplayTight':
+						setDisplay('foswikiViewDisplayTight');
 						break;
 				}
+			};	
+			$('a.foswikiDisplayRoomy,a.foswikiDisplayCosy,a.foswikiDisplayTight').livequery('click', function (e) {
+				var $this = $(this),
+					mode = $this.attr('class');
+				
 				e.preventDefault();
+				parseMode(mode);
+				if (foswiki.Pref && mode) {
+					foswiki.Pref.setPref('skinDisplay', mode);
+				}
 			});
 			
 			if (foswiki.Pref) {
-				var pref = foswiki.Pref.getPref('skinDisplay');
-				if (pref) {
-					setDisplay(pref);
-				}
+				parseMode(foswiki.Pref.getPref('skinDisplay'));
 			}
 		},
-
-		handleSticky: function($) { 
-			// make elements with class STICKY_CLASS_SELECTOR stick to the window	
+		
+		/*
+		Make elements with class STICKY_CLASS_SELECTOR stick to the window	
+		*/
+		handleSticky: function() { 
 			$(STICKY_CLASS_SELECTOR).sticky({
 				cssclass: 'foswikiSticky'
 			});
 		}
 		
 	};
-}());
+}(jQuery));
 
 jQuery(document).ready(function ($) {
 
-	foswiki.base.removeYellowFromInputs($);
-	foswiki.base.manageDisplay($);
-	foswiki.base.handleLocalScroll($);
-	foswiki.base.handleSticky($);
+	foswiki.base.removeYellowFromInputs();
+	foswiki.base.manageDisplaySettings();
+	foswiki.base.handleSticky();
+	foswiki.base.handleLocalScroll();
 	
 	// add focus to elements with class foswikiFocus
 	$('input.foswikiFocus').livequery(function () {
 		$(this).focus();
 	});
 });
+
+function scrollY() {
+	return window.pageYOffset ? window.pageYOffset : document.documentElement.scrollTop ? document.documentElement.scrollTop : document.body.scrollTop;
+}

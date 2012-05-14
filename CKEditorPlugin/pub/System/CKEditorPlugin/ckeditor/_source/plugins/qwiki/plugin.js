@@ -102,7 +102,13 @@ CKEDITOR.plugins.add('qwiki',
 
 	init : function( editor, pluginPath )
 	{
-	
+		// General UI fixes that don't fit anywhere else
+		// Make combo boxes wide enough so nothing gets truncated
+		$('head').append('<style type="text/css">\n'+
+			'.cke_panel { min-width: 200px; }\n'+
+			'.cke_rcombo { min-width: 10em; }\n'+
+		'</style>');
+
 		// Dokumente Verlinken
 		editor.addCommand( 'document', new CKEDITOR.dialogCommand( 'document' ) );
 		editor.ui.addButton( 'Document',
@@ -246,11 +252,12 @@ CKEDITOR.plugins.add('qwiki',
 										
 										//TODO: AjaxRequest? oder andere Möglichkeit?
 										
-										el = editor.createFakeParserElement( element, 'cke_provis', 'provis', false, url );
+										el = editor.createFakeParserElement( element, 'cke_provis', 'provis', false );
 										
 										el.attributes._cke_provis_name = attributes.name;
 										el.attributes._cke_provis_type = attributes.type;
 										el.attributes._cke_provis_rev = attributes.rev;
+										el.attributes.src = url;
 										
 										return el;
 									}

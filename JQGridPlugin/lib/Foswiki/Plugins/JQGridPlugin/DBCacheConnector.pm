@@ -121,6 +121,8 @@ sub restHandleSearch {
   throw Error::Simple("can't search in web $web using $query")
     unless defined $result;
 
+  #print STDERR "result=$result\n";
+
   $this->{session}->writeCompletePage($result, 'view', 'text/xml');
 }
 
@@ -199,7 +201,7 @@ sub search {
   }
 
   my $header = <<"HERE";
-<?xml version='1.0' encoding='utf-8'?>
+<?xml version='1.0' encoding='$Foswiki::cfg{Site}{CharSet}'?>
 <rows>
   <page>$page</page>
   <total>$totalPages</total>

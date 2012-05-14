@@ -490,7 +490,7 @@ CKEDITOR.plugins.add( 'qwikiprovisarea',
 					
 					//ProVis IFrame
 					iframe = CKEDITOR.dom.element.createFromHtml( '<iframe' +
-							' style="width:' + provisSize.width + 'px; height:100%;"' +
+							' style="width:' + provisSize.width + 'px; height:100%; position:relative;"' +
 							' frameBorder="0"' +
 							' id="iframe_provis"' +
 							' src="' + srcScript + '"' +
@@ -505,14 +505,12 @@ CKEDITOR.plugins.add( 'qwikiprovisarea',
 					editor.fire( 'load_provistoolbar' );
 					updateCommandsMode(editor, "provis", true);
 
-					iframe.on( 'load', function( ev )
+					$(iframe.$).one( 'load', function( ev )
 						{
 								//TODO: Dynamische Runtime Variable setzen
 								var frame = document.getElementById("iframe_provis")
 								var dynrunvar = frame.contentWindow.DynRunVar;
 
-								// Fix applet spacing in IE7
-								$(frame).contents().find('applet').css('padding', '5px');
 								watchIt(dynrunvar, "activeShape",
 										function (id,oldvalue,newvalue) {
 											if( newvalue ){

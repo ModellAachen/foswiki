@@ -1,0 +1,77 @@
+%TMPL:DEF{"metadata::edit"}%<a href="%SCRIPTURL{"rest"}%/RenderPlugin/template?topic=%topic%&redirectto=%WEB%.%TOPIC%&name=metadataplugin&expand=metadata::editor&metadata=%meta%&metadata::name=%name%&metadata::title=%MAKETEXT{"Edit"}% %title%" class="jqUIDialogLink metaDataEditAction {cache:false}">%JQICON{"pencil"}%</a>%TMPL:END%
+%TMPL:DEF{"metadata::duplicate"}%<a href="%SCRIPTURL{"rest"}%/RenderPlugin/template?topic=%topic%&redirectto=%WEB%.%TOPIC%&name=metadataplugin&expand=metadata::duplicator&metadata=%meta%&metadata::name=%name%&metadata::title=%MAKETEXT{"Duplicate"}% %title%" class="jqUIDialogLink metaDataDuplicateAction {cache:false}">%JQICON{"page_white_copy"}%</a>%TMPL:END%
+%TMPL:DEF{"metadata::delete"}%<a href="%SCRIPTURL{"rest"}%/RenderPlugin/template?topic=%topic%&redirectto=%WEB%.%TOPIC%&name=metadataplugin&expand=metadata::confirmdelete&metadata=%meta%&metadata::name=%name%&metadata::title=%title%" class="jqUIDialogLink metaDataDeleteAction {cache:false}">%JQICON{"bin"}%</a>%TMPL:END%
+%TMPL:DEF{"metadata::new"}%<a href="%SCRIPTURL{"rest"}%/RenderPlugin/template?topic=%topic%&redirectto=%WEB%.%TOPIC%&name=metadataplugin&expand=metadata::editor&metadata=%meta%&metadata::title=%MAKETEXT{"Add"}% %meta%" class="jqUIButton jqUIDialogLink metaDataNewAction {icons: {primary:'ui-icon-circle-plus'}}">%title%</a>%TMPL:END%
+
+%TMPL:DEF{"metadata::editor"}%<!-- -->
+<div title="%URLPARAM{"metadata::title" default="%MAKETEXT{"Edit"}% %URLPARAM{"metadata"}%" }%" class="jqUIDialog {modal:true, resizable:true, draggable:true, width:710}">
+  <form id='metaDataForm' action='%SCRIPTURL{"save"}%/%WEB%/%TOPIC%' method='post'>
+  <input type="hidden" name="redirectto" value="%URLPARAM{"redirectto" default="%WEB%.%TOPIC%"}%" />
+  %RENDERMETADATA{
+    "%URLPARAM{"metadata"}%" 
+    action="edit"
+    name="%URLPARAM{"metadata::name" default="id"}%"
+    %TMPL:P{"metadata::editor::params"}%
+  }%
+  <a class="jqUIDialogButton jqUIDialogSubmit {icon:'ui-icon-circle-check'}">%MAKETEXT{"Save"}%</a>
+  <a class="jqUIDialogButton jqUIDialogClose {icon:'ui-icon-cancel'}">%MAKETEXT{"Cancel"}%</a>
+  </form>
+</div>
+<!-- -->%TMPL:END%
+
+%TMPL:DEF{"metadata::editor::params"}%
+    TopicTitle_title="%MAKETEXT{"Title"}%"
+%TMPL:END%
+
+%TMPL:DEF{"metadata::duplicator"}%<!-- -->
+<div title="%URLPARAM{"metadata::title" default="%MAKETEXT{"Duplicate"}% %URLPARAM{"metadata"}%" }%" class="jqUIDialog {modal:true, resizable:true, draggable:true, width:710}">
+  <form id='metaDataForm' action='%SCRIPTURL{"save"}%/%WEB%/%TOPIC%' method='post'>
+  %RENDERMETADATA{
+    "%URLPARAM{"metadata"}%" 
+    action="edit"
+    name="%URLPARAM{"metadata::name" default="id"}%"
+    name_value="id"
+  }%
+  <a class="jqUIDialogButton jqUIDialogSubmit {icon:'ui-icon-circle-check'}">%MAKETEXT{"Save"}%</a>
+  <a class="jqUIDialogButton jqUIDialogClose {icon:'ui-icon-cancel'}">%MAKETEXT{"Cancel"}%</a>
+  </form>
+</div>
+<!-- -->%TMPL:END%
+
+%TMPL:DEF{"metadata::duplicator::params"}%%TMPL:P{"metadata::editor::params"}%%TMPL:END%
+
+%TMPL:DEF{"metadata::confirmdelete"}%<!-- -->
+<div title="%MAKETEXT{"Confirmation required"}%" class="jqUIDialog {modal:true, draggable:true, width:280}">
+<img src="%PUBURLPATH%/%SYSTEMWEB%/MetaDataPlugin/trash.png" width="48" height="48" align="right" />
+%MAKETEXT{"Are you sure that you want to delete this record?"}%
+%TMPL:P{"metadata::confirmdelete::details"}%<!-- -->
+<form id="metaDataDeleteForm" action="%SCRIPTURL{"jsonrpc"}%/MetaDataPlugin/delete" method="post">
+<input type="hidden" name="topic" value="%WEB%.%TOPIC%" />
+<input type="hidden" name="metadata" value="%URLPARAM{"metadata"}%" />
+<input type="hidden" name="metadata::name" value="%URLPARAM{"metadata::name"}%" />
+<input type="hidden" name="redirectto" value="%URLPARAM{"redirectto" default="%WEB%.%TOPIC%"}%" />
+<a class="jqUIDialogButton jqUIDialogSubmit {icon:'ui-icon-trash'}">%MAKETEXT{"Yes, delete"}%</a>
+<a class="jqUIDialogButton jqUIDialogClose {icon:'ui-icon-cancel'}">%MAKETEXT{"No, thanks"}%</a>
+</form>
+</div>
+<!-- -->%TMPL:END%
+
+%TMPL:DEF{"metadata::confirmdelete::details"}%<!-- -->
+<p class="foswikiCenter"><b>%URLPARAM{"metadata::title" default="%URLPARAM{"metadata::name"}%"}%</b></p>
+<!-- -->%TMPL:END%
+
+%TMPL:DEF{"metadata::init"}%
+%JQREQUIRE{"ui::dialog, ui::button"}%
+%ADDTOZONE{"script"
+  id="METADATAPLUGIN"
+  text="<script src='%PUBURLPATH%/%SYSTEMWEB%/MetaDataPlugin/metadata.js'></script>"
+  requires="JQUERYPLUGIN"
+}%
+%ADDTOZONE{"head"
+  id="METADATAPLUGIN"
+  text="<link rel='stylesheet' href='%PUBURLPATH%/%SYSTEMWEB%/MetaDataPlugin/metadata.css' media='all' />"
+  requires="JQUERYPLUGIN"
+}%
+%TMPL:END%
+
+%TMPL:P{"metadata::init"}%

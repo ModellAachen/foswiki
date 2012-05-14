@@ -1,0 +1,4 @@
+!noci
+data/System/ConfigureCheckPlugin.txt 0644 Documentation page
+data/System/VarCONFIGURE_CHECK.txt 0644 Examples
+lib/Foswiki/Plugins/ConfigureCheckPlugin.pm 0444 Perl module

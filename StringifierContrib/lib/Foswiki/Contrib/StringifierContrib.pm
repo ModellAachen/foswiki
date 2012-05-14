@@ -16,6 +16,6 @@
 
 package Foswiki::Contrib::StringifierContrib;
 our $VERSION = '$Rev: 9950 (2010-11-12) $';
-our $RELEASE = '2.10';
+our $RELEASE = '2.20';
 
 1;

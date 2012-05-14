@@ -1334,6 +1334,7 @@ sub flatten {
 
   $text =~ s/(https?)/<nop>$1/go;
   $text =~ s/[\r\n\|]+/ /gm;
+  $text =~ s/!!//g;
   return $text;
 }
 

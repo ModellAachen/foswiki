@@ -20,12 +20,13 @@ use warnings;
 use FoswikiFnTestCase();
 our @ISA = qw( FoswikiFnTestCase );
 
-use Foswiki();
-use Error qw( :try );
 use Assert;
-use English qw( -no_match_vars );
+use Foswiki();
+use Foswiki::Func();
 use Foswiki::Search();
 use Foswiki::Search::InfoCache();
+use English qw( -no_match_vars );
+use Error qw( :try );
 
 use File::Spec qw(case_tolerant)
   ; #TODO: this really should be in the Store somehow - but its not worth doing now, as we should really obliterate the issue
@@ -425,6 +426,27 @@ EXPECT
     return;
 }
 
+sub _expect_with_deps {
+    my ( $this, $default, %expectations ) = @_;
+    my @deps = sort( keys %expectations );
+    my $expected;
+    my $checking = 1;
+
+    while ( $checking && scalar(@deps) ) {
+        my $dep = shift(@deps);
+
+        if ( $this->check_dependency($dep) ) {
+            $expected = $expectations{$dep};
+            $checking = 0;
+        }
+    }
+    if ($checking) {
+        $expected = $default;
+    }
+
+    return $expected;
+}
+
 # Verify that the default result orering is independent of the web= and
 # topic= parameters
 sub verify_default_alpha_order_query {
@@ -439,7 +461,8 @@ sub verify_default_alpha_order_query {
                 format="$web.$topic"
         }%'
     );
-    my $expected = <<'EXPECT';
+    my $expected = $this->_expect_with_deps(
+        <<'FOSWIKI12',
 Main.WebHome
 Main.WebPreferences
 Main.WebSearch
@@ -449,7 +472,18 @@ Sandbox.WebSearch
 System.WebHome
 System.WebPreferences
 System.WebSearch
-EXPECT
+FOSWIKI12
+        'Foswiki,<,1.2' => <<'FOSWIKI11');
+System.WebHome
+System.WebPreferences
+System.WebSearch
+Main.WebHome
+Main.WebPreferences
+Main.WebSearch
+Sandbox.WebHome
+Sandbox.WebPreferences
+Sandbox.WebSearch
+FOSWIKI11
     $expected =~ s/\n$//s;
     $this->assert_str_equals( $expected, $result );
 
@@ -468,7 +502,8 @@ sub verify_default_alpha_order_search {
                 format="$web.$topic"
         }%'
     );
-    my $expected = <<'EXPECT';
+    my $expected = $this->_expect_with_deps(
+        <<'FOSWIKI12',
 Main.WebHome
 Main.WebPreferences
 Main.WebSearch
@@ -478,7 +513,18 @@ Sandbox.WebSearch
 System.WebHome
 System.WebPreferences
 System.WebSearch
-EXPECT
+FOSWIKI12
+        'Foswiki,<,1.2' => <<'FOSWIKI11');
+System.WebHome
+System.WebPreferences
+System.WebSearch
+Main.WebHome
+Main.WebPreferences
+Main.WebSearch
+Sandbox.WebHome
+Sandbox.WebPreferences
+Sandbox.WebSearch
+FOSWIKI11
     $expected =~ s/\n$//s;
     $this->assert_str_equals( $expected, $result );
 
@@ -737,6 +783,60 @@ OkTopic
 EXPECT
 
     return;
+}
+
+sub test_headingoffset {
+    my ( $this, $query, $web ) = @_;
+    my ($topicObject) =
+      Foswiki::Func::readTopic( $this->{test_web}, 'TestHINC' );
+    $topicObject->text(<<HERE);
+---+ H4
+<ho off="1">
+---+ H5
+<h1>H2</h1>
+<ho off="+2">
+---+ H6
+<h1>H6</h1>
+<ho off="-3">
+---+ H4
+HERE
+    $topicObject->save();
+    $topicObject->finish();
+    my $result = $this->{test_topicObject}->expandMacros(<<HERE);
+%SEARCH{"---+" web="$this->{test_web}" topic="TestHINC" format="\$text" headingoffset="3"}%
+###
+%SEARCH{"---+" multiple="on" web="$this->{test_web}" topic="TestHINC" format="\$text" headingoffset="3"}%
+HERE
+
+    $this->assert_str_equals( <<EXPECT, $result );
+<div class="foswikiSearchResultsHeader"><span>Searched: <b><noautolink>---+</noautolink></b></span><span id="foswikiNumberOfResultsContainer"></span></div>
+<ho off="3">
+---+ H4
+<ho off="1">
+---+ H5
+<h1>H2</h1>
+<ho off="+2">
+---+ H6
+<h1>H6</h1>
+<ho off="-3">
+---+ H4
+
+<ho off="-3"/>
+<div class="foswikiSearchResultCount">Number of topics: <span>1</span></div>
+###
+<div class="foswikiSearchResultsHeader"><span>Searched: <b><noautolink>---+</noautolink></b></span><span id="foswikiNumberOfResultsContainer"></span></div>
+---+ H4
+<ho off="1">
+---+ H5
+<h1>H2</h1>
+<ho off="+2">
+---+ H6
+<h1>H6</h1>
+<ho off="-3">
+---+ H4
+
+<div class="foswikiSearchResultCount">Number of topics: <span>1</span></div>
+EXPECT
 }
 
 sub verify_regex_match {
@@ -1591,12 +1691,10 @@ sub verify_formQuery2 {
     my $result =
       $this->{test_topicObject}
       ->expandMacros( '%SEARCH{"TestForm"' . $stdCrap );
-    if ( $this->check_dependency('Foswiki,<,1.2') ) {
-        $this->assert_str_equals( 'QueryTopic', $result );
-    }
-    else {
-        $this->assert_str_equals( '', $result );
-    }
+    my $expected =
+      $this->_expect_with_deps( '', 'Foswiki,<,1.2' => 'QueryTopic' );
+
+    $this->assert_str_equals( $expected, $result );
 
     return;
 }
@@ -1617,17 +1715,10 @@ sub verify_formQuery3 {
 sub verify_formQuery4 {
     my $this = shift;
 
-    if (
-            ( $Foswiki::cfg{OS} eq 'WINDOWS' )
-        and ( $Foswiki::cfg{DetailedOS} ne 'cygwin' )
-        and ( $Foswiki::cfg{Store}{SearchAlgorithm} eq
-            'Foswiki::Store::SearchAlgorithms::Forking' )
-      )
-    {
-        $this->expect_failure();
-        $this->annotate(
-            "THIS IS WINDOWS & grep; Test will fail because of Item1072");
-    }
+    $this->expect_failure(
+        "THIS IS WINDOWS & grep; Test will fail because of Item1072",
+        using => [ 'PlatformWindows', 'SearchAlgorithmForking' ]
+    );
 
     $this->set_up_for_queries();
 
@@ -1642,17 +1733,10 @@ sub verify_formQuery4 {
 sub verify_formQuery5 {
     my $this = shift;
 
-    if (
-            ( $Foswiki::cfg{OS} eq 'WINDOWS' )
-        and ( $Foswiki::cfg{DetailedOS} ne 'cygwin' )
-        and ( $Foswiki::cfg{Store}{SearchAlgorithm} eq
-            'Foswiki::Store::SearchAlgorithms::Forking' )
-      )
-    {
-        $this->expect_failure();
-        $this->annotate(
-            "THIS IS WINDOWS & grep; Test will fail because of Item1072");
-    }
+    $this->expect_failure(
+        "THIS IS WINDOWS & grep; Test will fail because of Item1072",
+        using => [ 'PlatformWindows', 'SearchAlgorithmForking' ]
+    );
 
     $this->set_up_for_queries();
 
@@ -2098,7 +2182,10 @@ HERE
 }
 
 sub _getTopicList {
-    my ( $this, $expected, $web, $options, $sadness ) = @_;
+    my ( $this, $web, $options, $sadness, $default_expected, %expected_list ) =
+      @_;
+    my $expected =
+      $this->_expect_with_deps( $default_expected, %expected_list );
 
     #    my $options = {
     #        casesensitive  => $caseSensitive,
@@ -2107,7 +2194,8 @@ sub _getTopicList {
     #        excludeTopics  => $excludeTopic,
     #    };
 
-    my $webObject = Foswiki::Meta->new( $this->{session}, $web );
+    $this->assert_str_equals( 'ARRAY', ref($expected) );
+    my $webObject = $this->getWebObject($web);
 
     # Run the search on topics in this web
     my $search = $this->{session}->search();
@@ -2133,16 +2221,19 @@ sub verify_getTopicList {
 
     #no topics specified..
     $this->_getTopicList(
+        $this->{test_web},
+        {},
+        'no filters, all topics in test_web',
         [
             'OkATopic', 'OkBTopic',
             'OkTopic',  'TestTopicSEARCH',
             'WebPreferences'
         ],
-        $this->{test_web},
-        {},
-        'no filters, all topics in test_web'
     );
     $this->_getTopicList(
+        '_default',
+        {},
+        'no filters, all topics in test_web',
         [
             'WebAtom',           'WebChanges',
             'WebCreateNewTopic', 'WebHome',
@@ -2151,19 +2242,19 @@ sub verify_getTopicList {
             'WebRss',            'WebSearch',
             'WebSearchAdvanced', 'WebTopicList'
         ],
-        '_default',
-        {},
-        'no filters, all topics in test_web'
     );
 
     #use wildcards
     $this->_getTopicList(
-        [ 'OkATopic', 'OkBTopic', 'OkTopic' ],
         $this->{test_web},
         { includeTopics => 'Ok*' },
-        'comma separated list'
+        'comma separated list',
+        [ 'OkATopic', 'OkBTopic', 'OkTopic' ],
     );
     $this->_getTopicList(
+        '_default',
+        { includeTopics => 'Web*' },
+        'no filters, all topics in test_web',
         [
             'WebAtom',           'WebChanges',
             'WebCreateNewTopic', 'WebHome',
@@ -2172,33 +2263,35 @@ sub verify_getTopicList {
             'WebRss',            'WebSearch',
             'WebSearchAdvanced', 'WebTopicList'
         ],
-        '_default',
-        { includeTopics => 'Web*' },
-        'no filters, all topics in test_web'
     );
 
     #comma separated list specifed for inclusion
     $this->_getTopicList(
-        [ 'OkTopic', 'TestTopicSEARCH' ],
         $this->{test_web},
         { includeTopics => 'TestTopicSEARCH,OkTopic,NoSuchTopic' },
-        'comma separated list'
+        'comma separated list',
+        [ 'OkTopic', 'TestTopicSEARCH' ],
+        'Foswiki,<,1.2' => [ 'TestTopicSEARCH', 'OkTopic' ],
     );
     $this->_getTopicList(
-        [ 'WebCreateNewTopic', 'WebTopicList' ],
         '_default',
         { includeTopics => 'WebTopicList, WebCreateNewTopic, NoSuchTopic' },
-        'no filters, all topics in test_web'
+        'no filters, all topics in test_web',
+        [ 'WebCreateNewTopic', 'WebTopicList' ],
+        'Foswiki,<,1.2' => [ 'WebTopicList', 'WebCreateNewTopic' ],
     );
 
     #excludes
     $this->_getTopicList(
-        [ 'OkATopic', 'OkTopic', 'TestTopicSEARCH', 'WebPreferences' ],
         $this->{test_web},
         { excludeTopics => 'NoSuchTopic,OkBTopic' },
-        'no filters, all topics in test_web'
+        'no filters, all topics in test_web',
+        [ 'OkATopic', 'OkTopic', 'TestTopicSEARCH', 'WebPreferences' ],
     );
     $this->_getTopicList(
+        '_default',
+        { excludeTopics => 'WebSearch' },
+        'no filters, all topics in test_web',
         [
             'WebAtom',           'WebChanges',
             'WebCreateNewTopic', 'WebHome',
@@ -2207,45 +2300,42 @@ sub verify_getTopicList {
             'WebRss',            'WebSearchAdvanced',
             'WebTopicList'
         ],
-        '_default',
-        { excludeTopics => 'WebSearch' },
-        'no filters, all topics in test_web'
     );
 
     #Talk about missing alot of tests
     $this->_getTopicList(
+        $this->{test_web},
+        { includeTopics => '*' },
+        'all topics, using wildcard',
         [
             'OkATopic', 'OkBTopic',
             'OkTopic',  'TestTopicSEARCH',
             'WebPreferences'
         ],
-        $this->{test_web},
-        { includeTopics => '*' },
-        'all topics, using wildcard'
     );
     $this->_getTopicList(
-        [ 'OkATopic', 'OkBTopic', 'OkTopic' ],
         $this->{test_web},
         { includeTopics => 'Ok*' },
-        'Ok* topics, using wildcard'
+        'Ok* topics, using wildcard',
+        [ 'OkATopic', 'OkBTopic', 'OkTopic' ],
     );
     $this->_getTopicList(
-        [],
         $this->{test_web},
         {
             includeTopics => 'ok*',
             casesensitive => 1
         },
-        'case sensitive ok* topics, using wildcard'
+        'case sensitive ok* topics, using wildcard',
+        [],
     );
     $this->_getTopicList(
-        [ 'OkATopic', 'OkBTopic', 'OkTopic' ],
         $this->{test_web},
         {
             includeTopics => 'ok*',
             casesensitive => 0
         },
-        'case insensitive ok* topics, using wildcard'
+        'case insensitive ok* topics, using wildcard',
+        [ 'OkATopic', 'OkBTopic', 'OkTopic' ],
     );
 
     if ( File::Spec->case_tolerant() ) {
@@ -2255,101 +2345,100 @@ sub verify_getTopicList {
 
         # this test won't work on Mac OS X or windows.
         $this->_getTopicList(
-            [],
             $this->{test_web},
             {
                 includeTopics => 'okatopic',
                 casesensitive => 1
             },
-            'case sensitive okatopic topic 1'
+            'case sensitive okatopic topic 1',
+            [],
         );
     }
 
     $this->_getTopicList(
-        ['OkATopic'],
         $this->{test_web},
         {
             includeTopics => 'okatopic',
             casesensitive => 0
         },
-        'case insensitive okatopic topic'
+        'case insensitive okatopic topic',
+        ['OkATopic'],
     );
     ##### same again, with excludes.
     $this->_getTopicList(
-        [
-            'OkATopic', 'OkBTopic',
-            'OkTopic',  'TestTopicSEARCH',
-            'WebPreferences'
-        ],
         $this->{test_web},
         {
             includeTopics => '*',
             excludeTopics => 'web*'
         },
-        'all topics, using wildcard'
+        'all topics, using wildcard',
+        [
+            'OkATopic', 'OkBTopic',
+            'OkTopic',  'TestTopicSEARCH',
+            'WebPreferences'
+        ],
     );
     $this->_getTopicList(
-        [ 'OkATopic', 'OkBTopic', 'OkTopic' ],
         $this->{test_web},
         {
             includeTopics => 'Ok*',
             excludeTopics => 'okatopic'
         },
-        'Ok* topics, using wildcard'
+        'Ok* topics, using wildcard',
+        [ 'OkATopic', 'OkBTopic', 'OkTopic' ],
     );
     $this->_getTopicList(
-        [],
         $this->{test_web},
         {
             includeTopics => 'ok*',
             excludeTopics => 'WebPreferences',
             casesensitive => 1
         },
-        'case sensitive ok* topics, using wildcard'
+        'case sensitive ok* topics, using wildcard',
+        [],
     );
     $this->_getTopicList(
-        [ 'OkATopic', 'OkBTopic', 'OkTopic' ],
         $this->{test_web},
         {
             includeTopics => 'ok*',
             excludeTopics => '',
             casesensitive => 0
         },
-        'case insensitive ok* topics, using wildcard'
+        'case insensitive ok* topics, using wildcard',
+        [ 'OkATopic', 'OkBTopic', 'OkTopic' ],
     );
 
     $this->_getTopicList(
-        [ 'OkBTopic', 'OkTopic' ],
         $this->{test_web},
         {
             includeTopics => 'Ok*',
             excludeTopics => '*ATopic',
             casesensitive => 1
         },
-        'case sensitive okatopic topic 2'
+        'case sensitive okatopic topic 2',
+        [ 'OkBTopic', 'OkTopic' ],
     );
 
     $this->_getTopicList(
-        [ 'OkATopic', 'OkBTopic', 'OkTopic' ],
-
         $this->{test_web},
         {
             includeTopics => 'Ok*',
             excludeTopics => '*atopic',
             casesensitive => 1
         },
-        'case sensitive okatopic topic 3'
+        'case sensitive okatopic topic 3',
+        [ 'OkATopic', 'OkBTopic', 'OkTopic' ],
     );
 
     $this->_getTopicList(
-        [ 'OkBTopic', 'OkTopic' ],
         $this->{test_web},
         {
             includeTopics => 'ok*topic',
             excludeTopics => 'okatopic',
             casesensitive => 0
         },
-        'case insensitive okatopic topic'
+        'case insensitive okatopic topic',
+        [ 'OkBTopic', 'OkTopic' ],
     );
 
     return;
@@ -2519,12 +2608,14 @@ HERE
 #TODO: rewrite using named params for more flexibility
 #need summary, and multiple
 sub _multiWebSeptic {
-    my ( $this, $head, $foot, $sep, $results, $expected, $format ) = @_;
+    my ( $this, $head, $foot, $sep, $results, $format, $default, %expectations )
+      = @_;
     my $str = $results ? '*Preferences' : 'Septic';
     $head = $head        ? 'header="HEAD($web)"'            : '';
     $foot = $foot        ? 'footer="FOOT($ntopics,$nhits)"' : '';
     $sep  = defined $sep ? "separator=\"$sep\""             : '';
     $format = '$topic' unless ( defined($format) );
+    my $expected = $this->_expect_with_deps( $default, %expectations );
 
     my $result = $this->{test_topicObject}->expandMacros(
         "%SEARCH{\"name~'$str'\" 
@@ -2546,67 +2637,89 @@ sub _multiWebSeptic {
 
 sub test_multiWeb_no_header_no_footer_no_separator_with_results {
     my $this = shift;
-    $this->_multiWebSeptic( 0, 0, undef, 1, <<'EXPECT');
+    $this->_multiWebSeptic(
+        0, 0, undef, 1, undef, <<'FOSWIKI12',
 SitePreferences
 WebPreferences
 DefaultPreferences
 WebPreferences
-EXPECT
+FOSWIKI12
+        'Foswiki,<,1.2' => <<'FOSWIKI11');
+DefaultPreferences
+WebPreferences
+SitePreferences
+WebPreferences
+FOSWIKI11
 
     return;
 }
 
 sub test_multiWeb_no_header_no_footer_no_separator_with_results_counters {
     my $this = shift;
-    $this->_multiWebSeptic( 0, 0, undef, 1,
-        <<'EXPECT', '$nhits, $ntopics, $index, $topic' );
+    $this->_multiWebSeptic(
+        0,                                  0, undef, 1,
+        '$nhits, $ntopics, $index, $topic', <<'FOSWIKI12',
 1, 1, 1, SitePreferences
 2, 2, 2, WebPreferences
 1, 1, 3, DefaultPreferences
 2, 2, 4, WebPreferences
-EXPECT
+FOSWIKI12
+        'Foswiki,<,1.2' => <<'FOSWIKI11');
+1, 1, 1, DefaultPreferences
+2, 2, 2, WebPreferences
+1, 1, 3, SitePreferences
+2, 2, 4, WebPreferences
+FOSWIKI11
 
     return;
 }
 
 sub test_multiWeb_no_header_no_footer_no_separator_no_results {
     my $this = shift;
-    $this->_multiWebSeptic( 0, 0, undef, 0, <<'EXPECT');
-EXPECT
+    $this->_multiWebSeptic( 0, 0, undef, 0, undef, <<'FOSWIKI12');
+FOSWIKI12
 
     return;
 }
 
 sub test_multiWeb_no_header_no_footer_empty_separator_with_results {
     my $this = shift;
-    $this->_multiWebSeptic( 0, 0, "", 1, <<'EXPECT');
+    $this->_multiWebSeptic(
+        0, 0, "", 1, undef, <<'FOSWIKI12',
 SitePreferencesWebPreferencesDefaultPreferencesWebPreferences
-EXPECT
+FOSWIKI12
+        'Foswiki,<,1.2' => <<'FOSWIKI11');
+DefaultPreferencesWebPreferencesSitePreferencesWebPreferences
+FOSWIKI11
 
     return;
 }
 
 sub test_multiWeb_no_header_no_footer_empty_separator_no_results {
     my $this = shift;
-    $this->_multiWebSeptic( 0, 0, "", 0, <<'EXPECT');
-EXPECT
+    $this->_multiWebSeptic( 0, 0, "", 0, undef, <<'FOSWIKI12');
+FOSWIKI12
 
     return;
 }
 
 sub test_multiWeb_no_header_no_footer_with_separator_with_results {
     my $this = shift;
-    $this->_multiWebSeptic( 0, 0, ",", 1, <<'EXPECT');
+    $this->_multiWebSeptic(
+        0, 0, ",", 1, undef, <<'FOSWIKI12',
 SitePreferences,WebPreferences,DefaultPreferences,WebPreferences
-EXPECT
+FOSWIKI12
+        'Foswiki,<,1.2' => <<'FOSWIKI11');
+DefaultPreferences,WebPreferences,SitePreferences,WebPreferences
+FOSWIKI11
 
     return;
 }
 
 sub test_multiWeb_no_header_no_footer_with_separator_no_results {
     my $this = shift;
-    $this->_multiWebSeptic( 0, 0, ",", 0, <<'EXPECT');
-EXPECT
+    $this->_multiWebSeptic( 0, 0, ",", 0, undef, <<'FOSWIKI12');
+FOSWIKI12
 
     return;
 }
@@ -2614,47 +2727,63 @@ EXPECT
 
 sub test_multiWeb_no_header_with_footer_no_separator_with_results {
     my $this = shift;
-    $this->_multiWebSeptic( 0, 1, undef, 1, <<'EXPECT');
+    $this->_multiWebSeptic(
+        0, 1, undef, 1, undef, <<'FOSWIKI12',
 SitePreferences
 WebPreferences
 FOOT(2,2)DefaultPreferences
 WebPreferences
 FOOT(2,2)
-EXPECT
+FOSWIKI12
+        'Foswiki,<,1.2' => <<'FOSWIKI11');
+DefaultPreferences
+WebPreferences
+FOOT(2,2)SitePreferences
+WebPreferences
+FOOT(2,2)
+FOSWIKI11
 
     return;
 }
 
 sub test_multiWeb_no_header_with_footer_no_separator_no_results {
     my $this = shift;
-    $this->_multiWebSeptic( 0, 1, undef, 0, <<'EXPECT');
-EXPECT
+    $this->_multiWebSeptic( 0, 1, undef, 0, undef, <<'FOSWIKI12');
+FOSWIKI12
 
     return;
 }
 
 sub test_multiWeb_no_header_with_footer_empty_separator_with_results {
     my $this = shift;
-    $this->_multiWebSeptic( 0, 1, "", 1, <<'EXPECT');
+    $this->_multiWebSeptic(
+        0, 1, "", 1, undef, <<'FOSWIKI12',
 SitePreferencesWebPreferencesFOOT(2,2)DefaultPreferencesWebPreferencesFOOT(2,2)
-EXPECT
+FOSWIKI12
+        'Foswiki,<,1.2' => <<'FOSWIKI11');
+DefaultPreferencesWebPreferencesFOOT(2,2)SitePreferencesWebPreferencesFOOT(2,2)
+FOSWIKI11
 
     return;
 }
 
 sub test_multiWeb_no_header_with_footer_empty_separator_no_results {
     my $this = shift;
-    $this->_multiWebSeptic( 0, 1, "", 0, <<'EXPECT');
-EXPECT
+    $this->_multiWebSeptic( 0, 1, "", 0, undef, <<'FOSWIKI12');
+FOSWIKI12
 
     return;
 }
 
 sub test_multiWeb_no_header_with_footer_with_separator_with_results {
     my $this = shift;
-    $this->_multiWebSeptic( 0, 1, ",", 1, <<'EXPECT');
+    $this->_multiWebSeptic(
+        0, 1, ",", 1, undef, <<'FOSWIKI12',
 SitePreferences,WebPreferencesFOOT(2,2)DefaultPreferences,WebPreferencesFOOT(2,2)
-EXPECT
+FOSWIKI12
+        'Foswiki,<,1.2' => <<'FOSWIKI11');
+DefaultPreferences,WebPreferencesFOOT(2,2)SitePreferences,WebPreferencesFOOT(2,2)
+FOSWIKI11
 
     return;
 }
@@ -2663,7 +2792,8 @@ EXPECT
 
 sub test_multiWeb_with_header_with_footer_no_separator_with_results {
     my $this = shift;
-    $this->_multiWebSeptic( 1, 1, undef, 1, <<'EXPECT');
+    $this->_multiWebSeptic(
+        1, 1, undef, 1, undef, <<'FOSWIKI12',
 HEAD(Main)
 SitePreferences
 WebPreferences
@@ -2671,49 +2801,66 @@ FOOT(2,2)HEAD(System)
 DefaultPreferences
 WebPreferences
 FOOT(2,2)
-EXPECT
+FOSWIKI12
+        'Foswiki,<,1.2' => <<'FOSWIKI11');
+HEAD(System)
+DefaultPreferences
+WebPreferences
+FOOT(2,2)HEAD(Main)
+SitePreferences
+WebPreferences
+FOOT(2,2)
+FOSWIKI11
 
     return;
 }
 
 sub test_multiWeb_with_header_with_footer_no_separator_no_results {
     my $this = shift;
-    $this->_multiWebSeptic( 1, 1, undef, 0, <<'EXPECT');
-EXPECT
+    $this->_multiWebSeptic( 1, 1, undef, 0, undef, <<'FOSWIKI12');
+FOSWIKI12
 
     return;
 }
 
 sub test_multiWeb_with_header_with_footer_empty_separator_with_results {
     my $this = shift;
-    $this->_multiWebSeptic( 1, 1, "", 1, <<'EXPECT');
+    $this->_multiWebSeptic(
+        1, 1, "", 1, undef, <<'FOSWIKI12',
 HEAD(Main)SitePreferencesWebPreferencesFOOT(2,2)HEAD(System)DefaultPreferencesWebPreferencesFOOT(2,2)
-EXPECT
+FOSWIKI12
+        'Foswiki,<,1.2' => <<'FOSWIKI11');
+HEAD(System)DefaultPreferencesWebPreferencesFOOT(2,2)HEAD(Main)SitePreferencesWebPreferencesFOOT(2,2)
+FOSWIKI11
 
     return;
 }
 
 sub test_multiWeb_with_header_with_footer_empty_separator_no_results {
     my $this = shift;
-    $this->_multiWebSeptic( 1, 1, "", 0, <<'EXPECT');
-EXPECT
+    $this->_multiWebSeptic( 1, 1, "", 0, undef, <<'FOSWIKI12');
+FOSWIKI12
 
     return;
 }
 
 sub test_multiWeb_with_header_with_footer_with_separator_with_results {
     my $this = shift;
-    $this->_multiWebSeptic( 1, 1, ",", 1, <<'EXPECT');
+    $this->_multiWebSeptic(
+        1, 1, ",", 1, undef, <<'FOSWIKI12',
 HEAD(Main)SitePreferences,WebPreferencesFOOT(2,2)HEAD(System)DefaultPreferences,WebPreferencesFOOT(2,2)
-EXPECT
+FOSWIKI12
+        'Foswiki,<,1.2' => <<'FOSWIKI11');
+HEAD(System)DefaultPreferences,WebPreferencesFOOT(2,2)HEAD(Main)SitePreferences,WebPreferencesFOOT(2,2)
+FOSWIKI11
 
     return;
 }
 
 sub test_multiWeb_with_header_with_footer_with_separator_no_results {
     my $this = shift;
-    $this->_multiWebSeptic( 1, 1, ",", 0, <<'EXPECT');
-EXPECT
+    $this->_multiWebSeptic( 1, 1, ",", 0, undef, <<'FOSWIKI12');
+FOSWIKI12
 
     return;
 }
@@ -2722,56 +2869,73 @@ EXPECT
 
 sub test_multiWeb_with_header_no_footer_no_separator_with_results {
     my $this = shift;
-    $this->_multiWebSeptic( 1, 0, undef, 1, <<'EXPECT');
+    $this->_multiWebSeptic(
+        1, 0, undef, 1, undef, <<'FOSWIKI12',
 HEAD(Main)
 SitePreferences
 WebPreferences
 HEAD(System)
 DefaultPreferences
 WebPreferences
-EXPECT
+FOSWIKI12
+        'Foswiki,<,1.2' => <<'FOSWIKI11');
+HEAD(System)
+DefaultPreferences
+WebPreferences
+HEAD(Main)
+SitePreferences
+WebPreferences
+FOSWIKI11
 
     return;
 }
 
 sub test_multiWeb_with_header_no_footer_no_separator_no_results {
     my $this = shift;
-    $this->_multiWebSeptic( 1, 0, undef, 0, <<'EXPECT');
-EXPECT
+    $this->_multiWebSeptic( 1, 0, undef, 0, undef, <<'FOSWIKI12');
+FOSWIKI12
 
     return;
 }
 
 sub test_multiWeb_with_header_no_footer_empty_separator_with_results {
     my $this = shift;
-    $this->_multiWebSeptic( 1, 0, "", 1, <<'EXPECT');
+    $this->_multiWebSeptic(
+        1, 0, "", 1, undef, <<'FOSWIKI12',
 HEAD(Main)SitePreferencesWebPreferencesHEAD(System)DefaultPreferencesWebPreferences
-EXPECT
+FOSWIKI12
+        'Foswiki,<,1.2' => <<'FOSWIKI11');
+HEAD(System)DefaultPreferencesWebPreferencesHEAD(Main)SitePreferencesWebPreferences
+FOSWIKI11
 
     return;
 }
 
 sub test_multiWeb_with_header_no_footer_empty_separator_no_results {
     my $this = shift;
-    $this->_multiWebSeptic( 1, 0, "", 0, <<'EXPECT');
-EXPECT
+    $this->_multiWebSeptic( 1, 0, "", 0, undef, <<'FOSWIKI12');
+FOSWIKI12
 
     return;
 }
 
 sub test_multiWeb_with_header_no_footer_with_separator_with_results {
     my $this = shift;
-    $this->_multiWebSeptic( 1, 0, ",", 1, <<'EXPECT');
+    $this->_multiWebSeptic(
+        1, 0, ",", 1, undef, <<'FOSWIKI12',
 HEAD(Main)SitePreferences,WebPreferencesHEAD(System)DefaultPreferences,WebPreferences
-EXPECT
+FOSWIKI12
+        'Foswiki,<,1.2' => <<'FOSWIKI11');
+HEAD(System)DefaultPreferences,WebPreferencesHEAD(Main)SitePreferences,WebPreferences
+FOSWIKI11
 
     return;
 }
 
 sub test_multiWeb_with_header_no_footer_with_separator_no_results {
     my $this = shift;
-    $this->_multiWebSeptic( 1, 0, ",", 0, <<'EXPECT');
-EXPECT
+    $this->_multiWebSeptic( 1, 0, ",", 0, undef, <<'FOSWIKI12');
+FOSWIKI12
 
     return;
 }
@@ -2791,7 +2955,8 @@ sub test_web_and_topic_expansion {
                 footer="FOOT($ntopics,$nhits)"
         }%'
     );
-    my $expected = <<'EXPECT';
+    my $expected = $this->_expect_with_deps(
+        <<'FOSWIKI12',
 Main.WebHome
 Main.WebPreferences
 FOOT(2,2)Sandbox.WebHome
@@ -2799,7 +2964,16 @@ Sandbox.WebPreferences
 FOOT(2,2)System.WebHome
 System.WebPreferences
 FOOT(2,2)
-EXPECT
+FOSWIKI12
+        'Foswiki,<,1.2' => <<'FOSWIKI11');
+System.WebHome
+System.WebPreferences
+FOOT(2,2)Main.WebHome
+Main.WebPreferences
+FOOT(2,2)Sandbox.WebHome
+Sandbox.WebPreferences
+FOOT(2,2)
+FOSWIKI11
     $expected =~ s/\n$//s;
     $this->assert_str_equals( $expected, $result );
 
@@ -2825,14 +2999,23 @@ sub test_paging_three_webs_first_page {
 }%'
     );
 
-    my $expected = <<'EXPECT';
+    my $expected = $this->_expect_with_deps(
+        <<'FOSWIKI12',
 Main.WebChanges
 Main.WebHome
 Main.WebIndex
 Main.WebPreferences
 FOOT(4,4)Sandbox.WebChanges
 FOOT(1,1)
-EXPECT
+FOSWIKI12
+        'Foswiki,<,1.2' => <<'FOSWIKI11');
+System.WebChanges
+System.WebHome
+System.WebIndex
+System.WebPreferences
+FOOT(4,4)Main.WebChanges
+FOOT(1,1)
+FOSWIKI11
     $expected =~ s/\n$//s;
     $this->assert_str_equals( $expected, $result );
 
@@ -2857,14 +3040,23 @@ sub test_paging_three_webs_second_page {
 }%'
     );
 
-    my $expected = <<'EXPECT';
+    my $expected = $this->_expect_with_deps(
+        <<'FOSWIKI12',
 Sandbox.WebHome
 Sandbox.WebIndex
 Sandbox.WebPreferences
 FOOT(3,3)System.WebChanges
 System.WebHome
 FOOT(2,2)
-EXPECT
+FOSWIKI12
+        'Foswiki,<,1.2' => <<'FOSWIKI11');
+Main.WebHome
+Main.WebIndex
+Main.WebPreferences
+FOOT(3,3)Sandbox.WebChanges
+Sandbox.WebHome
+FOOT(2,2)
+FOSWIKI11
     $expected =~ s/\n$//s;
     $this->assert_str_equals( $expected, $result );
 
@@ -2889,11 +3081,17 @@ sub test_paging_three_webs_third_page {
 }%'
     );
 
-    my $expected = <<'EXPECT';
+    my $expected = $this->_expect_with_deps(
+        <<'FOSWIKI12',
 System.WebIndex
 System.WebPreferences
 FOOT(2,2)
-EXPECT
+FOSWIKI12
+        'Foswiki,<,1.2' => <<'FOSWIKI11');
+Sandbox.WebIndex
+Sandbox.WebPreferences
+FOOT(2,2)
+FOSWIKI11
     $expected =~ s/\n$//s;
     $this->assert_str_equals( $expected, $result );
 
@@ -2971,15 +3169,24 @@ sub verify_non_paging_with_limit {
     footer="FOOT($ntopics,$nhits)$n()"
 }%'
     );
-
-    my $expected = <<'EXPECT';
+    my $expected = $this->_expect_with_deps(
+        <<'FOSWIKI12',
 Main.WebPreferences
 FOOT(1,1)
 Sandbox.WebPreferences
 FOOT(1,1)
 System.WebPreferences
 FOOT(1,1)
-EXPECT
+FOSWIKI12
+        'Foswiki,<,1.2' => <<'FOSWIKI11');
+System.WebPreferences
+FOOT(1,1)
+Main.WebPreferences
+FOOT(1,1)
+Sandbox.WebPreferences
+FOOT(1,1)
+FOSWIKI11
+
     $expected =~ s/\n$//s;
     $this->assert_str_equals( $expected, $result );
 
@@ -3007,12 +3214,19 @@ sub test_paging_with_limit_first_page {
 }%'
     );
 
-    my $expected = <<'EXPECT';
+    my $expected = $this->_expect_with_deps(
+        <<'FOSWIKI12',
 Main.WebChanges
 Main.WebHome
 Main.WebIndex
 FOOT(3,3)
-EXPECT
+FOSWIKI12
+        'Foswiki,<,1.2' => <<'FOSWIKI11');
+System.WebChanges
+System.WebHome
+System.WebIndex
+FOOT(3,3)
+FOSWIKI11
     $expected =~ s/\n$//s;
     $this->assert_str_equals( $expected, $result );
 
@@ -3038,12 +3252,19 @@ sub test_paging_with_limit_second_page {
 }%'
     );
 
-    my $expected = <<'EXPECT';
+    my $expected = $this->_expect_with_deps(
+        <<'FOSWIKI12',
 Sandbox.WebChanges
 Sandbox.WebHome
 Sandbox.WebIndex
 FOOT(3,3)
-EXPECT
+FOSWIKI12
+        'Foswiki,<,1.2' => <<'FOSWIKI11');
+Main.WebChanges
+Main.WebHome
+Main.WebIndex
+FOOT(3,3)
+FOSWIKI11
     $expected =~ s/\n$//s;
     $this->assert_str_equals( $expected, $result );
 
@@ -3069,12 +3290,19 @@ sub test_paging_with_limit_third_page {
 }%'
     );
 
-    my $expected = <<'EXPECT';
+    my $expected = $this->_expect_with_deps(
+        <<'FOSWIKI12',
 System.WebChanges
 System.WebHome
 System.WebIndex
 FOOT(3,3)
-EXPECT
+FOSWIKI12
+        'Foswiki,<,1.2' => <<'FOSWIKI11');
+Sandbox.WebChanges
+Sandbox.WebHome
+Sandbox.WebIndex
+FOOT(3,3)
+FOSWIKI11
     $expected =~ s/\n$//s;
     $this->assert_str_equals( $expected, $result );
 
@@ -3145,9 +3373,7 @@ EXPECT
 sub test_groupby_none_using_subwebs {
     my $this = shift;
 
-    my $webObject =
-      Foswiki::Meta->new( $this->{session}, "$this->{test_web}/A" );
-    $webObject->populateNewWeb();
+    my $webObject = $this->populateNewWeb("$this->{test_web}/A");
     $webObject->finish();
     my ($topicObject) =
       Foswiki::Func::readTopic( "$this->{test_web}/A", 'TheTopic' );
@@ -3158,8 +3384,7 @@ CRUD
     $topicObject->save( forcedate => 1000 );
     $topicObject->finish();
 
-    $webObject = Foswiki::Meta->new( $this->{session}, "$this->{test_web}/B" );
-    $webObject->populateNewWeb();
+    $webObject = $this->populateNewWeb("$this->{test_web}/B");
     $webObject->finish();
     ($topicObject) =
       Foswiki::Func::readTopic( "$this->{test_web}/B", 'TheTopic' );
@@ -3170,8 +3395,7 @@ CRUD
     $topicObject->save( forcedate => 100 );
     $topicObject->finish();
 
-    $webObject = Foswiki::Meta->new( $this->{session}, "$this->{test_web}/C" );
-    $webObject->populateNewWeb();
+    $webObject = $this->populateNewWeb("$this->{test_web}/C");
     $webObject->finish();
     ($topicObject) =
       Foswiki::Func::readTopic( "$this->{test_web}/C", 'TheTopic' );
@@ -3364,19 +3588,19 @@ Searched: <noautolink>BLEEGLE</noautolink>Results from <nop>$this->{test_web} we
 
 <a href="">OkATopic</a>
 <nop>BLEEGLE dontmatchme.blah
-NEW - <a href="">DATE - TIME</a> by WikiGuest
+NEW - <a href="">DATE - TIME</a> by !WikiGuest
 
 <a href="">OkBTopic</a>
 <nop>BLEEGLE dont.matchmeblah
-NEW - <a href="">DATE - TIME</a> by WikiGuest
+NEW - <a href="">DATE - TIME</a> by !WikiGuest
 
 <a href="">OkTopic</a>
 <nop>BLEEGLE blah/matchme.blah
-NEW - <a href="">DATE - TIME</a> by WikiGuest
+NEW - <a href="">DATE - TIME</a> by !WikiGuest
 
 <a href="">TestTopicSEARCH</a>
 <nop>BLEEGLE
-NEW - <a href="">DATE - TIME</a> by WikiGuest
+NEW - <a href="">DATE - TIME</a> by !WikiGuest
 
 Number of topics: 4
 CRUD
@@ -4239,7 +4463,8 @@ sub test_pager_on {
 }%'
     );
 
-    my $expected = <<"EXPECT";
+    my $expected = $this->_expect_with_deps(
+        <<"FOSWIKI12",
 Main.WebChanges
 Main.WebHome
 Main.WebIndex
@@ -4248,7 +4473,17 @@ FOOT(4,4)Sandbox.WebChanges
 FOOT(1,1)<div class="foswikiSearchResultsPager">
    Page 1 of 3   [[$viewTopicUrl?SEARCHc6139cf1d63c9614230f742fca2c6a36=2][Next >]]
 </div>
-EXPECT
+FOSWIKI12
+        'Foswiki,<,1.2' => <<"FOSWIKI11");
+System.WebChanges
+System.WebHome
+System.WebIndex
+System.WebPreferences
+FOOT(4,4)Main.WebChanges
+FOOT(1,1)<div class="foswikiSearchResultsPager">
+   Page 1 of 3   [[$viewTopicUrl?SEARCHc6139cf1d63c9614230f742fca2c6a36=2][Next >]]
+</div>
+FOSWIKI11
     $expected =~ s/\n$//s;
     $this->assert_str_equals( $expected, $result );
 
@@ -4268,7 +4503,8 @@ EXPECT
 }%'
     );
 
-    $expected = <<"EXPECT";
+    $expected = $this->_expect_with_deps(
+        <<"FOSWIKI12",
 Sandbox.WebHome
 Sandbox.WebIndex
 Sandbox.WebPreferences
@@ -4277,7 +4513,17 @@ System.WebHome
 FOOT(2,2)<div class="foswikiSearchResultsPager">
 [[$viewTopicUrl?SEARCH6331ae02a320baf1478c8302e38b7577=1][< Previous]]   Page 2 of 3   [[$viewTopicUrl?SEARCH6331ae02a320baf1478c8302e38b7577=3][Next >]]
 </div>
-EXPECT
+FOSWIKI12
+        'Foswiki,<,1.2' => <<"FOSWIKI11");
+Main.WebHome
+Main.WebIndex
+Main.WebPreferences
+FOOT(3,3)Sandbox.WebChanges
+Sandbox.WebHome
+FOOT(2,2)<div class="foswikiSearchResultsPager">
+[[$viewTopicUrl?SEARCH6331ae02a320baf1478c8302e38b7577=1][< Previous]]   Page 2 of 3   [[$viewTopicUrl?SEARCH6331ae02a320baf1478c8302e38b7577=3][Next >]]
+</div>
+FOSWIKI11
     $expected =~ s/\n$//s;
     $this->assert_str_equals( $expected, $result );
 
@@ -4308,7 +4554,8 @@ sub test_pager_on_pagerformat {
 }%
 EXPECT
 
-    my $expected = <<"EXPECT";
+    my $expected = $this->_expect_with_deps(
+        <<"FOSWIKI12",
 Main.WebChanges
 Main.WebHome
 Main.WebIndex
@@ -4316,7 +4563,16 @@ Main.WebPreferences
 FOOT(4,4)Sandbox.WebChanges
 FOOT(1,1)
 ..prev=0, 1, next=2, numberofpages=3, pagesize=5, prevurl=, nexturl=$viewTopicUrl?SEARCHe9863b5d7ec27abeb8421578b0747c25=2..
-EXPECT
+FOSWIKI12
+        'Foswiki,<,1.2' => <<"FOSWIKI11");
+System.WebChanges
+System.WebHome
+System.WebIndex
+System.WebPreferences
+FOOT(4,4)Main.WebChanges
+FOOT(1,1)
+..prev=0, 1, next=2, numberofpages=3, pagesize=5, prevurl=, nexturl=$viewTopicUrl?SEARCHe9863b5d7ec27abeb8421578b0747c25=2..
+FOSWIKI11
     $this->assert_str_equals( $expected, $result );
 
     $result = $this->{test_topicObject}->expandMacros(
@@ -4337,7 +4593,8 @@ EXPECT
 '
     );
 
-    $expected = <<"EXPECT";
+    $expected = $this->_expect_with_deps(
+        <<"FOSWIKI12",
 Sandbox.WebHome
 Sandbox.WebIndex
 Sandbox.WebPreferences
@@ -4345,7 +4602,16 @@ FOOT(3,3)System.WebChanges
 System.WebHome
 FOOT(2,2)
 ..prev=1, 2, next=3, numberofpages=3, pagesize=5, prevurl=$viewTopicUrl?SEARCHc5ceccfcec96473a9efe986cf3597eb1=1, nexturl=$viewTopicUrl?SEARCHc5ceccfcec96473a9efe986cf3597eb1=3..
-EXPECT
+FOSWIKI12
+        'Foswiki,<,1.2' => <<"FOSWIKI11");
+Main.WebHome
+Main.WebIndex
+Main.WebPreferences
+FOOT(3,3)Sandbox.WebChanges
+Sandbox.WebHome
+FOOT(2,2)
+..prev=1, 2, next=3, numberofpages=3, pagesize=5, prevurl=$viewTopicUrl?SEARCHc5ceccfcec96473a9efe986cf3597eb1=1, nexturl=$viewTopicUrl?SEARCHc5ceccfcec96473a9efe986cf3597eb1=3..
+FOSWIKI11
     $this->assert_str_equals( $expected, $result );
 
     return;
@@ -4375,14 +4641,23 @@ sub test_pager_off_pagerformat {
 }%'
     );
 
-    my $expected = <<'EXPECT';
+    my $expected = $this->_expect_with_deps(
+        <<'FOSWIKI12',
 Main.WebChanges
 Main.WebHome
 Main.WebIndex
 Main.WebPreferences
 FOOT(4,4)Sandbox.WebChanges
 FOOT(1,1)
-EXPECT
+FOSWIKI12
+        'Foswiki,<,1.2' => <<'FOSWIKI11');
+System.WebChanges
+System.WebHome
+System.WebIndex
+System.WebPreferences
+FOOT(4,4)Main.WebChanges
+FOOT(1,1)
+FOSWIKI11
     $expected =~ s/\n$//s;
     $this->assert_str_equals( $expected, $result );
 
@@ -4403,14 +4678,23 @@ EXPECT
 }%'
     );
 
-    $expected = <<'EXPECT';
+    $expected = $this->_expect_with_deps(
+        <<'FOSWIKI12',
 Sandbox.WebHome
 Sandbox.WebIndex
 Sandbox.WebPreferences
 FOOT(3,3)System.WebChanges
 System.WebHome
 FOOT(2,2)
-EXPECT
+FOSWIKI12
+        'Foswiki,<,1.2' => <<'FOSWIKI11');
+Main.WebHome
+Main.WebIndex
+Main.WebPreferences
+FOOT(3,3)Sandbox.WebChanges
+Sandbox.WebHome
+FOOT(2,2)
+FOSWIKI11
     $expected =~ s/\n$//s;
     $this->assert_str_equals( $expected, $result );
 
@@ -4442,7 +4726,8 @@ sub test_pager_off_pagerformat_pagerinheaderfooter {
 }%'
     );
 
-    my $expected = <<'EXPECT';
+    my $expected = $this->_expect_with_deps(
+        <<'FOSWIKI12',
 HEADER(..prev=0, 1, next=2, numberofpages=3, pagesize=5..)
 Main.WebChanges
 Main.WebHome
@@ -4451,7 +4736,17 @@ Main.WebPreferences
 FOOT(4,4)(..prev=0, 1, next=2, numberofpages=3, pagesize=5..)HEADER(..prev=0, 1, next=2, numberofpages=3, pagesize=5..)
 Sandbox.WebChanges
 FOOT(1,1)(..prev=0, 1, next=2, numberofpages=3, pagesize=5..)
-EXPECT
+FOSWIKI12
+        'Foswiki,<,1.2' => <<'FOSWIKI11');
+HEADER(..prev=0, 1, next=2, numberofpages=3, pagesize=5..)
+System.WebChanges
+System.WebHome
+System.WebIndex
+System.WebPreferences
+FOOT(4,4)(..prev=0, 1, next=2, numberofpages=3, pagesize=5..)HEADER(..prev=0, 1, next=2, numberofpages=3, pagesize=5..)
+Main.WebChanges
+FOOT(1,1)(..prev=0, 1, next=2, numberofpages=3, pagesize=5..)
+FOSWIKI11
     $expected =~ s/\n$//s;
     $this->assert_str_equals( $expected, $result );
 
@@ -4473,7 +4768,8 @@ EXPECT
 }%'
     );
 
-    $expected = <<'EXPECT';
+    $expected = $this->_expect_with_deps(
+        <<'FOSWIKI12',
 HEADER(..prev=1, 2, next=3, numberofpages=3, pagesize=5..)
 Sandbox.WebHome
 Sandbox.WebIndex
@@ -4482,7 +4778,17 @@ FOOT(3,3)(..prev=1, 2, next=3, numberofpages=3, pagesize=5..)HEADER(..prev=1, 2,
 System.WebChanges
 System.WebHome
 FOOT(2,2)(..prev=1, 2, next=3, numberofpages=3, pagesize=5..)
-EXPECT
+FOSWIKI12
+        'Foswiki,<,1.2' => <<'FOSWIKI11');
+HEADER(..prev=1, 2, next=3, numberofpages=3, pagesize=5..)
+Main.WebHome
+Main.WebIndex
+Main.WebPreferences
+FOOT(3,3)(..prev=1, 2, next=3, numberofpages=3, pagesize=5..)HEADER(..prev=1, 2, next=3, numberofpages=3, pagesize=5..)
+Sandbox.WebChanges
+Sandbox.WebHome
+FOOT(2,2)(..prev=1, 2, next=3, numberofpages=3, pagesize=5..)
+FOSWIKI11
     $expected =~ s/\n$//s;
     $this->assert_str_equals( $expected, $result );
 
@@ -4510,7 +4816,8 @@ sub verify_pager_off_pagerformat_pagerinall {
 }%'
     );
 
-    my $expected = <<'EXPECT';
+    my $expected = $this->_expect_with_deps(
+        <<'FOSWIKI12',
 HEADER(ntopics=0..prev=1, 2, next=3, numberofpages=3, pagesize=5..)ntopics=0
 Sandbox.WebHome (ntopics=1..prev=1, 2, next=3, numberofpages=3, pagesize=5..)ntopics=1
 Sandbox.WebIndex (ntopics=2..prev=1, 2, next=3, numberofpages=3, pagesize=5..)ntopics=2
@@ -4519,7 +4826,18 @@ FOOT(3,3)(ntopics=3..prev=1, 2, next=3, numberofpages=3, pagesize=5..)HEADER(nto
 System.WebChanges (ntopics=1..prev=1, 2, next=3, numberofpages=3, pagesize=5..)ntopics=1
 System.WebHome (ntopics=2..prev=1, 2, next=3, numberofpages=3, pagesize=5..)ntopics=2
 FOOT(2,2)(ntopics=2..prev=1, 2, next=3, numberofpages=3, pagesize=5..)
-EXPECT
+FOSWIKI12
+        'Foswiki,<,1.2' => <<'FOSWIKI11');
+HEADER(ntopics=0..prev=1, 2, next=3, numberofpages=3, pagesize=5..)ntopics=0
+Main.WebHome (ntopics=1..prev=1, 2, next=3, numberofpages=3, pagesize=5..)ntopics=1
+Main.WebIndex (ntopics=2..prev=1, 2, next=3, numberofpages=3, pagesize=5..)ntopics=2
+Main.WebPreferences (ntopics=3..prev=1, 2, next=3, numberofpages=3, pagesize=5..)ntopics=3
+FOOT(3,3)(ntopics=3..prev=1, 2, next=3, numberofpages=3, pagesize=5..)HEADER(ntopics=0..prev=1, 2, next=3, numberofpages=3, pagesize=5..)ntopics=0
+Sandbox.WebChanges (ntopics=1..prev=1, 2, next=3, numberofpages=3, pagesize=5..)ntopics=1
+Sandbox.WebHome (ntopics=2..prev=1, 2, next=3, numberofpages=3, pagesize=5..)ntopics=2
+FOOT(2,2)(ntopics=2..prev=1, 2, next=3, numberofpages=3, pagesize=5..)
+FOSWIKI11
+
     $expected =~ s/\n$//s;
     $this->assert_str_equals( $expected, $result );
 
@@ -4540,7 +4858,8 @@ sub test_simple_format {
 }%
 '
     );
-    my $expected = <<'HERE';
+    my $expected = $this->_expect_with_deps(
+        <<'FOSWIKI12',
    * !Main.WebHome
    * !Main.WebPreferences
    * !Main.WebTopicList
@@ -4557,7 +4876,25 @@ sub test_simple_format {
    * !TestCases.WebPreferences
    * !TestCases.WebTopicList
 <div class="foswikiSearchResultCount">Number of topics: <span>3</span></div>
-HERE
+FOSWIKI12
+        'Foswiki,<,1.2' => <<'FOSWIKI11');
+   * !TestCases.WebHome
+   * !TestCases.WebPreferences
+   * !TestCases.WebTopicList
+<div class="foswikiSearchResultCount">Number of topics: <span>3</span></div>
+   * !System.WebHome
+   * !System.WebPreferences
+   * !System.WebTopicList
+<div class="foswikiSearchResultCount">Number of topics: <span>3</span></div>
+   * !Main.WebHome
+   * !Main.WebPreferences
+   * !Main.WebTopicList
+<div class="foswikiSearchResultCount">Number of topics: <span>3</span></div>
+   * !Sandbox.WebHome
+   * !Sandbox.WebPreferences
+   * !Sandbox.WebTopicList
+<div class="foswikiSearchResultCount">Number of topics: <span>3</span></div>
+FOSWIKI11
 
     $this->assert_str_equals( $expected, $actual );
 
@@ -5045,7 +5382,7 @@ footer: \$web=$this->{test_web}", $result
   nonoise="on"
   format="   1 $topic"
   pager="on"
-  pagesize="10"
+  pagesize="4"
   pagerformat="pagerformat: $dollarweb=$web"
 }%'
     );
@@ -5055,7 +5392,6 @@ footer: \$web=$this->{test_web}", $result
    1 OkBTopic
    1 OkTopic
    1 TestTopicSEARCH
-   1 WebPreferences
 pagerformat: \$web=$this->{test_web}", $result
     );
 
@@ -5463,7 +5799,7 @@ TOPICTEXT
 <div class="foswikiSearchResult"><div class="foswikiTopRow">
 <a href="/~sven/core/bin/view/$this->{test_web}/Item10491"><b>Item10491</b></a>
 <div class="foswikiSummary"><b>&hellip;</b> it can be created From <nop>IRC<nop>: <em><nop>SomeString</em>.txt So hopefully this topic  <b>&hellip;</b>  hits don't get corrupted. <em><nop>SomeString</em>? " txt<nop>: <nop>SomeString? And  <b>&hellip;</b> ?tab=searchadvanced search=<em><nop>SomeString</em> scope=all order=topic type= <b>&hellip;</b> </div></div>
-<div class="foswikiBottomRow"><span class="foswikiSRRev"><span class="foswikiNew">NEW</span> - <a href="/~sven/core/bin/rdiff/$this->{test_web}/Item10491" rel='nofollow'>16 Mar 2011 - 04:34</a></span> <span class="foswikiSRAuthor">by WikiGuest </span></div>
+<div class="foswikiBottomRow"><span class="foswikiSRRev"><span class="foswikiNew">NEW</span> - <a href="/~sven/core/bin/rdiff/$this->{test_web}/Item10491" rel='nofollow'>16 Mar 2011 - 04:34</a></span> <span class="foswikiSRAuthor">by !WikiGuest </span></div>
 </div>
 <div class="foswikiSearchResultCount">Number of topics: <span>1</span></div>
 RESULT
@@ -5619,26 +5955,25 @@ HERE
 
     $this->createNewFoswikiSession( $Foswiki::cfg{AdminUserLogin}, $query );
     $this->assert_str_equals( $this->{test_web}, $this->{session}->{webName} );
-    require Foswiki::Address;
     while ( my ( $fwaddress, $metatext ) = each %topics ) {
-        my $addrObj = Foswiki::Address->new( string => $fwaddress );
+        my ( $web, $topic ) =
+          Foswiki::Func::normalizeWebTopicName( '', $fwaddress );
         my $topicObj;
 
-        if ( not Foswiki::Func::webExists( $addrObj->web() ) ) {
+        if ( not Foswiki::Func::webExists($web) ) {
             my @webs;
 
-            foreach my $part ( @{ $addrObj->webpath() } ) {
-                my $web;
+            foreach my $part ( split( /\//, $web ) ) {
+                my $w;
 
                 push( @webs, $part );
-                $web = join( '/', @webs );
-                if ( not Foswiki::Func::webExists($web) ) {
-                    Foswiki::Func::createWeb( $web, '_default' );
+                $w = join( '/', @webs );
+                if ( not Foswiki::Func::webExists($w) ) {
+                    Foswiki::Func::createWeb( $w, '_default' );
                 }
             }
         }
-        ($topicObj) =
-          Foswiki::Func::readTopic( $addrObj->web(), $addrObj->topic() );
+        ($topicObj) = Foswiki::Func::readTopic( $web, $topic );
         $topicObj->text($metatext);
         $topicObj->save();
         $topicObj->finish();
@@ -5671,6 +6006,66 @@ HERE
     chomp($result);
 
     return $result;
+}
+
+sub test_pager_details_Item10350_one {
+    my $this = shift;
+
+    my $search = <<'HERE';
+%SEARCH{
+    "web"
+    type="text"
+    web="System"
+    topic="WebHome,WebChanges,WebIndex,WebPreferences"
+    scope="text"
+    nonoise="on"
+    format="$web.$topic"
+    pager="on"
+}%
+HERE
+    my $result = $this->{test_topicObject}->expandMacros($search);
+
+    # Should get the default search order (or an error message, perhaps?)
+    $this->assert_str_equals( <<'THERE', $result );
+System.WebChanges
+System.WebHome
+System.WebIndex
+System.WebPreferences
+THERE
+
+    return;
+}
+
+sub test_pager_details_Item10350_two {
+    my $this = shift;
+
+    my $search = <<'HERE';
+%SEARCH{
+    "web"
+    type="text"
+    web="System"
+    topic="WebHome,WebChanges,WebIndex,WebPreferences"
+    scope="text"
+    nonoise="on"
+    format="$web.$topic"
+    showpage="1"
+    pagesize="5"
+    footer="FOOT($ntopics,$nhits)"
+    pager="on"
+}%
+HERE
+    my $result = $this->{test_topicObject}->expandMacros($search);
+
+    # Should get the default search order (or an error message, perhaps?)
+    $this->assert_str_equals( <<'THERE', $result );
+System.WebChanges
+System.WebHome
+System.WebIndex
+System.WebPreferences
+FOOT(4,4)
+THERE
+
+    return;
 }
 
 1;

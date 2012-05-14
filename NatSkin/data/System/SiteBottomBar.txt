@@ -1,4 +1,4 @@
-%META:TOPICINFO{author="ProjectContributor" comment="reprev" date="1292444337" format="1.1" reprev="10" version="10"}%
+%META:TOPICINFO{author="ProjectContributor" comment="reprev" date="1331117060" format="1.1" reprev="10" version="12"}%
 %META:TOPICPARENT{name="NatSkin"}%
 <h1 >%TOPIC%</h1>
 
@@ -63,8 +63,8 @@ Default bottombar component
 <div class="natCopyRight">%WEBCOPYRIGHT%</div>
 <div class="natSyndicate">
   %MAKETEXT{"Syndicate this site"}% 
-  <a class='natFeedIcon' href='%SCRIPTURL{"view"}%/%WEB%/WebRss'>RSS</a>
-  <a class='natFeedIcon' href='%SCRIPTURL{"view"}%/%WEB%/WebAtom'>ATOM</a>
+  <a class='natFeedIcon' href='%SCRIPTURL{"view"}%/%BASEWEB%/WebRss'>RSS</a>
+  <a class='natFeedIcon' href='%SCRIPTURL{"view"}%/%BASEWEB%/WebAtom'>ATOM</a>
 </div>
 <!-- //sitebottombar -->%STOPINCLUDE%
 
@@ -73,3 +73,4 @@ Default bottombar component
    * <a href="#">%MAKETEXT{"Set new parent"}%</a>
    * <a href="#">%MAKETEXT{"Change name identifier"}%</a>
 -->
+

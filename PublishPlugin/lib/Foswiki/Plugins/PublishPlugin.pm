@@ -7,7 +7,7 @@ package Foswiki::Plugins::PublishPlugin;
 use strict;
 use warnings;
 
-use Foswiki ();
+use Foswiki       ();
 use Foswiki::Func ();
 use Error qw( :try );
 use Assert;
@@ -70,7 +70,7 @@ sub _publishRESTHandler {
         $query->delete('web');
         $webs =~ m#([\w/.,\s]*)#;    # clean up and untaint
 
-        $publisher->publish(split(/[,\s]+/, $1));
+        $publisher->publish( split( /[,\s]+/, $1 ) );
     }
     $publisher->finish();
 }
@@ -89,7 +89,7 @@ sub _display {
 
 # Allow manipulation of $Foswiki::cfg{PublishPlugin}{Dir}
 sub _publishControlCentre {
-    my ($session, $params, $topic, $web, $topicObject) = @_;
+    my ( $session, $params, $topic, $web, $topicObject ) = @_;
 
     my $query = Foswiki::Func::getCgiQuery();
 
@@ -98,6 +98,7 @@ sub _publishControlCentre {
         return CGI::span( { class => 'foswikiAlert' },
             "Only admins can access the control interface" );
     }
+
     # Old code doesn't have isAnAdmin so will allow access to
     # the control UI for everyone. Caveat emptor.
 
@@ -115,12 +116,13 @@ HERE
 
     if ( $action eq 'delete' ) {
         $file =~ m#([\w./\\]+)#;    # untaint
-	if (-e "$Foswiki::cfg{PublishPlugin}{Dir}/$1") {
-	    File::Path::rmtree("$Foswiki::cfg{PublishPlugin}{Dir}/$1");
-	    $output .= CGI::p("$1 deleted");
-	} else {
-	    $output .= CGI::p("Cannot delete $1 - no such file");
-	}
+        if ( -e "$Foswiki::cfg{PublishPlugin}{Dir}/$1" ) {
+            File::Path::rmtree("$Foswiki::cfg{PublishPlugin}{Dir}/$1");
+            $output .= CGI::p("$1 deleted");
+        }
+        else {
+            $output .= CGI::p("Cannot delete $1 - no such file");
+        }
     }
     if ( opendir( D, $Foswiki::cfg{PublishPlugin}{Dir} ) ) {
         my @files = grep( !/^\./, readdir(D) );
@@ -132,8 +134,8 @@ HERE
                 my @cols   = ( CGI::th($link) );
                 my $delcol = CGI::start_form(
                     {
-                        action => Foswiki::Func::getScriptUrl(
-			    $web, $topic, 'view'),
+                        action =>
+                          Foswiki::Func::getScriptUrl( $web, $topic, 'view' ),
                         method => 'POST',
                         name   => $file
                     }
@@ -145,7 +147,8 @@ HERE
                     }
                 );
                 $delcol .= "<input type='hidden' name='file' value='$file'/>";
-                $delcol .= "<input type='hidden' name='action' value='delete' />";
+                $delcol .=
+                  "<input type='hidden' name='action' value='delete' />";
                 $delcol .= "<input type='hidden' name='control' value='1' />";
                 $delcol .= CGI::end_form();
                 push( @cols, $delcol );

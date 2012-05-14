@@ -67,7 +67,8 @@ sub initPlugin {
       || &Foswiki::Func::getPreferencesValue("SPACEDWIKIWORDPLUGIN_DONTSPACE");
     $dontSpaceWords =~ s/^\s*(\w+)\s*$/$1/go;
     $dontSpaceWords =~ s/\s+/ /go;
-    %dontSpaceSet = map { $_ => 1 } split( /[,\s]/, $dontSpaceWords ) if $dontSpaceWords;
+    %dontSpaceSet = map { $_ => 1 } split( /[,\s]/, $dontSpaceWords )
+      if $dontSpaceWords;
 
     Foswiki::Func::registerTagHandler( 'SPACEOUT', \&_SPACEOUT );
 
@@ -136,7 +137,8 @@ sub _spaceOutWikiWordLinks {
     my $upperAlphaRegex = Foswiki::Func::getRegularExpression('upperAlpha');
     my $numericRegex    = Foswiki::Func::getRegularExpression('numeric');
 
-    $linkLabel =~ s/([$lowerAlphaRegex])([$upperAlphaRegex$numericRegex]+)/$1$separator$2/go;
+    $linkLabel =~
+s/([$lowerAlphaRegex])([$upperAlphaRegex$numericRegex]+)/$1$separator$2/go;
     $linkLabel =~ s/([$numericRegex])([$upperAlphaRegex])/$1$separator$2/go;
 
     return $linkLabel;

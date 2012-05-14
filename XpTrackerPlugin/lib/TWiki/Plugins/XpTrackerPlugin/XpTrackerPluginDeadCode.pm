@@ -19,7 +19,7 @@
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details, published at 
+# GNU General Public License for more details, published at
 # http://www.gnu.org/copyleft/gpl.html
 #
 # =========================
@@ -74,7 +74,6 @@ package TWiki::Plugins::XpTrackerPlugin::XpTrackerPluginDeadCode;
 #
 #}
 
-
 ###########################
 # xpGetIterDevelopers
 # WARNING: (RAF) THIS METHOD IS NOT BEING USED ANYWHERE... IS DEAD CODE
@@ -88,7 +87,7 @@ package TWiki::Plugins::XpTrackerPlugin::XpTrackerPluginDeadCode;
 #
 #    my @dev = ();
 #    foreach my $story (@iterStories) {
-#    my $storyText = &TWiki::Func::readTopic($web, $story);      
+#    my $storyText = &TWiki::Func::readTopic($web, $story);
 #
 #    # search for text matching a developer
 #    my $ret = "";

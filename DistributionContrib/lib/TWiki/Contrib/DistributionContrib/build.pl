@@ -13,10 +13,10 @@
 #
 # Standard preamble
 BEGIN {
-	warn '$FOSWIKI_LIBS is not set' unless $ENV{FOSWIKI_LIBS};
-	foreach my $pc ( split( /:/, $ENV{FOSWIKI_LIBS} ) ) {
-		unshift @INC, $pc;
-	}
+    warn '$FOSWIKI_LIBS is not set' unless $ENV{FOSWIKI_LIBS};
+    foreach my $pc ( split( /:/, $ENV{FOSWIKI_LIBS} ) ) {
+        unshift @INC, $pc;
+    }
 }
 use TWiki::Contrib::Build;
 
@@ -32,16 +32,15 @@ package DistributionContribBuild;
 @DistributionContribBuild::ISA = ("TWiki::Contrib::Build");
 
 sub new {
-	my $class = shift;
-	my $this = bless( $class->SUPER::new("DistributionContrib"), $class );
-	return $this;
+    my $class = shift;
+    my $this = bless( $class->SUPER::new("DistributionContrib"), $class );
+    return $this;
 }
 
 sub target_install {
-	my $this = shift;
-	$this->SUPER::target_install();
+    my $this = shift;
+    $this->SUPER::target_install();
 }
-
 
 # Create the build object
 my $builder = new DistributionContribBuild();
@@ -49,11 +48,10 @@ my $builder = new DistributionContribBuild();
 # Build the target on the command line, or the default target
 
 if (@ARGV) {
-	$builder->build( $builder->{target} );    #NB. Buildpm picks up from ARGV
+    $builder->build( $builder->{target} );    #NB. Buildpm picks up from ARGV
 }
 else {
-	$builder->build("test");
-	$builder->build("build");
+    $builder->build("test");
+    $builder->build("build");
 }
-
 

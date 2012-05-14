@@ -22,7 +22,19 @@
 <table cellspacing="5" class="natChangeForm">
 %NATFORMLIST{
   separator=" "
-  format="<tr><td><input type='radio' name='formtemplate' id='formtemplateelem$index' $checked value='$name' /></td><td style='padding-right:10px'><label for='formtemplateelem$index'><nop>$formTopic</label></td><td>$percntIF{\"'$name'='none'\" then=\"%MAKETEXT{"remove the current form (caution: possible data loss)"}%\" else=\"$percntFORMFIELD{\"Summary\" topic=\"$formWeb.$formTopic\"}$percnt (<a href='%SCRIPTURLPATH{"view"}%/$formWeb/$formTopic' target='_blank'>?</a>)\"}$percnt</td></tr>"
+  format="<tr>
+      <td>
+        <input type='radio' name='formtemplate' id='formtemplateelem$index' $checked value='$name' />
+      </td>
+      <td style='padding-right:10px'>
+        <label for='formtemplateelem$index'><nop>$formTopic</label>
+      </td>
+      <td>$percntIF{\"'$name'='none'\" 
+          then=\"%MAKETEXT{"remove the current form (caution: possible data loss)"}%\" 
+          else=\"$percntFORMFIELD{\"Summary\" topic=\"$formWeb.$formTopic\"}$percnt (<a href='%SCRIPTURLPATH{"view"}%/$formWeb/$formTopic' target='_blank'>?</a>)\"
+        }$percnt
+      </td>
+    </tr>"
 }%
 </table>
 </div>

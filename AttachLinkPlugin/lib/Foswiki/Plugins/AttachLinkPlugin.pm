@@ -1,4 +1,4 @@
-# Plugin for Foswiki - The Free and Open Source Wiki, http://foswiki.org/ 
+# Plugin for Foswiki - The Free and Open Source Wiki, http://foswiki.org/
 #
 # Copyright (C) 2000-2003 Andrea Sterbini, a.sterbini@flashnet.it
 # Copyright (C) 2006 Meredith Lesly, msnomer@spamcop.net
@@ -31,20 +31,21 @@ $RELEASE = '1.001';
 
 ###############################################################################
 sub initPlugin {
-  my ($baseTopic, $baseWeb) = @_;
+    my ( $baseTopic, $baseWeb ) = @_;
 
-  # check for Plugins.pm versions
-  if( $Foswiki::Plugins::VERSION < 1.026 ) {
-    Foswiki::Func::writeWarning( "Version mismatch between AttachLinkPlugin and Plugins.pm" );
-    return 0;
-  }
+    # check for Plugins.pm versions
+    if ( $Foswiki::Plugins::VERSION < 1.026 ) {
+        Foswiki::Func::writeWarning(
+            "Version mismatch between AttachLinkPlugin and Plugins.pm");
+        return 0;
+    }
 
-  # register the tag handlers
-  Foswiki::Func::registerTagHandler( 'ATTACHMENT', \&_ATT);
+    # register the tag handlers
+    Foswiki::Func::registerTagHandler( 'ATTACHMENT', \&_ATT );
 
-  # Plugin correctly initialized
-  return 1;
-} 
+    # Plugin correctly initialized
+    return 1;
+}
 
 # The function used to handle the %ATTACHMENT{...}% tag
 #
@@ -55,7 +56,8 @@ sub initPlugin {
 #  Text that you want for the hyperlink - which may be an IMG tag!
 
 sub _ATT {
-    my($session, $params, $theTopic, $theWeb) = @_;
+    my ( $session, $params, $theTopic, $theWeb ) = @_;
+
     # $session  - a reference to the Foswiki session object (if you don't know
     #             what this is, just ignore it)
     # $params=  - a reference to a Foswiki::Attrs object containing parameters.
@@ -66,17 +68,18 @@ sub _ATT {
     # $theWeb   - name of the web in the query
     # Return: the result of processing the tag
 
-    my $attName = $params->{name} || $params->{_DEFAULT};
-    my $path = Foswiki::Func::getPubUrlPath();
+    my $attName  = $params->{name} || $params->{_DEFAULT};
+    my $path     = Foswiki::Func::getPubUrlPath();
     my $attTopic = $params->{topic} || $theTopic;
-    my $attWeb = $params->{web} || $theWeb;
-    my $label = $params->{label};
+    my $attWeb   = $params->{web} || $theWeb;
+    my $label    = $params->{label};
 
     my $txt = "<a href='$path/$attWeb/$attTopic/$attName'>";
 
-    if( $label ) {
+    if ($label) {
         $txt .= $label;
-    } else {
+    }
+    else {
         $txt .= $attName;
     }
     $txt .= '</a>';

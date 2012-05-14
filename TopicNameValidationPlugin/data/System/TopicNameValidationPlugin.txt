@@ -1,17 +1,5 @@
 %META:TOPICINFO{author="ProjectContributor" date="1224862720" format="1.1" version="$Rev$"}%
 ---+!! %TOPIC%
-<!--
-One line description, required for extensions repository catalog.
-   * Set SHORTDESCRIPTION = Control naming of topics
--->
-<table style="float:right">
-<tr>
-  <td><img src="%ATTACHURLPATH%/wikiringlogo40x40.png"></td>
-  <td><a href="http://wikiring.com" title="Make your Wiki ring!" style="text-decoration:none">
-      Powered by <br /> <nop>WikiRing Consultants </a>
-  </td>
-</tr>
-</table>
 %SHORTDESCRIPTION%
 
 This plugin allows you to enforce a certain policy for topic names by defining
@@ -56,20 +44,24 @@ A rule can be disabled temporarily by adding =disabled= to the third column.
 %$INSTALL_INSTRUCTIONS%
 
 ---++ Plugin Info
+<!--
+One line description, required for extensions repository catalog.
+   * Set SHORTDESCRIPTION = Control naming of topics
+-->
 
 Sponsored by <a href="http://www.schenck-rotec.net"><img src="%ATTACHURLPATH%/schenck_logo.gif" border="0" title="Schenck-RoTec"/></a>
 
 |  Plugin Author(s): | Foswiki:Main/MichaelDaum |
-|  Copyright &copy;: | 2008-2009, Michael Daum http://michaeldaumconsulting.com |
+|  Copyright &copy;: | 2008-2012, Michael Daum http://michaeldaumconsulting.com |
 |  License: | [[http://www.gnu.org/licenses/gpl.html][GPL (Gnu General Public License)]] |
 |  Release: | %$RELEASE% |
 |  Version: | %$VERSION% |
 |  Change History: | <!-- versions below in reverse order -->&nbsp; |
+|  07 May 2012 | added german translation |
 |  23 Apr 2009 | converted to foswiki plugin |
 |  24 Oct 2008 | initial version |
 |  Dependencies: | %$DEPENDENCIES% |
 |  Plugin Home: | Foswiki:Extensions/%TOPIC% |
 |  Support: | Foswiki:Support/%TOPIC% |
 
-%META:FILEATTACHMENT{name="wikiringlogo40x40.png" attachment="wikiringlogo40x40.png" attr="h" comment="" date="1189787359" path="wikiringlogo40x40.png" size="2571" stream="wikiringlogo40x40.png" tmpFilename="" user="ProjectContributor" version="1"}%
 %META:FILEATTACHMENT{name="schenck_logo.gif" attachment="schenck_logo.gif" attr="h" comment="" date="1184958431" path="schenck_logo.gif" size="882" stream="schenck_logo.gif" tmpFilename="/var/tmp/CGItemp4701" user="ProjectContributor" version="1"}%

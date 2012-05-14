@@ -39,83 +39,111 @@ The book parser accepts topics in a variety of formats, as described in %SYSTEMW
 =cut
 
 sub new {
-    my ($class, $book_topic) = @_;
+    my ( $class, $book_topic ) = @_;
 
-    my ($web, $topic) = Foswiki::Func::normalizeWebTopicName(
-	Foswiki::Func::getPreferencesValue('BOOKMAKER_BOOKWEB') || 'Sandbox',
-	$book_topic);
+    my ( $web, $topic ) =
+      Foswiki::Func::normalizeWebTopicName(
+        Foswiki::Func::getPreferencesValue('BOOKMAKER_BOOKWEB') || 'Sandbox',
+        $book_topic );
 
-    my $this = bless({ web => $web, topic => $topic, order => [],
-		     before => '', after => '' }, $class);
+    my $this = bless(
+        {
+            web    => $web,
+            topic  => $topic,
+            order  => [],
+            before => '',
+            after  => ''
+        },
+        $class
+    );
 
     # load the table of contents topic
-    if (Foswiki::Func::topicExists($web, $topic)) {
-        my ($meta, $text) = Foswiki::Func::readTopic($web, $topic);
-	throw Foswiki::AccessControlException(
-	    "VIEW", $Foswiki::Plugins::SESSION->{user}, $web, $topic, "access denied")
-	    unless Foswiki::Func::checkAccessPermission(
-		"VIEW", Foswiki::Func::getWikiName(),
-		$text, $topic, $web, $meta);
+    if ( Foswiki::Func::topicExists( $web, $topic ) ) {
+        my ( $meta, $text ) = Foswiki::Func::readTopic( $web, $topic );
+        throw Foswiki::AccessControlException( "VIEW",
+            $Foswiki::Plugins::SESSION->{user},
+            $web, $topic, "access denied" )
+          unless Foswiki::Func::checkAccessPermission( "VIEW",
+            Foswiki::Func::getWikiName(),
+            $text, $topic, $web, $meta );
 
-	# Expand any embedded macros. Note that this *destroys* the macros.
-	$text = Foswiki::Func::expandCommonVariables(
-	    $text, $topic, $web, $meta);
+        # Expand any embedded macros. Note that this *destroys* the macros.
+        $text =
+          Foswiki::Func::expandCommonVariables( $text, $topic, $web, $meta );
 
         # extract the list
         my @lines = grep { /^(\t|   )+(\*|\d+)\s/ } split( /[\n\r]+/, $text );
-    
+
         # Check that each topic in the WebOrder only appears once
         my %seen;
-	my $state = 0; # 0 = before list, 1 = in list, 2 = after list
+        my $state = 0;    # 0 = before list, 1 = in list, 2 = after list
 
-        foreach my $line ( @lines ) {
-	    if ($state < 2 && $line =~ /^((?:   |\t)+)(?:\*|\d+)\s*(.*?)\s*$/ ) {
-		$state = 1;
-		# drop through
-	    } elsif ($state == 0) {
-		$this->{before} .= "$line\n";
-		next;
-	    } elsif ($state > 0) {
-		$state = 2;
-		$this->{after} .= "$line\n";
-		next;
-	    }
-		
-	    my ($indent, $name) = ($1, $2);
-	    $indent =~ s/(   |\t)/./g;
-        
-	    # The name may be:
-	    # Web.Topic
-	    # [[Topic name]] - relative to the web the book is in
-	    # [[Web.topic name]]
-	    # [[Web.topic name][arbitrary  string]]
-	    # The standard Foswiki rules are used to convert these to a web.topic name
-	    # (See Foswiki::Render::_handleSquareBracketedLink)
-	    if ($name =~ /^\[\[(.*)\]\]$/) { # squab
-		$name = $1;
-		# We are only interested in the first part
-		$name =~ s/\]\[.*$//;
-		# Extract '?params' and anchor
-		$name =~ s/[\?#].*$//;
-		# filter out &any; entities (legacy)
-		$name =~ s/\&[a-z]+\;//gi;
-		# filter out &#123; entities (legacy)
-		$name =~ s/\&\#[0-9]+\;//g;
-		# Filter junk
-		$name =~ s/$Foswiki::cfg{NameFilter}+/ /g;
-		$name = ucfirst($name);
-		# Collapse spaces and capitalise following letter
-		$name =~ s/\s([$Foswiki::regex{mixedAlphaNum}])/\U$1/g;
-		# Get rid of remaining spaces, i.e. spaces in front of -'s and ('s
-		$name =~ s/\s//g;
-	    }
+        foreach my $line (@lines) {
+            if ( $state < 2 && $line =~ /^((?:   |\t)+)(?:\*|\d+)\s*(.*?)\s*$/ )
+            {
+                $state = 1;
 
-	    my ($eweb, $etopic) = $this->_canonicalise($name);
-	    $name = "$eweb.$etopic";
-            next if ($seen{$name});
+                # drop through
+            }
+            elsif ( $state == 0 ) {
+                $this->{before} .= "$line\n";
+                next;
+            }
+            elsif ( $state > 0 ) {
+                $state = 2;
+                $this->{after} .= "$line\n";
+                next;
+            }
+
+            my ( $indent, $name ) = ( $1, $2 );
+            $indent =~ s/(   |\t)/./g;
+
+      # The name may be:
+      # Web.Topic
+      # [[Topic name]] - relative to the web the book is in
+      # [[Web.topic name]]
+      # [[Web.topic name][arbitrary  string]]
+      # The standard Foswiki rules are used to convert these to a web.topic name
+      # (See Foswiki::Render::_handleSquareBracketedLink)
+            if ( $name =~ /^\[\[(.*)\]\]$/ ) {    # squab
+                $name = $1;
+
+                # We are only interested in the first part
+                $name =~ s/\]\[.*$//;
+
+                # Extract '?params' and anchor
+                $name =~ s/[\?#].*$//;
+
+                # filter out &any; entities (legacy)
+                $name =~ s/\&[a-z]+\;//gi;
+
+                # filter out &#123; entities (legacy)
+                $name =~ s/\&\#[0-9]+\;//g;
+
+                # Filter junk
+                $name =~ s/$Foswiki::cfg{NameFilter}+/ /g;
+                $name = ucfirst($name);
+
+                # Collapse spaces and capitalise following letter
+                $name =~ s/\s([$Foswiki::regex{mixedAlphaNum}])/\U$1/g;
+
+              # Get rid of remaining spaces, i.e. spaces in front of -'s and ('s
+                $name =~ s/\s//g;
+            }
+
+            my ( $eweb, $etopic ) = $this->_canonicalise($name);
+            $name = "$eweb.$etopic";
+            next if ( $seen{$name} );
             $seen{$name} = 1;
 
-            push(@{$this->{order}}, { web => $eweb, topic => $etopic, level => length($indent) - 1 });
+            push(
+                @{ $this->{order} },
+                {
+                    web   => $eweb,
+                    topic => $etopic,
+                    level => length($indent) - 1
+                }
+            );
         }
     }
     return $this;
@@ -123,8 +151,8 @@ sub new {
 
 # Private method to get a canonical web.topic name.
 sub _canonicalise {
-    my ($this, $name) = @_;
-    return Foswiki::Func::normalizeWebTopicName($this->{web}, $name);
+    my ( $this, $name ) = @_;
+    return Foswiki::Func::normalizeWebTopicName( $this->{web}, $name );
 }
 
 =begin TML
@@ -141,11 +169,12 @@ Note that a topic can only occur once in a book.
 =cut
 
 sub find {
-    my ($this, $name) = @_;
-    my ($web, $topic) = $this->_canonicalise($name);
-    for (my $i = 0; $i < scalar(@{$this->{order}}); $i++) {
-	return $i if ($this->{order}->[$i]->{web} eq $web &&
-		      $this->{order}->[$i]->{topic} eq $topic);
+    my ( $this, $name )  = @_;
+    my ( $web,  $topic ) = $this->_canonicalise($name);
+    for ( my $i = 0 ; $i < scalar( @{ $this->{order} } ) ; $i++ ) {
+        return $i
+          if ( $this->{order}->[$i]->{web} eq $web
+            && $this->{order}->[$i]->{topic} eq $topic );
     }
     return -1;
 }
@@ -160,8 +189,8 @@ The entry is a hash containing ={ web, topic, level }=
 =cut
 
 sub at {
-    my ($this, $i) = @_;
-    return undef unless $i >= 0 && $i < scalar(@{$this->{order}});
+    my ( $this, $i ) = @_;
+    return undef unless $i >= 0 && $i < scalar( @{ $this->{order} } );
     return $this->{order}->[$i];
 }
 
@@ -176,15 +205,17 @@ Returns the removed entry.
 =cut
 
 sub remove {
-    my ($this, $i) = @_;
+    my ( $this, $i ) = @_;
     my $x;
-    if ($i <= 0) {
-	$x = shift(@{$this->{order}});
-    } elsif ($i >= $#{$this->{order}}) {
-	$x = pop(@{$this->{order}});
-    } else {
-	$x = $this->{order}->[$i];
-	splice(@{$this->{order}}, $i, 1);
+    if ( $i <= 0 ) {
+        $x = shift( @{ $this->{order} } );
+    }
+    elsif ( $i >= $#{ $this->{order} } ) {
+        $x = pop( @{ $this->{order} } );
+    }
+    else {
+        $x = $this->{order}->[$i];
+        splice( @{ $this->{order} }, $i, 1 );
     }
     return $x;
 }
@@ -208,7 +239,7 @@ Returns the new entry.
 
 sub add {
     my $this = shift;
-    return $this->insert(scalar(@{$this->{order}}), @_);
+    return $this->insert( scalar( @{ $this->{order} } ), @_ );
 }
 
 =begin TML
@@ -231,22 +262,25 @@ start, if =$i > length= at the end,
 =cut
 
 sub insert {
-    my ($this, $i, $name, $level) = @_;
+    my ( $this, $i, $name, $level ) = @_;
     my $e;
-    if (ref($name)) {
-	$e = $name;
-    } else {
-	my ($web, $topic) = $this->_canonicalise($name);
-	$e = { web => $web, topic => $topic, level => $level || 0 };
+    if ( ref($name) ) {
+        $e = $name;
+    }
+    else {
+        my ( $web, $topic ) = $this->_canonicalise($name);
+        $e = { web => $web, topic => $topic, level => $level || 0 };
     }
     if ( $i >= 0 ) {
-	if ($i < scalar(@{$this->{order}}) ) {
-	    splice(@{$this->{order}}, $i, 0, $e);
-	} else {
-	    push(@{$this->{order}}, $e);
-	}
-    } else {
-	unshift(@{$this->{order}}, $e);
+        if ( $i < scalar( @{ $this->{order} } ) ) {
+            splice( @{ $this->{order} }, $i, 0, $e );
+        }
+        else {
+            push( @{ $this->{order} }, $e );
+        }
+    }
+    else {
+        unshift( @{ $this->{order} }, $e );
     }
     return $e;
 }
@@ -269,7 +303,7 @@ Modifying the list during iteration is *not* supported.
 sub each {
     my ($this) = @_;
     require Foswiki::ListIterator;
-    return Foswiki::ListIterator->new($this->{order});
+    return Foswiki::ListIterator->new( $this->{order} );
 }
 
 =begin TML
@@ -285,22 +319,33 @@ header and footer sections.
 sub save {
     my ($this) = @_;
     throw Foswiki::AccessControlException("CHANGE")
-	unless Foswiki::Func::checkAccessPermission(
-	    "CHANGE", Foswiki::Func::getWikiName(),
-	    undef, $this->{topic}, $this->{web});
+      unless Foswiki::Func::checkAccessPermission( "CHANGE",
+        Foswiki::Func::getWikiName(),
+        undef, $this->{topic}, $this->{web} );
     my $m;
-    if (Foswiki::Func::topicExists($this->{web}, $this->{topic})) {
-	($m, my $t) = Foswiki::Func::readTopic($this->{web}, $this->{topic});
+    if ( Foswiki::Func::topicExists( $this->{web}, $this->{topic} ) ) {
+        ( $m, my $t ) =
+          Foswiki::Func::readTopic( $this->{web}, $this->{topic} );
     }
-    my $i = 0;
+    my $i    = 0;
     my $list = $this->{before} . join(
-	"\n",
-	map { ('   ' x ($_->{level} + 1)) . (++$i) . " $_->{web}.$_->{topic}" } @{$this->{order}})
-	. "\n$this->{after}";
-    Foswiki::Func::saveTopic($this->{web}, $this->{topic}, $m, $list, {
-	ignorepermissions => 1,
-	minor => 1,
-	dontlog => 1 });
+        "\n",
+        map {
+                ( '   ' x ( $_->{level} + 1 ) )
+              . ( ++$i )
+              . " $_->{web}.$_->{topic}"
+          } @{ $this->{order} }
+    ) . "\n$this->{after}";
+    Foswiki::Func::saveTopic(
+        $this->{web},
+        $this->{topic},
+        $m, $list,
+        {
+            ignorepermissions => 1,
+            minor             => 1,
+            dontlog           => 1
+        }
+    );
 }
 
 =begin TML

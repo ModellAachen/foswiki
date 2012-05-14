@@ -28,4 +28,4 @@ use TWiki::Contrib::Build;
 $build = new TWiki::Contrib::Build("YetAnotherXpTrackerPlugin");
 
 # Build the target on the command line, or the default target
-$build->build($build->{target});
+$build->build( $build->{target} );

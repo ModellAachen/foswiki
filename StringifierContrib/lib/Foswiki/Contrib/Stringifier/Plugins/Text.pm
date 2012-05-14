@@ -18,21 +18,32 @@ our @ISA = qw( Foswiki::Contrib::Stringifier::Base );
 
 # Note: I need not do any register, because I am the default handler for stringification!
 
+use Encode::Guess ();
+
 sub stringForFile {
     my ( $self, $file ) = @_;
     my $in;
 
     # check it is a text file
-    return '' unless ( -T $file );
+    return '' unless ( -e $file );
 
     open($in, $file) or return "";
     local $/ = undef;    # set to read to EOF
     my $text = <$in>;
     close($in);
 
-    $text = $self->fromUtf8($text);
-    $text =~ s/^\?//; # remove bom
+    my $decoder = Encode::Guess::guess_encoding($text, "utf-8, iso8859-1");
 
-    return $text;
+    if (ref($decoder)) {
+      #print STDERR "here1: decodere=".$decoder->name."\n";
+      $text = $decoder->decode($text);
+    } else {
+      #print STDERR "decoder=$decoder\n";
+      $text = $self->decode($text, $Foswiki::cfg{StringifierContrib}{CharSet}{text} || 'utf-8');
+    }
+
+    $text =~ s/^\?//; # remove bom
+    
+    return $self->encode($text);
 }
 1;

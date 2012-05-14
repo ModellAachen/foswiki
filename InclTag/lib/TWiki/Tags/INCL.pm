@@ -26,41 +26,49 @@ package TWiki;
 use TWiki::Func;
 
 sub _INCL {
-    my ($twikiObj, $params, $topic, $web) = @_;
+    my ( $twikiObj, $params, $topic, $web ) = @_;
     my $webNameRegex = TWiki::Func::getRegularExpression('webNameRegex');
-    my $inclWeb = $web;
-    my $inclTopic = $params->{'_DEFAULT'} || $params->{'topic'};
-    my $warn = $params->{'warn'} || 'on';
-    my $fallback = $params->{'fallback'};
-    my $user = TWiki::Func::getWikiName();
+    my $inclWeb      = $web;
+    my $inclTopic    = $params->{'_DEFAULT'} || $params->{'topic'};
+    my $warn         = $params->{'warn'} || 'on';
+    my $fallback     = $params->{'fallback'};
+    my $user         = TWiki::Func::getWikiName();
     my $webs;
 
-    if ($inclTopic =~ /^($webNameRegex)\.([^.]+)$/) {
-	$inclWeb = $1;
-	$inclTopic = $2;
+    if ( $inclTopic =~ /^($webNameRegex)\.([^.]+)$/ ) {
+        $inclWeb   = $1;
+        $inclTopic = $2;
     }
 
     if ($fallback) {
-	$webs = $inclWeb . ',' . $fallback;
-    } else {
-	$webs = $inclWeb;
+        $webs = $inclWeb . ',' . $fallback;
+    }
+    else {
+        $webs = $inclWeb;
     }
     $webs =~ tr/ //d;
 
     my $name = TWiki::Func::getWikiName();
 
-    foreach my $aWeb (split(/,/, $webs)) {
-	if (TWiki::Func::topicExists($aWeb, $inclTopic) &&
-	    TWiki::Func::checkAccessPermission('VIEW', $name, undef, $inclTopic, $aWeb)) {
-	    my ($meta, $text) = TWiki::Func::readTopic($aWeb, $inclTopic);
-	    return TWiki::Func::expandCommonVariables($text, $topic, $aWeb);
-	}
+    foreach my $aWeb ( split( /,/, $webs ) ) {
+        if (
+            TWiki::Func::topicExists( $aWeb, $inclTopic )
+            && TWiki::Func::checkAccessPermission(
+                'VIEW', $name, undef, $inclTopic, $aWeb
+            )
+          )
+        {
+            my ( $meta, $text ) = TWiki::Func::readTopic( $aWeb, $inclTopic );
+            return TWiki::Func::expandCommonVariables( $text, $topic, $aWeb );
+        }
     }
-    if (warn eq 'on') {
-	return $twikiObj->inlineAlert('alerts', 'topic_not_found', $inclTopic);
-    } else {
-	return '';
+    if ( warn eq 'on' ) {
+        return $twikiObj->inlineAlert( 'alerts', 'topic_not_found',
+            $inclTopic );
+    }
+    else {
+        return '';
     }
 }
-    
+
 return 1;

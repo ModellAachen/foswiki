@@ -163,11 +163,12 @@ separator) may contain special variables:
 -->
 
 |  Plugin Author: | Michael Daum |
-|  Copyright &copy;: | 2006-2009, Michael Daum http://michaeldaumconsulting.com |
+|  Copyright &copy;: | 2006-2012, Michael Daum http://michaeldaumconsulting.com |
 |  License: | GPL ([[http://www.gnu.org/copyleft/gpl.html][GNU General Public License]]) |
 |  Release: | %$RELEASE% |
 |  Version: | %$VERSION% |
 |  Change History: | &nbsp; |
+|  24 Feb 2012: | check access rights before extracting the !TopicTitle |
 |  20 Aug 2009: | fixed usage of =$web= |
 |  03 Jul 2009: | fixed fallback method to get the !TopicTitle without !DBCachePlugin |
 |  29 Jun 2009: | use Foswiki !DBCachePlugin now |

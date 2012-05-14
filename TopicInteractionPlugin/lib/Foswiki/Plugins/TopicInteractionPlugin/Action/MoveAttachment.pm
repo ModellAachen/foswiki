@@ -18,9 +18,9 @@ package Foswiki::Plugins::TopicInteractionPlugin::Action::MoveAttachment;
 use strict;
 use warnings;
 use Error qw( :try );
-use Foswiki::Plugins::DBCachePlugin ();
 use Foswiki::Plugins::TopicInteractionPlugin::Core ();
 use constant DRY => 0; # toggle me
+use Foswiki::Func ();
 
 sub handle {
   my ($response, $params) = @_;
@@ -55,7 +55,11 @@ sub handle {
   }
 
   # disable dbcache handler during loop
-  Foswiki::Plugins::DBCachePlugin::disableRenameHandler();
+  my $dbCacheEnabled = Foswiki::Func::getContext()->{DBCachePluginEnabled};
+  if ($dbCacheEnabled) {
+    require Foswiki::Plugins::DBCachePlugin;
+    Foswiki::Plugins::DBCachePlugin::disableRenameHandler();
+  }
 
   my $error;
   foreach my $fileName (@fileNames) {
@@ -98,12 +102,14 @@ sub handle {
     last if $error;
   }
 
-  # enabling dbcache handlers again
-  Foswiki::Plugins::DBCachePlugin::enableRenameHandler();
+  if ($dbCacheEnabled) {
+    # enabling dbcache handlers again
+    Foswiki::Plugins::DBCachePlugin::enableRenameHandler();
 
-  # manually update this topic
-  Foswiki::Plugins::DBCachePlugin::loadTopic($web, $topic);
-  Foswiki::Plugins::DBCachePlugin::loadTopic($newWeb, $newTopic);
+    # manually update this topic
+    Foswiki::Plugins::DBCachePlugin::loadTopic($web, $topic);
+    Foswiki::Plugins::DBCachePlugin::loadTopic($newWeb, $newTopic);
+  }
 
   if ($error) {
     Foswiki::Plugins::TopicInteractionPlugin::Core::printJSONRPC($response, 1, $error, $id)

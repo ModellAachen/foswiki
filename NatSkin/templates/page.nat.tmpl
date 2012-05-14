@@ -6,17 +6,13 @@
 </html>
 %TMPL:END%
 
-%TMPL:DEF{"msie::compatibility"}%%IF{"context 'msie'"
-  then="%IF{"context 'edit' and $'EDIT_FORCE_IE8_COMPATIBILITYMODE'='on'" 
-    then="$n<meta http-equiv='X-UA-Compatible' content='ie=emulateie7,chrome=1' />"
-    else="$n<meta http-equiv='X-UA-Compatible' content='ie=edge,chrome=1' />"
-  }%"
-}%%TMPL:END%
-
-%TMPL:DEF{"head"}%<head>%TMPL:P{"msie::compatibility"}%
+%TMPL:DEF{"head"}%<head>%TMPL:P{context="msie" then="msie::compatibility"}%
 <title>%TMPL:P{"title"}%</title>
 <meta charset="%CHARSET%" />
 <meta name="date" content="%REVINFO{"$http"}%" /> 
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="icon" href="%TMPL:P{"favicon"}%" type="image/x-icon" />
 <link rel="shortcut icon" href="%TMPL:P{"favicon"}%" type="image/x-icon" />
 %TMPL:P{"meta"}%%TMPL:P{"metaflags"}%%TMPL:P{"styles"}%%TMPL:P{"javascript"}%%WEBCOMPONENT{"HtmlHead"}%

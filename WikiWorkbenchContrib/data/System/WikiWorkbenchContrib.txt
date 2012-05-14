@@ -1,33 +1,93 @@
 %META:TOPICINFO{author="ProjectContributor" date="1173050334" format="1.1" reprev="1.1" version="1"}%
 ---+!! %TOPIC%
+%SHORTDESCRIPTION%
 
 %TOC%
-<table style="float:right">
-<tr>
-  <td><img src="%ATTACHURLPATH%/wikiringlogo40x40.png"></td>
-  <td><a href="http://wikiring.com" title="Make your Wiki ring!" style="text-decoration:none">
-      Powered by <br /> <nop>WikiRing Consultants </a>
-  </td>
-</tr>
-</table>
 
----++ Description
-This is a <nop>WikiApplication to write <nop>WikiApplications.
+---++ Introduction
+
+The !WikiWorkbench standardizes writing, deploying and using wiki applications
+on Foswiki. It builds on the core concepts of standard Foswiki and establishes
+a unified terminology to leverage concepts and key benefits known from
+conventional programming towards wiki applications. These are:
+
+   * separation of programming code from net data: clearly distinguish the roles of wiki application programmers and wiki authors 
+   * reusability: bundle functions into libraries to be used in multiple places
+   * abstraction: establish a multi-level architecture of wiki applications, one built upon the other 
+   * standardize model, view and control: share common concepts defining !DataForms, view and edit templates
+   * typed content: establish a hierarchy of !TopicTypes to let topics participate in specific wiki applications
+   * documentation: auto-generate complete documentation for a wiki application ready to be printed out
+
+While these concepts are nothing new for a normal programmer, they do have a
+clear equivalent using Foswiki as an application framework. Wiki applications
+still are written in TML using your browser on your foswiki site. However, all
+bits are managed in a clean way to guarantee that you will still find them
+years later. People trained to write wiki applications the !WikiWorkbench way
+will immediately know where to look and fix applications written by others, as
+they all share the same concepts.  So by establishing a clear teminology and
+best practice, you will be able to maintain even large wiki apps consisting of
+hundrets of different components working
+together long term. 
+
+!WikiWorkbench has been developed over the last 5 years working together with a
+series of companies in need of large scale wiki applications, custom tailored to their
+business needs, covering fields like
+
+   * human resource management 
+   * skills management
+   * project management
+   * tour planning
+   * book reviewing
+   * public relations management
+   * employee training
+   * knowledge management
+   * vacation planning
+   * corporate blogging
+   * enterprise search applications 
+
+---++ Getting started
+
+When installing the !WikiWorkbench, you will get two new webs: 
+
+   * Applications: the core of the !WikiWorkbench
+   * _WikiApplicationTemplate: an application template to bootstrap a new wiki app
+
+The [[Applications.WebHome][Applications web]] is the starting point accessing and creating
+all wiki applications. There's a button to create a new wiki application.
+
+   1 Click on the button "New !WikiApplication".
+   1 Enter the name of your new wiki application, e.g. !MyCompanyApp (this must be a valid web name for foswiki)
+   1 Enter a short description what this application is about.
+   1 Click "Submit".
+
+This will create a new subweb under Applications web (e.g. !Applications.MyCompanyApp). 
+
+All !WikiWorkbench applications are located under the Applications web. Any
+code part of your application will be contained in this newly created subweb.
+
+In this sense a "wiki application" is the sum of all components stored in the
+Applications subweb (Applications.MyCompanyApp).  You will be able to write and
+maintain the wiki application by going to this web.
+
+A wiki application is made up of different components that are used when deploying it to one or more 
+target webs...
+
 
 ---++ Installation Instructions
 %$INSTALL_INSTRUCTIONS%
       
----++ !AddOn Info
+---++ Installation Instructions
 <!--
-   * Set SHORTDESCRIPTION = IDE for <nop>WikiApplications
+   * Set SHORTDESCRIPTION = Framework for <nop>WikiApplications
 -->
 
 |  Authors: | Foswiki:Main.MichaelDaum |
-|  Copyright &copy;: | 2007 Michael Daum http://michaeldaumconsulting.com |
+|  Copyright &copy;: | 2007-2012 Michael Daum http://michaeldaumconsulting.com |
 |  License: | GPL ([[http://www.gnu.org/copyleft/gpl.html][GNU General Public License]]) |
 |  Version: | %$VERSION% |
 |  Release: | %$RELEASE% |
 |  Change History: | |
+|  01 Mar 2012 | first public release |
 |  30 Oct 2007 | first version in svn |
 |  30 Apr 2007 | initial version |
 |  Dependencies: | %$DEPENDENCIES% |

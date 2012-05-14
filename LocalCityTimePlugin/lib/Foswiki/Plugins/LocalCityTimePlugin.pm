@@ -4,12 +4,16 @@ package Foswiki::Plugins::LocalCityTimePlugin;
 use strict;
 
 our $SHORTDESCRIPTION = 'Shows the local time in a city';
+
 # root dir of zone info files
-our $tzDir     = '/usr/share/zoneinfo';
+our $tzDir = '/usr/share/zoneinfo';
+
 # path to date command
-our $dateCmd   = '/bin/date';
+our $dateCmd = '/bin/date';
+
 # RFC-822 compliant date format
 our $dateParam = "'+\%a, \%d \%b \%Y \%T \%z \%Z'";
+
 # Example: Fri, 14 Nov 2003 23:46:52 -0800 PST
 
 our $VERSION = '$Rev$';
@@ -19,9 +23,9 @@ sub initPlugin {
     my ( $topic, $web, $user, $installWeb ) = @_;
 
     die "tzDir $tzDir does not exist" unless -d $tzDir;
-    die "dateCmd $dateCmd not found" unless -x $dateCmd;
+    die "dateCmd $dateCmd not found"  unless -x $dateCmd;
 
-    Foswiki::Func::registerTagHandler('LOCALCITYTIME', \&_LOCALCITYTIME);
+    Foswiki::Func::registerTagHandler( 'LOCALCITYTIME', \&_LOCALCITYTIME );
 
     return 1;
 }
@@ -31,27 +35,30 @@ sub _LOCALCITYTIME {
 
     my $timeZone = $attributes->{_DEFAULT} || '';
     $timeZone =~ s/[^\w\-\/\_\+]//gos;
-    unless( $timeZone ) {
+    unless ($timeZone) {
+
         # return help
         return "LocalCityTimePlugin help: Enter a Continent/City "
-          ."timezone code, e.g. %<nop>LOCALCITYTIME{\"Europe/Zurich\"}%";
+          . "timezone code, e.g. %<nop>LOCALCITYTIME{\"Europe/Zurich\"}%";
     }
 
     # try date command and zoneinfo file
     my $tz = $tzDir . "/" . $timeZone;
-    unless( -f $tz ) {
-        return "LocalCityTimePlugin warning: Invalid Timezone "
+    unless ( -f $tz ) {
+        return
+            "LocalCityTimePlugin warning: Invalid Timezone "
           . "'$timeZone'. Use a Continent/City timezone code "
-            . " e.g. %<nop>LOCALCITYTIME{\"Europe/Zurich\"}%";
+          . " e.g. %<nop>LOCALCITYTIME{\"Europe/Zurich\"}%";
     }
-    my $saveTZ = $ENV{TZ};       # save timezone
+    my $saveTZ = $ENV{TZ};    # save timezone
     $ENV{TZ} = $tz;
     my $text = `$dateCmd $dateParam`;
-    chomp( $text );
-    if (defined $saveTZ) {
-	$ENV{TZ} = $saveTZ;          # restore TZ environment
-    } else {
-	delete $ENV{TZ};
+    chomp($text);
+    if ( defined $saveTZ ) {
+        $ENV{TZ} = $saveTZ;    # restore TZ environment
+    }
+    else {
+        delete $ENV{TZ};
     }
 
     return $text . ' (' . $timeZone . ')';

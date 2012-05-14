@@ -40,6 +40,7 @@ test/unit/StringifierContrib/attachement_examples/Simple_example.docx 0644
 test/unit/StringifierContrib/attachement_examples/Simple_example.dotm 0644
 test/unit/StringifierContrib/attachement_examples/Simple_example.dotx 0644
 test/unit/StringifierContrib/attachement_examples/Simple_example.html 0644
+test/unit/StringifierContrib/attachement_examples/Simple_example_latin1.txt 0644
 test/unit/StringifierContrib/attachement_examples/Simple_example.pdf 0644
 test/unit/StringifierContrib/attachement_examples/Simple_example.potm 0644
 test/unit/StringifierContrib/attachement_examples/Simple_example.potx 0644
@@ -62,6 +63,7 @@ test/unit/StringifierContrib/PdfTests.pm 0644
 test/unit/StringifierContrib/PptTests.pm 0644
 test/unit/StringifierContrib/PptxTests.pm 0644
 test/unit/StringifierContrib/StringifierContribSuite.pm 0644
+test/unit/StringifierContrib/StringifierTest.pm 0644
 test/unit/StringifierContrib/StringifyBaseTest.pm 0644
 test/unit/StringifierContrib/tree_example/sub_tree/test_file.txt 0644
 test/unit/StringifierContrib/tree_example/test_file.txt 0644

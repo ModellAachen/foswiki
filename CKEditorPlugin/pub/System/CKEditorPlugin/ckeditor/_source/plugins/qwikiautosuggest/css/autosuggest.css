@@ -5,3 +5,7 @@
 	color: gray;
 	border-bottom: solid 1px silver;
 }
+.ui-autocomplete:hover .autocomplete_sublabel {
+	color: silver;
+	border-bottom: white;
+}

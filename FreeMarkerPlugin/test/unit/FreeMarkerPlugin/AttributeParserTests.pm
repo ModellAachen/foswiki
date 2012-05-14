@@ -5,8 +5,8 @@ use strict;
 use Foswiki;
 use Foswiki::Plugins::FreeMarkerPlugin::AttributeParser;
 
-my $DEBUG     = 0;
-my $PARSER_DEBUG = $DEBUG ? 0x1F : 0;
+my $DEBUG              = 0;
+my $PARSER_DEBUG       = $DEBUG ? 0x1F : 0;
 my $PARSER_DEBUG_LEVEL = $DEBUG ? 0x1F : 0;
 
 sub new {
@@ -26,18 +26,18 @@ sub set_up {
 sub test_empty {
     my ($this) = @_;
 
-	my $template;
-	my $parser;
-	my $data;
-	my $result;
-	my $expected;
-	
+    my $template;
+    my $parser;
+    my $data;
+    my $result;
+    my $expected;
+
     $template = '';
-    $parser = new Foswiki::Plugins::FreeMarkerPlugin::AttributeParser();
-	$parser->{debugLevel} = $PARSER_DEBUG_LEVEL;
-    $parser->{debug} = $PARSER_DEBUG;
-    $data = $parser->parse($template);
-	
+    $parser   = new Foswiki::Plugins::FreeMarkerPlugin::AttributeParser();
+    $parser->{debugLevel} = $PARSER_DEBUG_LEVEL;
+    $parser->{debug}      = $PARSER_DEBUG;
+    $data                 = $parser->parse($template);
+
     $result   = $data;
     $expected = {};
 
@@ -51,18 +51,18 @@ sub test_empty {
 sub test_string {
     my ($this) = @_;
 
-	my $template;
-	my $parser;
-	my $data;
-	my $result;
-	my $expected;
-	
+    my $template;
+    my $parser;
+    my $data;
+    my $result;
+    my $expected;
+
     $template = '"hello"';
-    $parser = new Foswiki::Plugins::FreeMarkerPlugin::AttributeParser();
-	$parser->{debugLevel} = $PARSER_DEBUG_LEVEL;
-    $parser->{debug} = $PARSER_DEBUG;
-    $data = $parser->parse($template);
-	
+    $parser   = new Foswiki::Plugins::FreeMarkerPlugin::AttributeParser();
+    $parser->{debugLevel} = $PARSER_DEBUG_LEVEL;
+    $parser->{debug}      = $PARSER_DEBUG;
+    $data                 = $parser->parse($template);
+
     $result   = $data;
     $expected = 'hello';
 
@@ -77,18 +77,18 @@ sub test_string {
 sub test_string_no_quotes {
     my ($this) = @_;
 
-	my $template;
-	my $parser;
-	my $data;
-	my $result;
-	my $expected;
-	
+    my $template;
+    my $parser;
+    my $data;
+    my $result;
+    my $expected;
+
     $template = 'a!';
-    $parser = new Foswiki::Plugins::FreeMarkerPlugin::AttributeParser();
-	$parser->{debugLevel} = $PARSER_DEBUG_LEVEL;
-    $parser->{debug} = $PARSER_DEBUG;
-    $data = $parser->parse($template);
-	
+    $parser   = new Foswiki::Plugins::FreeMarkerPlugin::AttributeParser();
+    $parser->{debugLevel} = $PARSER_DEBUG_LEVEL;
+    $parser->{debug}      = $PARSER_DEBUG;
+    $data                 = $parser->parse($template);
+
     $result   = $data;
     $expected = 'a!';
 
@@ -103,18 +103,18 @@ sub test_string_no_quotes {
 sub test_string_spaces {
     my ($this) = @_;
 
-	my $template;
-	my $parser;
-	my $data;
-	my $result;
-	my $expected;
-	
+    my $template;
+    my $parser;
+    my $data;
+    my $result;
+    my $expected;
+
     $template = '   hello    ';
-    $parser = new Foswiki::Plugins::FreeMarkerPlugin::AttributeParser();
-	$parser->{debugLevel} = $PARSER_DEBUG_LEVEL;
-    $parser->{debug} = $PARSER_DEBUG;
-    $data = $parser->parse($template);
-	
+    $parser   = new Foswiki::Plugins::FreeMarkerPlugin::AttributeParser();
+    $parser->{debugLevel} = $PARSER_DEBUG_LEVEL;
+    $parser->{debug}      = $PARSER_DEBUG;
+    $data                 = $parser->parse($template);
+
     $result   = $data;
     $expected = 'hello';
 
@@ -129,18 +129,18 @@ sub test_string_spaces {
 sub test_string_addition {
     my ($this) = @_;
 
-	my $template;
-	my $parser;
-	my $data;
-	my $result;
-	my $expected;
-	
+    my $template;
+    my $parser;
+    my $data;
+    my $result;
+    my $expected;
+
     $template = '"hello"+" "+"goodbye"';
-    $parser = new Foswiki::Plugins::FreeMarkerPlugin::AttributeParser();
-	$parser->{debugLevel} = $PARSER_DEBUG_LEVEL;
-    $parser->{debug} = $PARSER_DEBUG;
-    $data = $parser->parse($template);
-	
+    $parser   = new Foswiki::Plugins::FreeMarkerPlugin::AttributeParser();
+    $parser->{debugLevel} = $PARSER_DEBUG_LEVEL;
+    $parser->{debug}      = $PARSER_DEBUG;
+    $data                 = $parser->parse($template);
+
     $result   = $data;
     $expected = 'hello goodbye';
 
@@ -155,18 +155,18 @@ sub test_string_addition {
 sub test_number {
     my ($this) = @_;
 
-	my $template;
-	my $parser;
-	my $data;
-	my $result;
-	my $expected;
-	
+    my $template;
+    my $parser;
+    my $data;
+    my $result;
+    my $expected;
+
     $template = '-99.99';
-    $parser = new Foswiki::Plugins::FreeMarkerPlugin::AttributeParser();
-	$parser->{debugLevel} = $PARSER_DEBUG_LEVEL;
-    $parser->{debug} = $PARSER_DEBUG;
-    $data = $parser->parse($template);
-	
+    $parser   = new Foswiki::Plugins::FreeMarkerPlugin::AttributeParser();
+    $parser->{debugLevel} = $PARSER_DEBUG_LEVEL;
+    $parser->{debug}      = $PARSER_DEBUG;
+    $data                 = $parser->parse($template);
+
     $result   = $data;
     $expected = -99.99;
 
@@ -181,30 +181,30 @@ sub test_number {
 sub test_boolean {
     my ($this) = @_;
 
-	my $template;
-	my $parser;
-	my $data;
-	my $result;
-	my $expected;
-	
+    my $template;
+    my $parser;
+    my $data;
+    my $result;
+    my $expected;
+
     $template = 'true';
-    $parser = new Foswiki::Plugins::FreeMarkerPlugin::AttributeParser();
-	$parser->{debugLevel} = $PARSER_DEBUG_LEVEL;
-    $parser->{debug} = $PARSER_DEBUG;
-    $data = $parser->parse($template);
-	
+    $parser   = new Foswiki::Plugins::FreeMarkerPlugin::AttributeParser();
+    $parser->{debugLevel} = $PARSER_DEBUG_LEVEL;
+    $parser->{debug}      = $PARSER_DEBUG;
+    $data                 = $parser->parse($template);
+
     $result   = $data;
     $expected = 1;
 
     print("EXP=$expected.\n") if $DEBUG;
     $this->assert( $result eq $expected );
-    
+
     $template = 'false';
-    $parser = new Foswiki::Plugins::FreeMarkerPlugin::AttributeParser();
-	$parser->{debugLevel} = $PARSER_DEBUG_LEVEL;
-    $parser->{debug} = $PARSER_DEBUG;
-    $data = $parser->parse($template);
-	
+    $parser   = new Foswiki::Plugins::FreeMarkerPlugin::AttributeParser();
+    $parser->{debugLevel} = $PARSER_DEBUG_LEVEL;
+    $parser->{debug}      = $PARSER_DEBUG;
+    $data                 = $parser->parse($template);
+
     $result   = $data;
     $expected = 0;
 
@@ -219,18 +219,18 @@ sub test_boolean {
 sub test_array_strings {
     my ($this) = @_;
 
-	my $template;
-	my $parser;
-	my $data;
-	my $result;
-	my $expected;
-	
+    my $template;
+    my $parser;
+    my $data;
+    my $result;
+    my $expected;
+
     $template = '["winter", "spring", "summer", "autumn"]';
-    $parser = new Foswiki::Plugins::FreeMarkerPlugin::AttributeParser();
-	$parser->{debugLevel} = $PARSER_DEBUG_LEVEL;
-    $parser->{debug} = $PARSER_DEBUG;
-    $data = $parser->parse($template);
-	
+    $parser   = new Foswiki::Plugins::FreeMarkerPlugin::AttributeParser();
+    $parser->{debugLevel} = $PARSER_DEBUG_LEVEL;
+    $parser->{debug}      = $PARSER_DEBUG;
+    $data                 = $parser->parse($template);
+
     $result   = $data->[0];
     $expected = 'winter';
 
@@ -245,18 +245,18 @@ sub test_array_strings {
 sub test_array_strings_no_quotes {
     my ($this) = @_;
 
-	my $template;
-	my $parser;
-	my $data;
-	my $result;
-	my $expected;
-	
+    my $template;
+    my $parser;
+    my $data;
+    my $result;
+    my $expected;
+
     $template = '[winter, spring, summer, autumn]';
-    $parser = new Foswiki::Plugins::FreeMarkerPlugin::AttributeParser();
-	$parser->{debugLevel} = $PARSER_DEBUG_LEVEL;
-    $parser->{debug} = $PARSER_DEBUG;
-    $data = $parser->parse($template);
-	
+    $parser   = new Foswiki::Plugins::FreeMarkerPlugin::AttributeParser();
+    $parser->{debugLevel} = $PARSER_DEBUG_LEVEL;
+    $parser->{debug}      = $PARSER_DEBUG;
+    $data                 = $parser->parse($template);
+
     $result   = $data->[0];
     $expected = 'winter';
 
@@ -271,18 +271,18 @@ sub test_array_strings_no_quotes {
 sub test_array_mixed {
     my ($this) = @_;
 
-	my $template;
-	my $parser;
-	my $data;
-	my $result;
-	my $expected;
-	
+    my $template;
+    my $parser;
+    my $data;
+    my $result;
+    my $expected;
+
     $template = '[10, spring, 10+10, "autumn"]';
-    $parser = new Foswiki::Plugins::FreeMarkerPlugin::AttributeParser();
-	$parser->{debugLevel} = $PARSER_DEBUG_LEVEL;
-    $parser->{debug} = $PARSER_DEBUG;
-    $data = $parser->parse($template);
-	
+    $parser   = new Foswiki::Plugins::FreeMarkerPlugin::AttributeParser();
+    $parser->{debugLevel} = $PARSER_DEBUG_LEVEL;
+    $parser->{debug}      = $PARSER_DEBUG;
+    $data                 = $parser->parse($template);
+
     $result   = $data->[2];
     $expected = 20;
 
@@ -297,18 +297,18 @@ sub test_array_mixed {
 sub test_hash {
     my ($this) = @_;
 
-	my $template;
-	my $parser;
-	my $data;
-	my $result;
-	my $expected;
-	
+    my $template;
+    my $parser;
+    my $data;
+    my $result;
+    my $expected;
+
     $template = '{color:red, value:255}';
-    $parser = new Foswiki::Plugins::FreeMarkerPlugin::AttributeParser();
-	$parser->{debugLevel} = $PARSER_DEBUG_LEVEL;
-    $parser->{debug} = $PARSER_DEBUG;
-    $data = $parser->parse($template);
-	
+    $parser   = new Foswiki::Plugins::FreeMarkerPlugin::AttributeParser();
+    $parser->{debugLevel} = $PARSER_DEBUG_LEVEL;
+    $parser->{debug}      = $PARSER_DEBUG;
+    $data                 = $parser->parse($template);
+
     $result   = $data->{value};
     $expected = 255;
 
@@ -323,18 +323,18 @@ sub test_hash {
 sub test_list_of_hashes {
     my ($this) = @_;
 
-	my $template;
-	my $parser;
-	my $data;
-	my $result;
-	my $expected;
-	
+    my $template;
+    my $parser;
+    my $data;
+    my $result;
+    my $expected;
+
     $template = '[{"color":"red", "value":255},{color:green, "value":100}]';
-    $parser = new Foswiki::Plugins::FreeMarkerPlugin::AttributeParser();
-	$parser->{debugLevel} = $PARSER_DEBUG_LEVEL;
-    $parser->{debug} = $PARSER_DEBUG;
-    $data = $parser->parse($template);
-	
+    $parser   = new Foswiki::Plugins::FreeMarkerPlugin::AttributeParser();
+    $parser->{debugLevel} = $PARSER_DEBUG_LEVEL;
+    $parser->{debug}      = $PARSER_DEBUG;
+    $data                 = $parser->parse($template);
+
     $result   = $data->[1]->{color};
     $expected = 'green';
 
@@ -349,18 +349,18 @@ sub test_list_of_hashes {
 sub test_hash_with_lists {
     my ($this) = @_;
 
-	my $template;
-	my $parser;
-	my $data;
-	my $result;
-	my $expected;
-	
+    my $template;
+    my $parser;
+    my $data;
+    my $result;
+    my $expected;
+
     $template = '{colors:[red,blue,green], values:[-1,0,1]}';
-    $parser = new Foswiki::Plugins::FreeMarkerPlugin::AttributeParser();
-	$parser->{debugLevel} = $PARSER_DEBUG_LEVEL;
-    $parser->{debug} = $PARSER_DEBUG;
-    $data = $parser->parse($template);
-	
+    $parser   = new Foswiki::Plugins::FreeMarkerPlugin::AttributeParser();
+    $parser->{debugLevel} = $PARSER_DEBUG_LEVEL;
+    $parser->{debug}      = $PARSER_DEBUG;
+    $data                 = $parser->parse($template);
+
     $result   = $data->{colors}->[2];
     $expected = 'green';
 
@@ -375,25 +375,25 @@ sub test_hash_with_lists {
 sub test_hash_with_lists2 {
     my ($this) = @_;
 
-	my $template;
-	my $parser;
-	my $data;
-	my $result;
-	my $expected;
-	
-    $template = "{ users: [ 'Joe',    'Fred' ], admins: [ 'Julia',  'Kate' ], children: [ 'Mickey', 'Rooney' ]}";
+    my $template;
+    my $parser;
+    my $data;
+    my $result;
+    my $expected;
+
+    $template =
+"{ users: [ 'Joe',    'Fred' ], admins: [ 'Julia',  'Kate' ], children: [ 'Mickey', 'Rooney' ]}";
     $parser = new Foswiki::Plugins::FreeMarkerPlugin::AttributeParser();
-	$parser->{debugLevel} = $PARSER_DEBUG_LEVEL;
-    $parser->{debug} = $PARSER_DEBUG;
-    $data = $parser->parse($template);
-	
+    $parser->{debugLevel} = $PARSER_DEBUG_LEVEL;
+    $parser->{debug}      = $PARSER_DEBUG;
+    $data                 = $parser->parse($template);
+
     $result   = $data->{admins}->[1];
     $expected = 'Kate';
 
     print("EXP=$expected.\n") if $DEBUG;
     $this->assert( $result eq $expected );
 }
-
 
 # HELPER FUNCTIONS
 

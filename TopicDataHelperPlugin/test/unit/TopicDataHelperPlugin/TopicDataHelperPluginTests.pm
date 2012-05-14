@@ -121,12 +121,12 @@ sub set_up {
     $this->SUPER::set_up();
     $this->_createForms();
     $this->{plugin_name} = 'TopicDataHelperPlugin';
-    
+
     $Foswiki::cfg{Plugins}{ $this->{plugin_name} }{Enabled} = 1;
     $Foswiki::cfg{Plugins}{ $this->{plugin_name} }{Module} =
       "Foswiki::Plugins::$this->{plugin_name}";
     $this->{session}->finish();
-    $this->{session} = new Foswiki();    # default user
+    $this->{session} = new Foswiki();                # default user
     $Foswiki::Plugins::SESSION = $this->{session};
 }
 
@@ -187,7 +187,7 @@ sub test_createTopicData_default_no_web {
       Foswiki::Plugins::TopicDataHelperPlugin::createTopicData( $webs,
         $excludeWebs, $topics, $excludeTopics );
 
-    my $resultTopics           = $topicData->{ $defaultUsersWeb };
+    my $resultTopics           = $topicData->{$defaultUsersWeb};
     my @resultTopicsList       = sort keys %{$resultTopics};
     my $resultTopicsListString = join( ",", @resultTopicsList );
     $this->assert_equals( 'WebHome,WebPreferences', $resultTopicsListString );

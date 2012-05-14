@@ -28,25 +28,26 @@ It will have the same name as it did on the remote server.
 
 =cut
 
-
 sub fetchLatestDistributionVersion {
-   my ($distribution, $distributionFile, $attachmentPath) = @_;
+    my ( $distribution, $distributionFile, $attachmentPath ) = @_;
 
-	my $fileUrl = $config{'serverUrl'}. "/" . $distribution.'/'.$distributionFile;
-	my $ans = $attachmentPath;
-	my $status = getstore($fileUrl, $attachmentPath);
-	if (is_error($status)) {
-		my $error = "Couldn't get $distribution as $fileUrl to $attachmentPath ($status)";
-#		TWiki::Func::writeWarning($error."\n");
-		$ans = "Couldn't download - $error";
-	}
-	return $ans;
+    my $fileUrl =
+      $config{'serverUrl'} . "/" . $distribution . '/' . $distributionFile;
+    my $ans = $attachmentPath;
+    my $status = getstore( $fileUrl, $attachmentPath );
+    if ( is_error($status) ) {
+        my $error =
+          "Couldn't get $distribution as $fileUrl to $attachmentPath ($status)";
+
+        #		TWiki::Func::writeWarning($error."\n");
+        $ans = "Couldn't download - $error";
+    }
+    return $ans;
 
 }
 
 sub getDistributionTopic {
-	return $config{'saveTopic'};
+    return $config{'saveTopic'};
 }
-
 
 1;

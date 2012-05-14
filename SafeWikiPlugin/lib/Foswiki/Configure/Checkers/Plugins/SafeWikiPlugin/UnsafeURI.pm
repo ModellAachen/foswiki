@@ -18,7 +18,7 @@ sub check {
 
     if ( $Foswiki::cfg{Plugins}{SafeWikiPlugin}{Enabled} ) {
         foreach my $goodURI (@goodURIs) {
-            foreach my $unsafeURI (@{$unsafeURIs}) {
+            foreach my $unsafeURI ( @{$unsafeURIs} ) {
                 my $expandedUnsafeURI =
                   Foswiki::Configure::Checkers::Plugins::SafeWikiPlugin::SafeURI::expandVars(
                     $unsafeURI);

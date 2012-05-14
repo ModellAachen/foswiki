@@ -1,4 +1,4 @@
-%META:TOPICINFO{author="ProjectContributor" comment="reprev" date="1319610036" format="1.1" reprev="15" version="15"}%
+%META:TOPICINFO{author="micha" comment="reprev" date="1334846906" format="1.1" reprev="15" version="21"}%
 %META:TOPICPARENT{name="TopicFunction"}%
 %TOC{depth="2"}%
 
@@ -13,6 +13,8 @@ This TopicFunction displays a collection of BlogEntries within the given CATegor
    * TAG: tagged entries to be extracted (optional)
    * STICKY: a pattern the Sticky field must match to list the posting see the "Sticky" definition in BlogEntry (optional)
    * NOSTICKY: same as STICKY but with inverse logic
+   * FROM_TIME: lower boundary of timespan to display in epoch seconds 
+   * TO_TIME: uppwer boundary of timespan to display in epoch seconds 
 %ENDSECTION{name="documentation" type="section"}%
 
 ---++ Implementation
@@ -23,6 +25,8 @@ This TopicFunction displays a collection of BlogEntries within the given CATegor
   "TopicType=~'\bBlogEntry\b'
    AND State != 'unpublished'
    AND topic != 'WebTopicEditTemplate'
+   %IF{"defined FROM_TIME and '%FROM_TIME%' != ''" then="AND createdate >= '%FROM_TIME%'"}%
+   %IF{"defined TO_TIME and '%TO_TIME%' != ''" then="AND createdate < '%TO_TIME%'"}%
    %IF{"defined CAT and '%CAT%' != ''" then="AND topic ISA '%CAT%'"}%
    %IF{"defined TAG and '%TAG%' != ''" then="AND Tag=~'\b%TAG%\b'"}%
    %IF{"defined STICKY and '%STICKY%' != ''" then="AND Sticky=~'\b%STICKY%\b'"}%
@@ -86,9 +90,7 @@ This TopicFunction displays a collection of BlogEntries within the given CATegor
       }$percnt<!-- -->
     </div>
     <div class='blogText hyphenate'>
-$expand(text)
-~~~
-      <span class='blogMore'>&#8230;&nbsp;[[$web.$topic][%MAKETEXT{"reply"}%]]</span>
+$expand(text) <span class='blogMore'>&#8230;&nbsp;[[$web.$topic][%MAKETEXT{"more"}%]]</span>
       %CLEAR%
     </div>
     </div>"

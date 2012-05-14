@@ -1,10 +1,10 @@
-// (c)opyright 2006-2011 Michael Daum http://michaeldaumconsulting.com
+// (c)opyright 2006-2012 Michael Daum http://michaeldaumconsulting.com
 
 // document ready
 jQuery(function($) {
 
   /* move revinfo */
-  if (foswiki.getPreference("NatSkin.fixRevisionPosition") == 'true') {
+  if (foswiki.getPreference("NatSkin.fixRevisionPosition")) {
     var target = $(".natMainContents h1:first");
     if (target.length) { 
       $(".natRevision").remove().insertAfter(target);
@@ -12,7 +12,7 @@ jQuery(function($) {
   }
 
   /* horiz menu */
-  if (foswiki.getPreference("NatSkin.initWebMenu") == 'true') {
+  if (foswiki.getPreference("NatSkin.initWebMenu")) {
     var $container = $(".natWebMenuContents");
     $container.children("ul").superfish({
       dropShadows: false, /* enabled using css3 */
@@ -40,13 +40,13 @@ jQuery(function($) {
   }
 
   /* add overflow div for tables */
-  if (foswiki.getPreference("NatSkin.initOverflows") == 'true') { 
-    $(".natMainContents").find(".foswikiTable, .DISui-jqgrid")
+  if (foswiki.getPreference("NatSkin.initOverflows")) { 
+    $(".natMainContents").find(".foswikiTable")
       .not($(".foswikiTable .foswikiTable", this))
       .wrap("<div class='overflow foswikiTableOverflow'></div>");
   }
 
-  if (foswiki.getPreference("NatSkin.initTopicActions") == 'true') { // topicaction tooltips 
+  if (foswiki.getPreference("NatSkin.initTopicActions")) { // topicaction tooltips 
     $(".natHistoryTopicActions .natTopicAction").each(function() {
       var $this = $(this),
           tip = $this.find("span.natTopicActionShortLabel").text();
@@ -86,7 +86,7 @@ jQuery(function($) {
     });
   }
 
-  if (foswiki.getPreference("NatSkin.initSideBar") == 'true') { // typographic improvements in sidebar
+  if (foswiki.getPreference("NatSkin.initSideBar")) { // typographic improvements in sidebar
     $('.natSideBar h2 + h2:not(.jqInitedSideBar)').livequery(function() {
       var $this = $(this);
       $this.addClass('jqInitedSideBar');
@@ -94,9 +94,8 @@ jQuery(function($) {
     });
   }
 
-  if (foswiki.getPreference("NatSkin.initAutocomplete") == 'true') {// autocompletion using solr 
+  if (foswiki.getPreference("NatSkin.initAutocomplete")) {// autocompletion using solr 
     var $input = $("#searchbox input[type=text]"),
-        width = $("#searchbox").width()-7,
         scriptUrl = foswiki.getPreference("SCRIPTURL") + '/rest/SolrPlugin/autocomplete',
         now = (new Date).getTime(),
         submitButton = $input.parent().find(".foswikiSubmit");
@@ -121,46 +120,6 @@ jQuery(function($) {
     }
   }
 
-  // raw dialog
-if (0) {
-  $(".natRawTopicAction").click(function() { 
-    var $this = $(this), href = $this.attr("href");
-    $.blockUI({
-      message:"<h1>Loading wiki text ...</h1>",
-      fadeIn: 0,
-      fadeOut: 0
-    });
-    foswiki.openDialog("#natPreviewRaw", {
-      persist:false, 
-      containerCss: {
-        width:800
-      },
-      onShow: function(dialog) { 
-        var web = foswiki.getPreference("WEB"),
-            topic = foswiki.getPreference("TOPIC"),
-            url = href+"&raw=text&skin=text";
-        $.unblockUI();
-        dialog.container.find(".topic").text(web.replace(/\//, ".")+"."+topic);
-        dialog.container.find(".separate").attr("target", "_blank").click(function() {
-          $.modal.close();
-        });
-
-        $.ajax({
-          url: url,
-          async:false,
-          dataType:"text",
-          success: function(data, status, xhr) {
-            var $textarea = dialog.container.find(".foswikiTextarea");
-            $textarea.text(data);
-            setTimeout(function() { $textarea.focus(); }, 100);
-          }
-        });
-      } 
-    }); 
-    return false; 
-  }); 
-}
-
   // replace hr with a div.hr on ie7
   if ($.browser.msie && $.browser.version == 7.0) {
     $("hr").livequery(function() {
@@ -168,4 +127,8 @@ if (0) {
     });
   }
 
+  // hide address bar on mobile devices
+  if(navigator.userAgent.match(/Android/i)){
+    window.scrollTo(0,1);
+  }
 });

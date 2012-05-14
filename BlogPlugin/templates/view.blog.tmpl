@@ -1,0 +1,9 @@
+%TMPL:INCLUDE{"view"}%
+%TMPL:INCLUDE{"metacomments"}%
+%TMPL:DEF{"contentfooter"}%%TMPL:P{"comments"}%%TMPL:P{"blog::styles"}%%TMPL:END%
+%TMPL:DEF{"comments"}% %IF{ "$'DISPLAYCOMMENTS'='on'" then="<div>$percntTMPL:P{\"metacomments\"}$percnt</div>" else="<!-- -->" }%%TMPL:END%
+
+%TMPL:DEF{"blog::styles"}%%ADDTOZONE{"head"
+  id="BLOGPLUGIN::CSS"
+  text="<link rel='stylesheet' href='%PUBURLPATH%/%SYSTEMWEB%/BlogPlugin/blogplugin.css'  media='all' />"
+}%%TMPL:END%

@@ -9,6 +9,7 @@ data/System/BaseSkinAttachNewTemplate.txt 0644
 data/System/BaseSkinAttachtablesTemplate.txt 0644
 data/System/BaseSkinAttachTemplate.txt 0644
 data/System/BaseSkinEditTemplate.txt 0644
+data/System/BaseSkinEditFormTemplate.txt 0644
 data/System/BaseSkinFormtablesTemplate.txt 0644
 data/System/BaseSkinFoswikiTemplate.txt 0644
 data/System/BaseSkinLoginTemplate.txt 0644
@@ -19,8 +20,8 @@ data/System/BaseSkinWebBottomBarExample.txt 0644
 data/System/BaseSkinWebBottomBarTemplate.txt 0644
 data/System/BaseSkinWebTopBarExample.txt 0644
 data/System/BaseSkinWebTopBarTemplate.txt 0644
-data/System/BasewebfontsSkinFoswikiTemplate.txt 0644
 pub/System/BaseSkin/foswiki-logo-top.png 0644
+pub/System/BaseSkin/controls-icon-check.png 0644
 pub/System/BaseSkinCss/baseskin_src.css 0644 # the styles in css
 pub/System/BaseSkinCss/baseskin-bootstrap.less 0644
 pub/System/BaseSkinCss/baseskin-colors.less 0644
@@ -34,7 +35,7 @@ pub/System/BaseSkinCss/baseskin-variables.less 0644
 pub/System/BaseSkinCss/baseskin.css 0644 # the styles in css
 pub/System/BaseSkinCss/baseskin.css 0644 # the styles minified
 pub/System/BaseSkinCss/baseskin.less 0644 # the styles in less
-pub/System/BaseSkinCss/less-1.1.5.min.js 0644
+pub/System/BaseSkinCss/less-1.2.1.min.js 0644
 pub/System/BaseSkinCss/twitter-bootstrap/bootstrap.less 0644
 pub/System/BaseSkinCss/twitter-bootstrap/forms.less 0644
 pub/System/BaseSkinCss/twitter-bootstrap/mixins.less 0644
@@ -172,6 +173,9 @@ pub/System/BaseSkinJs/facebox.js.gz 0644
 pub/System/BaseSkinJs/jquery.easing.1.3_src.js 0644
 pub/System/BaseSkinJs/jquery.easing.1.3.js 0644
 pub/System/BaseSkinJs/jquery.easing.1.3.js.gz 0644
+pub/System/BaseSkinJs/jquery.page-scroll_src.js 0644
+pub/System/BaseSkinJs/jquery.page-scroll.js 0644
+pub/System/BaseSkinJs/jquery.page-scroll.js.gz 0644
 pub/System/BaseSkinJs/jquery.sticky_src.js 0644
 pub/System/BaseSkinJs/jquery.sticky.js 0644
 pub/System/BaseSkinJs/jquery.sticky.js.gz 0644

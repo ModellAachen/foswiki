@@ -24,10 +24,11 @@ sub set_up {
     $this->{users1} = {
         alligator => { pass => 'hissss', emails => 'ally@masai.mara' },
         bat => { pass => 'ultrasonic squeal', emails => 'bat@belfry' },
-        budgie => { pass => 'tweet',    emails => 'budgie@flock;budge@oz' },
-        lion   => { pass => 'roar',     emails => 'lion@pride' },
-        dodo   => { pass => '3zmVlgI9', emails => 'dodo@extinct' },
-        mole   => { pass => '',         emails => 'mole@hill' }
+        budgie  => { pass => 'tweet',    emails => 'budgie@flock;budge@oz' },
+        lion    => { pass => 'roar',     emails => 'lion@pride' },
+        dodo    => { pass => '3zmVlgI9', emails => 'dodo@extinct' },
+        tortise => { pass => 'slowone',  emails => 'turtle@soup' },
+        mole    => { pass => '',         emails => 'mole@hill' }
     };
 
     $this->{users2} = {
@@ -39,6 +40,8 @@ sub set_up {
         lion =>
           { pass => 'antelope', emails => $this->{users1}->{lion}->{emails} },
         dodo => { pass => 'b2rd', emails => $this->{users1}->{dodo}->{emails} },
+        tortise =>
+          { pass => 'slower', emails => $this->{users1}->{tortise}->{emails} },
         mole =>
           { pass => 'earthworm', emails => $this->{users1}->{mole}->{emails} },
     };
@@ -199,18 +202,57 @@ sub doTests {
     return;
 }
 
+sub skip {
+    my ( $this, $test ) = @_;
+
+    return $this->SUPER::skip_test_if(
+        $test,
+        {
+            condition => { without_dep => 'Digest::SHA' },
+            tests     => {
+                'PasswordTests::test_disabled_entry' => 'Missing Digest::SHA',
+                'PasswordTests::test_htpasswd_sha1'  => 'Missing Digest::SHA',
+                'PasswordTests::test_htpasswd_htdigest_preserves_email' =>
+                  'Missing Digest::SHA',
+                'PasswordTests::test_htpasswd_auto' => 'Missing Digest::SHA',
+            }
+        },
+        {
+            condition => { without_dep => 'Crypt::PasswdMD5' },
+            tests     => {
+                'PasswordTests::test_disabled_entry' =>
+                  'Missing Crypt::PasswdMD5',
+                'PasswordTests::test_htpasswd_apache_md5' =>
+                  'Missing Crypt::PasswdMD5',
+                'PasswordTests::test_htpasswd_auto' =>
+                  'Missing Crypt::PasswdMD5',
+                'PasswordTests::test_ApacheHtpasswdUser_md5' =>
+                  'Missing Crypt::PasswdMD5',
+                'PasswordTests::test_htpasswd_htdigest_preserves_email' =>
+                  'Missing Crypt::PasswdMD5',
+            }
+        },
+        {
+            condition => { without_dep => 'Crypt::Eksblowfish::Bcrypt' },
+            tests     => {
+                'PasswordTests::test_htpasswd_bcrypt' =>
+                  'Missing Crypt::Eksblowfish::Bcrypt',
+                'PasswordTests::test_htpasswd_auto' =>
+                  'Missing Crypt::Eksblowfish::Bcrypt',
+            }
+        },
+        {
+            condition => { without_dep => 'Apache::Htpasswd' },
+            tests     => {
+                'PasswordTests::test_ApacheHtpasswdUser_crypt' =>
+                  'Missing Apache::Htpasswd',
+            }
+        }
+    );
+}
+
 sub test_disabled_entry {
     my $this = shift;
-
-    foreach my $m (qw( Digest::SHA Crypt::PasswdMD5 )) {
-
-        if ( !eval "require $m; 1;" ) {
-            my $mess = $@;
-            $mess =~ s/\(\@INC contains:.*$//s;
-            $this->expect_failure();
-            $this->annotate("disabled_entry TESTS WILL FAIL: missing $m");
-        }
-    }
 
     $Foswiki::cfg{AuthRealm} = 'MyNewRealmm';
     $Foswiki::cfg{Htpasswd}{AutoDetect} = 1;
@@ -299,16 +341,6 @@ DONE
 sub test_htpasswd_auto {
     my $this = shift;
 
-    foreach my $m (qw( Digest::SHA Crypt::PasswdMD5 )) {
-
-        if ( !eval "require $m; 1;" ) {
-            my $mess = $@;
-            $mess =~ s/\(\@INC contains:.*$//s;
-            $this->expect_failure();
-            $this->annotate("AUTO TESTS WILL FAIL: missing $m");
-        }
-    }
-
     $Foswiki::cfg{AuthRealm} = 'MyNewRealmm';
     $Foswiki::cfg{Htpasswd}{AutoDetect} = 1;
 
@@ -335,6 +367,7 @@ budgie:{SHA}1pqeQCvCHCfCrnFA8mTGYna/DV0=
 dodo:$1$pUXqkX97$zqxdNSnpusVmoB.B.aUhB/:dodo@extinct
 lion:MyNewRealmm:3e60f5f16dc3b8658879d316882a3f00:lion@pride
 mole:plainpasswordx:mole@hill
+tortise:$2a$08$STPELUTxMRf2Y0v1J1nWaOXH1mdWf9VzPlGQ9NgIFU.9B/GCGpC8G:turtle@soup
 DONE
     $this->assert( close($fh) );
 
@@ -372,6 +405,7 @@ budgie:{SHA}1pqeQCvCHCfCrnFA8mTGYna/DV0=:budgie@flock;budge@oz
 dodo:$1$pUXqkX97$zqxdNSnpusVmoB.B.aUhB/:dodo@extinct
 lion:MyNewRealmm:3e60f5f16dc3b8658879d316882a3f00:lion@pride
 mole:plainpasswordx:mole@hill
+tortise:$2a$08$STPELUTxMRf2Y0v1J1nWaOXH1mdWf9VzPlGQ9NgIFU.9B/GCGpC8G:turtle@soup
 DONE
     $this->assert( close($fh) );
 
@@ -484,6 +518,28 @@ DONE
         $this->assert_str_equals( 'apache-md5', $encoded{$user}->{enc} );
     }
 
+    $Foswiki::cfg{Htpasswd}{Encoding} = 'bcrypt';
+    $impl = new Foswiki::Users::HtPasswdUser( $this->{session} );
+
+    # force-change them to users2 password again, migrating to bcrypt.
+    foreach my $user ( sort keys %{ $this->{users1} } ) {
+        my $added = $impl->setPassword(
+            $user,
+            $this->{users2}->{$user}->{pass},
+            $this->{users2}->{$user}->{pass}
+        );
+        $this->assert_null( $impl->error() );
+        $this->assert_str_not_equals( $encrapted{$user},
+            $impl->fetchPass($user) );
+        $this->assert_null( $impl->error() );
+        $this->assert_str_equals(
+            $this->{users1}->{$user}->{emails},
+            join( ";", $impl->getEmails($user) )
+        );
+        ( $encrapted{$user}, $encoded{$user} ) = $impl->fetchPass($user);
+        $this->assert_str_equals( 'bcrypt', $encoded{$user}->{enc} );
+    }
+
     #dumpFile();
 
     return;
@@ -513,6 +569,19 @@ sub test_htpasswd_crypt_md5 {
     return;
 }
 
+sub test_htpasswd_bcrypt {
+    my $this = shift;
+
+    $Foswiki::cfg{Htpasswd}{AutoDetect} = 0;
+    $Foswiki::cfg{Htpasswd}{Encoding}   = 'bcrypt';
+    my $impl = new Foswiki::Users::HtPasswdUser( $this->{session} );
+    $this->assert($impl);
+    $impl->ClearCache() if $impl->can('ClearCache');
+    $this->doTests( $impl, $SALTED );
+
+    #dumpFile();
+}
+
 sub test_htpasswd_crypt_crypt {
     my $this = shift;
     $Foswiki::cfg{Htpasswd}{AutoDetect} = 0;
@@ -528,12 +597,12 @@ sub test_htpasswd_crypt_crypt {
 sub test_htpasswd_sha1 {
     my $this = shift;
 
-    if ( !eval 'require Digest::SHA; 1;' ) {
-        my $mess = $@;
-        $mess =~ s/\(\@INC contains:.*$//s;
-        $this->expect_failure();
-        $this->annotate("CANNOT RUN SHA1 TESTS: $mess");
-    }
+    #if ( !eval 'require Digest::SHA; 1;' ) {
+    #    my $mess = $@;
+    #    $mess =~ s/\(\@INC contains:.*$//s;
+    #    $this->expect_failure();
+    #    $this->annotate("CANNOT RUN SHA1 TESTS: $mess");
+    #}
 
     $Foswiki::cfg{Htpasswd}{AutoDetect} = 0;
     $Foswiki::cfg{Htpasswd}{Encoding}   = 'sha1';
@@ -610,9 +679,10 @@ sub test_htpasswd_htdigest_preserves_email {
     $impl->ClearCache() if $impl->can('ClearCache');
 
     my @users = keys %{ $this->{users1} };
-    foreach
-      my $algo ( 'apache-md5', 'htdigest-md5', 'crypt', 'sha1', 'crypt-md5',
-        'md5' )
+    foreach my $algo (
+        'apache-md5', 'htdigest-md5', 'crypt', 'sha1',
+        'crypt-md5',  'md5',          'bcrypt'
+      )
     {
         my $user = pop @users;
         $Foswiki::cfg{Htpasswd}{Encoding} = $algo;

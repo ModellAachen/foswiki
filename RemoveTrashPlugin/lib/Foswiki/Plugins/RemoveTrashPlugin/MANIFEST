@@ -1,0 +1,6 @@
+!noci
+data/System/RemoveTrashPlugin.txt 0644 Documentation page
+data/System/VarREMOVETRASH.txt 0644 Tag documentation
+data/Sandbox/PluginTestRemoveTrashPlugin.txt 0644 Examples
+lib/Foswiki/Plugins/RemoveTrashPlugin.pm 0444 Perl module
+lib/Foswiki/Plugins/RemoveTrashPlugin/Config.spec 0444 Configuration

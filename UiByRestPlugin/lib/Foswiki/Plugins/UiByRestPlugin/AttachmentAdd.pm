@@ -32,22 +32,25 @@ See documentation in Foswiki::Plugins::UiByRestPlugin::moveAttachment()
 
 sub do {
     my $session = shift;
+
     # check preconditions. If something fails and is critical
     # a status code will be set and a template will be returned if.
 
     my $template = _hardPrecondition($session);
-    if($template ne 0) { # if a template has been returned, we have errors. So lets print the template to the body and return.
+    if ( $template ne 0 )
+    { # if a template has been returned, we have errors. So lets print the template to the body and return.
         return $template;
     }
 
     # if everything is fine, we can do the actual renaming now
-    my $query         = $session->{cgiQuery};
-    
+    my $query = $session->{cgiQuery};
+
     use Foswiki::UI::Upload;
-    Foswiki::UI::Upload::upload( $session );
+    Foswiki::UI::Upload::upload($session);
 
     return "";
 }
+
 =begin TML
 
 ---++ template( $session )
@@ -59,7 +62,8 @@ sub template {
     my $query    = $session->{cgiQuery};
     my $theTopic = $session->{topicName};
     my $theWeb   = $session->{webName};
-    my $theSkin  = $query->param("skin") || Foswiki::Func::getSkin(); # SMELL: should be sanatized
+    my $theSkin  = $query->param("skin")
+      || Foswiki::Func::getSkin();    # SMELL: should be sanatized
 
     # we do this, to get the proper status code.
     # Eventhough we return the template requested in any case
@@ -73,39 +77,46 @@ sub template {
     return _showTemplate( $theTopic, $theWeb, $theSkin, $templatename );
 }
 
-
 sub _hardPrecondition {
-    my $session       = shift;
-    my $query         = $session->{cgiQuery};
-    my $theTopic      = $session->{topicName};
-    my $theWeb        = $session->{webName};
-    my $theUser       = Foswiki::Func::getWikiName();
-    my $theSkin       = $query->param("skin")  || Foswiki::Func::getSkin(); # SMELL: should be sanatized
-    my $isSetTopic    =  $query->param("topic") || 0;
+    my $session  = shift;
+    my $query    = $session->{cgiQuery};
+    my $theTopic = $session->{topicName};
+    my $theWeb   = $session->{webName};
+    my $theUser  = Foswiki::Func::getWikiName();
+    my $theSkin  = $query->param("skin")
+      || Foswiki::Func::getSkin();    # SMELL: should be sanatized
+    my $isSetTopic = $query->param("topic") || 0;
 
     # check topic parameter first; if not set, the rest is irrelevant
     my @missing = ();
-    if (!$isSetTopic)  { push( @missing, "topic :'$isSetTopic'") };
+    if ( !$isSetTopic ) { push( @missing, "topic :'$isSetTopic'" ) }
 
     if ( scalar(@missing) > 0 ) {
-      $session->{response}->status( "400 Missing parameter: ".join(",", @missing) );
-      return _showTemplate( $theTopic, $theWeb, $theSkin, $templatename );
+        $session->{response}
+          ->status( "400 Missing parameter: " . join( ",", @missing ) );
+        return _showTemplate( $theTopic, $theWeb, $theSkin, $templatename );
     }
-    
+
     # check if topic exists
     if ( !Foswiki::Func::topicExists( $theWeb, $theTopic ) ) {
-      $session->{response}->status( "404 Topic not found" );
-      return _showTemplate( $theTopic, $theWeb, $theSkin, $templatename );
+        $session->{response}->status("404 Topic not found");
+        return _showTemplate( $theTopic, $theWeb, $theSkin, $templatename );
     }
 
     # check permissions
-    if ( !Foswiki::Func::checkAccessPermission( "CHANGE", $theUser, undef, $theTopic, $theWeb, undef ) ) {
-      if ( $theUser eq $Foswiki::cfg{DefaultUserWikiName} ) {
-        $session->{response}->status( "401 Unauthorized" );
-        return _showTemplate( $theTopic, $theWeb, $theSkin, "login" );
-      } # else
-      $session->{response}->status( "403 Forbidden: Current location is write protected" );
-      return _showTemplate( $theTopic, $theWeb, $theSkin, $templatename );
+    if (
+        !Foswiki::Func::checkAccessPermission(
+            "CHANGE", $theUser, undef, $theTopic, $theWeb, undef
+        )
+      )
+    {
+        if ( $theUser eq $Foswiki::cfg{DefaultUserWikiName} ) {
+            $session->{response}->status("401 Unauthorized");
+            return _showTemplate( $theTopic, $theWeb, $theSkin, "login" );
+        }    # else
+        $session->{response}
+          ->status("403 Forbidden: Current location is write protected");
+        return _showTemplate( $theTopic, $theWeb, $theSkin, $templatename );
     }
 
     return 0;
@@ -115,6 +126,7 @@ sub _showTemplate {
     my ( $topic, $web, $skin, $templatename ) = @_;
 
     my $template = Foswiki::Func::loadTemplate( $templatename, $skin, undef );
-    return Foswiki::Func::expandCommonVariables( $template, $topic, $web, undef );
+    return Foswiki::Func::expandCommonVariables( $template, $topic, $web,
+        undef );
 }
 

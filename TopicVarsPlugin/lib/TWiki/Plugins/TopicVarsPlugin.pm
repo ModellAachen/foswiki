@@ -12,7 +12,7 @@
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details, published at 
+# GNU General Public License for more details, published at
 # http://www.gnu.org/copyleft/gpl.html
 #
 # =========================
@@ -26,9 +26,9 @@
 package TWiki::Plugins::TopicVarsPlugin;
 
 use vars qw(
-        $currWeb $currTopic $user $installWeb $VERSION $RELEASE
-        %vars
-    );
+  $currWeb $currTopic $user $installWeb $VERSION $RELEASE
+  %vars
+);
 
 # This should always be $Rev$ so that TWiki can determine the checked-in
 # status of the plugin. It is used by the build automation tools, so
@@ -44,8 +44,9 @@ sub initPlugin {
     ( $currTopic, $currWeb, $user, $installWeb ) = @_;
 
     # check for Plugins.pm versions
-    if( $TWiki::Plugins::VERSION < 1 ) {
-        TWiki::Func::writeWarning( "Version mismatch between TopicVarsPlugin and Plugins.pm" );
+    if ( $TWiki::Plugins::VERSION < 1 ) {
+        TWiki::Func::writeWarning(
+            "Version mismatch between TopicVarsPlugin and Plugins.pm");
         return 0;
     }
 
@@ -61,35 +62,38 @@ sub initPlugin {
 # Perhaps some day, when the object model is properly done.
 #
 sub getVarsFromTopic {
-	my ( $web, $topic ) = @_;
+    my ( $web, $topic ) = @_;
 
-	my( $meta, $text ) = TWiki::Func::readTopic( $web, $topic );
+    my ( $meta, $text ) = TWiki::Func::readTopic( $web, $topic );
 
-	my $key = '';
-	my $value = '';
-	my $isKey = 0;
-	foreach( split( /\r?\n/, $text ) ) {
-		if( /^(?:\t|   )+\*\sSet\s(\w+)\s\=\s*(.*)$/ ) {
-			if( $isKey ) {
-				$vars{$web}{$topic}{$key} = $value;
-			}
-			$key = $1;
-			$value = $2;
+    my $key   = '';
+    my $value = '';
+    my $isKey = 0;
+    foreach ( split( /\r?\n/, $text ) ) {
+        if (/^(?:\t|   )+\*\sSet\s(\w+)\s\=\s*(.*)$/) {
+            if ($isKey) {
+                $vars{$web}{$topic}{$key} = $value;
+            }
+            $key   = $1;
+            $value = $2;
             $value = '' unless defined $value;
-			$isKey = 1;
-		} elsif ( $isKey ) {
-			if( ( /^(\t|   )+/ ) && ( ! /^(\t|   )+\*/ ) ) {
-				# follow up line, extending value
-				$value .= "\n$_";
-			} else {
-				$vars{$web}{$topic}{$key} = $value;
-				$isKey = 0;
-			}
-		}
-	}
-	if( $isKey ) {
-		$vars{$web}{$topic}{$key} = $value;
-	}
+            $isKey = 1;
+        }
+        elsif ($isKey) {
+            if ( (/^(\t|   )+/) && ( !/^(\t|   )+\*/ ) ) {
+
+                # follow up line, extending value
+                $value .= "\n$_";
+            }
+            else {
+                $vars{$web}{$topic}{$key} = $value;
+                $isKey = 0;
+            }
+        }
+    }
+    if ($isKey) {
+        $vars{$web}{$topic}{$key} = $value;
+    }
 }
 
 sub get_var {
@@ -97,27 +101,30 @@ sub get_var {
 
     my $id = '';
 
-    if( $web ) {
-        $id = $web.'.';
-        if(defined($TWiki::securityFilter)) {
+    if ($web) {
+        $id = $web . '.';
+        if ( defined($TWiki::securityFilter) ) {
             $web =~ s/$TWiki::securityFilter//go;
-        } else {
+        }
+        else {
             $web =~ s/$TWiki::cfg{NameFilter}//go;
         }
-    } else {
+    }
+    else {
         $web = $currWeb;
     }
 
-    if( $topic ) {
-        $id .= $topic.'.';
-    } else {
+    if ($topic) {
+        $id .= $topic . '.';
+    }
+    else {
         $topic = $currTopic;
     }
 
-	getVarsFromTopic( $web, $topic ) unless $vars{$web}{$topic};
-	my $var = $vars{$web}{$topic}{$varname};
-	$var = defined $var ? $var : "%$id$varname%";
-	return $var;
+    getVarsFromTopic( $web, $topic ) unless $vars{$web}{$topic};
+    my $var = $vars{$web}{$topic}{$varname};
+    $var = defined $var ? $var : "%$id$varname%";
+    return $var;
 }
 
 sub commonTagsHandler {
@@ -127,10 +134,12 @@ sub commonTagsHandler {
     $_[0] =~ s/%(\w+)%/get_var(undef, undef, $1)/geo;
 
     ## Handle topic-qualified var references (will look at topics on this web)
-    $_[0] =~ s/%([A-Z]+[a-z]+[A-Z]+[A-Za-z0-9]*)\.([A-Za-z0-9_]+)%/get_var(undef, $1, $2)/geo;
+    $_[0] =~
+s/%([A-Z]+[a-z]+[A-Z]+[A-Za-z0-9]*)\.([A-Za-z0-9_]+)%/get_var(undef, $1, $2)/geo;
 
     ## Handle fully-qualified var references (will look at webs/topics on this wiki)
-    $_[0] =~ s/%([A-Z][^%]*)\.([A-Z]+[a-z]+[A-Z]+\w*)\.(\w+)%/get_var($1, $2, $3)/geo;
+    $_[0] =~
+      s/%([A-Z][^%]*)\.([A-Z]+[a-z]+[A-Z]+\w*)\.(\w+)%/get_var($1, $2, $3)/geo;
 }
 
 1;

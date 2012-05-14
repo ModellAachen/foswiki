@@ -590,6 +590,9 @@ See [[Sandbox.FormPluginExamples]]
 |  Version: | %$VERSION% |
 |  Release: | %$RELEASE% |
 |  Change History: | <!-- versions below in reverse order -->&nbsp; |
+|  03 Apr 2012 | 2.4.0 [[Foswiki:Main.FlorianSchlichting][Florian Schlichting]] %BR% \
+Fix a bunch of issues when running under mod_perl (Foswikitask:Item11690). %BR% \
+Allow field token substitution in topic, web and restAction variables ((Foswikitask:Item11719). |
 |  21 Dec 2011 | 2.3.0 Allow multiple email addresses in email field (use =multiemail=). %BR% \
 Foswikitask:Item11295 Fixed issues with =fastcgi= (thanks [[Foswiki:Main.JayenAshar][Jayen Ashar]]). %BR% \
 Fixed client side validation check on fields named 'submit' on IE7+IE8. %BR% \

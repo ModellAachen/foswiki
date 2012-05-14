@@ -33,7 +33,8 @@ use strict;
 
 # $VERSION is referred to by TWiki, and is the only global variable that
 # *must* exist in this package.
-use vars qw( $VERSION $RELEASE $SHORTDESCRIPTION $debug $pluginName $NO_PREFS_IN_TOPIC );
+use vars
+  qw( $VERSION $RELEASE $SHORTDESCRIPTION $debug $pluginName $NO_PREFS_IN_TOPIC );
 
 # This should always be $Rev$ so that TWiki can determine the checked-in
 # status of the plugin. It is used by the build automation tools, so
@@ -94,11 +95,12 @@ FOOBARSOMETHING. This avoids namespace issues.
 =cut
 
 sub initPlugin {
-    my( $topic, $web, $user, $installWeb ) = @_;
+    my ( $topic, $web, $user, $installWeb ) = @_;
 
     # check for Plugins.pm versions
-    if( $TWiki::Plugins::VERSION < 1.026 ) {
-        TWiki::Func::writeWarning( "Version mismatch between $pluginName and Plugins.pm" );
+    if ( $TWiki::Plugins::VERSION < 1.026 ) {
+        TWiki::Func::writeWarning(
+            "Version mismatch between $pluginName and Plugins.pm");
         return 0;
     }
 
@@ -115,16 +117,16 @@ sub initPlugin {
     # register the _EXAMPLETAG function to handle %EXAMPLETAG{...}%
     # This will be called whenever %EXAMPLETAG% or %EXAMPLETAG{...}% is
     # seen in the topic text.
-    TWiki::Func::registerTagHandler( 'SELECT', \&_SELECT );
+    TWiki::Func::registerTagHandler( 'SELECT',   \&_SELECT );
     TWiki::Func::registerTagHandler( 'CHECKBOX', \&_CHECKBOX );
-    TWiki::Func::registerTagHandler( 'RADIO', \&_RADIO );
+    TWiki::Func::registerTagHandler( 'RADIO',    \&_RADIO );
 
     TWiki::Func::registerTagHandler( 'TEXTVALUE', \&_TEXTVALUE );
-    TWiki::Func::registerTagHandler( 'TEXTAREA', \&_TEXTAREA );
-    
+    TWiki::Func::registerTagHandler( 'TEXTAREA',  \&_TEXTAREA );
+
     TWiki::Func::registerTagHandler( 'BUTTON', \&_BUTTON );
 
-    # Allow a sub to be called from the REST interface 
+    # Allow a sub to be called from the REST interface
     # using the provided alias
     # TWiki::Func::registerRESTHandler('example', \&restExample);
 
@@ -133,236 +135,245 @@ sub initPlugin {
 }
 
 sub _SELECT {
-    my($session, $params, $theTopic, $theWeb) = @_;
-    
+    my ( $session, $params, $theTopic, $theWeb ) = @_;
+
     my $currentvalue = $params->{currentvalue} || '';
-    my @current = split(/,\s*/, $currentvalue);
-    
+    my @current = split( /,\s*/, $currentvalue );
+
     my $optionlist = $params->{options} || '';
-    my @options = split(/,\s*/, $optionlist);
+    my @options = split( /,\s*/, $optionlist );
     for my $opt (@current) {
-        push @options, $opt unless (grep(/$opt/, @options));
+        push @options, $opt unless ( grep( /$opt/, @options ) );
     }
-    
+
     my $destinationaddress = $params->{destinationaddress};
 
-    my $web = $theWeb;
-    my $topic = $theTopic;
+    my $web      = $theWeb;
+    my $topic    = $theTopic;
     my $variable = $destinationaddress;
-    if ($destinationaddress =~ /^(.*)\.([^.]*)$/) {
-        $topic = $1;
+    if ( $destinationaddress =~ /^(.*)\.([^.]*)$/ ) {
+        $topic    = $1;
         $variable = $2;
     }
-    ($web, $topic) = TWiki::Func::normalizeWebTopicName($web, $topic);
-    
-    my $method='POST';
-    my $action="%SCRIPTURL{save}%/$web/$topic";
-    
-    my $element =     
-        $session->{cgiQuery}->scrolling_list(
-#        $session->{cgiQuery}->checkbox_group(
-                -name=>$variable,
-				-values=>\@options,          #['eenie','meenie','minie','moe'],
-				-default=>\@current,         #['eenie','moe'],
-				-size=>5,
-				-multiple=>'true',
-#				-linebreak=>'true',
-#               -labels=>\%labels,
-#               -attributes=>\%attributes
-            );
-    return getForm($session, $element, $method, $action, $variable, "$theWeb.$theTopic");
+    ( $web, $topic ) = TWiki::Func::normalizeWebTopicName( $web, $topic );
+
+    my $method = 'POST';
+    my $action = "%SCRIPTURL{save}%/$web/$topic";
+
+    my $element = $session->{cgiQuery}->scrolling_list(
+
+        #        $session->{cgiQuery}->checkbox_group(
+        -name     => $variable,
+        -values   => \@options,    #['eenie','meenie','minie','moe'],
+        -default  => \@current,    #['eenie','moe'],
+        -size     => 5,
+        -multiple => 'true',
+
+        #				-linebreak=>'true',
+        #               -labels=>\%labels,
+        #               -attributes=>\%attributes
+    );
+    return getForm( $session, $element, $method, $action, $variable,
+        "$theWeb.$theTopic" );
 }
+
 sub _CHECKBOX {
-    my($session, $params, $theTopic, $theWeb) = @_;
-    
+    my ( $session, $params, $theTopic, $theWeb ) = @_;
+
     my $currentvalue = $params->{currentvalue} || '';
-    my @current = split(/,\s*/, $currentvalue);
-    
+    my @current = split( /,\s*/, $currentvalue );
+
     my $optionlist = $params->{options} || '';
-    my @options = split(/,\s*/, $optionlist);
+    my @options = split( /,\s*/, $optionlist );
     for my $opt (@current) {
-        push @options, $opt unless (grep(/$opt/, @options));
+        push @options, $opt unless ( grep( /$opt/, @options ) );
     }
-   
+
     my $destinationaddress = $params->{destinationaddress};
 
-    my $web = $theWeb;
-    my $topic = $theTopic;
+    my $web      = $theWeb;
+    my $topic    = $theTopic;
     my $variable = $destinationaddress;
-    if ($destinationaddress =~ /^(.*)\.([^.]*)$/) {
-        $topic = $1;
+    if ( $destinationaddress =~ /^(.*)\.([^.]*)$/ ) {
+        $topic    = $1;
         $variable = $2;
     }
-    ($web, $topic) = TWiki::Func::normalizeWebTopicName($web, $topic);
-    
-    my $method='POST';
-    my $action="%SCRIPTURL{save}%/$web/$topic";
-    
-    my $element =     
-        $session->{cgiQuery}->checkbox_group(
-                -name=>$variable,
-				-values=>\@options,          #['eenie','meenie','minie','moe'],
-				-default=>\@current,         #['eenie','moe'],
-				-linebreak=>'true',
-#               -labels=>\%labels,
-#               -attributes=>\%attributes
-            );
-    return getForm($session, $element, $method, $action, $variable, "$theWeb.$theTopic");
+    ( $web, $topic ) = TWiki::Func::normalizeWebTopicName( $web, $topic );
+
+    my $method = 'POST';
+    my $action = "%SCRIPTURL{save}%/$web/$topic";
+
+    my $element = $session->{cgiQuery}->checkbox_group(
+        -name      => $variable,
+        -values    => \@options,    #['eenie','meenie','minie','moe'],
+        -default   => \@current,    #['eenie','moe'],
+        -linebreak => 'true',
+
+        #               -labels=>\%labels,
+        #               -attributes=>\%attributes
+    );
+    return getForm( $session, $element, $method, $action, $variable,
+        "$theWeb.$theTopic" );
 }
+
 sub _RADIO {
-    my($session, $params, $theTopic, $theWeb) = @_;
-    
+    my ( $session, $params, $theTopic, $theWeb ) = @_;
+
     my $currentvalue = $params->{currentvalue} || '';
-    my @current = split(/,\s*/, $currentvalue);
-    
+    my @current = split( /,\s*/, $currentvalue );
+
     my $optionlist = $params->{options} || '';
-    my @options = split(/,\s*/, $optionlist);
+    my @options = split( /,\s*/, $optionlist );
     for my $opt (@current) {
-        push @options, $opt unless (grep(/$opt/, @options));
+        push @options, $opt unless ( grep( /$opt/, @options ) );
     }
-    
+
     my $destinationaddress = $params->{destinationaddress};
 
-    my $web = $theWeb;
-    my $topic = $theTopic;
+    my $web      = $theWeb;
+    my $topic    = $theTopic;
     my $variable = $destinationaddress;
-    if ($destinationaddress =~ /^(.*)\.([^.]*)$/) {
-        $topic = $1;
+    if ( $destinationaddress =~ /^(.*)\.([^.]*)$/ ) {
+        $topic    = $1;
         $variable = $2;
     }
-    ($web, $topic) = TWiki::Func::normalizeWebTopicName($web, $topic);
-    
-    my $method='POST';
-    my $action="%SCRIPTURL{save}%/$web/$topic";
-    
-    my $element =     
-        $session->{cgiQuery}->radio_group(
-                -name=>$variable,
-				-values=>\@options,          #['eenie','meenie','minie','moe'],
-				-default=>\@current,         #['eenie','moe'],
-				-linebreak=>'true',
-#               -labels=>\%labels,
-#               -attributes=>\%attributes
-            );
-    return getForm($session, $element, $method, $action, $variable, "$theWeb.$theTopic");
+    ( $web, $topic ) = TWiki::Func::normalizeWebTopicName( $web, $topic );
+
+    my $method = 'POST';
+    my $action = "%SCRIPTURL{save}%/$web/$topic";
+
+    my $element = $session->{cgiQuery}->radio_group(
+        -name      => $variable,
+        -values    => \@options,    #['eenie','meenie','minie','moe'],
+        -default   => \@current,    #['eenie','moe'],
+        -linebreak => 'true',
+
+        #               -labels=>\%labels,
+        #               -attributes=>\%attributes
+    );
+    return getForm( $session, $element, $method, $action, $variable,
+        "$theWeb.$theTopic" );
 }
+
 sub _TEXTVALUE {
-    my($session, $params, $theTopic, $theWeb) = @_;
-    
+    my ( $session, $params, $theTopic, $theWeb ) = @_;
+
     my $value = $params->{value} || '';
-   
+
     my $destinationaddress = $params->{destinationaddress};
 
-    my $web = $theWeb;
-    my $topic = $theTopic;
+    my $web      = $theWeb;
+    my $topic    = $theTopic;
     my $variable = $destinationaddress;
-    if ($destinationaddress =~ /^(.*)\.([^.]*)$/) {
-        $topic = $1;
+    if ( $destinationaddress =~ /^(.*)\.([^.]*)$/ ) {
+        $topic    = $1;
         $variable = $2;
     }
-    ($web, $topic) = TWiki::Func::normalizeWebTopicName($web, $topic);
-    
-    my $method='POST';
-    my $action="%SCRIPTURL{save}%/$web/$topic";
-    
-    my $element =     
-        $session->{cgiQuery}->textfield(
-                -name=>$variable,
-				-value=>$value,
-                -size=>50,
-    		    -maxlength=>80				
-            );
-    return getForm($session, $element, $method, $action, $variable, "$theWeb.$theTopic");
+    ( $web, $topic ) = TWiki::Func::normalizeWebTopicName( $web, $topic );
+
+    my $method = 'POST';
+    my $action = "%SCRIPTURL{save}%/$web/$topic";
+
+    my $element = $session->{cgiQuery}->textfield(
+        -name      => $variable,
+        -value     => $value,
+        -size      => 50,
+        -maxlength => 80
+    );
+    return getForm( $session, $element, $method, $action, $variable,
+        "$theWeb.$theTopic" );
 }
+
 sub _TEXTAREA {
-    my($session, $params, $theTopic, $theWeb) = @_;
-    
+    my ( $session, $params, $theTopic, $theWeb ) = @_;
+
     my $value = $params->{value} || '';
-    
+
     my $destinationaddress = $params->{destinationaddress};
 
-    my $web = $theWeb;
-    my $topic = $theTopic;
+    my $web      = $theWeb;
+    my $topic    = $theTopic;
     my $variable = $destinationaddress;
-    if ($destinationaddress =~ /^(.*)\.([^.]*)$/) {
-        $topic = $1;
+    if ( $destinationaddress =~ /^(.*)\.([^.]*)$/ ) {
+        $topic    = $1;
         $variable = $2;
     }
-    ($web, $topic) = TWiki::Func::normalizeWebTopicName($web, $topic);
-    
-    my $method='POST';
-    my $action="%SCRIPTURL{save}%/$web/$topic";
-    
-    my $element =     
-        $session->{cgiQuery}->textarea(
-                -name=>$variable,
-				-value=>$value,
-                -rows=>10,
-    		    -columns=>80				
-            );
-    return getForm($session, $element, $method, $action, $variable, "$theWeb.$theTopic");
+    ( $web, $topic ) = TWiki::Func::normalizeWebTopicName( $web, $topic );
+
+    my $method = 'POST';
+    my $action = "%SCRIPTURL{save}%/$web/$topic";
+
+    my $element = $session->{cgiQuery}->textarea(
+        -name    => $variable,
+        -value   => $value,
+        -rows    => 10,
+        -columns => 80
+    );
+    return getForm( $session, $element, $method, $action, $variable,
+        "$theWeb.$theTopic" );
 }
+
 sub _BUTTON {
-    my($session, $params, $theTopic, $theWeb) = @_;
-    
+    my ( $session, $params, $theTopic, $theWeb ) = @_;
+
     my $value = $params->{value} || '';
-    
+
     my $destinationaddress = $params->{destinationaddress};
 
-    my $web = $theWeb;
-    my $topic = $theTopic;
+    my $web      = $theWeb;
+    my $topic    = $theTopic;
     my $variable = $destinationaddress;
-    if ($destinationaddress =~ /^(.*)\.([^.]*)$/) {
-        $topic = $1;
+    if ( $destinationaddress =~ /^(.*)\.([^.]*)$/ ) {
+        $topic    = $1;
         $variable = $2;
     }
-    ($web, $topic) = TWiki::Func::normalizeWebTopicName($web, $topic);
-    
-    my $method='POST';
-    my $action="%SCRIPTURL{save}%/$web/$topic";
-    
-    my $element =     
-        $session->{cgiQuery}->hidden(
-                -name=>$variable,
-				-default=>$value,
-            );
-    return getForm($session, $element, $method, $action, $variable, "$theWeb.$theTopic");
+    ( $web, $topic ) = TWiki::Func::normalizeWebTopicName( $web, $topic );
+
+    my $method = 'POST';
+    my $action = "%SCRIPTURL{save}%/$web/$topic";
+
+    my $element = $session->{cgiQuery}->hidden(
+        -name    => $variable,
+        -default => $value,
+    );
+    return getForm( $session, $element, $method, $action, $variable,
+        "$theWeb.$theTopic" );
 }
 
 ################################################################################
 sub getForm {
-    my ($session, $element, $method, $action, $variable, $redirectTo) = @_;
+    my ( $session, $element, $method, $action, $variable, $redirectTo ) = @_;
 
-    my $form =     
+    my $form =
+
 #        "\n   * action  =$action= \n   * destinationaddress = =$destinationaddress= \n " .
-        $session->{cgiQuery}->start_form(
-                -method=>$method,
-                -action=>$action,
-#                -enctype=>$encoding
-		    ) . 
-        $element .
-#TODO: add disabled if the user does not have permission
-        $session->{cgiQuery}->submit(
-                -name=>'button_name',
-                -value=>"set value"
-            ) .
-        $session->{cgiQuery}->hidden(
-                -name=>'htmlformvalue',
-                -default=>"set"
-            ) .
-        $session->{cgiQuery}->hidden(
-                -name=>'variable',
-                -default=>"$variable"
-            ) .
-        $session->{cgiQuery}->hidden(
-                -name=>'redirectto',
-                -default=>$redirectTo
-            ) .
-        $session->{cgiQuery}->endform;
-        
+      $session->{cgiQuery}->start_form(
+        -method => $method,
+        -action => $action,
+
+        #                -enctype=>$encoding
+      ) . $element .
+
+      #TODO: add disabled if the user does not have permission
+      $session->{cgiQuery}->submit(
+        -name  => 'button_name',
+        -value => "set value"
+      )
+      . $session->{cgiQuery}->hidden(
+        -name    => 'htmlformvalue',
+        -default => "set"
+      )
+      . $session->{cgiQuery}->hidden(
+        -name    => 'variable',
+        -default => "$variable"
+      )
+      . $session->{cgiQuery}->hidden(
+        -name    => 'redirectto',
+        -default => $redirectTo
+      ) . $session->{cgiQuery}->endform;
+
     return $form;
 }
-
 
 =pod
 
@@ -386,28 +397,30 @@ __Since:__ TWiki::Plugins::VERSION = '1.010'
 =cut
 
 sub beforeSaveHandler {
+
     # do not uncomment, use $_[0], $_[1]... instead
     #my ( $text, $topic, $web ) = @_;
-    
-   my $query = TWiki::Func::getCgiQuery();
-   my $session = $TWiki::Plugins::SESSION;
 
-   return unless defined($query->param('htmlformvalue'));
-   
-    my $name = $query->param('variable');
+    my $query   = TWiki::Func::getCgiQuery();
+    my $session = $TWiki::Plugins::SESSION;
+
+    return unless defined( $query->param('htmlformvalue') );
+
+    my $name   = $query->param('variable');
     my $params = $query->Vars;
-    my @values = split("\0",$params->{$name});   #$query->param($name) || '';
-    
-    my $set = join(', ', @values);
+    my @values = split( "\0", $params->{$name} );   #$query->param($name) || '';
 
-   $_[3]->putKeyed( 'PREFERENCE',
-                                 {
-                                     name => $name,
-                                     type => 'Set',
-                                     title => 'PREFERENCE_'.$name,
-                                     value => $set
-                                    }
-                                );
+    my $set = join( ', ', @values );
+
+    $_[3]->putKeyed(
+        'PREFERENCE',
+        {
+            name  => $name,
+            type  => 'Set',
+            title => 'PREFERENCE_' . $name,
+            value => $set
+        }
+    );
 }
 
 =pod
@@ -429,18 +442,21 @@ __Since:__ TWiki::Plugins::VERSION = '1.020'
 =cut
 
 sub afterSaveHandler {
+
     # do not uncomment, use $_[0], $_[1]... instead
     ### my ( $text, $topic, $web, $error, $meta ) = @_;
 
-   my $query = TWiki::Func::getCgiQuery();
-   my $session = $TWiki::Plugins::SESSION;
+    my $query   = TWiki::Func::getCgiQuery();
+    my $session = $TWiki::Plugins::SESSION;
 
-   return unless defined($query->param('htmlformvalue'));
-    
+    return unless defined( $query->param('htmlformvalue') );
+
     #on success, go back to where we came from, not what we saved..
-    my ($redirectWeb, $redirectTopic) = TWiki::Func::normalizeWebTopicName('', $query->param('redirectto'));
-    my $redirecturl = $session->getScriptUrl( 1, 'view', $redirectWeb, $redirectTopic );
-    $session->redirect( $redirecturl );
+    my ( $redirectWeb, $redirectTopic ) =
+      TWiki::Func::normalizeWebTopicName( '', $query->param('redirectto') );
+    my $redirecturl =
+      $session->getScriptUrl( 1, 'view', $redirectWeb, $redirectTopic );
+    $session->redirect($redirecturl);
 }
 
 =pod
@@ -475,10 +491,13 @@ __Since:__ TWiki::Plugins::VERSION = '1.010'
 =cut
 
 sub DISABLE_initializeUserHandler {
+
     # do not uncomment, use $_[0], $_[1]... instead
     ### my ( $loginName, $url, $pathInfo ) = @_;
 
-    TWiki::Func::writeDebug( "- ${pluginName}::initializeUserHandler( $_[0], $_[1] )" ) if $debug;
+    TWiki::Func::writeDebug(
+        "- ${pluginName}::initializeUserHandler( $_[0], $_[1] )")
+      if $debug;
 }
 
 =pod
@@ -495,10 +514,13 @@ __Since:__ TWiki::Plugins::VERSION = '1.010'
 =cut
 
 sub DISABLE_registrationHandler {
+
     # do not uncomment, use $_[0], $_[1]... instead
     ### my ( $web, $wikiName, $loginName ) = @_;
 
-    TWiki::Func::writeDebug( "- ${pluginName}::registrationHandler( $_[0], $_[1] )" ) if $debug;
+    TWiki::Func::writeDebug(
+        "- ${pluginName}::registrationHandler( $_[0], $_[1] )")
+      if $debug;
 }
 
 =pod
@@ -530,10 +552,12 @@ handler.
 =cut
 
 sub DISABLE_commonTagsHandler {
+
     # do not uncomment, use $_[0], $_[1]... instead
     ### my ( $text, $topic, $web ) = @_;
 
-    TWiki::Func::writeDebug( "- ${pluginName}::commonTagsHandler( $_[2].$_[1] )" ) if $debug;
+    TWiki::Func::writeDebug("- ${pluginName}::commonTagsHandler( $_[2].$_[1] )")
+      if $debug;
 
     # do custom extension rule, like for example:
     # $_[0] =~ s/%XYZ%/&handleXyz()/ge;
@@ -561,10 +585,13 @@ handler.
 =cut
 
 sub DISABLE_beforeCommonTagsHandler {
+
     # do not uncomment, use $_[0], $_[1]... instead
     ### my ( $text, $topic, $web ) = @_;
 
-    TWiki::Func::writeDebug( "- ${pluginName}::beforeCommonTagsHandler( $_[2].$_[1] )" ) if $debug;
+    TWiki::Func::writeDebug(
+        "- ${pluginName}::beforeCommonTagsHandler( $_[2].$_[1] )")
+      if $debug;
 }
 
 =pod
@@ -587,10 +614,13 @@ handler.
 =cut
 
 sub DISABLE_afterCommonTagsHandler {
+
     # do not uncomment, use $_[0], $_[1]... instead
     ### my ( $text, $topic, $web ) = @_;
 
-    TWiki::Func::writeDebug( "- ${pluginName}::afterCommonTagsHandler( $_[2].$_[1] )" ) if $debug;
+    TWiki::Func::writeDebug(
+        "- ${pluginName}::afterCommonTagsHandler( $_[2].$_[1] )")
+      if $debug;
 }
 
 =pod
@@ -641,6 +671,7 @@ Since TWiki::Plugins::VERSION = '1.026'
 =cut
 
 sub DISABLE_preRenderingHandler {
+
     # do not uncomment, use $_[0], $_[1]... instead
     #my( $text, $pMap ) = @_;
 }
@@ -661,6 +692,7 @@ Since TWiki::Plugins::VERSION = '1.026'
 =cut
 
 sub DISABLE_postRenderingHandler {
+
     # do not uncomment, use $_[0], $_[1]... instead
     #my $text = shift;
 }
@@ -682,10 +714,12 @@ __Since:__ TWiki::Plugins::VERSION = '1.010'
 =cut
 
 sub DISABLE_beforeEditHandler {
+
     # do not uncomment, use $_[0], $_[1]... instead
     ### my ( $text, $topic, $web ) = @_;
 
-    TWiki::Func::writeDebug( "- ${pluginName}::beforeEditHandler( $_[2].$_[1] )" ) if $debug;
+    TWiki::Func::writeDebug("- ${pluginName}::beforeEditHandler( $_[2].$_[1] )")
+      if $debug;
 }
 
 =pod
@@ -707,10 +741,12 @@ __Since:__ TWiki::Plugins::VERSION = '1.010'
 =cut
 
 sub DISABLE_afterEditHandler {
+
     # do not uncomment, use $_[0], $_[1]... instead
     ### my ( $text, $topic, $web ) = @_;
 
-    TWiki::Func::writeDebug( "- ${pluginName}::afterEditHandler( $_[2].$_[1] )" ) if $debug;
+    TWiki::Func::writeDebug("- ${pluginName}::afterEditHandler( $_[2].$_[1] )")
+      if $debug;
 }
 
 =pod
@@ -733,9 +769,12 @@ __Since:__ TWiki::Plugins::VERSION = '1.023'
 =cut
 
 sub DISABLE_beforeAttachmentSaveHandler {
+
     # do not uncomment, use $_[0], $_[1]... instead
     ###   my( $attrHashRef, $topic, $web ) = @_;
-    TWiki::Func::writeDebug( "- ${pluginName}::beforeAttachmentSaveHandler( $_[2].$_[1] )" ) if $debug;
+    TWiki::Func::writeDebug(
+        "- ${pluginName}::beforeAttachmentSaveHandler( $_[2].$_[1] )")
+      if $debug;
 }
 
 =pod
@@ -756,9 +795,12 @@ __Since:__ TWiki::Plugins::VERSION = '1.023'
 =cut
 
 sub DISABLE_afterAttachmentSaveHandler {
+
     # do not uncomment, use $_[0], $_[1]... instead
     ###   my( $attrHashRef, $topic, $web ) = @_;
-    TWiki::Func::writeDebug( "- ${pluginName}::afterAttachmentSaveHandler( $_[2].$_[1] )" ) if $debug;
+    TWiki::Func::writeDebug(
+        "- ${pluginName}::afterAttachmentSaveHandler( $_[2].$_[1] )")
+      if $debug;
 }
 
 =pod
@@ -832,7 +874,7 @@ __Since:__ TWiki::Plugins::VERSION 1.026
 sub DISABLE_modifyHeaderHandler {
     my ( $headers, $query ) = @_;
 
-    TWiki::Func::writeDebug( "- ${pluginName}::modifyHeaderHandler()" ) if $debug;
+    TWiki::Func::writeDebug("- ${pluginName}::modifyHeaderHandler()") if $debug;
 }
 
 =pod
@@ -852,10 +894,13 @@ __Since:__ TWiki::Plugins::VERSION = '1.010'
 =cut
 
 sub DISABLE_redirectCgiQueryHandler {
+
     # do not uncomment, use $_[0], $_[1] instead
     ### my ( $query, $url ) = @_;
 
-    TWiki::Func::writeDebug( "- ${pluginName}::redirectCgiQueryHandler( query, $_[1] )" ) if $debug;
+    TWiki::Func::writeDebug(
+        "- ${pluginName}::redirectCgiQueryHandler( query, $_[1] )")
+      if $debug;
 }
 
 =pod
@@ -896,8 +941,9 @@ For more information, check %SYSTEMWEB%.CommandAndCGIScripts#rest
 =cut
 
 sub restExample {
-   #my ($session) = @_;
-   return "This is an example of a REST invocation\n\n";
+
+    #my ($session) = @_;
+    return "This is an example of a REST invocation\n\n";
 }
 
 1;

@@ -12,7 +12,7 @@
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details, published at 
+# GNU General Public License for more details, published at
 # http://www.gnu.org/copyleft/gpl.html
 #
 # =========================
@@ -35,13 +35,14 @@ package Foswiki::Plugins::X509UserPlugin;
 # Always use strict to enforce variable scoping
 use strict;
 
-require Foswiki::Func;    # The plugins API
-require Foswiki::Plugins; # For the API version
+require Foswiki::Func;       # The plugins API
+require Foswiki::Plugins;    # For the API version
 
 # =========================
 # $VERSION is referred to by Foswiki, and is the only global variable that
 # *must* exist in this package.
-use vars qw( $VERSION $RELEASE $SHORTDESCRIPTION $debug $pluginName $NO_PREFS_IN_TOPIC );
+use vars
+  qw( $VERSION $RELEASE $SHORTDESCRIPTION $debug $pluginName $NO_PREFS_IN_TOPIC );
 
 # This should always be $Rev: 15942 (11 Aug 2008) $ so that Foswiki can determine the checked-in
 # status of the plugin. It is used by the build automation tools, so
@@ -55,7 +56,8 @@ $RELEASE = 'V1.0-4';
 
 # Short description of this plugin
 # One line description, is shown in the %SYSTEMWEB%.TextFormattingRules topic:
-$SHORTDESCRIPTION = 'X509 Authentication support, used by Foswiki Administrators';
+$SHORTDESCRIPTION =
+  'X509 Authentication support, used by Foswiki Administrators';
 
 # Do not parse plugin topic for preferences
 
@@ -87,27 +89,31 @@ will be trapped and reported in the browser.
 
 =cut
 
-sub initPlugin
-{
-    my( $topic, $web, $user, $installWeb ) = @_;
+sub initPlugin {
+    my ( $topic, $web, $user, $installWeb ) = @_;
 
     # check for Plugins.pm versions
-    if( $Foswiki::Plugins::VERSION < 1.2 ) {
-        Foswiki::Func::writeWarning( "Version mismatch between $pluginName and Plugins.pm" );
+    if ( $Foswiki::Plugins::VERSION < 1.2 ) {
+        Foswiki::Func::writeWarning(
+            "Version mismatch between $pluginName and Plugins.pm");
         return 0;
     }
+
     # Get plugin debug flag
     $debug = $Foswiki::cfg{Plugins}{X509UserPlugin}{Debug} || 0;
 
-    die "X509 User Mapping Manager is required by X509UerPlugin, but is not loaded." if( $Foswiki::cfg{UserMappingManager} !~ /X509/ );
+    die
+"X509 User Mapping Manager is required by X509UerPlugin, but is not loaded."
+      if ( $Foswiki::cfg{UserMappingManager} !~ /X509/ );
 
     Foswiki::Func::registerTagHandler( 'X509', \&_X509TAG );
 
     # Plugin correctly initialized
-    Foswiki::Func::writeDebug( "- Foswiki::Plugins::${pluginName}::initPlugin( $web.$topic ) is OK" ) if $debug;
+    Foswiki::Func::writeDebug(
+        "- Foswiki::Plugins::${pluginName}::initPlugin( $web.$topic ) is OK")
+      if $debug;
     return 1;
 }
-
 
 =pod
 
@@ -120,8 +126,7 @@ If it returns a non-null error string, the plugin will be disabled.
 
 =cut
 
-sub DISABLED_earlyInitPlugin
-{
+sub DISABLED_earlyInitPlugin {
 
     return undef;
 }
@@ -144,8 +149,7 @@ This handler is called very early, immediately after =earlyInitPlugin=.
 
 =cut
 
-sub initializeUserHandler
-{
+sub initializeUserHandler {
 ### my ( $loginName, $url, $pathInfo ) = @_;   # do not uncomment, use $_[0], $_[1]... instead
 
 #    Foswiki::Func::writeDebug( "- ${pluginName}::initializeUserHandler( $_[0], $_[1] )" ) if $debug;
@@ -155,19 +159,21 @@ sub initializeUserHandler
     # SSLOptions +StdEnvVars
     #
     # You probably also want
-    # SSLOptions +FakeBasicAuth 
+    # SSLOptions +FakeBasicAuth
     # SSLVerifyClient require
     #
     # Determine the username from the client certificate
     #
 
-    return "" if( !$_[0] );
+    return "" if ( !$_[0] );
 
-    return $_[0] if( $_[0] !~ m|^/[\w]+=| );  # Check for and X.509 name: /XX=
+    return $_[0] if ( $_[0] !~ m|^/[\w]+=| );   # Check for and X.509 name: /XX=
 
     # Require a verified certificate - unless a command
-    return Foswiki::Func::getDefaultUserName() unless( Foswiki::Func::getContext()->{command_line} || defined $ENV{'SSL_CLIENT_VERIFY'} && $ENV{'SSL_CLIENT_VERIFY'} eq 'SUCCESS' );
-
+    return Foswiki::Func::getDefaultUserName()
+      unless ( Foswiki::Func::getContext()->{command_line}
+        || defined $ENV{'SSL_CLIENT_VERIFY'}
+        && $ENV{'SSL_CLIENT_VERIFY'} eq 'SUCCESS' );
 
     return $_[0];
 }
@@ -185,12 +191,11 @@ Called when a new user registers with this Foswiki.
 
 =cut
 
-sub DISABLED_registrationHandler
-{
+sub DISABLED_registrationHandler {
+
 #    my ( $web, $wikiName, $loginName ) = @_;   # do not uncomment, use $_[0], $_[1]... instead
 
 #    Foswiki::Func::writeDebug( "- ${pluginName}::registrationHandler( $_[0], $_[1] )" ) if $debug;
-
 
 }
 
@@ -209,69 +214,98 @@ sub DISABLED_registrationHandler
 =cut
 
 sub _X509TAG {
-    my($session, $params, $theTopic, $theWeb) = @_;
+    my ( $session, $params, $theTopic, $theWeb ) = @_;
 
-    my $regtopic = $Foswiki::cfg{Plugins}{X509UserPlugin}{RegistrationTopic} || 'UserRegistration';
+    my $regtopic = $Foswiki::cfg{Plugins}{X509UserPlugin}{RegistrationTopic}
+      || 'UserRegistration';
     my $regweb = $Foswiki::cfg{UsersWebName};
-    unless( Foswiki::Func::topicExists($regweb, $regtopic ) ){
-	$regweb = ::cfg{SystemWebName};
+    unless ( Foswiki::Func::topicExists( $regweb, $regtopic ) ) {
+        $regweb = ::cfg{SystemWebName};
     }
 
-    unless( $debug || ( $theTopic eq $regtopic && $theWeb eq $regweb )
-	           || Foswiki::Func::checkAccessPermission( 'CHANGE', Foswiki::Func::getWikiUserName(undef), undef, $regtopic, $regweb, undef ) ) {
-	return "%<NOP>X509% not permitted on this topic"
+    unless (
+           $debug
+        || ( $theTopic eq $regtopic && $theWeb eq $regweb )
+        || Foswiki::Func::checkAccessPermission(
+            'CHANGE', Foswiki::Func::getWikiUserName(undef),
+            undef, $regtopic, $regweb, undef
+        )
+      )
+    {
+        return "%<NOP>X509% not permitted on this topic";
     }
 
     my $element = $params->{element} || $params->{_DEFAULT};
-    my $remove = $params->{remove};
+    my $remove  = $params->{remove};
     my $replace = $params->{replace} || "";
 
-    Foswiki::Func::writeDebug( "- Foswiki::Plugins::${pluginName}::_X509TAG( $theWeb.$theTopic ) %X509{" . join( ", ", map { "$_=$params->{$_}" } (keys %$params) ) . "}%" ) if $debug;
+    Foswiki::Func::writeDebug(
+"- Foswiki::Plugins::${pluginName}::_X509TAG( $theWeb.$theTopic ) %X509{"
+          . join( ", ", map { "$_=$params->{$_}" } ( keys %$params ) )
+          . "}%" )
+      if $debug;
 
     my $from = 'SSL_CLIENT_S';
 
-    if( $params->{from} ) {
-	if( $params->{from} eq 'issuer' ) {
-	    $from = 'SSL_CLIENT_I';
-	} elsif( $params->{from} eq 'user' ) {
-	    $from = 'SSL_CLIENT_S';
-	}
+    if ( $params->{from} ) {
+        if ( $params->{from} eq 'issuer' ) {
+            $from = 'SSL_CLIENT_I';
+        }
+        elsif ( $params->{from} eq 'user' ) {
+            $from = 'SSL_CLIENT_S';
+        }
     }
-    
+
     my $value;
-    if( $element ) {
-	# %X509{ DNfield login="" remove="" replace="" }%
-	my $cert = $params->{login} ||  $ENV{"${from}_DN"} || "";
+    if ($element) {
 
-	$cert = Foswiki::Users::X509UserMapping::Cert->parseDN( $cert );
+        # %X509{ DNfield login="" remove="" replace="" }%
+        my $cert = $params->{login} || $ENV{"${from}_DN"} || "";
 
-	$value = $cert->element( $element );
-    } elsif( $params->{getloginname} ) {
-	# %X509{ getloginname="1" login="" remove="" replace="" }%
+        $cert = Foswiki::Users::X509UserMapping::Cert->parseDN($cert);
 
-	$value = $params->{login} ||  $ENV{"${from}_DN"} || "";
-    } elsif( $params->{getcert} ) {
-	# %X509{ getcert="component" remove="" replace="" }% (e.g. C => country code)
-	$value = $ENV{"${from}_DN_".$params->{getcert}} || "";
-    } elsif( $params->{getwikiname} ) {
-	# %X509{ getwikiname="1" login="" remove="" replace="" }%
-
-	$value = $params->{login} ||  $ENV{"${from}_DN"} || "";
-
-	$value = $session->{users}->{mapping}->wikinameFromDN( $value );
-    } else {
-	$value = "%X509: Unrecognized request{" . join( ", ", map { "$_=$params->{$_}" } (keys %$params) ) . "}%" 
+        $value = $cert->element($element);
     }
-    
-    if( defined $remove ) {
-	Foswiki::Func::writeDebug( "- Foswiki::Plugins::${pluginName}::_X509TAG( $theWeb.$theTopic ) |$element|$value|$remove|$replace|" ) if $debug;
-	  eval ( "\$value =~ s/$remove/$replace/g;" );
-	  $value = "X509: eval failed: $@.  Check \$remove= and \$replace= parameters" if( $@ );
-      }
-    Foswiki::Func::writeDebug( "- Foswiki::Plugins::${pluginName}::_X509TAG( $theWeb.$theTopic ) value is \"$value\"" ) if $debug;
+    elsif ( $params->{getloginname} ) {
+
+        # %X509{ getloginname="1" login="" remove="" replace="" }%
+
+        $value = $params->{login} || $ENV{"${from}_DN"} || "";
+    }
+    elsif ( $params->{getcert} ) {
+
+   # %X509{ getcert="component" remove="" replace="" }% (e.g. C => country code)
+        $value = $ENV{ "${from}_DN_" . $params->{getcert} } || "";
+    }
+    elsif ( $params->{getwikiname} ) {
+
+        # %X509{ getwikiname="1" login="" remove="" replace="" }%
+
+        $value = $params->{login} || $ENV{"${from}_DN"} || "";
+
+        $value = $session->{users}->{mapping}->wikinameFromDN($value);
+    }
+    else {
+        $value = "%X509: Unrecognized request{"
+          . join( ", ", map { "$_=$params->{$_}" } ( keys %$params ) ) . "}%";
+    }
+
+    if ( defined $remove ) {
+        Foswiki::Func::writeDebug(
+"- Foswiki::Plugins::${pluginName}::_X509TAG( $theWeb.$theTopic ) |$element|$value|$remove|$replace|"
+        ) if $debug;
+        eval("\$value =~ s/$remove/$replace/g;");
+        $value =
+          "X509: eval failed: $@.  Check \$remove= and \$replace= parameters"
+          if ($@);
+    }
+    Foswiki::Func::writeDebug(
+"- Foswiki::Plugins::${pluginName}::_X509TAG( $theWeb.$theTopic ) value is \"$value\""
+    ) if $debug;
 
     return $value;
 }
+
 =pod
 
 ---++ commonTagsHandler($text, $topic, $web, $included, $meta )
@@ -304,8 +338,7 @@ handler. Use the =$meta= object.
 
 =cut
 
-sub DISABLED_commonTagsHandler
-{
+sub DISABLED_commonTagsHandler {
 ### my ( $text, $topic, $web, $included, $meta ) = @_;   # do not uncomment, use $_[0], $_[1]... instead
 
 #    Foswiki::Func::writeDebug( "- ${pluginName}::commonTagsHandler( $_[2].$_[1] )" ) if $debug;

@@ -1,9 +1,9 @@
-%META:TOPICINFO{author="ProjectContributor" comment="reprev" date="1277309049" format="1.1" reprev="3" version="3"}%
+%META:TOPICINFO{author="micha" comment="reprev" date="1335190733" format="1.1" reprev="5" version="5"}%
 %META:TOPICPARENT{name="TopicFunction"}%
 ---++ Documentation
 %STARTSECTION{"documentation"}%
 ---+++++ Parameters
-   * NAME: application name, defaults to BASETOPIC
+   * NAME: application name, defaults to BASEWEB
    * THEWEB: web to search for docu, defaults to BASEWEB
    * TYPE: extract documentation of topics of the given type
    * NOTTYPE: don't list topics of that type
@@ -19,7 +19,7 @@
 <verbatim class="tml">
 %STARTINCLUDE%<!-- render application documentation -->
 %DBQUERY{
-   "WikiApplication='\b%IF{"defined NAME" then="%NAME%" else="%BASETOPIC%"}%\b'
+   "WikiApplication='\b%IF{"defined NAME" then="%NAME%" else="%EXTRACT{text="%BASEWEB%" pattern=".*/(.+?)$" format="$1"}%"}%\b'
    AND TopicType=~'\b%TYPE%\b' 
    %IF{"defined NOTTYPE" then=" AND !(TopicType=~'\b%NOTTYPE%\b')"}%"
    web="%IF{"defined THEWEB" then="%THEWEB%" else="%BASEWEB%"}%"
@@ -50,6 +50,6 @@
 
 %META:FORM{name="Applications.ApplicationTopic"}%
 %META:FIELD{name="TopicType" title="TopicType" value="TopicFunction"}%
-%META:FIELD{name="TopicTitle" attributes="" title="<nop>TopicTitle" value="RenderApplicationDocumentation"}%
+%META:FIELD{name="TopicTitle" attributes="" title="<nop>TopicTitle" value=""}%
 %META:FIELD{name="Summary" attributes="c" title="Summary" value="Extracts the documentation section from all parts of a WikiApplication"}%
 %META:FIELD{name="WikiApplication" attributes="" title="WikiApplication" value="WikiWorkbench"}%

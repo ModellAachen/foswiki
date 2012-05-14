@@ -126,7 +126,9 @@ s/(\d\d:\d\d:\d\d\.\d\d\d\d\d\d) ([<*>{}]) (.*)(\n)/addToResultHash($1, $2, $3, 
 
     #print STDERR "\n================\n$result\n==========\n";
 
-print STDERR join("\n-----------------\n", ($result, $data->{'*'}, $data->{'>'}, $data->{'<'})) if MONITOR;
+    print STDERR join( "\n-----------------\n",
+        ( $result, $data->{'*'}, $data->{'>'}, $data->{'<'} ) )
+      if MONITOR;
 
     return ( $result, $data );
 }
@@ -201,10 +203,10 @@ sub runTest {
         $replytext =~ s/date=\\"(.*?)\\"/date=\\"EXTRACTED_FOR_TESTING\\"/g;
         $replytext =~ s/"date":(.*?),/"date":"EXTRACTED_FOR_TESTING",/g;
 
-        print STDERR "\njson expected:\n" if MONITOR;
+        print STDERR "\njson expected:\n"  if MONITOR;
         print STDERR $expectedReplyPayload if MONITOR;
-        print STDERR "\njson got:\n" if MONITOR;
-        print STDERR $replytext if MONITOR;
+        print STDERR "\njson got:\n"       if MONITOR;
+        print STDERR $replytext            if MONITOR;
         my $replyObj =
           Foswiki::Serialise::deserialise( $this->{session}, $replytext,
             'json' );

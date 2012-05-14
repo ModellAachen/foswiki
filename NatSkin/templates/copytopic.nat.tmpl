@@ -34,7 +34,7 @@
   <input type="checkbox" class="foswikiCheckbox" name="nonwikiword" id="nonwikiword" %IF{"$ 'URLPARAM{nonwikiword}'='on'" then="checked='checked'"}% />
   <label for="nonwikiword">%MAKETEXT{"Allow non-<nop>WikiWord for the new topic name"}%</label>
 </div>
-<a class="jqUIDialogButton {icon:'ui-icon-copy', click: function() { $(this).find('form:first').submit(); }}">%MAKETEXT{"Copy"}%</a>
-<a class="jqUIDialogButton {icon:'ui-icon-cancel', click: function() { $(this).dialog('close'); }}">%MAKETEXT{"Cancel"}%</a>
+<a class="jqUIDialogButton jqUIDialogSubmit {icon:'ui-icon-copy'}">%MAKETEXT{"Copy"}%</a>
+<a class="jqUIDialogButton jqUIDialogClose {icon:'ui-icon-cancel'}">%MAKETEXT{"Cancel"}%</a>
 </form>
 <!-- -->%TMPL:END%

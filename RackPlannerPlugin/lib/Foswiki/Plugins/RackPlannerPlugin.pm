@@ -23,7 +23,8 @@ use strict;
 
 require Foswiki::Plugins::RackPlannerPlugin::RackPlanner;
 
-use vars qw( $VERSION $RELEASE $debug $pluginName $NO_PREFS_IN_TOPIC $SHORTDESCRIPTION );
+use vars
+  qw( $VERSION $RELEASE $debug $pluginName $NO_PREFS_IN_TOPIC $SHORTDESCRIPTION );
 
 # This should always be $Rev: 8670$ so that TWiki can determine the checked-in
 # status of the plugin. It is used by the build automation tools, so
@@ -45,7 +46,8 @@ $RELEASE = '1.1';
 # Name of this Plugin, only used in this module
 $pluginName = 'RackPlannerPlugin';
 
-$SHORTDESCRIPTION = "Render a rack overview (e.g. of 19'' computer racks) with HTML tables.";
+$SHORTDESCRIPTION =
+  "Render a rack overview (e.g. of 19'' computer racks) with HTML tables.";
 
 $NO_PREFS_IN_TOPIC = 1;
 
@@ -85,6 +87,5 @@ s/%RACKPLANNER{(.*?)}%/&Foswiki::Plugins::RackPlannerPlugin::RackPlanner::expand
     };
     &Foswiki::Func::writeWarning($@) if $@;
 }
-
 
 1;

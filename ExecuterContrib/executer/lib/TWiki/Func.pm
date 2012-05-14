@@ -70,6 +70,7 @@ package TWiki::Func;
 
 use strict;
 use warnings;
+
 #use Error qw( :try );
 #use Assert;
 
@@ -77,10 +78,10 @@ use warnings;
 #use TWiki::Plugins;
 use TWiki::Attrs;
 
-
 sub extractParameters {
-    my( $attr ) = @_;
-    my $params = new TWiki::Attrs( $attr );
+    my ($attr) = @_;
+    my $params = new TWiki::Attrs($attr);
+
     # take out _RAW and _ERROR (compatibility)
     delete $params->{_RAW};
     delete $params->{_ERROR};

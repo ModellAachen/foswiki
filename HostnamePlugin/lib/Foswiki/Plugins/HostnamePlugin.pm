@@ -18,28 +18,31 @@ package Foswiki::Plugins::HostnamePlugin;
 use strict;
 use warnings;
 
-our $VERSION = '$Rev$';
-our $RELEASE = '1.1';
-our $SHORTDESCRIPTION = 'Displays the hostname of the server serving Foswiki.';
+our $VERSION           = '$Rev$';
+our $RELEASE           = '1.1';
+our $SHORTDESCRIPTION  = 'Displays the hostname of the server serving Foswiki.';
 our $NO_PREFS_IN_TOPIC = 1;
-our $pluginName = 'HostnamePlugin';
+our $pluginName        = 'HostnamePlugin';
 
 sub initPlugin {
-    Foswiki::Func::registerTagHandler( 'HOSTNAME', \&_handleTag);
+    Foswiki::Func::registerTagHandler( 'HOSTNAME', \&_handleTag );
 
     # Plugin correctly initialized
     return 1;
 }
 
 sub _handleTag {
+
     #my($session, $params, $theTopic, $theWeb) = @_;
 
     eval 'use Sys::Hostname';
-    if (! $@ ){
+    if ( !$@ ) {
         return hostname();
-    } else {
-        Foswiki::Func::writeWarning( $@ );
-        return "<span class='foswikiAlert'>$pluginName error: Sys::Hostname not found in \@INC. Please contact %WIKIWEBMASTER%.</span>";
+    }
+    else {
+        Foswiki::Func::writeWarning($@);
+        return
+"<span class='foswikiAlert'>$pluginName error: Sys::Hostname not found in \@INC. Please contact %WIKIWEBMASTER%.</span>";
     }
 }
 

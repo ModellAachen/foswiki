@@ -110,7 +110,7 @@ my $allTopics =
 "$testForms{topic1}{name}, $testForms{topic2}{name}, $testForms{topic3}{name}, $testForms{topic4}{name}, $testForms{topic5}{name}";
 
 sub new {
-    my $self = shift()->SUPER::new( @_ );
+    my $self = shift()->SUPER::new(@_);
     return $self;
 }
 
@@ -1602,9 +1602,9 @@ sub test_param_footer_no_results {
 }
 
 sub test_param_sort_fieldDefinition {
-    my $this = shift;
+    my $this      = shift;
     my $testTopic = 'sortFieldDefinition';
-    my $source = <<"HERE";
+    my $source    = <<"HERE";
 ---+ Sorted
 %FORMFIELDLIST{sort="\$fieldDefinition" format="   * \$name: \$value"}%
 ---+ Unsorted
@@ -1621,7 +1621,7 @@ HERE
    * Bfield: 1
 HERE
 
-    $this->_set_up_topic($testTopic, <<'HERE');
+    $this->_set_up_topic( $testTopic, <<'HERE');
 TestForm doesn't exist
 
 For now we just test that the order of appearance of the META:FIELD macros
@@ -1729,6 +1729,7 @@ sub _addForm {
     $options{author}  = $cUID;
     $options{format}  = '1.1';
     $options{version} = '1.1913';
+
     # Added for Item8392; seems the topic isn't saved with correct date
     # otherwise
     $options{forcedate} = $formData{date} if $formData{date};

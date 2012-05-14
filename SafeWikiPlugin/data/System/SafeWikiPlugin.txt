@@ -77,18 +77,8 @@ against a whitelist of filter-in regular expressions, one of which must match
 or the URI will be replaced with a disarming string.
 
 ---+++ URIs
-By default the following URI parameters are checked against the
-whitelist:
-| *Tag* | *Parameter* |
-| APPLET | archive, code, codebase |
-| EMBED | src, pluginspace, pluginurl |
-| OBJECT | archive, codebase |
-| SCRIPT | src |
-You can also enable filtering for *all* URIs, in which case URIs
-such as those used in the =action= attribute of =FORM= tags will also be
-filtered.
-
-The filter-in regular expressions and the disarming strings are all
+The tags filtered, the filter-in regular expressions,
+and the disarming strings are all
 defined using the =configure= interface. See the setup for SafeWikiPlugin
 for more help.
 
@@ -117,16 +107,17 @@ Another great Foswiki extension from the <a style="text-decoration:none" href="h
 Sponsors for support and improvements are always welcome.
 
 |  Author(s): | Crawford Currie http://wikiring.com from an original idea by Sven Dowideit http://wikiring.com |
-|  Copyright: | &copy; 2007-2009 C-Dot Consultants http://c-dot.co.uk |
+|  Copyright: | &copy; 2007-2012 C-Dot Consultants http://c-dot.co.uk |
 |  License: | [[http://www.gnu.org/licenses/gpl.html][GPL (Gnu General Public License)]] |
 |  Release: | %$RELEASE% |
 |  Version: | %$VERSION% |
 |  Change History: | <!-- versions below in reverse order -->&nbsp; |
-|  18 Nov 2009 | Foswiki:Task:Item1963: add configure checkers for basic sanity of {SafeURI} and {UnsafeURI} filter values; also complain if {AllowRedirectUrl} is true |
-|  12 Oct 2009 | Foswiki:Task:Item8255: fix extraneous (missing '!') &lt;[endif]--&gt; shown by IEs at top of page |
-|  17 Sep 2009 | Foswiki:Task:Item8220: support filtering of eval() calls by supporting filter-out for handlers, and URIs too while I was in there Foswiki:Task:Item1963: hardened the regex that selects where to get JS from to restrict it to the Foswiki System web, which is not normally writable by ordinary users |
-|  14 Jun 2009 | Foswiki:Task:Item8181: plugin made aware of use of foswikiStrikeOne which is needed to work with Foswiki 1.0.6 and later versions. |
-|  30 Apr 2009 | Foswiki:Task:Item8143: First public release |
+|  5 Feb 2012 | Foswikitask:Item1928: remove nop tags, support UTF-8 |
+|  18 Nov 2009 | Foswikitask:Item1963: add configure checkers for basic sanity of {SafeURI} and {UnsafeURI} filter values; also complain if {AllowRedirectUrl} is true |
+|  12 Oct 2009 | Foswikitask:Item8255: fix extraneous (missing '!') &lt;[endif]--&gt; shown by IEs at top of page |
+|  17 Sep 2009 | Foswikitask:Item8220: support filtering of eval() calls by supporting filter-out for handlers, and URIs too while I was in there Foswikitask:Item1963: hardened the regex that selects where to get JS from to restrict it to the Foswiki System web, which is not normally writable by ordinary users |
+|  14 Jun 2009 | Foswikitask:Item8181: plugin made aware of use of foswikiStrikeOne which is needed to work with Foswiki 1.0.6 and later versions. |
+|  30 Apr 2009 | Foswikitask:Item8143: First public release |
 |  Dependencies: | %$DEPENDENCIES% |
 |  Home: | http://foswiki.org/Extensions/SafeWikiPlugin |
 |  Support: | http://foswiki.org/Support/SafeWikiPlugin |

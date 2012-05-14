@@ -384,7 +384,8 @@ var solr; /* last solr manager constructed; this is a singleton in most use case
 
     if ($searchField.length) {
       var searchFieldOpts = $.extend({}, $searchField.metadata()),
-          filter = searchFieldOpts.filter?searchFieldOpts.filter:[];
+          filter = searchFieldOpts.filter?searchFieldOpts.filter:[],
+          cache = {}, lastXhr, url;
 
       for (var i = 0; i < self.selection.length; i++) {
         var fv = self.selection[i];
@@ -395,32 +396,41 @@ var solr; /* last solr manager constructed; this is a singleton in most use case
       if (filter.length) {
         filter = ";filter="+filter.join(",");
       }
+        
+      url = foswiki.getPreference("SCRIPTURL")
+          + '/rest/SolrPlugin/autocomplete?topic='+foswiki.getPreference('WEB')+'.'+foswiki.getPreference('TOPIC')
+          + filter;
 
-      /* init autocompletion */
-      // TODO: test for newer autocomplete library
-      if (1) {
-        $searchField.autocomplete({
-          source:foswiki.getPreference("SCRIPTURL")+'/rest/SolrPlugin/autocomplete?'+filter
-        }).data("autocomplete")._renderItem = function(ul, item) {
-          return $("<li></li>")
-            .data("item.autocomplete", item)
-            .append("<a><table width='100%'><tr><td align='left'>"+item.label+"</td><td align='right'>"+item.frequency+"</td></tr></table></a>")
-            .appendTo(ul);
-        };
-      } else {
-        $searchField.autocomplete(
-          foswiki.getPreference("SCRIPTURL")+'/rest/SolrPlugin/autocomplete?'+filter, {
-            selectFirst: false,
-            autoFill:false,
-            matchCase:false,
-            matchSubset:false,
-            matchContains:false,
-            scrollHeight:'20em',
-            formatItem: function(row, index, max, search) {
-              return "<table width='100%'><tr><td align='left'>"+row[0]+"</td><td align='right'>"+row[2]+"</td></tr></table>";
+      $searchField.autocomplete({
+        source: function(request, response) {
+          var term = request.term, cacheKey = term;
+
+          // check cache
+          if (cacheKey in cache) {
+            response(cache[cacheKey]);
+            return;
+          }
+
+          // get result from backend
+          lastXhr = $.ajax({
+            url: url, 
+            dataType: 'json',
+            data: request, 
+            success: function(data, status, xhr) {
+              cache[cacheKey] = data;
+
+              // throw away response if there already was a newer one
+              if (xhr === lastXhr) {
+                response(data);
+              }
+            },
+            error: function(xhr, status, error) {
+              //alert("Error: "+status);
+              response();
             }
-        });
-      }
+          });
+        }
+      });
     }
 
     var filter = [];

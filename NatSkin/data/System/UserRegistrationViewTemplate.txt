@@ -26,7 +26,7 @@
 %TMPL:P{"formstart"}%
 %TMPL:P{"accountdetails"}%
 %TMPL:P{"logindetails"}%
-%TMPL:P{"extradetails"}%
+%TMPL:P{"DIS_extradetails"}%<!-- -->
 %TMPL:P{"groupdetails"}%
 %TMPL:P{context="CaptchaPluginEnabled" then="captcha"}%<!-- -->
 %TMPL:P{"formend"}%
@@ -284,8 +284,8 @@ jQuery(function($) {
     })
     .validate({
       rules: {
-        Fwk1FirstName: '%MAKETEXT{"required"}%',
-        Fwk1LastName: '%MAKETEXT{"required"}%',
+        Fwk1FirstName: 'required',
+        Fwk1LastName: 'required',
         Fwk1WikiName: {
           required: true,
           wikiword: true,
@@ -302,7 +302,7 @@ jQuery(function($) {
         },
         Fwk1Password: {
           required: true,
-          minlength: 3 /* on foswiki > 1.1 use '%QUERY{"{MinPasswordLength}"}% */
+          minlength: '%QUERY{"{MinPasswordLength}"}%'
         },
         Fwk1Confirm: {
           required: true,

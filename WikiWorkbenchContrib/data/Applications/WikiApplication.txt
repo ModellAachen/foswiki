@@ -1,7 +1,8 @@
-%META:TOPICINFO{author="ProjectContributor" comment="reprev" date="1277825875" format="1.1" reprev="4" version="6"}%
+%META:TOPICINFO{author="micha" comment="reprev" date="1335192251" format="1.1" reprev="4" version="8"}%
 %META:TOPICPARENT{name="TopicType"}%
 ---++ Documentation
 %STARTSECTION{"documentation"}%
+Normally there's only one WikiApplication topic in a wiki application as created using the !WikiWorkbench. This will be used to capture the CompleteDocumentation, including version and license information.
 
 See also: WikiApplicationTemplate
 %ENDSECTION{"documentation"}%
@@ -35,7 +36,7 @@ See also: WikiApplicationTemplate
 
 %META:FORM{name="Applications.TopicType"}%
 %META:FIELD{name="TopicType" title="TopicType" value="TopicType, DataForm, DocuTopic"}%
-%META:FIELD{name="TopicTitle" attributes="" title="<nop>TopicTitle" value="WikiApplication"}%
+%META:FIELD{name="TopicTitle" attributes="" title="<nop>TopicTitle" value=""}%
 %META:FIELD{name="Inheritance" attributes="" title="Inheritance" value="ApplicationTopic"}%
 %META:FIELD{name="Summary" attributes="c" title="Summary" value="TopicType of a WikiApplication"}%
 %META:FIELD{name="WikiApplication" attributes="" title="WikiApplication" value="WikiWorkbench"}%

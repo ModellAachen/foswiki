@@ -1,0 +1,10 @@
+data/System/PingBackClient.txt 0644
+data/System/PingBackManager.txt 0644
+data/System/PingBackPlugin.txt 0644
+lib/Foswiki/Plugins/PingBackPlugin/Client.pm 0644
+lib/Foswiki/Plugins/PingBackPlugin/Core.pm 0644
+lib/Foswiki/Plugins/PingBackPlugin/DB.pm 0644
+lib/Foswiki/Plugins/PingBackPlugin/Ping.pm 0644
+lib/Foswiki/Plugins/PingBackPlugin.pm 0644
+lib/Foswiki/Plugins/PingBackPlugin/QueueManager.pm 0644
+tools/pingbackmanager 0755

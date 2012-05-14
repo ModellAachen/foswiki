@@ -1,3 +1,5 @@
+%META:TOPICINFO{author="BaseUserMapping_333" date="1332297246" format="1.1" version="2"}%
+<img src="%ATTACHURLPATH%/HiddenPatternSidebar.jpg" alt="HiddenPatternSidebar.jpg" width='344' height='145' class="foswikiRight" style="border: 2px solid black" />
 ---+!! !HiddenPatternSidebarSkin
 <!--
 One line description, required for extensions repository catalog.
@@ -12,7 +14,20 @@ prefer.
 
 ---++ Usage
 
----++ Examples
+This is a UI minimisation of Pattern skin to improve _my_ usage on my 1024x768 pixel tablet notebook.
+
+Specifically, it 
+   1 reduces the height of the top bar, 
+   2 makes the sidebar autohide (or allow the user to hide / pin it and
+   3 pins the bottom action bar to the bottom of the browser window, allowing you to always access it wherever on the topic you are.
+
+The core focus is to focus on the current topic, while changing as little of the default skin as possible.
+
+<verbatim>
+   * Set SKIN=hiddenpattern,famfamfam,pattern
+</verbatim>
+
+---++ 
 
 ---++ Installation Instructions
 
@@ -20,17 +35,21 @@ prefer.
 
 ---++ Info
 
-Many thanks to the following sponsors for supporting this work:
-   * Acknowledge any sponsors here
-
-|  Author(s): | |
-|  Copyright: | &copy; |
-|  License: | [[http://www.gnu.org/licenses/gpl.html][GPL (Gnu General Public License)]] |
+|  Author(s): | Sven Dowideit |
+|  Copyright: | &copy; SvenDowideit@fosiki.com [[http://fosiki.com][fosiki consulting]] |
+|  License: | [[http://www.gnu.org/licenses/gpl.html][GPL (Gnu General Public License 3)]] |
 |  Release: | %$RELEASE% |
 |  Version: | %$VERSION% |
+|  Description: | Shows rendered topic text without any page decoration |
+|  Screenshot: | <a href="%ATTACHURL%/HiddenPatternSidebar.jpg"><img src="%ATTACHURL%/HiddenPatternSidebar.jpg" alt="Click for full screen image" width="344" height="145" /></a> |
+|  Base Name: | plain |
 |  Change History: | <!-- versions below in reverse order -->&nbsp; |
 |  Dependencies: | %$DEPENDENCIES% |
 |  Home page: | http://foswiki.org/bin/view/Extensions/HiddenPatternSidebarSkin |
 |  Support: | http://foswiki.org/bin/view/Support/HiddenPatternSidebarSkin |
 
 <!-- Do _not_ attempt to edit this topic; it is auto-generated. -->
+
+
+
+%META:FILEATTACHMENT{name="HiddenPatternSidebar.jpg" attachment="HiddenPatternSidebar.jpg" attr="" comment="" date="1332297246" path="HiddenPatternSidebar.jpg" size="54311" user="BaseUserMapping_333" version="1"}%

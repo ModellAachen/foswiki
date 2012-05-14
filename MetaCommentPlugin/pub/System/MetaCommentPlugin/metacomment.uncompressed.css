@@ -80,6 +80,7 @@ h3.cmtCommentNr {
 .cmtComment {
   position:relative;
 }
+a.cmtPermLink,
 .cmtAuthor a {
   text-decoration:none;
 }
@@ -127,20 +128,3 @@ h3.cmtCommentNr {
   display:none; /* switched on by js */
 }
 
-/* pattern skin */
-#patternScreen .cmtComments h2,
-#patternScreen .cmtComments h3 {
-  padding:0px;
-}
-#patternScreen .cmtComments .foswikiFormSteps {
-  margin-top:1.3846em; /* 18px */
-  border-left:0px;
-  border-right:0px;
-}
-#patternScreen .cmtStyle_threaded .foswikiFormSteps {
-  border-bottom:0px;
-  margin-bottom:0px;
-}
-#patternScreen .cmtComments .foswikiFormStep {
-  border:0px;
-}

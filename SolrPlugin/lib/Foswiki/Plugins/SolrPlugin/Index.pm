@@ -13,6 +13,7 @@
 
 package Foswiki::Plugins::SolrPlugin::Index;
 use strict;
+use warnings;
 
 use Foswiki::Plugins::SolrPlugin::Base ();
 our @ISA = qw( Foswiki::Plugins::SolrPlugin::Base );
@@ -194,7 +195,7 @@ sub update {
       foreach my $topic (Foswiki::Func::getTopicList($web)) {
         next if $this->isSkippedTopic($web, $topic);
         $this->indexTopic($web, $topic);
-        my $found = 1;
+        $found = 1;
       }
     } else { 
       # delta
@@ -338,7 +339,7 @@ sub indexTopic {
     $summary = $field->{value} if $field && $field->{value};
   }
   $summary = $this->plainify($summary, $web, $topic);
-  $summary = substr($text, 0, 300) unless $summary;
+  $summary = unicode_substr($text, 0, 300) unless $summary;
 
   # url to topic
   my $url = Foswiki::Func::getViewUrl($web, $topic);
@@ -368,7 +369,7 @@ sub indexTopic {
 
   # tag and analyze language
   my $contentLanguage = $this->getContentLanguage($web, $topic);
-  if (defined $contentLanguage) {
+  if (defined $contentLanguage && $contentLanguage ne 'detect') {
     $doc->add_fields(
       language => $contentLanguage,
       'text_'.$contentLanguage => $text,
@@ -568,12 +569,9 @@ sub getContentLanguage {
   }
 
   my $prefsLanguage = Foswiki::Func::getPreferencesValue('CONTENT_LANGUAGE') || '';
-  my $siteLanguage = $Foswiki::cfg{Site}{Locale} || 'en';
-  $siteLanguage =~ s/_.*$//; # the prefix: e.g. de, en
+  my $contentLanguage = $Foswiki::cfg{SolrPlugin}{SupportedLanguages}{$prefsLanguage} || 'detect';
 
-  my $contentLanguage = $Foswiki::cfg{SolrPlugin}{SupportedLanguages}{$prefsLanguage || $siteLanguage};
-
-  #$this->log("contentLanguage=$contentLanguage");
+  $this->log("contentLanguage=$contentLanguage") if DEBUG;
 
   Foswiki::Func::popTopicContext() if $donePush;
 
@@ -669,7 +667,7 @@ sub indexAttachment {
   my $author = getWikiName($attachment->{user});
 
   # get summary
-  my $summary = substr($attText, 0, 300);
+  my $summary = unicode_substr($attText, 0, 300);
 
 #  my $author = $attachment->{'user'} || $attachment->{'author'} || '';
 #  $author = Foswiki::Func::getWikiName($author) || 'UnknownUser';
@@ -716,7 +714,7 @@ sub indexAttachment {
   # tag and analyze language
   # SMELL: silently assumes all attachments to a topic are the same langauge
   my $contentLanguage = $this->getContentLanguage($web, $topic);
-  if (defined $contentLanguage) {
+  if (defined $contentLanguage && $contentLanguage ne 'detect') {
     $doc->add_fields(
       language => $contentLanguage,
       'text_'.$contentLanguage => $attText,
@@ -1006,7 +1004,11 @@ sub plainify {
   # remove/escape special chars
   $text =~ s/\\//g;
   $text =~ s/"//g;
+  $text =~ s/%{//g;
+  $text =~ s/}%//g;
   $text =~ s/%//g;
+  $text =~ s/{\s*}//g;
+  $text =~ s/#+//g;
   $text =~ s/\$perce?nt//g;
   $text =~ s/\$dollar//g;
   $text =~ s/\n/ /g;
@@ -1130,6 +1132,7 @@ sub getGrantedUsers {
   # set {knownUsers} and {nrKnownUsers}
   $this->getListOfUsers();
 
+  $text = $meta->text() unless defined $text;
   $text ||= '';
 
   my @grantedUsers = ();
@@ -1182,14 +1185,12 @@ sub getGrantedUsers {
 
 ################################################################################
 sub getAclFields {
-  my ($this, $web, $topic, $meta, $text) = @_;
-
-  $text = $meta->text() unless defined $text;
+  my $this = shift;
 
   my @aclFields = ();
 
   # permissions
-  my @grantedUsers = $this->getGrantedUsers($web, $topic, $meta, $text);
+  my @grantedUsers = $this->getGrantedUsers(@_);
   foreach my $wikiName (@grantedUsers) {
     push @aclFields, 'access_granted' => $wikiName;
   }
@@ -1219,6 +1220,19 @@ sub setTimestamp {
   Foswiki::Func::saveFile($timestampFile, $time);
 
   return $time;
+}
+
+################################################################################
+sub unicode_substr {
+  my ($string, $offset, $length) = @_;
+
+  my $charset = $Foswiki::cfg{Site}{CharSet};
+
+  $string = Encode::encode($charset, $string);
+  $string = substr($string, $offset, $length);
+  $string = Encode::decode($charset, $string);
+
+  return $string;
 }
 
 ################################################################################

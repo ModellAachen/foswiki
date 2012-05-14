@@ -21,18 +21,18 @@ package SpacedWikiWordPluginBuild;
 
 # Standard preamble
 BEGIN {
-  foreach my $pc (split(/:/, $ENV{FOSWIKI_LIBS})) {
-    unshift @INC, $pc;
-  }
+    foreach my $pc ( split( /:/, $ENV{FOSWIKI_LIBS} ) ) {
+        unshift @INC, $pc;
+    }
 }
 
 use Foswiki::Contrib::Build;
 our @ISA = qw( Foswiki::Contrib::Build );
 
-  sub new {
+sub new {
     my $class = shift;
-    return bless( $class->SUPER::new( "SpacedWikiWordPlugin"), $class );
-  }
+    return bless( $class->SUPER::new("SpacedWikiWordPlugin"), $class );
+}
 
 $build = new SpacedWikiWordPluginBuild();
-$build->build($build->{target});
+$build->build( $build->{target} );

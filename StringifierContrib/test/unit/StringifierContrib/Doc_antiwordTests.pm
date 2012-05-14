@@ -1,13 +1,13 @@
 # Test for DOC_antiword.pm
 package Doc_antiwordTests;
-use FoswikiFnTestCase;
-our @ISA = qw( FoswikiFnTestCase );
+use StringifierTest;
+our @ISA = qw( StringifierTest );
 
 use strict;
+use utf8;
 
 use Foswiki::Func;
 use Foswiki::Contrib::Stringifier();
-use utf8;
 
 sub set_up {
     my $this = shift;
@@ -65,7 +65,7 @@ sub test_SpecialCharacters {
 
     my $text  = $stringifier->stringForFile($this->{attachmentDir}.'Simple_example.doc');
 
-    $this->assert_matches('Größer', $text, "Text Größer not found.");
+    $this->assert_matches($this->encode('Größer'), $text, "Text Größer not found.");
 }
 
 # test for Passworded_example.doc

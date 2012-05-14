@@ -3,8 +3,8 @@ package MetasearchTagSuite;
 use Unit::TestSuite;
 our @ISA = qw( Unit::TestSuite );
 
-sub name { 'MetasearchTagSuite' };
+sub name { 'MetasearchTagSuite' }
 
-sub include_tests { qw(MetasearchTagTests) };
+sub include_tests { qw(MetasearchTagTests) }
 
 1;

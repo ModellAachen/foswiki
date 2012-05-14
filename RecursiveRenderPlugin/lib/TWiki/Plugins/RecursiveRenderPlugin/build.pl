@@ -3,16 +3,16 @@
 # Build for RecursiveRenderPlugin
 #
 BEGIN {
-  foreach my $pc (split(/:/, $ENV{FOSWIKI_LIBS})) {
-    unshift @INC, $pc;
-  }
+    foreach my $pc ( split( /:/, $ENV{FOSWIKI_LIBS} ) ) {
+        unshift @INC, $pc;
+    }
 }
 
 use TWiki::Contrib::Build;
 
 # Create the build object
-$build = new TWiki::Contrib::Build( 'RecursiveRenderPlugin' );
+$build = new TWiki::Contrib::Build('RecursiveRenderPlugin');
 
 # Build the target on the command line, or the default target
-$build->build($build->{target});
+$build->build( $build->{target} );
 

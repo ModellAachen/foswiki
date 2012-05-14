@@ -19,14 +19,15 @@ use TWiki;
 use vars qw( $VERSION $RELEASE $SHORTDESCRIPTION );
 $VERSION = '$Rev: 0$';
 $RELEASE = 'Dakar';
-$SHORTDESCRIPTION = 'Supports report generation for workflow topics (see [[Foswiki:Extensions/WorkflowPlugin][WorkflowPlugin]])';
+$SHORTDESCRIPTION =
+'Supports report generation for workflow topics (see [[Foswiki:Extensions/WorkflowPlugin][WorkflowPlugin]])';
 
-my $debugMode  = 0;
+my $debugMode    = 0;
 my $queryContext = 0;
 
 # Do a dynamic 'use locale' for this module
 BEGIN {
-    if( $TWiki::cfg{UseLocale} ) {
+    if ( $TWiki::cfg{UseLocale} ) {
         require locale;
         import locale();
     }
@@ -34,30 +35,31 @@ BEGIN {
 
 #The command handler
 sub workflowReports {
-    my $twiki = shift;
+    my $twiki   = shift;
     my $webList = undef;
 
-    $queryContext = !$twiki->inContext( 'command_line' );
+    $queryContext = !$twiki->inContext('command_line');
 
     # start html output if not running from command_line
-    if ( $queryContext ) {
-	    my $query = $twiki->{cgiQuery};
-	    $webList = $query->param( 'webs' );
-	    $debugMode  = $query->param( 'debug' );
+    if ($queryContext) {
+        my $query = $twiki->{cgiQuery};
+        $webList   = $query->param('webs');
+        $debugMode = $query->param('debug');
 
         $twiki->writePageHeader();
-        print CGI::start_html(-title=>'TWiki: Create Workflow Reports');
+        print CGI::start_html( -title => 'TWiki: Create Workflow Reports' );
 
         _report( $twiki, $webList );
 
-	    # insert a link to return referring url
-        my $url = $ENV{HTTP_REFERER} || $query->url().$query->path_info();
-        _print_message( $twiki, '   * Go back to '
-                             . CGI::a( { href => $url, rel => 'nofollow' }, $url ) );
-    	print CGI::end_html();
+        # insert a link to return referring url
+        my $url = $ENV{HTTP_REFERER} || $query->url() . $query->path_info();
+        _print_message( $twiki,
+            '   * Go back to '
+              . CGI::a( { href => $url, rel => 'nofollow' }, $url ) );
+        print CGI::end_html();
     }
     else {
-	    _report( $twiki, $webList );
+        _report( $twiki, $webList );
     }
 }
 
@@ -69,22 +71,22 @@ sub _report {
     _print_message( $twiki, 'Please wait until data collection has finished.' );
 
     my @webs = ();
-    if( $weblist ) {  # did we get a web list?
+    if ($weblist) {    # did we get a web list?
         push( @webs, split( /,\s*/, $weblist ) );
     }
-    else { # otherwise do all user webs:
-        @webs = $twiki->{store}->getListOfWebs( 'user' );
+    else {             # otherwise do all user webs:
+        @webs = $twiki->{store}->getListOfWebs('user');
     }
 
-    foreach my $web ( @webs ) {
+    foreach my $web (@webs) {
         no locale;
         if ( $web =~ /^([\/-\@\w.]+)$/ ) {
-            $web = $1; # $web now untainted
-			_try_on( $twiki, $web );
-	    }
-	    else {
-	        print STDERR "**** ERROR Bad data in '$web' \n";
-	    }
+            $web = $1;    # $web now untainted
+            _try_on( $twiki, $web );
+        }
+        else {
+            print STDERR "**** ERROR Bad data in '$web' \n";
+        }
     }
 
     _print_message( $twiki, 'End creating workflow reports' );
@@ -94,21 +96,20 @@ sub _try_on {
     my ( $twiki, $web ) = @_;
     my $store = $twiki->{store};
 
-    return unless $store->webExists( $web );
+    return unless $store->webExists($web);
 
-    my $reportTopic
-       = $twiki->{prefs}->getPreferencesValue( 'WEBWORKFLOWREPORT' )
-         || 'WorkflowReport';
+    my $reportTopic = $twiki->{prefs}->getPreferencesValue('WEBWORKFLOWREPORT')
+      || 'WorkflowReport';
 
-    if ($debugMode) { #override when debugging
+    if ($debugMode) {    #override when debugging
         $reportTopic = 'DebugWorkflowReport';
     }
 
     return unless $store->topicExists( $web, $reportTopic );
 
     # Save existing meta data from report topric
-    my ( $topicMetadata, $topicText )
-        = $store->readTopic( undef, $web, $reportTopic, undef );
+    my ( $topicMetadata, $topicText ) =
+      $store->readTopic( undef, $web, $reportTopic, undef );
 
     my @report_rows = _report_on( $twiki, $web );
 
@@ -117,35 +118,31 @@ sub _try_on {
     $topicText = join( "\n", @report_rows );
     $topicText .= "\n";
 
-    $store->saveTopic( $twiki->{user},
-                       $web,
-                       $reportTopic,
-                       $topicText,
-                       $topicMetadata,
-                       { minor => 1, dontlog => 1 } );
+    $store->saveTopic( $twiki->{user}, $web, $reportTopic, $topicText,
+        $topicMetadata, { minor => 1, dontlog => 1 } );
 }
 
 sub _report_on {
-    my( $twiki, $web ) = @_;
+    my ( $twiki, $web ) = @_;
 
-    return () if
-      $web ne $twiki->{webName} &&
-      $twiki->{prefs}->getWebPreferencesValue( 'NOSEARCHALL', $web );
+    return ()
+      if $web ne $twiki->{webName}
+          && $twiki->{prefs}->getWebPreferencesValue( 'NOSEARCHALL', $web );
 
     # List of all web topics
-	my	@topicnames = $twiki->{store}->getTopicNames( $web );
-    ( @topicnames ) = sort( @topicnames );
+    my @topicnames = $twiki->{store}->getTopicNames($web);
+    (@topicnames) = sort(@topicnames);
 
     # get workflow report topic name
-    my $reportFormat
-          = $twiki->{prefs}->getPreferencesValue( 'WEBWORKFLOWREPORTFORMAT' )
-            || '|$topic|$status|$lasttime|$history|';
+    my $reportFormat =
+      $twiki->{prefs}->getPreferencesValue('WEBWORKFLOWREPORTFORMAT')
+      || '|$topic|$status|$lasttime|$history|';
 
     # Report content (table of topics under workflow control)
-    my @reportRows = _get_report_header( $reportFormat );
-    foreach my $topic ( @topicnames ) {
-    	my $reportRow = _get_report_item( $twiki, $web, $topic, $reportFormat );
-    	if ( $reportRow ) {
+    my @reportRows = _get_report_header($reportFormat);
+    foreach my $topic (@topicnames) {
+        my $reportRow = _get_report_item( $twiki, $web, $topic, $reportFormat );
+        if ($reportRow) {
             push @reportRows, $reportRow;
         }
     }
@@ -154,7 +151,7 @@ sub _report_on {
 }
 
 sub _get_report_header {
-    my $header = shift; # load report format
+    my $header = shift;    # load report format
 
     # replace coresponding format placeholder with header text
     $header =~ s/\$topic\b/*%MAKETEXT{"Topic"}%*/g;
@@ -170,52 +167,53 @@ sub _get_report_header {
 }
 
 sub _get_report_item {
-    my( $twiki, $web, $topic, $item ) = @_; # loads item with report format
+    my ( $twiki, $web, $topic, $item ) = @_;    # loads item with report format
 
-    if( $twiki->{store}->topicExists( $web, $topic ) ) {
+    if ( $twiki->{store}->topicExists( $web, $topic ) ) {
+
         # Get topic meta data
-        my ( $meta, $text ) = $twiki->{store}->readTopic(
-        		undef, $web, $topic, undef );
+        my ( $meta, $text ) =
+          $twiki->{store}->readTopic( undef, $web, $topic, undef );
 
         # Get workflow attributes (status, lasttime)
-        my $type = 'WORKFLOW';
+        my $type      = 'WORKFLOW';
         my $keyValue  = undef;
         my $attribute = $meta->get( $type, $keyValue );
-		return undef if ( !defined( $attribute ) );
+        return undef if ( !defined($attribute) );
 
-        my $status = $attribute->{name};
-        my $lasttime = $attribute->{'LASTTIME_'.$status};
+        my $status   = $attribute->{name};
+        my $lasttime = $attribute->{ 'LASTTIME_' . $status };
 
         # Get workflow history attribute (history)
-        $type = 'WORKFLOWHISTORY';
-        $keyValue  = undef;
+        $type     = 'WORKFLOWHISTORY';
+        $keyValue = undef;
 
         $attribute = $meta->get( $type, $keyValue );
         my $history = ' - ';
         $history = $attribute->{value} if $attribute;
 
         # Get topicinfo attributes (lasteditor, last edit time, revision)
-        $type = 'TOPICINFO';
-        $keyValue = undef;
+        $type      = 'TOPICINFO';
+        $keyValue  = undef;
         $attribute = $meta->get( $type, $keyValue );
 
-        my $author = ' - ';
+        my $author   = ' - ';
         my $wikiname = $attribute->{author};
-        $author = '%MAINWEB%.'.$wikiname if $wikiname;
+        $author = '%MAINWEB%.' . $wikiname if $wikiname;
 
         my $intDate = $attribute->{date};    # Last topic revision date
-	    my $date = TWiki::Time::formatTime($intDate, '$day $mon $year');
-	    $date .= ' - ';
-        $date .= TWiki::Time::formatTime($intDate, '$hour:$min:$sec');
+        my $date = TWiki::Time::formatTime( $intDate, '$day $mon $year' );
+        $date .= ' - ';
+        $date .= TWiki::Time::formatTime( $intDate, '$hour:$min:$sec' );
 
-	    my $revision = $attribute->{version};    # Last topic revision number
+        my $revision = $attribute->{version};    # Last topic revision number
 
         # Get topicparent attribute (parent)
-		my $parent = ' - ';
-        $type = 'TOPICPARENT';
-        $keyValue = undef;
+        my $parent = ' - ';
+        $type      = 'TOPICPARENT';
+        $keyValue  = undef;
         $attribute = $meta->get( $type, $keyValue );
-        $parent = $attribute->{name} if $attribute ;
+        $parent    = $attribute->{name} if $attribute;
 
         # replace coresponding format placeholder with value retrieved
         $item =~ s/\$topic\b/[[$topic]]/g;
@@ -230,7 +228,7 @@ sub _get_report_item {
     }
     else {
         print STDERR "**** ERROR workflow reporter cannot find topic $topic\n";
-    	$item = undef;
+        $item = undef;
     }
 
     return $item;
@@ -238,28 +236,32 @@ sub _get_report_item {
 
 # print message helper
 sub _print_message {
-    my( $twiki, $message ) = @_;
+    my ( $twiki, $message ) = @_;
 
-    if( $queryContext ) {
-        if( $message =~ s/^\!// ) {
-            $message = CGI::h4( CGI::span( { class=>'twikiAlert' }, $message ));
+    if ($queryContext) {
+        if ( $message =~ s/^\!// ) {
+            $message =
+              CGI::h4( CGI::span( { class => 'twikiAlert' }, $message ) );
         }
-        elsif( $message =~ /^[A-Z]/ ) {
+        elsif ( $message =~ /^[A-Z]/ ) {
+
             # SMELL: does not support internationalised script messages
             $message =~ s/^([A-Z].*)/CGI::h3($1)/ge;
         }
         else {
-            $message =~ s/(\*\*\*.*)/CGI::span( { class=>'twikiAlert' }, $1 )/ge;
+            $message =~
+              s/(\*\*\*.*)/CGI::span( { class=>'twikiAlert' }, $1 )/ge;
             $message =~ s/^\s\s/&nbsp;&nbsp;/go;
             $message =~ s/^\s/&nbsp;/go;
             $message .= CGI::br();
         }
-        $message =~ s/==([A-Z]*)==/'=='.CGI::span( { class=>'twikiAlert' }, $1 ).'=='/ge;
+        $message =~
+          s/==([A-Z]*)==/'=='.CGI::span( { class=>'twikiAlert' }, $1 ).'=='/ge;
     }
     else {
         $message =~ s/&nbsp;/ /go;
     }
-    print $message,"\n";
+    print $message, "\n";
 }
 
 1;

@@ -45,7 +45,7 @@ our $SHORTDESCRIPTION =
 # and topic level.
 our $NO_PREFS_IN_TOPIC = 1;
 
-my $fortune_db; 
+my $fortune_db;
 my $fortune_bin;
 
 =begin TML
@@ -83,15 +83,17 @@ sub initPlugin {
     }
 
     $fortune_db = $Foswiki::cfg{Plugins}{FortunePlugin}{FortuneDBPath};
-    if (! length($fortune_db)) {
-      $fortune_db = Foswiki::Func::getPubDir()
-      . "/$Foswiki::cfg{SystemWebName}"
-      . "/FortunePlugin/";
-      } elsif ($fortune_db eq 'system') {
-          $fortune_db = '';
-          }
+    if ( !length($fortune_db) ) {
+        $fortune_db =
+            Foswiki::Func::getPubDir()
+          . "/$Foswiki::cfg{SystemWebName}"
+          . "/FortunePlugin/";
+    }
+    elsif ( $fortune_db eq 'system' ) {
+        $fortune_db = '';
+    }
 
-   Foswiki::Func::writeDebug("FortuneDBPath set to $fortune_db ");
+    Foswiki::Func::writeDebug("FortuneDBPath set to $fortune_db ");
 
     if ( $fortune_db && !( -d $fortune_db ) ) {
         Foswiki::Func::writeDebug('provided FortuneDBPath not found ');
@@ -143,7 +145,7 @@ sub _FORTUNE {
         my ( $output, $exit ) =
           Foswiki::Sandbox->sysCommand( "$fortune_bin %DATABASE|U% $len ",
             DATABASE => "$cdb" );
-          Foswiki::Func::writeDebug( "$fortune_bin Length $len Database ^$cdb^" );
+        Foswiki::Func::writeDebug("$fortune_bin Length $len Database ^$cdb^");
         return $output;
     }
     else {
@@ -234,7 +236,8 @@ sub _FORTUNE_DB_LIST {
     my $output = undef;
     if ($fortune_bin) {
         $output = `$fortune_bin -f $fortune_db 2>&1`;
-        $output =~ s/^100.*+$//m; #Remove the file path statement.  Don't reveal system information.
+        $output =~ s/^100.*+$//m
+          ;   #Remove the file path statement.  Don't reveal system information.
         return "<pre>" . $output . "\n </pre>\n";
     }
     else {

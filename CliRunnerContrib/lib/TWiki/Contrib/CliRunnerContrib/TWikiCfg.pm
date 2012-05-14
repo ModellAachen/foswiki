@@ -37,28 +37,27 @@ our $VERSION = '$Rev$';
 
 use TWiki::Configure::Load;
 
-
 # Read the configuration change during the import phase.
 sub import {
     my $self = shift;
 
-    my ($config_manip_filename)  =  @_;
+    my ($config_manip_filename) = @_;
 
     # Read the configuration *right now*
     TWiki::Configure::Load::readConfig();
 
-    my $done  =  do $config_manip_filename;
+    my $done = do $config_manip_filename;
     if ($done) {
         unlink $config_manip_filename;
     }
     else {
-        $!  and  die "Failed to read '$config_manip_filename': '$!'\n";
-        $@  and  die "Failed to compile '$config_manip_filename':\n$@\n";
+        $! and die "Failed to read '$config_manip_filename': '$!'\n";
+        $@ and die "Failed to compile '$config_manip_filename':\n$@\n";
         die "'$config_manip_filename' did not return a true value\n";
     }
 
     # Finally say that we're done to suppress re-reading
-    $TWiki::cfg{ConfigurationFinished}  =  1;
+    $TWiki::cfg{ConfigurationFinished} = 1;
 }
 
 1;

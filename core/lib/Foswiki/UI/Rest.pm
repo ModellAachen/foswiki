@@ -17,7 +17,7 @@ use Error qw( :try );
 
 our %restDispatch;
 
-=begin TML=
+=begin TML
 
 ---++ StaticMethod registerRESTHandler( $subject, $verb, \&fn, %options )
 
@@ -50,7 +50,7 @@ attacks, or used for phishing.
    * =http_allow= use this option to specify the HTTP methods that can
      be used to invoke the handler.
 
-=cut=
+=cut
 
 sub registerRESTHandler {
     my ( $subject, $verb, $fnref, %options ) = @_;
@@ -100,8 +100,8 @@ sub rest {
           if $Foswiki::cfg{Cache}{Debug};
 
         # render uncacheable areas
-        my $text = $cachedPage->{text};
-        $cache->renderDirtyAreas( \$text ) if $cachedPage->{isDirty};
+        my $text = $cachedPage->{data};
+        $cache->renderDirtyAreas( \$text ) if $cachedPage->{isdirty};
 
         # set status
         my $status = $cachedPage->{status};
@@ -113,7 +113,7 @@ sub rest {
         }
 
         # set headers
-        $session->generateHTTPHeaders( 'rest', $cachedPage->{contentType},
+        $session->generateHTTPHeaders( 'rest', $cachedPage->{contenttype},
             $text, $cachedPage );
 
         # send it out
@@ -172,7 +172,7 @@ sub rest {
         $res->print($err);
 
         $res->print(
-            "\nuseage: ./rest /PluginName/restHandler param=value\n\n" . join(
+            "\nusage: ./rest /PluginName/restHandler param=value\n\n" . join(
                 "\n",
                 map {
                     $_ . ' : '
@@ -247,7 +247,6 @@ sub rest {
         # an XHR.
     }
 
-
     $session->logEvent( 'rest',
         $session->{webName} . '.' . $session->{topicName} );
 
@@ -256,16 +255,17 @@ sub rest {
     my $result = &$function( $session, $subject, $verb, $session->{response} );
     use strict 'refs';
 
-    # Used by CommentPlugin rest handler to redirect to an alternate topic.
-    # Note that this might be better validated before dispatching the rest handler
-    # however the CommentPlugin handler modifies the endPoint and validating it early
-    # fails.
+# Used by CommentPlugin rest handler to redirect to an alternate topic.
+# Note that this might be better validated before dispatching the rest handler
+# however the CommentPlugin handler modifies the endPoint and validating it early
+# fails.
 
     my $endPoint = $req->param('endPoint');
     my $nurl;
 
     if ($endPoint) {
         my $epParms = '';
+
         # Strip off any anchors or query string
         if ( $endPoint =~ s/([#\?].*$)// ) {
             $epParms = $1;
@@ -280,7 +280,7 @@ sub rest {
         $topic = Foswiki::Sandbox::untaint( $topic,
             \&Foswiki::Sandbox::validateTopicName );
 
-        unless ( Foswiki::Func::topicExists($web, $topic) ) {
+        unless ( Foswiki::Func::topicExists( $web, $topic ) ) {
             $res->header( -type => 'text/html', -status => '404' );
             $err =
                 'ERROR: (404) Invalid REST invocation - '
@@ -290,9 +290,10 @@ sub rest {
             throw Foswiki::EngineException( 404, $err, $res );
         }
 
-        $nurl = $session->getScriptUrl( 1, 'view', '', $endPoint );
-        $nurl .= $epParms if ( $epParms );
+        $nurl = $session->getScriptUrl( 1, 'view', $web, $topic );
+        $nurl .= $epParms if ($epParms);
     }
+
     if ( defined($nurl) ) {
         $session->redirect($nurl);
     }

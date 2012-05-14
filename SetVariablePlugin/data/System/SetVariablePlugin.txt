@@ -71,7 +71,7 @@ matches =pattern=
   type="PREFERENCE|FIELD|TOPICINFO|..."
   sort="on|off"
   default="<default>"
-  scope="topic|web|user|session"
+  scope="topic|web|user|session|global"
 }%</verbatim>
 
 This displays a variable =key= as stored in topic =web.topic= and formats it using
@@ -100,7 +100,7 @@ The =format= string may contain the standard escape parameters
    * =$value= - the value of the current variable
    * =$name= - the name of the current variable
    * =$title= - the title and the
-   * =$type= - which is =Set=, =Local=, =Web= or =Session= depending on the type
+   * =$type= - which is =Set=, =Local=, =Web=, =Session= or =Global= depending on the type
                and scope of the variable
 
 ---++ Installation Instructions
@@ -108,11 +108,13 @@ The =format= string may contain the standard escape parameters
 
 ---++ Plugin Info
 |  Plugin Author: | Foswiki:Main.MichaelDaum |
-|  Copyright: | &copy; 2007-2011 Michael Daum http://michaeldaumconsulting.com |
+|  Copyright: | &copy; 2007-2012 Michael Daum http://michaeldaumconsulting.com |
 |  License: | GPL ([[http://www.gnu.org/copyleft/gpl.html][GNU General Public License]]) |
 |  Release: | %$RELEASE% |
 |  Version: | %$VERSION% |
 |  Change History: | &nbsp; |
+|  10 Apr 2012: | fixing scope="web"; finxign reading the view template yet again |
+|  27 Feb 2012: | added scope="global"; fixed reading view templates when there is none |
 |  02 Dec 2011: | improving save times, thanks to Foswiki:Main.PaulHarvey |
 |  28 Sep 2011: | implement setting variables via view_templates |
 |  17 Nov 2009: | SETVAR has higher priority than urlparams; fixed use in persistent perl envs |
@@ -120,4 +122,3 @@ The =format= string may contain the standard escape parameters
 |  Dependencies: | %$DEPENDENCIES% |
 |  Home: | Foswiki:Extensions/%TOPIC% |
 |  Support: | Foswiki:Support/%TOPIC% |
-

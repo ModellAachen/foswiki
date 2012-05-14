@@ -302,7 +302,7 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 						this.setupContent( LINK, link );
 				}
 
-				if ( element && element.getName() == 'img' && !element.getAttribute( '_cke_realelement' )
+				if ( element && element.getName() == 'img' && !element.getAttribute( 'data-cke-realelement' )
 					|| element && element.getName() == 'input' && element.getAttribute( 'type' ) == 'image' )
 				{
 					this.imageEditMode = element.getName();
@@ -490,7 +490,12 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 											{
 												var dialog = this.getDialog(),
 													newUrl = this.getValue();
-												
+
+												// During autocomplete, selecting an option in the menu
+												// blurs the input and thus triggers this handler.
+												// We don't have the complete URL at this point, though.
+												if ($('.ui-autocomplete:visible').length > 0) return;
+
 												//Update original image
 												if ( newUrl.length > 0 )	//Prevent from load before onShow
 												{
@@ -546,16 +551,25 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 											},
 											onShow : function()
 											{
-												//Alex: Verbessern - veralgemeinern
-												dialog = this.getDialog()
-												dialog.getContentElement('info', 'txtUrl').qwikiautosuggest({source: CKEDITOR.qwikiautosuggest.attachments, minLength: 2});
+												dialog = this.getDialog();
+												dialog.getContentElement('info', 'txtUrl').qwikiautosuggest('init', {
+													source: CKEDITOR.qwikiautosuggest.attachmentURLs,
+													minLength: 2,
+													select: function() {
+														// Need to delay this so that it only runs after the field has been updated
+														setTimeout(function() {
+															// Change of value doesn't trigger this when the field is not focused
+															dialog.getContentElement('info', 'txtUrl').fire('change');
+														});
+													}
+												});
 											},
 											commit : function( type, element )
 											{
 												if ( type == IMAGE && ( this.getValue() || this.isChanged() ) )
 												{
-													element.setAttribute( 'data-cke-saved-src', decodeURI( this.getValue() ) );
-													element.setAttribute( 'src', decodeURI( this.getValue() ) );
+													element.setAttribute( 'data-cke-saved-src', this.getValue() );
+													element.setAttribute( 'src', this.getValue() );
 												}
 												else if ( type == CLEANUP )
 												{
@@ -1108,7 +1122,7 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 							{
 								if ( type == LINK )
 								{
-									var href = element.getAttribute( '_cke_saved_href' );
+									var href = element.getAttribute( 'data-cke-saved-href' );
 									if ( !href )
 										href = element.getAttribute( 'href' );
 									this.setValue( href );
@@ -1120,7 +1134,7 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 								{
 									if ( this.getValue() || this.isChanged() )
 									{
-										element.setAttribute( '_cke_saved_href', decodeURI( this.getValue() ) );
+										element.setAttribute( 'data-cke-saved-href', decodeURI( this.getValue() ) );
 										element.setAttribute( 'href', 'javascript:void(0)/*' +
 											CKEDITOR.tools.getNextNumber() + '*/' );
 
@@ -1202,8 +1216,8 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 								{
 									dialog = this.getDialog()
 									var fname = dialog.getContentElement('upload', 'filepath').getInputElement().getValue();
-									// IE hates us and does stupid things
-									fname = fname.replace(/^C:\\fakepath\\/, '');
+									// We're not terribly interested in Windows paths
+									fname = fname.replace(/^.:\\(.+)\\/, '');
 									this.setValue(fname);
 								}
 							}

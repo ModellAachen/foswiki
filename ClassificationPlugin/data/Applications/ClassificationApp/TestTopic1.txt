@@ -1,4 +1,4 @@
-%META:TOPICINFO{author="ProjectContributor" date="1271175599" format="1.1" version="1.10"}%
+%META:TOPICINFO{author="ProjectContributor" comment="reprev" date="1330595414" format="1.1" reprev="12" version="12"}%
 %META:TOPICPARENT{name="WebHome"}%
 <verbatim>
    * ISA{IntranetDirectory}: %ISA{cat="IntranetDirectory"}%
@@ -13,9 +13,13 @@
    * DISTANCE{from="FinanceAndPlaning" to="TestCategory8"}: %DISTANCE{from="FinanceAndPlaning" to="TestCategory8" abs="off"}%
 </verbatim>
 
+---++ Topics without a category
+
+%DBQUERY{"Category = ''" format="   * [[$web.$topic][$topic]]"}%
+
 %META:FORM{name="Applications.ClassificationApp.ClassifiedTopic"}%
 %META:FIELD{name="TopicType" title="TopicType" value="ClassifiedTopic, CategorizedTopic, TaggedTopic, WikiTopic"}%
-%META:FIELD{name="TopicTitle" attributes="" title="<nop>TopicTitle" value="TestTopic1"}%
+%META:FIELD{name="TopicTitle" attributes="" title="<nop>TopicTitle" value=""}%
 %META:FIELD{name="Summary" attributes="" title="Summary" value=""}%
 %META:FIELD{name="Tag" attributes="" title="Tag" value="FooBar, BarBaz"}%
 %META:FIELD{name="Category" attributes="" title="Category" value=""}%

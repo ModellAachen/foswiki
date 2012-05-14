@@ -1,10 +1,10 @@
-%TMPL:DEF{"expired_vchash"}%
-Your registration session has expired. Please [[%TWIKIREGISTRATION%][click here]] to try again.
+%TMPL:INCLUDE{"oops"}%<!-- template: oopscaptcha.tmpl -->
+
+%TMPL:DEF{"captcha::invalid_response"}%<!-- -->
+%MAKETEXT{"The security code you entered for verification did not match the image."}%
+%MAKETEXT{"Please go back and <a href='javascript:history.back()'>try again</a>."}%
 %TMPL:END%
-%TMPL:DEF{"invalid_vcstr"}%
-The security code you entered for verification did not match the image. Please <a href="javascript:history.back()">go back</a> and try again.
-%TMPL:END%
-%TMPL:INCLUDE{"oops"}%
+
 %TMPL:DEF{"heading"}%%MAKETEXT{"Attention"}%%TMPL:END%
 %TMPL:DEF{"message"}%
 %INSTANTIATE%

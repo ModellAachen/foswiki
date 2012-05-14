@@ -15,7 +15,6 @@ require Foswiki::Func;    # The plugins API
 require Net::Twitter;
 require WWW::Shorten::Bitly;
 
-
 =begin TML
 
 ---++ afterSaveHandler($text, $topic, $web, $error, $meta )
@@ -42,45 +41,51 @@ sub afterSaveHandler {
     # as if it was passed by reference; for example:
     # $_[0] =~ s/SpecialString/my alternative/ge;
 
-    return if(grep(/^$web$/,@excludeWebs));
+    return if ( grep( /^$web$/, @excludeWebs ) );
 
-    my $tweet=$Foswiki::cfg{Plugins}{ImmediateNotifyPlugin}{Template} || '$user $action topic $web.$topic $url';
+    my $tweet = $Foswiki::cfg{Plugins}{ImmediateNotifyPlugin}{Template}
+      || '$user $action topic $web.$topic $url';
 
-    my $action='saved';
-    $action='created' if($isNewTopic{$$});
+    my $action = 'saved';
+    $action = 'created' if ( $isNewTopic{$$} );
 
-    my $user=$Foswiki::Plugins::SESSION->{'user'};
+    my $user = $Foswiki::Plugins::SESSION->{'user'};
 
     # only shorten url if url is actually used
-    my $url=Foswiki::Func::getViewUrl($web,$topic);
-    if( ($tweet=~/\$url/) and (defined($Foswiki::cfg{Plugins}{ImmediateNotifyPlugin}{BitlyUser})) ) {
-      $url=WWW::Shorten::Bitly::makeashorterlink(
-	$url,
-	$Foswiki::cfg{Plugins}{ImmediateNotifyPlugin}{BitlyUser},
-        $Foswiki::cfg{Plugins}{ImmediateNotifyPlugin}{BitlyKey}
-      );
+    my $url = Foswiki::Func::getViewUrl( $web, $topic );
+    if (    ( $tweet =~ /\$url/ )
+        and
+        ( defined( $Foswiki::cfg{Plugins}{ImmediateNotifyPlugin}{BitlyUser} ) )
+      )
+    {
+        $url = WWW::Shorten::Bitly::makeashorterlink(
+            $url,
+            $Foswiki::cfg{Plugins}{ImmediateNotifyPlugin}{BitlyUser},
+            $Foswiki::cfg{Plugins}{ImmediateNotifyPlugin}{BitlyKey}
+        );
     }
 
-    $tweet=~s/\$web/$web/g;
-    $tweet=~s/\$topic/$topic/g;  
-    $tweet=~s/\$action/$action/g;
-    $tweet=~s/\$user/$user/g;
-    $tweet=~s/\$url/$url/g;
+    $tweet =~ s/\$web/$web/g;
+    $tweet =~ s/\$topic/$topic/g;
+    $tweet =~ s/\$action/$action/g;
+    $tweet =~ s/\$user/$user/g;
+    $tweet =~ s/\$url/$url/g;
 
     Foswiki::Func::writeDebug("tweet: $tweet");
 
     my $twitter = Net::Twitter->new(
-      traits   => [qw/API::REST/],
-      username => $Foswiki::cfg{Plugins}{ImmediateNotifyPlugin}{StatusUser},
-      password => $Foswiki::cfg{Plugins}{ImmediateNotifyPlugin}{StatusPassword}
+        traits   => [qw/API::REST/],
+        username => $Foswiki::cfg{Plugins}{ImmediateNotifyPlugin}{StatusUser},
+        password =>
+          $Foswiki::cfg{Plugins}{ImmediateNotifyPlugin}{StatusPassword}
     );
 
     my $result = $twitter->update($tweet);
 
-    Foswiki::Func::writeDebug("result for twitter update: ".join(', ',keys %{$result}));
+    Foswiki::Func::writeDebug(
+        "result for twitter update: " . join( ', ', keys %{$result} ) );
 
 }
-
 
 1;
 __END__

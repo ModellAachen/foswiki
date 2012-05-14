@@ -58,9 +58,14 @@ table.foswikiMakeVisible {
 	display: block;
 }
 
-.foswikiMakeSticky {}
+.foswikiMakeSticky {
+	&.foswikiShadow {
+		.box-shadow(none);
+	}
+}
 .foswikiSticky {
 	position: fixed;
 	width: 100%;
+	z-index: 10;
 }
 

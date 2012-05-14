@@ -10,7 +10,7 @@
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details, published at 
+# GNU General Public License for more details, published at
 # http://www.gnu.org/copyleft/gpl.html
 
 # This plugin is part of the TWPC, TWiki Public Cache Addon.
@@ -24,9 +24,9 @@ $debug = 0;
 
 # =========================
 use vars qw(
-        $web $topic $user $installWeb $VERSION  $RELEASE $pluginName
-        $debug 
-    );
+  $web $topic $user $installWeb $VERSION  $RELEASE $pluginName
+  $debug
+);
 
 # This should always be $Rev$ so that TWiki can determine the checked-in
 # status of the plugin. It is used by the build automation tools, so
@@ -38,7 +38,7 @@ $VERSION = '$Rev$';
 # of the version number in PLUGINDESCRIPTIONS.
 $RELEASE = 'v3';
 
-$pluginName = 'PublicCachePlugin';  # Name of this Plugin
+$pluginName = 'PublicCachePlugin';    # Name of this Plugin
 
 sub debug { TWiki::Func::writeDebug(@_) if $debug; }
 
@@ -48,13 +48,12 @@ sub warning {
 }
 
 # =========================
-sub initPlugin
-{
+sub initPlugin {
     ( $topic, $web, $user, $installWeb ) = @_;
 
     # check for Plugins.pm versions
-    if( $TWiki::Plugins::VERSION < 1.020 ) {
-        warning( "Version mismatch between $pluginName and Plugins.pm" );
+    if ( $TWiki::Plugins::VERSION < 1.020 ) {
+        warning("Version mismatch between $pluginName and Plugins.pm");
         return 0;
     }
     return 1;
@@ -78,44 +77,55 @@ __NOTE:__ meta-data is embedded in $text (using %META: tags)
 =cut
 
 sub afterSaveHandler {
+
     # do not uncomment, use $_[0], $_[1]... instead
     ### my ( $text, $topic, $web, $error, $meta ) = @_;
     #         0      1       2     3       4
-    if ($_[3]) {
+    if ( $_[3] ) {
         debug("- $pluginName: Unsuccessful save, not notifying...");
         return;
     }
+
     # immediately clear cache for cleargrace null
-    if (XXXcleargraceXXX == 0) {
+    if ( XXXcleargraceXXX == 0 ) {
         eval "require  LWP::Simple;";
-        my $response =  LWP::Simple::get("XXXbinurlXXX/pcad?action=clear");
-        if (! defined $response) {
+        my $response = LWP::Simple::get("XXXbinurlXXX/pcad?action=clear");
+        if ( !defined $response ) {
             warning("Error in clearing cache");
         }
-    } else {
+    }
+    else {
+
         # register our client as a changer
         # untaint var,  http://www.perlmeme.org/howtos/secure_code/taint.html
         my $ip_tainted = $ENV{REMOTE_ADDR};
         if ( $ip_tainted =~ m/^([0-9\.]+)$/ ) {
             my $ip = "$1";
-    
-            if( open( FILE, ">XXXcacheXXX/_changers/$ip" ) ) {
-                print FILE $ip; # "touch"
-                close( FILE );
-            } else {
+
+            if ( open( FILE, ">XXXcacheXXX/_changers/$ip" ) ) {
+                print FILE $ip;    # "touch"
+                close(FILE);
+            }
+            else {
+
                 # retry once
                 eval "require File::Path;";
-                File::Path::mkpath("XXXcacheXXX/_changers", 0, 0777);
-                if( open( FILE, ">>XXXcacheXXX/_changers/$ip" ) ) {
-                    print FILE $ip; # "touch"
-                    close( FILE ); # just create an empty file
-                } else {
+                File::Path::mkpath( "XXXcacheXXX/_changers", 0, 0777 );
+                if ( open( FILE, ">>XXXcacheXXX/_changers/$ip" ) ) {
+                    print FILE $ip;    # "touch"
+                    close(FILE);       # just create an empty file
+                }
+                else {
+
                     # dont complain: it means the cache system was not in
                     # place yet, so no need to bypass it anyways at this time
-                    debug("PublicCachePlugin: could not write XXXcacheXXX/_changers/$ip");
+                    debug(
+"PublicCachePlugin: could not write XXXcacheXXX/_changers/$ip"
+                    );
                 }
             }
-        } else {
+        }
+        else {
             warning("Bad IP address in REMOTE_ADDR: $ENV{REMOTE_ADDR}");
         }
     }
@@ -136,6 +146,7 @@ This handler is called just after page rendering (end of view).
 =cut
 
 sub beforeWriteCompletePage {
+
     # do not uncomment, use $_[0], $_[1]... instead
     ### my ( $page, $topic, $web, $contentType ) = @_;
     #         0      1       2     3
@@ -143,24 +154,27 @@ sub beforeWriteCompletePage {
     # handle cache expiration time of this page if set
     # 0 = no expire, -1 = not cached, 1 = default value, N = seconds
     my $exptime = TWiki::Func::getPreferencesValue('PUBLIC_CACHE_EXPIRE') || 0;
+
     #debug("- $pluginName: beforeWriteCompletePage $exptime");
-    if ($exptime != 0) {
+    if ( $exptime != 0 ) {
         eval "require File::Path;";
-        if ($exptime < 0) {
-            File::Path::mkpath("XXXcacheXXX/$_[2]", 0, 0777);
-            if( open( FILE, ">>XXXcacheXXX/$_[2]/$_[1].nc" ) ) {
-                close( FILE ); # just create an empty file
+        if ( $exptime < 0 ) {
+            File::Path::mkpath( "XXXcacheXXX/$_[2]", 0, 0777 );
+            if ( open( FILE, ">>XXXcacheXXX/$_[2]/$_[1].nc" ) ) {
+                close(FILE);    # just create an empty file
             }
-        } else {
+        }
+        else {
             eval "require File::Path;";
-	    $exptime = XXXexptimeXXX if( $exptime == 1 );
-            File::Path::mkpath("XXXcacheXXX/_expire/$_[2]", 0, 0777);
-            if( open( FILE, ">>XXXcacheXXX/_expire/$_[2]/$_[1]" ) ) {
-                close( FILE ); # just create an empty file
+            $exptime = XXXexptimeXXX if ( $exptime == 1 );
+            File::Path::mkpath( "XXXcacheXXX/_expire/$_[2]", 0, 0777 );
+            if ( open( FILE, ">>XXXcacheXXX/_expire/$_[2]/$_[1]" ) ) {
+                close(FILE);    # just create an empty file
                 my $fileexptime = time() + $exptime;
-                utime($fileexptime, $fileexptime, 
-                    "XXXcacheXXX/_expire/$_[2]/$_[1]");
-            } else {
+                utime( $fileexptime, $fileexptime,
+                    "XXXcacheXXX/_expire/$_[2]/$_[1]" );
+            }
+            else {
                 warning("Error writing XXXcacheXXX/_expire/$_[2]/$_[1]");
             }
         }

@@ -17,61 +17,43 @@
 package Foswiki::Plugins::UserInfoPlugin;
 
 use strict;
-use vars qw( $VERSION $RELEASE $uipCore );
+use warnings;
 
-$VERSION = '$Rev$';
-$RELEASE = '1.55';
+use Foswiki::Func ();
+use Foswiki::Plugins ();
+
+our $uipCore;
+our $VERSION = '$Rev$';
+our $RELEASE = '2.00';
+our $SHORTDESCRIPTION = 'Render information about the users on your wiki';
+our $NO_PREFS_IN_TOPIC = 1;
 
 ###############################################################################
 sub initPlugin {
   #($topic, $web, $user, $installWeb) = @_;
 
   $uipCore = undef;
-  return 1;
-}
 
-###############################################################################
-sub commonTagsHandler {
-  $_[0] =~ s/%NR(VISITORS|USERS|GUESTS)%/&handleSimpleTags($1)/ge;
-  $_[0] =~ s/%(VISITORS|LASTVISITORS|NRLASTVISITORS|NEWUSERS)(?:{(.*?)})?%/&handleTags($1, $2)/ge;
+  Foswiki::Func::registerTagHandler('NRVISITORS', sub { return getCore()->handleNrVisitors(@_);});
+  Foswiki::Func::registerTagHandler('NRUSERS', sub { return getCore()->handleNrUsers(@_);});
+  Foswiki::Func::registerTagHandler('NRGUESTS', sub { return getCore()->handleNrGuests(@_);});
+  Foswiki::Func::registerTagHandler('NRLASTVISITORS', sub { return getCore()->handleNrLastVisitors(@_);});
+  Foswiki::Func::registerTagHandler('VISITORS', sub { return getCore()->handleVisitors(@_);});
+  Foswiki::Func::registerTagHandler('LASTVISITORS', sub { return getCore()->handleLastVisitors(@_);});
+  Foswiki::Func::registerTagHandler('NEWUSERS', sub { return getCore()->handleNewUsers(@_);});
+
+  return 1;
 }
 
 ###############################################################################
 sub getCore {
   return $uipCore if $uipCore;
 
-  eval 'use Foswiki::Plugins::UserInfoPlugin::Core;';
-  die $@ if $@;
-
-  $uipCore = new Foswiki::Plugins::UserInfoPlugin::Core;
+  require Foswiki::Plugins::UserInfoPlugin::Core;
+  $uipCore = new Foswiki::Plugins::UserInfoPlugin::Core();
 
   return $uipCore;
 }
-
-###############################################################################
-sub handleSimpleTags {
-  my $mode = shift;
-
-  my $core = getCore();
-
-  return $core->handleNrVisitors() if $mode eq 'VISITORS';
-  return $core->handleNrUsers() if $mode eq 'USERS';
-  return $core->handleNrGuests()#; if $mode eq 'GUESTS';
-}
-
-###############################################################################
-sub handleTags {
-  my $mode = shift;
-
-  my $core = getCore();
-
-  return $core->handleNrLastVisitors(@_) if $mode eq 'NRLASTVISITORS';
-  return $core->handleCurrentVisitors(@_) if $mode eq 'VISITORS';
-  return $core->handleLastVisitors(@_) if $mode eq 'LASTVISITORS';
-  return $core->handleNewUsers(@_);# if $mode eq 'NEWUSERS';
-}
-
-###############################################################################
 
 1;
 

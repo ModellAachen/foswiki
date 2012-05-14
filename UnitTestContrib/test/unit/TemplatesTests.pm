@@ -22,6 +22,23 @@ my $test_data;
 
 my $tmpls;
 
+sub skip {
+    my ( $this, $test ) = @_;
+
+    return $this->SUPER::skip_test_if(
+        $test,
+        {
+            condition => { with_dep => 'Foswiki,<,1.2' },
+            tests     => {
+                'TemplatesTests::test_languageEnglish' =>
+                  'Default TMPL params are Foswiki 1.2+ only, Item11400',
+                'TemplatesTests::test_languageGaelic' =>
+                  'Default TMPL params are Foswiki 1.2+ only, Item11400',
+            }
+        }
+    );
+}
+
 sub set_up {
     my $this = shift;
     $this->SUPER::set_up();
@@ -566,20 +583,17 @@ SKIN=pattern An faca sibh?
 sub language_setup {
     my ($this) = @_;
 
-    $this->expect_failure(
-        'Default TMPL params are Foswiki 1.2+ only, Item11400',
-        with_dep => 'Foswiki,<,1.2' );
     write_template( 'strings', <<'HERE');
 
 %TMPL:DEF{"Question"}%Do you see?%TMPL:END%
-%TMPL:DEF{"Yes" char="?"}%Yes%char%%TMPL:END%
+%TMPL:DEF{"Yes" char="%type%"}%Yes%char%%TMPL:END%
 %TMPL:DEF{"No"}%No%char%%TMPL:END%
 %TMPL:DEF{"Dontknow" char=""}%Dunno%char%%TMPL:END%
 HERE
     write_template( 'strings.gaelic', <<'HERE');
 
 %TMPL:DEF{"Question"}%An faca sibh?%TMPL:END%
-%TMPL:DEF{"Yes" char="?"}%Chunnaic%char%%TMPL:END%
+%TMPL:DEF{"Yes" char="%type%"}%Chunnaic%char%%TMPL:END%
 %TMPL:DEF{"No"}%Chan fhaca%char%%TMPL:END%
 %TMPL:DEF{"Dontknow" char=""}%Níl a fhios%char%%TMPL:END%
 HERE
@@ -593,7 +607,7 @@ HERE
     write_template( 'example', <<'HERE');
 %TMPL:INCLUDE{"pattern"}%%TMPL:P{"Question"}%
 <input type="button" value="%TMPL:P{"No" char="!"}%">
-<input type="button" value="%TMPL:P{"Yes"}%">
+<input type="button" value="%TMPL:P{"Yes" type="?"}%">
 <input type="button" value="%TMPL:P{"Dontknow"}%">
 HERE
 

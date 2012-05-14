@@ -7,16 +7,19 @@ use strict;
 use AnyDBM_File;
 use Fcntl;
 
-if (not @ARGV == 2) {
+if ( not @ARGV == 2 ) {
     &use();
-} else {
-    my $command = shift @ARGV;
+}
+else {
+    my $command  = shift @ARGV;
     my $filename = shift @ARGV;
-    if ($command eq '-d') {
+    if ( $command eq '-d' ) {
         &dump($filename);
-    } elsif ($command eq '-i') {
+    }
+    elsif ( $command eq '-i' ) {
         &import($filename);
-    } else {
+    }
+    else {
         &use();
     }
 }
@@ -41,8 +44,8 @@ sub use {
 
 sub dump {
     my %db;
-    tie(%db, 'AnyDBM_File', shift, O_RDONLY, 0666);
-    while (my ($key, $val) = each %db) {
+    tie( %db, 'AnyDBM_File', shift, O_RDONLY, 0666 );
+    while ( my ( $key, $val ) = each %db ) {
         chomp $val;
         print "$key => $val\n";
     }
@@ -50,18 +53,19 @@ sub dump {
 
 sub import {
     my %db;
-    tie(%db, 'AnyDBM_File', shift, O_WRONLY|O_CREAT, 0666);
+    tie( %db, 'AnyDBM_File', shift, O_WRONLY | O_CREAT, 0666 );
     while (<STDIN>) {
         chomp;
         unless (m/\s*(.+?)\s+=(?:is=|are=)?>\s+(.+?)\s*$/o) {
             m/\s*(.+?)\s+(?:is|are)?\s+(.+?)\s*$/o;
         }
-        if (length($1) and length($2)) {
-            if (defined($db{$1})) {
-                if (not $db{$1} =~ m/^(|.*\|)\Q$2\E(|.*\|)$/s) {
+        if ( length($1) and length($2) ) {
+            if ( defined( $db{$1} ) ) {
+                if ( not $db{$1} =~ m/^(|.*\|)\Q$2\E(|.*\|)$/s ) {
                     $db{$1} .= "|$2";
                 }
-            } else {
+            }
+            else {
                 $db{$1} = $2;
             }
         }

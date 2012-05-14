@@ -54,6 +54,7 @@ sub initPlugin {
         )
       )
     {
+
         # Lazy-load to help CGI compile times
         require Foswiki::Plugins::TinyMCECleanStickyBitsPlugin::Core;
         Foswiki::Plugins::TinyMCECleanStickyBitsPlugin::Core::setup();

@@ -1,6 +1,6 @@
 # Foswiki - The Free and Open Source Wiki, http://foswiki.org/
 #
-# Copyright (C) 2006-2010 Michael Daum http://michaeldaumconsulting.com
+# Copyright (C) 2006-2012 Michael Daum http://michaeldaumconsulting.com
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -15,49 +15,61 @@
 # As per the GPL, removal of this notice is prohibited.
 
 use strict;
+use warnings;
+
+=begin TML
+
+---+ package XmlRpcContrib
+
+=cut
 
 package Foswiki::Contrib::XmlRpcContrib;
 
 our $VERSION = '$Rev$';
 our $RELEASE = '1.00';
 our $SERVER;
-our %handler;
 our $SHORTDESCRIPTION = '';
 
-################################################################################
-# register an implementation for a handler
-sub registerRPCHandler {
-  my ($methodName, $methodImpl) = @_;
+=begin TML
 
-  # SMELL: this may override a previous registration; must we take care?
-  $handler{$methodName} = $methodImpl;
+---++ ClassMethod registerMethod($methodName, $handler)
+
+register an implementation for a handler
+
+=cut
+
+sub registerMethod {
+  getServer()->registerMethod(@_);
 }
 
-################################################################################
-# process an xml call
+=begin TML
+
+---++ ClassMethod dispatch($session, $data)
+
+process an xml call
+
+=cut
+
 sub dispatch {
-  my ($session, $data) = @_;
+  getServer()->dispatch(@_);
+}
 
-  $Foswiki::Plugins::SESSION = $session;
+=begin TML
 
-  initServer();
-  unless ($data) {
-    my $query = $session->{cgiQuery};
-    $data = $query->param('POSTDATA') || '';
+---++ ClassMethod getServer()
+
+create a singleton server object
+
+=cut
+
+sub getServer {
+
+  unless (defined $SERVER) {
+    require Foswiki::Contrib::XmlRpcContrib::Server;
+    $SERVER = Foswiki::Contrib::XmlRpcContrib::Server->new();
   }
 
-  return $SERVER->dispatch($session, $data);
-}
-
-################################################################################
-# create a singleton server object
-sub initServer {
-
-  return if $SERVER;
-  require Foswiki::Contrib::XmlRpcContrib::Server;
-  $SERVER = Foswiki::Contrib::XmlRpcContrib::Server->new(%handler);
   return $SERVER;
 }
-
 
 1;

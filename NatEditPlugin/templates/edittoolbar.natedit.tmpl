@@ -1,18 +1,8 @@
-<!-- template: edittoolbar.natedit.tmpl -->
-%TMPL:DEF{"bottomtopicactions"}%<!-- -->
-<div class="natEditBottomBar">
-<ul>
-%TMPL:P{"saveorrestorebutton"}%<!-- -->
-%TMPL:P{"checkpointbutton"}%<!-- -->
-%TMPL:P{"previewbutton"}%<!-- -->
-%TMPL:P{"formbutton"}%<!-- -->
-%TMPL:P{"changeform"}%<!-- -->
-%TMPL:P{"cancelbutton"}%<!-- -->
-%TMPL:P{"forcenewrevision"}%<!-- -->
-</ul>
+%TMPL:DEF{"bottomtopicactions"}%<div class="natEditBottomBar">
+<ul>%TMPL:P{"saveorrestorebutton"}%%TMPL:P{"checkpointbutton"}%%TMPL:P{"previewbutton"}%%TMPL:P{"formbutton"}%%TMPL:P{"changeform"}%%TMPL:P{"cancelbutton"}%%TMPL:P{"forcenewrevision"}%</ul>
 %CLEAR%
 </div>
-<!-- -->%TMPL:END%
+%TMPL:END%
 %TMPL:DEF{"restorebutton"}%%BUTTON{
   "%MAKETEXT{"Restore"}%" 
   title="%MAKETEXT{"Restore and exit"}%" 
@@ -63,7 +53,7 @@
   id="cancel" 
   accesskey="c" 
 }% </li>%TMPL:END%
-%TMPL:DEF{"formbutton"}%<li class="natEditFormButton">%FORMBUTTON{
+%TMPL:DEF{"formbutton"}%<li class="natEditFormButton">%NATFORMBUTTON{
   "$percntBUTTON{\"$action\" accesskey=\"f\" title=\"$title\" icon=\"application_form\" id=\"$id\"}$percnt"
 }%</li>%TMPL:END%
 %TMPL:DEF{"forcenewrevision"}%<li class="natEditForceNewRevision"><label for="forcenewrevision"><input type="checkbox" title="%MAKETEXT{"Creates a new topic revision when saving"}%" id="forcenewrevision" name="forcenewrevision" %FORCENEWREVISIONCHECKBOX% />%MAKETEXT{"Force new revision"}%</label></li>%TMPL:END%

@@ -43,7 +43,8 @@ sub initPlugin {
         return 0;
     }
 
-    Foswiki::Func::registerTagHandler( 'WIKIAPP_INSTALLER_TRYME', \&_WIKIAPP_INSTALLER_TRYME );
+    Foswiki::Func::registerTagHandler( 'WIKIAPP_INSTALLER_TRYME',
+        \&_WIKIAPP_INSTALLER_TRYME );
     Foswiki::Func::registerTagHandler( 'WIKIAPP_INSTALLER_PACKAGEME',
         \&_WIKIAPP_INSTALLER_PACKAGEME );
 

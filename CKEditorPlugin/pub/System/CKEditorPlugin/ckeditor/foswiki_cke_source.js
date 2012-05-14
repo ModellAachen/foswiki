@@ -282,9 +282,8 @@ var FoswikiCKE = {
         // editor.getElement().onchange = null;
 
         // Get the textarea content
-    	// Alex - gibt´s hier keine elegante Lösung über den Editor itself?
-    	var text = document.getElementById("topic").value;
-    	
+        var text = editor.getData();
+
         FoswikiCKE.enableSaveButton(false);
         editor.setData("<span class='foswikiAlert'>"
                          + "Please wait... retrieving page from server."

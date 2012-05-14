@@ -11,34 +11,36 @@ use diagnostics;
 =cut
 
 sub wikiVersionToDistributionName {
- my ($wikiVersion) = @_;
- my %months = (
-  Jan => "01",
-  Feb => "02",
-  Mar => "03",
-  Apr => "04",
-  May => "05",
-  Jun => "06",
-  Jul => "07",
-  Aug => "08",
-  Sep => "09",
-  Oct => "10",
-  Nov => "11",
-  Dec => "12"
- );
+    my ($wikiVersion) = @_;
+    my %months = (
+        Jan => "01",
+        Feb => "02",
+        Mar => "03",
+        Apr => "04",
+        May => "05",
+        Jun => "06",
+        Jul => "07",
+        Aug => "08",
+        Sep => "09",
+        Oct => "10",
+        Nov => "11",
+        Dec => "12"
+    );
 
- $wikiVersion =~ s/ \$.*//; # hack off the unique revision number 
-# SMELL - this is probably THE most unique way to identify.
- 
- if ( $wikiVersion =~ m/([0-9][0-9]) (.*) ([0-9].*)/ ) {   #CodeSmell lazy regex
-  my ( $day, $month, $year ) = ( $1, $2, $3 );
-  my $monthNumber = $months{$month};
-  my $ans         = "TWiki" . $year . $monthNumber . $day;
+    $wikiVersion =~ s/ \$.*//;    # hack off the unique revision number
 
-  #	print $ans;
-  return $ans;
- }
- return "ERROR - couldn't parse $wikiVersion";
+    # SMELL - this is probably THE most unique way to identify.
+
+    if ( $wikiVersion =~ m/([0-9][0-9]) (.*) ([0-9].*)/ )
+    {                             #CodeSmell lazy regex
+        my ( $day, $month, $year ) = ( $1, $2, $3 );
+        my $monthNumber = $months{$month};
+        my $ans         = "TWiki" . $year . $monthNumber . $day;
+
+        #	print $ans;
+        return $ans;
+    }
+    return "ERROR - couldn't parse $wikiVersion";
 
 }
 
@@ -52,19 +54,19 @@ sub wikiVersionToDistributionName {
 =cut 
 
 sub releaseTopicToDistributionName {
- my ($releaseTopic) = @_;
- my $date;
- my $type;
- if ( $releaseTopic =~ m/TWikiBetaRelease(.*)/ ) {
-  $date = $1;
-  $date =~ s/x//g;
-  $type = "beta";
- }
- elsif ( $releaseTopic =~ m/TWikiRelease(.*)/ ) {
-  $date = $1;
-  $type = "";
- }
- return "TWiki" . $date . $type;
+    my ($releaseTopic) = @_;
+    my $date;
+    my $type;
+    if ( $releaseTopic =~ m/TWikiBetaRelease(.*)/ ) {
+        $date = $1;
+        $date =~ s/x//g;
+        $type = "beta";
+    }
+    elsif ( $releaseTopic =~ m/TWikiRelease(.*)/ ) {
+        $date = $1;
+        $type = "";
+    }
+    return "TWiki" . $date . $type;
 }
 
 1;

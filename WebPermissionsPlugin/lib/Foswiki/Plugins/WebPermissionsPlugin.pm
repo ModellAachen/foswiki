@@ -30,9 +30,9 @@ use strict;
 
 use Foswiki::Func ();
 
-our $VERSION    = '$Rev: 160$';
-our $RELEASE    = '9 Jun 2010';
-our $SHORTDESCRIPTION = 'View and edit web permissions';
+our $VERSION           = '$Rev: 160$';
+our $RELEASE           = '9 Jun 2010';
+our $SHORTDESCRIPTION  = 'View and edit web permissions';
 our $NO_PREFS_IN_TOPIC = 1;
 
 use constant TRACE => 0;

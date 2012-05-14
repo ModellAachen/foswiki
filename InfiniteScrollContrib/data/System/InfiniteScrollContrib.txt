@@ -1,4 +1,4 @@
-%META:TOPICINFO{author="micha" comment="save topic" date="1307348209" format="1.1" reprev="7" version="8"}%
+%META:TOPICINFO{author="ProjectContributor" comment="save topic" date="1307348209" format="1.1" reprev="7" version="8"}%
 ---+!! %TOPIC%
 %SHORTDESCRIPTION%
 
@@ -225,6 +225,8 @@ Example:
 |  Release: | %$RELEASE% |
 |  Version: | %$VERSION% |
 |  Change History: | <!-- versions below in reverse order -->&nbsp; |
+|  24 Feb 2012 | fixed syntax error breaking dependency check of configure and pseudo-install |
+|  06 Jun 2011 | initial release |
 |  Dependencies: | %$DEPENDENCIES% |
 |  Home page: | Foswiki:Extensions/%TOPIC% |
 |  Support: | Foswiki:Support/%TOPIC% |

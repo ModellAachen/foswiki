@@ -22,7 +22,8 @@ our @ISA = qw( Foswiki::Plugins::TreePlugin::OutlineNodeFormatter );
 use strict;
 use warnings;
 
-use Foswiki::Plugins::TreePlugin::FormatHelper qw(spaceTopic loopReplaceRefData);
+use Foswiki::Plugins::TreePlugin::FormatHelper
+  qw(spaceTopic loopReplaceRefData);
 
 use Foswiki::Func;
 
@@ -52,10 +53,10 @@ sub formatCount { return $_[1]; }
 sub formatNode {
     my ( $this, $node, $count, $level ) = @_;
 
-    return "" if ( ! $this->isInsideLevelBounds( $level ) );
+    return "" if ( !$this->isInsideLevelBounds($level) );
 
-    #my $res = $this->data("format"); #SL: was that 
-    my $res =  $node->data("format"); #SL: we do that now
+    #my $res = $this->data("format"); #SL: was that
+    my $res = $node->data("format");    #SL: we do that now
 
     my $nodeLinkName = &Foswiki::Plugins::TreePlugin::getLinkName($node);
     return $nodeLinkName unless ($res);
@@ -65,16 +66,19 @@ sub formatNode {
     # ... in fact pseudo-variable common with SEARCH was already done
 
     # Make linkable non-wiki-word namesuse strict;
-    my $spaceTopic = &Foswiki::Plugins::TreePlugin::FormatHelper::spaceTopic( $node->data('topic') );
+    my $spaceTopic =
+      &Foswiki::Plugins::TreePlugin::FormatHelper::spaceTopic(
+        $node->data('topic') );
     $res =~ s/\$spacetopic/$spaceTopic/g;
+
     #$res =~ s/\$topic/$node->name()/geo;
     $res =~ s/\$outnum/$this->formatOutNum($node)/geo;
     $res =~ s/\$count/$this->formatCount($count)/geo;
     $res =~ s/\$level/$this->formatLevel($level)/geo;
 
-    #SL: here were some crazy data substitution we've delegating that to the SEARCH itself
+#SL: here were some crazy data substitution we've delegating that to the SEARCH itself
 
-    #SL: levelprefix allows rendering of bullet list using Foswiki:: syntax thus enabling combination with TreeBrowserPlugin
+#SL: levelprefix allows rendering of bullet list using Foswiki:: syntax thus enabling combination with TreeBrowserPlugin
     if ( defined( $this->data("levelprefix") ) ) {
         my $i = $level;
         while ( $i > 0 ) {

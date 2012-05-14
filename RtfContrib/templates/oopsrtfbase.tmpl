@@ -1,8 +1,8 @@
 %TMPL:DEF{"rtfmessage"}%
-<b>The RTF file has been created successfully.</b>
+<b>%MAKETEXT{"The RTF file has been created successfully."}%</b>
 
 %BUTTON{"%MAKETEXT{"OK"}%" icon="tick" target="%SCRIPTURLPATH{"view"}%/%WEB%/%TOPIC%?tab=cv"}%
-%BUTTON{"%MAKETEXT{"View"}%" icon="eye" onclick="window.location.href='%PARAM1%?t=%GMTIME{"$epoch"}%'"}%
+%BUTTON{"%MAKETEXT{"Download"}%" icon="disk" href="%PARAM1%?t=%GMTIME{"$epoch"}%"}%
 %CLEAR%
 %TMPL:END%
 

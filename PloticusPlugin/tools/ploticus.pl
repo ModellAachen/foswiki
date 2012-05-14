@@ -21,8 +21,10 @@ print ERRFILE "";
 # not called the write way - error and die
 #
 if ( $#ARGV != 5 ) {
-    print ERRFILE "Usage: ploticus.pl ploticus_executable working_dir infile format outfile errfile\n";
-    die "Usage: ploticus.pl ploticus_executable working_dir infile format outfile errfile\n";
+    print ERRFILE
+"Usage: ploticus.pl ploticus_executable working_dir infile format outfile errfile\n";
+    die
+"Usage: ploticus.pl ploticus_executable working_dir infile format outfile errfile\n";
 }
 
 my $ploticusBin = $ARGV[0];
@@ -45,7 +47,8 @@ if ($debug) {
 
 print `$execCmd`;
 if ($!) {
-    print ERRFILE "Problem with executing ploticus command: '$execCmd', got:\n$!";
+    print ERRFILE
+      "Problem with executing ploticus command: '$execCmd', got:\n$!";
     die "Problem with executing ploticus command: '$execCmd', got:\n$!";
 }
 

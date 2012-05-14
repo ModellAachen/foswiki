@@ -5,7 +5,7 @@
 #
 #   Portions derived from :
 #    Perl Power Tools - cal
-#    http://www.perl.com/language/ppt/src/cal 
+#    http://www.perl.com/language/ppt/src/cal
 #    Author: Greg Hewgill greg@hewgill.com 1999-03-01
 #    Portions copyright by Greg Hewgill 1999.
 #    Portions are free and open software. You may use, copy, modify,
@@ -20,15 +20,15 @@
 # modification, are permitted provided that the following conditions are met:
 #
 # 1. Redistributions of source code must retain the above copyright notice,
-# this list of conditions and the following disclaimer.  
+# this list of conditions and the following disclaimer.
 #
 # 2. Redistributions in binary form must reproduce the above copyright notice,
 # this list of conditions and the following disclaimer in the documentation
-# and/or other materials provided with the distribution.  
+# and/or other materials provided with the distribution.
 #
 # 3. Neither the name of the software nor the names of its contributors may be
 # used to endorse or promote products derived from this software without
-# specific prior written permission. 
+# specific prior written permission.
 #
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 # AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
@@ -69,7 +69,7 @@ use POSIX qw(ceil floor);
 # Especially ambiguous are week numbers.
 #  Week numbers range 01 .. 53 and all years have at least week 52.
 # Note though that POSIX strftime function has multiple representations
-#   of the week number, either: 
+#   of the week number, either:
 #      - 00-53 where the first Sunday of the year indicates week 1
 #      - 00-53 where the first Monday of the year indicates week 1
 #      - 01-53 where week 1 is indicated by the number of days in the first
@@ -81,16 +81,16 @@ use POSIX qw(ceil floor);
 # Reference:
 # http://www.cl.cam.ac.uk/~mgk25/iso-time.html
 # and "calendar FAQ" (search on google)
-# and http://sciastro.astronomy.net/sci.astro.3.FAQ 
+# and http://sciastro.astronomy.net/sci.astro.3.FAQ
 #       [sci.astro] Time (Astronomy Frequently Asked Questions)
 
 # =========================
 use vars qw(
-        $web $topic $user $installWeb $VERSION $RELEASE $pluginName
-        @NowStr @DayStr @MonthStr 
-        %Config %Static 
-        %This %Next %Last %Prev
-    );
+  $web $topic $user $installWeb $VERSION $RELEASE $pluginName
+  @NowStr @DayStr @MonthStr
+  %Config %Static
+  %This %Next %Last %Prev
+);
 
 # This should always be $Rev$ so that TWiki can determine the checked-in
 # status of the plugin. It is used by the build automation tools, so
@@ -104,38 +104,37 @@ $RELEASE = 'Dakar';
 
 $pluginName = 'QuickCalendarPlugin';
 
-
 # =========================
-sub initPlugin
-{
+sub initPlugin {
     ( $topic, $web, $user, $installWeb ) = @_;
 
     # check for Plugins.pm versions
-    if( $TWiki::Plugins::VERSION < 1 ) {
-        TWiki::Func::writeWarning( 
-            "Version mismatch between $pluginName and Plugins.pm" );
+    if ( $TWiki::Plugins::VERSION < 1 ) {
+        TWiki::Func::writeWarning(
+            "Version mismatch between $pluginName and Plugins.pm");
         return 0;
     }
 
     # Get plugin debug flag
-    $debug = TWiki::Func::getPreferencesFlag( "\U$pluginName\E_DEBUG" );
+    $debug = TWiki::Func::getPreferencesFlag("\U$pluginName\E_DEBUG");
 
     @NowStr = localtime;
     $Static{'wikiname'} = &TWiki::Func::getWikiUserName();
+
     # strip off web part
     # $Static{'wikiname'} =~ s/(.*)\.(.*)/$2/o;
 
     @MonthStr = qw( . January February March April May June
-            July August September October November December);
+      July August September October November December);
     @DayStr = qw(Sun Mon Tue Wed Thu Fri Sat);
 
-    $Static{'thisYear'} = 1900 + $NowStr[5];   # y2k compliant :-P
-    $Static{'thisMonth'} = $NowStr[4] + 1;     # 1 .. 12
-    $Static{'thisDay'} = $NowStr[3];           # 1 .. 31
-    $Static{'thisQtr'} = POSIX::ceil($NowStr[4] / 3); # 1 .. 4
+    $Static{'thisYear'}  = 1900 + $NowStr[5];                # y2k compliant :-P
+    $Static{'thisMonth'} = $NowStr[4] + 1;                   # 1 .. 12
+    $Static{'thisDay'}   = $NowStr[3];                       # 1 .. 31
+    $Static{'thisQtr'}   = POSIX::ceil( $NowStr[4] / 3 );    # 1 .. 4
 
     # The Config var is used to set certain defaults
-    
+
     # 1 = anchor mode, creates #yyyymmdd hrefs for each date
     $Config{'anchor'} = 1;
 
@@ -157,18 +156,16 @@ __STYLE__
     %Prev = %This = %Next = ();
 
     # Plugin correctly initialized
-    TWiki::Func::writeDebug( 
-        "- TWiki::Plugins::${pluginName}::initPlugin( $web.$topic ) is OK" ) 
-        if $debug;
+    TWiki::Func::writeDebug(
+        "- TWiki::Plugins::${pluginName}::initPlugin( $web.$topic ) is OK")
+      if $debug;
     return 1;
 }
-
-
 
 # =========================
 #
 # ======== generateAnchor ========
-# 
+#
 # this renders the anchors which jump to weeks or days
 # if these anchors don't exist in the page, they
 # won't go anywhere.  User must insert anchors in
@@ -180,38 +177,40 @@ __STYLE__
 # day style anchors look like this,
 #   (example, for last day in the year)
 #    <a href="(userHref)20031231">31</a>
-# where userHref is the wikiname (default) or user 
+# where userHref is the wikiname (default) or user
 # specified URL.  If in Anchor Mode then userHref
 # will be userHref#CalDateYYYYMMDD
 #
 # Important:  anchors must be ISO 8601 with
 #  the following format:  YYYYMMDD for days, and
 #  YYYYwWW for week.
-# 
+#
 # Note if the anchor'd destination wants to include
 #  a "go back" button, it can use this:
 #  <FORM>
-#    <INPUT TYPE="Button" VALUE="Back" 
+#    <INPUT TYPE="Button" VALUE="Back"
 #      onClick="history.go(-1)">
 #  </FORM>
-#  
-sub generateAnchor 
-{
+#
+sub generateAnchor {
     my $type = $_[0];
-    my ($y, $vv, $dd, $d) = (
-        sprintf("%04d", $_[1] || 0), 
-        sprintf("%02d", $_[2] || 0), 
-        sprintf("%02d", $_[3] || 0),
-        $_[3] || '');
+    my ( $y, $vv, $dd, $d ) = (
+        sprintf( "%04d", $_[1] || 0 ),
+        sprintf( "%02d", $_[2] || 0 ),
+        sprintf( "%02d", $_[3] || 0 ),
+        $_[3] || ''
+    );
     my $anchor;
 
-    $anchor = '<a TARGET="_blank" href="' .  $This{'userHref'} . $y;
+    $anchor = '<a TARGET="_blank" href="' . $This{'userHref'} . $y;
 
-    if ($type eq 'week') {
+    if ( $type eq 'week' ) {
+
         # continue with "week" style anchor
         $anchor .= 'w' . $vv . '">' . $y . 'w' . $vv;
     }
     else {
+
         # continue with "day" style anchor
         $anchor .= $vv . $dd . '">' . $d;
     }
@@ -219,8 +218,9 @@ sub generateAnchor
     $anchor .= '</a>';
     return $anchor;
 }
+
 # =========================
-    
+
 #
 # ======== dow ========
 #   Perl Power Tools - cal
@@ -250,16 +250,26 @@ sub generateAnchor
 #  }
 
 sub dow {
-  my ($y, $m, $d) = @_;
-  $y-- if $m < 3;
-  $d += 11 if $y < 1752 || $y == 1752 && $m < 9;
-  if ($y >= 1752) {
-    return (int(23*$m/9)+$d+4+($m<3?$y+1:$y-2)+int($y/4)-int($y/100)+int($y/400))%7;
-  } else {
-    return (int(23*$m/9)+$d+5+($m<3?$y+1:$y-2)+int($y/4))%7;
-  }
+    my ( $y, $m, $d ) = @_;
+    $y-- if $m < 3;
+    $d += 11 if $y < 1752 || $y == 1752 && $m < 9;
+    if ( $y >= 1752 ) {
+        return (
+            int( 23 * $m / 9 ) +
+              $d + 4 +
+              ( $m < 3 ? $y + 1 : $y - 2 ) +
+              int( $y / 4 ) -
+              int( $y / 100 ) +
+              int( $y / 400 ) ) % 7;
+    }
+    else {
+        return (
+            int( 23 * $m / 9 ) +
+              $d + 5 +
+              ( $m < 3 ? $y + 1 : $y - 2 ) +
+              int( $y / 4 ) ) % 7;
+    }
 }
-
 
 # =========================
 #  ======== days ========
@@ -271,22 +281,25 @@ sub dow {
 #   you wish, provided you do not restrict others to do the same.
 #
 sub getDaysInMonth {
-  my ($y, $m) = @_;
-  if ($m != 2) { return (0,31,0,31,30,31,30,31,31,30,31,30,31)[$m]; }
-  # Leap Year calc
-  # leap years occur every 4 years except for century years unless they are
-  # also divisible by 400.
-  if ($y % 4 != 0) { return 28; }
-  if ($y < 1752) { return 29; }
-  if ($y % 100 != 0) { return 29; }
-  if ($y % 400 != 0) { return 28; }
-  return 29;
+    my ( $y, $m ) = @_;
+    if ( $m != 2 ) {
+        return ( 0, 31, 0, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 )[$m];
+    }
+
+    # Leap Year calc
+    # leap years occur every 4 years except for century years unless they are
+    # also divisible by 400.
+    if ( $y % 4 != 0 )   { return 28; }
+    if ( $y < 1752 )     { return 29; }
+    if ( $y % 100 != 0 ) { return 29; }
+    if ( $y % 400 != 0 ) { return 28; }
+    return 29;
 }
 
 # =========================
 #
 # ======== getDatesInWeek ========
-# 
+#
 # Derived from:
 #   Perl Power Tools - cal
 #   Author: Greg Hewgill greg@hewgill.com 1999-03-01
@@ -296,65 +309,69 @@ sub getDaysInMonth {
 #   you wish, provided you do not restrict others to do the same.
 #
 # args: year (19xx), month (1-12), week in month (0-5)
-# 
+#
 # returns date information for a single week in month:
-#   ( work week/week in year 1-53, doy offset 0 .. 364, 
+#   ( work week/week in year 1-53, doy offset 0 .. 364,
 #       date-in-month for sunday ... date-in-month for saturday
 #   )
 #  date = 0 if that day is not in the given month.
 #  or, if no days in month for given week, returns (0) for every date-in-month
-# 
 #
-sub getDatesInWeek
-{
-    my ($y,     # 4 digit
-        $m,     # 1 .. 12
-        $w)     # 0 .. 5
-        = @_;
-    my $day;          # day in month 1 .. 31
-    my $doy = 0;      # day in year 0 .. 365
-    my $woy = 0;      # week in year 0 .. 53
+#
+sub getDatesInWeek {
+    my (
+        $y,    # 4 digit
+        $m,    # 1 .. 12
+        $w
+      )        # 0 .. 5
+      = @_;
+    my $day;    # day in month 1 .. 31
+    my $doy = 0;    # day in year 0 .. 365
+    my $woy = 0;    # week in year 0 .. 53
     my %result;
     local $_;
 
-    $day = 1 - dow($y, $m, 1) + 7*$w;
-    for (1 .. $m-1) { 
-        $doy += getDaysInMonth($y, $_);
+    $day = 1 - dow( $y, $m, 1 ) + 7 * $w;
+    for ( 1 .. $m - 1 ) {
+        $doy += getDaysInMonth( $y, $_ );
     }
-    
-    $woy = POSIX::ceil(($doy + $day)/7) + 1;  # this is non-iso std 
+
+    $woy = POSIX::ceil( ( $doy + $day ) / 7 ) + 1;    # this is non-iso std
 
     # could use instead:
-#    $d4 = ((($julianday + $day + 31741 - 
-#            (($julianday + $day) % 7)) % 1466097) % 36524) % 1461;
-#    $L = $d4 / 1460;
-#    $d1 = (($d4 - $L) % 365) + $L;
-#    $woy = $d1/7 + 1;
+    #    $d4 = ((($julianday + $day + 31741 -
+    #            (($julianday + $day) % 7)) % 1466097) % 36524) % 1461;
+    #    $L = $d4 / 1460;
+    #    $d1 = (($d4 - $L) % 365) + $L;
+    #    $woy = $d1/7 + 1;
     # got that?  but it doesn't work unless also calculate julian date
 
     # could use instead:
-#    $woy = POSIX::strftime("%W", 
-#            1, 1, 1, $day, $m -1, $y);
-#     gads, that's not supported in perl < v5.6 ?
-    
-    if ($day > getDaysInMonth($y, $m)) { 
+    #    $woy = POSIX::strftime("%W",
+    #            1, 1, 1, $day, $m -1, $y);
+    #     gads, that's not supported in perl < v5.6 ?
+
+    if ( $day > getDaysInMonth( $y, $m ) ) {
+
         # no days left this month
         return ();
     }
 
-    $result{'ww'} = $woy;
-    $result{'doy'} = $doy;
+    $result{'ww'}    = $woy;
+    $result{'doy'}   = $doy;
     $result{'dates'} = "";
 
-    for (0..6) { 
-        if ($day < 1) { 
+    for ( 0 .. 6 ) {
+        if ( $day < 1 ) {
+
             # no date for this day yet
             $result{'dates'} .= "0 ";
         }
-        elsif ($day <= getDaysInMonth($y, $m)) { 
-            $result{'dates'} .= $day." ";
+        elsif ( $day <= getDaysInMonth( $y, $m ) ) {
+            $result{'dates'} .= $day . " ";
         }
         else {
+
             # no more days in month
             last;
         }
@@ -365,13 +382,12 @@ sub getDatesInWeek
 }
 
 # =========================
-# 
+#
 # ======== handleCal ========
 # main processing
 #  This generates html table from mathematically calculated dates
 #
-sub handleCal 
-{
+sub handleCal {
     my ( $preSpace, $arg1 ) = @_;
     my %weekdates;
     my $weekInYear;
@@ -380,8 +396,8 @@ sub handleCal
     my $date;
     local $_;
 
-    my $out = $preSpace .
-            "<!-- Calender rendered by TWiki Plugin: Quick Calendar -->";
+    my $out =
+      $preSpace . "<!-- Calender rendered by TWiki Plugin: Quick Calendar -->";
 
     $out .= $Config{'style'};
 
@@ -390,117 +406,132 @@ sub handleCal
     %Next = ();
 
     # set default output
-    $This{'displayYear'} = $Static{'thisYear'};
+    $This{'displayYear'}  = $Static{'thisYear'};
     $This{'displayMonth'} = $Static{'thisMonth'};
-    $This{'displayQtr'} = $Static{'thisQtr'};
-    $This{'doy'} = $Config{'doy'};
+    $This{'displayQtr'}   = $Static{'thisQtr'};
+    $This{'doy'}          = $Config{'doy'};
 
-    $This{'userHref'} = scalar &TWiki::Func::extractNameValuePair( $arg1, "href" );
-    $This{'usermonth'} = scalar &TWiki::Func::extractNameValuePair( $arg1, "month" );
-    $This{'useryear'} = scalar &TWiki::Func::extractNameValuePair( $arg1, "year" );
+    $This{'userHref'} =
+      scalar &TWiki::Func::extractNameValuePair( $arg1, "href" );
+    $This{'usermonth'} =
+      scalar &TWiki::Func::extractNameValuePair( $arg1, "month" );
+    $This{'useryear'} =
+      scalar &TWiki::Func::extractNameValuePair( $arg1, "year" );
     $This{'doy'} = scalar &TWiki::Func::extractNameValuePair( $arg1, "doy" );
 
-    if ($Config{'anchor'} && !$This{'userHref'}) {
+    if ( $Config{'anchor'} && !$This{'userHref'} ) {
+
         # anchor mode forces calendar to link within current topic
         # note, pound-anchors require wikiword text in TWiki (not w3 spec)
         $This{'userHref'} = $topic . "#CalDate";
-    } 
+    }
 
     # Handle href argument
-    if (!$This{'userHref'}) {
+    if ( !$This{'userHref'} ) {
+
         # default link - change to your special default location here
         $This{'userHref'} = $Static{'wikiname'};
     }
 
     # Handle Month argument
-    if ($This{'usermonth'} =~ /^\-(\d+)/) { 
+    if ( $This{'usermonth'} =~ /^\-(\d+)/ ) {
+
         # month="-2"
         $This{'usermonth'} = $This{'displayMonth'} - $1;
-        while ($This{'usermonth'} < 1) { 
+        while ( $This{'usermonth'} < 1 ) {
             $This{'usermonth'} += 12;
             $This{'displayYear'} -= 1;
         }
         $This{'displayMonth'} = $This{'usermonth'};
     }
-    elsif ($This{'usermonth'} =~ /^\+(\d+)/) { 
+    elsif ( $This{'usermonth'} =~ /^\+(\d+)/ ) {
+
         # month="+2"
         $This{'usermonth'} = $This{'displayMonth'} + $1;
-        while ($This{'usermonth'} > 12) { 
+        while ( $This{'usermonth'} > 12 ) {
             $This{'usermonth'} -= 12;
             $This{'displayYear'} += 1;
         }
         $This{'displayMonth'} = $This{'usermonth'};
     }
-    elsif ($This{'usermonth'} =~ /^(\d+)/) { 
+    elsif ( $This{'usermonth'} =~ /^(\d+)/ ) {
+
         # month="4"
         $This{'displayMonth'} = $1;
     }
-    elsif ($This{'usermonth'}) {
+    elsif ( $This{'usermonth'} ) {
+
         # month="january"  or  month="jan"
-        for (1..12) { 
-            if ($MonthStr[$_] =~ /$This{'usermonth'}\w*/i) { 
+        for ( 1 .. 12 ) {
+            if ( $MonthStr[$_] =~ /$This{'usermonth'}\w*/i ) {
                 $This{'displayMonth'} = $_;
-                $This{'usermonth'} = $_;
+                $This{'usermonth'}    = $_;
                 last;
             }
         }
     }
 
-    if ($arg1) { 
+    if ($arg1) {
+
         # year="2002"
-        if ($arg1 =~ s/\s*year\s*=\s*['"]?(\d+)['"]?\s*//i) { 
+        if ( $arg1 =~ s/\s*year\s*=\s*['"]?(\d+)['"]?\s*//i ) {
             $This{'userYear'} = $1;
+
             # must be 4 digit year.
             # check for 4 digit year here?  Nah. garbage in, garbage out.
             $This{'displayYear'} = $This{'userYear'};
         }
+
         # year="-2"
-        if ($arg1 =~ s/\s*year\s*=\s*['"]?\-(\d+)['"]?\s*//i) { 
+        if ( $arg1 =~ s/\s*year\s*=\s*['"]?\-(\d+)['"]?\s*//i ) {
             $This{'displayYear'} = $This{'displayYear'} - $1;
         }
+
         # year="+2"
-        if ($arg1 =~ s/\s*year\s*=\s*['"]?\+(\d+)['"]?\s*//i) { 
+        if ( $arg1 =~ s/\s*year\s*=\s*['"]?\+(\d+)['"]?\s*//i ) {
             $This{'displayYear'} = $This{'displayYear'} + $1;
         }
     }
 
-    $out .= qq{<table style=$Config{'tablestyle'}>\n} .
-            qq{<tr> <th colspan=8> } .
-            qq{$MonthStr[$This{'displayMonth'}] $This{'displayYear'} } .
-            qq{($This{'displayMonth'}/$This{'displayYear'})} .
-            qq{ </th> </tr>\n} .
-            qq{<tr> <th>Week</th> };
-    for (@DayStr) { 
+    $out .=
+        qq{<table style=$Config{'tablestyle'}>\n}
+      . qq{<tr> <th colspan=8> }
+      . qq{$MonthStr[$This{'displayMonth'}] $This{'displayYear'} }
+      . qq{($This{'displayMonth'}/$This{'displayYear'})}
+      . qq{ </th> </tr>\n}
+      . qq{<tr> <th>Week</th> };
+    for (@DayStr) {
         $out .= qq{<th> $_ </th> };
     }
     $out .= qq{</tr>\n};
-    
-    for (0..5) { 
+
+    for ( 0 .. 5 ) {
+
         # get a week of dates in the month
-        if (%weekdates = getDatesInWeek($This{'displayYear'},
-                $This{'displayMonth'}, $_)) { 
+        if ( %weekdates =
+            getDatesInWeek( $This{'displayYear'}, $This{'displayMonth'}, $_ ) )
+        {
             $weekInYear = $weekdates{'ww'};
-            $dayInYear = $weekdates{'doy'};
-            $out .= '<tr><td class="week">' . 
-                    generateAnchor('week', $This{'displayYear'}, $weekInYear) . 
-                    "</td>\n";
-            for $date (split(' ',$weekdates{'dates'})) { 
-                if ($date) { 
-                    my $day_class = 
-                            ( $Static{'thisYear'}==$This{'displayYear'} && 
-                            $Static{'thisMonth'}==$This{'displayMonth'} && 
-                            $Static{'thisDay'}==$date && 
-                            'today' ) || 
-                            'day';
-                    if ($This{'doy'}) { 
+            $dayInYear  = $weekdates{'doy'};
+            $out .=
+                '<tr><td class="week">'
+              . generateAnchor( 'week', $This{'displayYear'}, $weekInYear )
+              . "</td>\n";
+            for $date ( split( ' ', $weekdates{'dates'} ) ) {
+                if ($date) {
+                    my $day_class =
+                      (      $Static{'thisYear'} == $This{'displayYear'}
+                          && $Static{'thisMonth'} == $This{'displayMonth'}
+                          && $Static{'thisDay'} == $date
+                          && 'today' )
+                      || 'day';
+                    if ( $This{'doy'} ) {
                         $date += $dayInYear;
                     }
-                    $out .= qq{<td class="$day_class">} . 
-                            generateAnchor('day', 
-                                $This{'displayYear'}, 
-                                $This{'displayMonth'}, 
-                                $date ) . 
-                            "</td>\n";
+                    $out .= qq{<td class="$day_class">}
+                      . generateAnchor( 'day', $This{'displayYear'},
+                        $This{'displayMonth'}, $date )
+                      . "</td>\n";
                 }
                 else {
                     $out .= "<td> </td>\n";
@@ -509,7 +540,7 @@ sub handleCal
             $out .= '</tr>';
         }
         else {
-            last;   # should only get here at 5 anyway?
+            last;    # should only get here at 5 anyway?
         }
     }
     $out .= '</table>';
@@ -518,23 +549,22 @@ sub handleCal
 }
 
 # =========================
-sub commonTagsHandler
-{
+sub commonTagsHandler {
 ### my ( $text, $topic, $web ) = @_;   # do not uncomment, use $_[0], $_[1]... instead
 
-    TWiki::Func::writeDebug( "- ${pluginName}::commonTagsHandler( $_[2].$_[1])" ) if $debug;
+    TWiki::Func::writeDebug("- ${pluginName}::commonTagsHandler( $_[2].$_[1])")
+      if $debug;
 
     return unless $_[0] =~ /%CAL.*%/s;
 
-    my $theWeb = $_[2];
+    my $theWeb   = $_[2];
     my $theTopic = $_[1];
 
     $_[0] =~ s/(\s*)%CAL{(.*)}%/&handleCal($1, $2)/geo;
     $_[0] =~ s/(\s*)%CAL%/&handleCal()/geo;
 
 }
+
 # =========================
-
-
 
 1;

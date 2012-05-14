@@ -19,9 +19,9 @@ package TWiki::Plugins::LDAPPasswordChangerPlugin;
 
 # =========================
 use vars qw(
-	    $web $topic $user $installWeb $VERSION $RELEASE $pluginName
-	    $debug $ldap_server $base_dn $filter
-	   );
+  $web $topic $user $installWeb $VERSION $RELEASE $pluginName
+  $debug $ldap_server $base_dn $filter
+);
 
 # Forward declaration for subs;
 sub initPlugin;
@@ -43,118 +43,154 @@ $RELEASE = 'Dakar';
 $pluginName = 'LDAPPasswordChangerPlugin';
 
 # =========================
-sub initPlugin{
-  ( $topic, $web, $user, $installWeb ) = @_;
+sub initPlugin {
+    ( $topic, $web, $user, $installWeb ) = @_;
 
-  # check for Plugins.pm versions
-  if( $TWiki::Plugins::VERSION < 1 ){
-    TWiki::Func::writeWarning( "Version mismatch between $pluginName and Plugins.pm" );
-    return 0;
-  }
-
-  # Get plugin debug flag
-  $debug = TWiki::Func::getPreferencesFlag( "\U$pluginName\E_DEBUG" );
-
-  # Get LDAP Server Domain Name or IP Address
-  $ldap_server = &TWiki::Func::getPreferencesValue( "\U$pluginName\E_LDAP_SERVER" );
-  $base_dn = &TWiki::Func::getPreferencesValue( "\U$pluginName\E_LDAP_BASE_DN" );
-  # $filter = sprintf( &TWiki::Func::getPreferencesValue( "\U$pluginName\E_LDAP_FILTER" ), TWiki::Func::wikiToUserName( TWiki::Func::getWikiName( ) ) );
-  $filter = TWiki::Func::expandCommonVariables( TWiki::Func::getPreferencesValue( "\U$pluginName\E_LDAP_FILTER" ), $topic, $web );
-
-  # Plugin correctly initialized
-  TWiki::Func::writeDebug( "- TWiki::Plugins::${pluginName}::initPlugin( $web.$topic ) is OK" ) if $debug;
-  return 1;
-}
-
-# =========================
-sub commonTagsHandler{
-  # do not uncomment, use $_[0], $_[1]... instead
-  ### my ( $text, $topic, $web ) = @_;
-
-  TWiki::Func::writeDebug( "- ${pluginName}::commonTagsHandler( $_[2].$_[1] )" )
-      if $debug;
-
-  $_[0] =~ s/%LDAPPASSWORDCHANGER%/&pwChanger()/ge;
-}
-
-# =========================
-sub pwChanger{
-  my ( $cgi, $message ) = ( TWiki::Func::getCgiQuery(), undef );
-  my ( $old, $new, $repeat, $change )
-    = map $cgi->param( $_ ), qw( oldpwd newpwd1 newpwd2 change );
-
-  if( $old ){
-    # Got old password.
-    if( $new ){
-      # Got New Password.
-      if( $repeat ){
-	# Got new password repeat.
-	if( $new == $repeat ){
-	  # Same password entered twice: I can safely change.
-	  $message = talkToLDAP( $old, $new )
-	}else{
-	  # User can't repeat new password: there is something wrong.
-	  $message = q"%X% %RED%'New Password' and 'Repeat New Password' fields doesn't match.%ENDCOLOR%";
-	}
-      }else{
-	# Error: New Password Repeat field is empty;
-	$message = q{%X% %RED%Please fill in your new password twice.%ENDCOLOR%};
-      }
-    }else{
-      # Error: New Password field is empty.
-      $message = q{%X% %RED%Please fill in your new password.%ENDCOLOR%};
+    # check for Plugins.pm versions
+    if ( $TWiki::Plugins::VERSION < 1 ) {
+        TWiki::Func::writeWarning(
+            "Version mismatch between $pluginName and Plugins.pm");
+        return 0;
     }
-  }else{
-    # Error: Empty old password.
-    $message = q{%X% %RED%Please fill in your old password.%ENDCOLOR%};
-  }
 
-  return genDialog( $change? $message : '&nbsp;' );
-}
+    # Get plugin debug flag
+    $debug = TWiki::Func::getPreferencesFlag("\U$pluginName\E_DEBUG");
 
-# =========================
-sub talkToLDAP{
-  use Net::LDAP;
-  my( $old, $new, $ldap, $dn ) = ( shift, shift, new Net::LDAP( $ldap_server ), undef );
-  return q"%X% %RED%Can't contact LDAP Server. Please review %MAINWEB%.LDAPPasswordChangerPlugin configuration.%ENDCOLOR%" unless $ldap;
-  my $msg;
-  $msg = $ldap->bind;
-  return q{%X% %RED%LDAP Error:}.$msg->error.q{%ENDCOLOR%}
-    if $msg->is_error;
+    # Get LDAP Server Domain Name or IP Address
+    $ldap_server =
+      &TWiki::Func::getPreferencesValue("\U$pluginName\E_LDAP_SERVER");
+    $base_dn =
+      &TWiki::Func::getPreferencesValue("\U$pluginName\E_LDAP_BASE_DN");
 
-  TWiki::Func::writeDebug( "calling ldap::search( base => '$base_dn', filter => '$filter' ) " )
+# $filter = sprintf( &TWiki::Func::getPreferencesValue( "\U$pluginName\E_LDAP_FILTER" ), TWiki::Func::wikiToUserName( TWiki::Func::getWikiName( ) ) );
+    $filter =
+      TWiki::Func::expandCommonVariables(
+        TWiki::Func::getPreferencesValue("\U$pluginName\E_LDAP_FILTER"),
+        $topic, $web );
+
+    # Plugin correctly initialized
+    TWiki::Func::writeDebug(
+        "- TWiki::Plugins::${pluginName}::initPlugin( $web.$topic ) is OK")
       if $debug;
-  $msg = $ldap->search( base => $base_dn, filter => $filter, attrs => [ '1.1' ] );
-  return
-    q"%X% %RED%LDAP doesn't return any users.<br />Please inform LDAP Administrator.%ENDCOLOR%"
-      unless $dn = $msg->shift_entry();
-  $msg = $ldap->bind( $dn, password => $old );
-  return q{%X% %RED%LDAP Error:}.$msg->error.q{%ENDCOLOR%}
-    if $msg->is_error;
-  $msg = $ldap->modify( $dn, replace => { userPassword => $new } );
-  return q{%X% %RED%LDAP Error:}.$msg->error.q{%ENDCOLOR%}
-    if $msg->is_error;
-  $ldap->unbind;
-  return q{%Y% %GREEN%Password changed sucessfully%ENDCOLOR%};
+    return 1;
 }
 
 # =========================
-sub genDialog{
-  my $message = shift;
-  return q{
+sub commonTagsHandler {
+
+    # do not uncomment, use $_[0], $_[1]... instead
+    ### my ( $text, $topic, $web ) = @_;
+
+    TWiki::Func::writeDebug("- ${pluginName}::commonTagsHandler( $_[2].$_[1] )")
+      if $debug;
+
+    $_[0] =~ s/%LDAPPASSWORDCHANGER%/&pwChanger()/ge;
+}
+
+# =========================
+sub pwChanger {
+    my ( $cgi, $message ) = ( TWiki::Func::getCgiQuery(), undef );
+    my ( $old, $new, $repeat, $change ) = map $cgi->param($_),
+      qw( oldpwd newpwd1 newpwd2 change );
+
+    if ($old) {
+
+        # Got old password.
+        if ($new) {
+
+            # Got New Password.
+            if ($repeat) {
+
+                # Got new password repeat.
+                if ( $new == $repeat ) {
+
+                    # Same password entered twice: I can safely change.
+                    $message = talkToLDAP( $old, $new );
+                }
+                else {
+
+                    # User can't repeat new password: there is something wrong.
+                    $message =
+q"%X% %RED%'New Password' and 'Repeat New Password' fields doesn't match.%ENDCOLOR%";
+                }
+            }
+            else {
+
+                # Error: New Password Repeat field is empty;
+                $message =
+                  q{%X% %RED%Please fill in your new password twice.%ENDCOLOR%};
+            }
+        }
+        else {
+
+            # Error: New Password field is empty.
+            $message = q{%X% %RED%Please fill in your new password.%ENDCOLOR%};
+        }
+    }
+    else {
+
+        # Error: Empty old password.
+        $message = q{%X% %RED%Please fill in your old password.%ENDCOLOR%};
+    }
+
+    return genDialog( $change ? $message : '&nbsp;' );
+}
+
+# =========================
+sub talkToLDAP {
+    use Net::LDAP;
+    my ( $old, $new, $ldap, $dn ) =
+      ( shift, shift, new Net::LDAP($ldap_server), undef );
+    return
+q"%X% %RED%Can't contact LDAP Server. Please review %MAINWEB%.LDAPPasswordChangerPlugin configuration.%ENDCOLOR%"
+      unless $ldap;
+    my $msg;
+    $msg = $ldap->bind;
+    return q{%X% %RED%LDAP Error:} . $msg->error . q{%ENDCOLOR%}
+      if $msg->is_error;
+
+    TWiki::Func::writeDebug(
+        "calling ldap::search( base => '$base_dn', filter => '$filter' ) ")
+      if $debug;
+    $msg =
+      $ldap->search( base => $base_dn, filter => $filter, attrs => ['1.1'] );
+    return
+q"%X% %RED%LDAP doesn't return any users.<br />Please inform LDAP Administrator.%ENDCOLOR%"
+      unless $dn = $msg->shift_entry();
+    $msg = $ldap->bind( $dn, password => $old );
+    return q{%X% %RED%LDAP Error:} . $msg->error . q{%ENDCOLOR%}
+      if $msg->is_error;
+    $msg = $ldap->modify( $dn, replace => { userPassword => $new } );
+    return q{%X% %RED%LDAP Error:} . $msg->error . q{%ENDCOLOR%}
+      if $msg->is_error;
+    $ldap->unbind;
+    return q{%Y% %GREEN%Password changed sucessfully%ENDCOLOR%};
+}
+
+# =========================
+sub genDialog {
+    my $message = shift;
+    return q{
 <form action="%TOPIC%" method="post">
   <table bgcolor="%WEBBGCOLOR%" align="center" border="0" cellpadding="1" cellspacing="1">
     <tr>
       <td height="25" colspan="2" valign="middle" align="center">
-        <b> Change Password for }.TWiki::Func::userToWikiName( $user, 0 ).q{</b>
+        <b> Change Password for }
+      . TWiki::Func::userToWikiName( $user, 0 ) . q{</b>
       </td>
     </tr>
     <tr>
       <td>
-        <table bgcolor="#FFFFFF" align="center" border="0" cellpadding="1" cellspacing="8">} . ($message ? qq{
+        <table bgcolor="#FFFFFF" align="center" border="0" cellpadding="1" cellspacing="8">}
+      . (
+        $message
+        ? qq{
           <tr>
             <td align="center" colspan="2"> $message </td>
-          </tr> } : '' ) .q{
+          </tr> }
+        : ''
+      )
+      . q{
           <tr>
             <td align="right"> Old Password: </td>
             <td> <input type="password" name="oldpwd"> </td>
@@ -179,5 +215,5 @@ sub genDialog{
 </form>
 };
 
-} # end sub
+}    # end sub
 1;

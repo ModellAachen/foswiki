@@ -2,7 +2,7 @@
 # PingBack QueueManager
 #
 # Copyright (C) 2006 MichaelDaum@WikiRing.com
-# All Rights Reserved. TWiki Contributors are listed in
+# All Rights Reserved. Foswiki Contributors are listed in
 # the AUTHORS file in the root of this distribution.
 # NOTE: Please extend that file, not this notice.
 #
@@ -21,7 +21,7 @@
 # by a user who can write files created by the webserver user!)
 # For example,
 #
-# 0 * * * * cd /usr/twiki/bin && perl ../tools/pingbackmanager
+# 0 * * * * cd $FOSWIKI_ROOT/tools && perl ./pingbackmanager
 #
 BEGIN {
     unshift @INC, '.';
@@ -29,9 +29,9 @@ BEGIN {
 }
 
 use strict;
-use TWiki::Plugins::PingBackPlugin::QueueManager;
-use TWiki::UI;
-TWiki::UI::run(\&TWiki::Plugins::PingBackPlugin::QueueManager::run);
+use Foswiki::Plugins::PingBackPlugin::QueueManager;
+use Foswiki::UI;
+Foswiki::UI::run(\&Foswiki::Plugins::PingBackPlugin::QueueManager::run);
 
 1;
 

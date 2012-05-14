@@ -5,7 +5,7 @@ use strict;
 use warnings;
 
 use Assert;
-use Foswiki::Form::FieldDefinition (); 
+use Foswiki::Form::FieldDefinition ();
 our @ISA = ('Foswiki::Form::FieldDefinition');
 
 sub new {
@@ -15,8 +15,8 @@ sub new {
     my $type;
 
     $attrs{type} =~ /^bibtex(\+(\w+)(\+([\w\+]+))?)?/;
-    $bibtype     = $2;
-    $type        = $4;
+    $bibtype = $2;
+    $type    = $4;
 
     if ( not $bibtype ) {
         $bibtype = 'field';

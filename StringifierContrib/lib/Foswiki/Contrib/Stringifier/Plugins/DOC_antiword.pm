@@ -37,7 +37,8 @@ sub stringForFile {
     $text =~ s/^\s+//g;
     $text =~ s/\s+$//g;
 
-    return $self->fromUtf8($text);
+    $text = $self->decode($text, $Foswiki::cfg{StringifierContrib}{CharSet}{antiword} || 'utf-8');
+    return $self->encode($text);
 }
 
 1;

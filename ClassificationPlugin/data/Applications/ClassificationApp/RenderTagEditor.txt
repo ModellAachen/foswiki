@@ -1,4 +1,4 @@
-%META:TOPICINFO{author="ProjectContributor" comment="reprev" date="1271769252" format="1.1" reprev="1.5" rev="6" version="1.6"}%
+%META:TOPICINFO{author="micha" comment="reprev" date="1335264968" format="1.1" reprev="12" version="14"}%
 %META:TOPICPARENT{name="TopicFunction"}%
 %TOC{depth="2"}%
 
@@ -16,26 +16,14 @@
 ---++ Implementation
 <verbatim class="tml">
 %STARTINCLUDE%<div class="clsTagEditor"><noautolink>
-~~~ <input type="text" 
-~~~        class="foswikiInputField 
-~~~               jqTextboxList
-~~~               {autocomplete:'%SCRIPTURL{"rest"}%/RenderPlugin/template?
-*~~                  topic=%THEWEB%.%THETOPIC%;
-*~~                  name=classificationplugin;
-*~~                  expand=querytags'
-~~~               }"
-~~~         name="%NAME%"
-~~~         id="%NAME%"
-~~~         size="%SIZE%"
-~~~         value="%IF{"defined VALUE" then="%VALUE%"}%"
-~~~ />
+<input type="text" class="foswikiInputField jqTextboxList {autocomplete:'%SCRIPTURL{"rest"}%/RenderPlugin/template?topic=%THEWEB%.%THETOPIC%;name=classificationplugin;expand=querytags'}" name="%NAME%" id="%NAME%" size="%SIZE%" value="%IF{"defined VALUE" then="%VALUE%"}%" />
 %IF{"context SolrPluginEnabled" then="%DBCALL{"%WEB%.%TOPIC%" section="tagsuggestion"}%"}%
 </noautolink></div>%STOPINCLUDE%
 </verbatim>
 
 ---++ Tag suggestion via !SolrPlugin
 <verbatim class="tml">
-%STARTSECTION{"tagsuggestion"}%<!-- tagsuggestion -->
+%STARTSECTION{"tagsuggestion"}%<!--  -->
 %FORMATLIST{
   "%SOLRSIMILAR{
      "id:%THEWEB%.%THETOPIC%"
@@ -48,7 +36,7 @@
      format_tag="$key=$count"
      separator_tag=","
   }%"
-  exclude="%FORMATLIST{"%VALUE%" split="\s*,\s*" format="\b($1=\d+)\b" separator="|"}%"
+  exclude="%FORMATLIST{"%VALUE%" split="\s*,\s*" format="\b($1=\d+)\b" separator="|" replace="-=\-,\[=\\[,\]=\\]"}%"
   split="\s*,\s*"
   pattern="(.*)=(.*)"
   header="$n$n<hr />$n$n<h3>%MAKETEXT{"Related tags"}%:</h3><ol>"
@@ -57,11 +45,9 @@
     </li>"
   footer="</ol>"
   separator="$n"
-  DISsort="on"
 }%
-<!-- //tagsuggestion-->%ENDSECTION{"tagsuggestion"}%
+<!-- -->%ENDSECTION{"tagsuggestion"}%
 </verbatim>
-
 
 ---++ Test
 <div class="alt">
@@ -72,13 +58,13 @@
 %DBCALL{"Applications.RenderFunctionCallers"}%
 
 ---++ Copyright
-&copy; 2006-2010 Michael Daum http://michaeldaumconsulting.com
+&copy; 2006-2012 Michael Daum http://michaeldaumconsulting.com
 
 %DBCALL{"Applications.GnuGeneralPublicLicense" section="notice"}%
 
 
 %META:FORM{name="Applications.ApplicationTopic"}%
 %META:FIELD{name="TopicType" title="TopicType" value="DocuTopic, TopicFunction"}%
-%META:FIELD{name="TopicTitle" attributes="" title="<nop>TopicTitle" value="RenderTagEditor"}%
+%META:FIELD{name="TopicTitle" attributes="" title="<nop>TopicTitle" value=""}%
 %META:FIELD{name="Summary" attributes="c" title="Summary" value="Render an editor for tags"}%
 %META:FIELD{name="WikiApplication" attributes="" title="WikiApplication" value="ClassificationApp"}%

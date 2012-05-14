@@ -12,7 +12,9 @@ use warnings;
 
 use Assert;
 use Foswiki::Func ();    # The plugins API
-use Foswiki::Plugins();
+
+use constant TRACE => 0;
+require Data::Dumper if TRACE;
 
 my %templates;
 my %semanticlinks;
@@ -139,6 +141,7 @@ sub preRenderingHandler {
     # $_[0] =~ s/SpecialString/my alternative/ge;
     # Handle [[][] and [[]] links
     # Change '![[...'  to ' [<nop>[...' to protect from further rendering
+    print STDERR "Here's the text: '$text'\n" if TRACE;
     $_[0] =~ s/(^|\s)\!\[\[/$1\[<nop>\[/gm;
 
     # Change ' [[$1::$2?$3#$4|$5]] '
@@ -162,6 +165,8 @@ s/\[\[([^:][^\]\n?]+?)::([^\]\n?\#\{]+?)(\?([^\]\n\#\{]+?))?(\#([^\]\n\{]+?))?(\
 # SemanticLinksPlugin::MissingLink template on the property topic.
 sub renderLink {
     my (@attrs) = @_;
+    print STDERR "In renderLink() with args: " . Data::Dumper->Dump( \@attrs )
+      if TRACE;
     my $semlink = _getSemLinkData( $attrs[$PROPERTY], $attrs[$VALUE] );
     my $templatetxt;
     my $tmplName = '';
@@ -330,6 +335,20 @@ sub getTemplate {
 
 sub beforeSaveHandler {
     my ( $text, $topic, $web, $topicObject ) = @_;
+    my %DATA = _parse( $topicObject->getEmbeddedStoreForm(), $topicObject );
+
+    foreach my $META ( keys %DATA ) {
+        $topicObject->putAll( $META, @{ $DATA{$META} } );
+    }
+
+    return;
+}
+
+# Parse $text for links, using topic/web/topicObject as context
+sub _parse {
+    my ( $text, $topicObject ) = @_;
+    my $web   = $topicObject->web();
+    my $topic = $topicObject->topic();
 
     init();
     $hardvars{WEB}       = $web;
@@ -340,15 +359,15 @@ sub beforeSaveHandler {
     $topicObject->remove('LINK');
     $topicObject->remove('SLVALUE');
     $topicObject->remove('SLPROPERTY');
-    $text = $topicObject->getEmbeddedStoreForm();
 
     # Expand prefs
     $text =~ s/(%([A-Z]+)%)/
         Foswiki::Func::getPreferencesValue($2) || $hardvars{$2} || $1/gex;
-    semanticLinksSaveHandler( $text, $topic, $web, $topicObject );
-    plainLinksSaveHandler( $text, $topic, $web, $topicObject );
 
-    return;
+    return (
+        semanticLinksSaveHandler( $text, $topic, $web, $topicObject ),
+        plainLinksSaveHandler( $text, $topic, $web, $topicObject )
+    );
 }
 
 sub plainLinksSaveHandler {
@@ -370,9 +389,8 @@ s/\[\[[:]?\s*([^\]\n\?\#]+?)(\?([^\]\n\#]+?))?(\#([^\]\n]+?))?\s*\](\[([^\]\n]+?
         $Foswiki::regex{abbrevRegex})
         ($Foswiki::regex{anchorRegex})?/
         stashPlainLink('internal', 'autolink', ($1 || '') . $3, undef, $4)/gexm;
-    $topicObject->putAll( 'LINK', values %links );
 
-    return;
+    return ( 'LINK' => [ values %links ] );
 }
 
 sub stashPlainLink {
@@ -439,6 +457,7 @@ sub stashPlainLink {
 
 sub semanticLinksSaveHandler {
     my ( $text, $topic, $web, $topicObject ) = @_;
+    my %DATA;
     my @propertyaddresses;
 
     # Instead of rendering, linkHandler will be set to stashSemLink() which
@@ -505,19 +524,19 @@ sub semanticLinksSaveHandler {
             }
         }
         @SLVALUE = sort { $a->{propertyseq} <=> $b->{propertyseq} } @SLVALUE;
-        $topicObject->putAll( 'SLPROPERTY', @SLPROPERTY );
-        $topicObject->putAll( 'SLVALUE',    @SLVALUE );
+        $DATA{SLPROPERTY} = [@SLPROPERTY];
+        $DATA{SLVALUE}    = [@SLVALUE];
         @SLMETAVALUE =
           sort { $a->{propertyseq} <=> $b->{propertyseq} } @SLMETAVALUE;
-        $topicObject->putAll( 'SLMETAPROPERTY', @SLMETAPROPERTY );
-        $topicObject->putAll( 'SLMETAVALUE',    @SLMETAVALUE );
+        $DATA{SLMETAPROPERTY} = [@SLMETAPROPERTY];
+        $DATA{SLMETAVALUE}    = [@SLMETAVALUE];
 
         # These are unused legacy types
-        $topicObject->putAll( 'SLPROPERTYVALUE', () );
-        $topicObject->putAll( 'SLPROPERTIES',    () );
+        $DATA{SLPROPERTYVALUE} = [];
+        $DATA{SLPROPERTIES}    = [];
     }
 
-    return;
+    return %DATA;
 }
 
 sub _getSemLinkData {
@@ -533,20 +552,34 @@ sub _getSemLinkData {
     my $valueaddress;
     my $valueweb;
     my $valuetopic;
+    print STDERR "_getSemLinkData($property, $value)\n" if TRACE;
 
     if ( not exists $propertyattributes{DEFAULT_VALUEWEB}{$propertyaddress} ) {
+        print STDERR "No valueweb entry for property '$propertyaddress'\n"
+          if TRACE;
         my ($propertyTopicObj) =
           Foswiki::Func::readTopic( $propertyweb, $propertytopic );
 
         if ( $propertyTopicObj->haveAccess('VIEW') ) {
+            print STDERR "have access to property '$propertyaddress'\n"
+              if TRACE;
             my $defweb = $propertyTopicObj->getPreference(
                 'SEMANTICLINKSPLUGIN_DEFAULT_VALUEWEB');
             if ($defweb) {
+                print STDERR
+                  "got defaultweb '$defweb' from property '$propertyaddress'\n"
+                  if TRACE;
                 $propertyattributes{DEFAULT_VALUEWEB}{$propertyaddress} =
                   $defweb;
             }
+            else {
+                print STDERR "go defaultweb on property '$propertyaddress'\n"
+                  if TRACE;
+            }
         }
         else {
+
+            print STDERR "no access to property '$propertyaddress'\n" if TRACE;
 
             # Don't bother checking for VIEW access again
             $propertyattributes{DEFAULT_VALUEWEB}{$propertyaddress} = undef;
@@ -560,15 +593,19 @@ sub _getSemLinkData {
     $valueaddress = $valueweb . '.' . $valuetopic;
     $semlink      = $semanticlinks{$propertyaddress}{$valueaddress};
     if ( not exists $nsemanticlinks{$propertytopic} ) {
+        print STDERR "adding '$propertytopic'\n" if TRACE;
         $nsemanticlinks{$propertytopic} = 1;
     }
     elsif ( not defined $semlink ) {
+        print STDERR "counting '$propertytopic'\n" if TRACE;
         $nsemanticlinks{$propertytopic} += 1;
     }
     if ( not defined $semanticlinks{$propertyaddress}{_topic} ) {
+        print STDERR "No propertytopic\n" if TRACE;
         $semanticlinks{$propertyaddress}{_topic} = $propertytopic;
     }
     if ( not defined $semlink ) {
+        print STDERR "No semlinkdata!\n" if TRACE;
         $semlink = {
             name     => $propertytopic . '__' . $nsemanticlinks{$propertytopic},
             property => $property,
@@ -583,6 +620,7 @@ sub _getSemLinkData {
         };
         $semanticlinks{$propertyaddress}{$valueaddress} = $semlink;
     }
+    print STDERR Data::Dumper->Dump( [$semlink] ) if TRACE;
 
     return $semlink;
 }
@@ -760,7 +798,7 @@ sub restReparseHandler {
             $count += 1;
         }
     }
-    return $restResult . "\n\n</pre>";
+    return ( $restResult || '' ) . "\n\n</pre>";
 }
 
 sub _report {
@@ -868,8 +906,8 @@ sub _checkHash {
 __END__
 Foswiki - The Free and Open Source Wiki, http://foswiki.org/
 
-Copyright (C) 2010-2011 Paul.W.Harvey@csiro.au, http://trin.org.au
-Copyright (C) 2010-2011 Foswiki Contributors. Foswiki Contributors
+Copyright (C) 2010-2012 Paul.W.Harvey@csiro.au, http://trin.org.au
+Copyright (C) 2010-2012 Foswiki Contributors. Foswiki Contributors
 are listed in the AUTHORS file in the root of this distribution.
 NOTE: Please extend that file, not this notice.
 

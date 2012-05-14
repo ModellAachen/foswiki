@@ -25,6 +25,7 @@ Behavior of this plugin is controlled through the following settings in =configu
 	* USE_ALIASES = &lt;boolean&gt;
 	* REMOVE_PREFIX = &lt;string&gt;
 	* REMOVE_SUFFIX = &lt;string&gt;
+    * CHANGE_CASE = =none,upper,lower,uppercasefirst=
 	* MAP_UNREGISTERED = &lt;login name&gt;
 	* RETURN_NOTHING_IF_UNCHANGED = &lt;boolean&gt;
 	* LOGGING = &lt;boolean&gt;
@@ -48,6 +49,7 @@ When it runs, the plugin performs the following steps in  succession to the user
 	2. If USE_ALIASES is set, the alias list is checked for a match and the first match found is  returned. 
 	3. If REMOVE_PREFIX is set, an attempt is made to remove that string from the beginning of the username (quotemeta is applied to the string before it is used).
 	4. If REMOVE_SUFFIX is set, an attempt is made to remove that string from the end of the username (quotemeta is applied to the string before it is used).
+	4. If CHANGE_CASE is set to =upper=, convert all letters to uppercase, =lower= to lowercase, and =uppercasefirst= convert _only_ the first letter to upper-case.
 	5. The MAP_BLANK_USER check from step 1 is applied again, since steps 3 or 4 may have zapped the whole username.
 	6. If MAP_UNREGISTERED is set, then check to see if the user has a !WikiName.  If not, then  return the value of MAP_UNREGISTERED. If the user already has a !WikiName, go to step 7. *Note:* This setting will not work unless doMapUserToWikiName is set to 1 in Foswiki.cfg.
 	7. If the username after the PREFIX/SUFFIX transformations is different from 
@@ -92,6 +94,7 @@ The currently logged in user's =%!USERINFO%= is
 |  Plugin Author: | Foswiki:Main.SvenDowideit & TWiki:Main/ClaussStrauch |
 |  Plugin Version: | %$VERSION% |
 |  Change History: | <!-- versions below in reverse order -->&nbsp; |
+|  15 Feb 2012: | add CHANGE_CASE option - to help normalise the login-names from different browsers |
 |  8 Jul 2009: | ported to Foswiki by Foswiki:Main.SvenDowideit, and changed to begin to use current practices |
 |  23 Jul 2004: | Initial version |
 |  Plugin Home: | http://foswiki.org/Extensions/%TOPIC% |

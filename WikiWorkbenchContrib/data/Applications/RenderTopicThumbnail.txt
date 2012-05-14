@@ -1,4 +1,4 @@
-%META:TOPICINFO{author="ProjectContributor" comment="reprev" date="1321307368" format="1.1" reprev="12" version="12"}%
+%META:TOPICINFO{author="ProjectContributor" comment="save topic" date="1327004278" format="1.1" reprev="14" version="14"}%
 %META:TOPICPARENT{name="TopicFunction"}%
 %TOC{depth="2"}%
 
@@ -36,7 +36,7 @@ is returned if no image attachment is found.
      align=\"%IF{"defined ALIGN" then="%ALIGN%" else="right"}%\"
      type=\"%IF{"defined TYPE" then="%TYPE%" else="simple"}%\"
      size=\"%IF{"defined SIZE" then="%SIZE%" else="48x48>"}%\"
-     crop=\"%IF{"defined CROP" then="%CROP%"}%\"
+     crop=\"%IF{"defined CROP" then="%CROP%" else="northwest"}%\"
      title=\"\"
      tooltip=\"on\"
      warn=\"off\"

@@ -52,9 +52,10 @@
 	text="
 $percntIF{
 $quot$WIKILOGOIMG$quot
-then=$quot.foswikiTopBar {
+then=$quot.foswikiLogo {
+    width: 40px;
+    height: 40px;
 	background-image:url(%WIKILOGOIMG%);
-	background-position: 50% 50%;
 	background-repeat: no-repeat;
 }$quot
 }$percnt
@@ -67,7 +68,7 @@ then=$quot.foswikiTopBar {
 ---------------------------------------------------
 }%%TMPL:DEF{"head:css:screen:_less"}%%TMPL:P{
 	"LIBJS"
-	id="BaseSkinCss/less-1.1.5.min"
+	id="BaseSkinCss/less-1.2.1.min"
 	name="lessparser"
 }%%TMPL:P{
 	"LIBLESS"

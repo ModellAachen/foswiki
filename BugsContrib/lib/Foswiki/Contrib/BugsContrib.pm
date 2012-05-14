@@ -11,6 +11,7 @@ our $VERSION = '$Rev: 2085 $';
 # of the version number in PLUGINDESCRIPTIONS.
 our $RELEASE = '4 Oct 2010';
 
-our $SHORTDESCRIPTION = 'Item Tracking system implemented as a Foswiki Application';
+our $SHORTDESCRIPTION =
+  'Item Tracking system implemented as a Foswiki Application';
 
 1;

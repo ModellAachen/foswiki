@@ -1,4 +1,4 @@
-%META:TOPICINFO{author="ProjectContributor" comment="save topic" date="1311053272" format="1.1" reprev="13" version="15"}%
+%META:TOPICINFO{author="micha" comment="save topic" date="1334594495" format="1.1" reprev="13" version="17"}%
 %META:TOPICPARENT{name="TopicView"}%
 %{<verbatim class="tml">}%
 %TMPL:INCLUDE{"Applications.WikiTopicEdit"}%
@@ -30,16 +30,10 @@
 
 %{<verbatim class="tml">}%
 %TMPL:DEF{"categoriestab"}%<!-- -->
-%~~ TAB{"%TMPL:P{"categorieslabel"}%"
-~~~   url="%SCRIPTURL{"rest"}%/RenderPlugin/tag?
-*~~     topic=%BASEWEB%.%BASETOPIC%;
-*~~     name=RENDERFOREDIT;
-*~~     field=%TMPL:P{"catfield"}%;
-*~~     form=%TMPL:P{"formdefinition"}%;
-*~~
-%~~     IF{"defined '%TMPL:P{"catfield"}%'" then="value=%URLPARAM{"%TMPL:P{"catfield"}%"}%;"}%
-*~~     render=on;t=%GMTIME{"$epoch"}%"
-~~~ }%
+%TAB{
+  "%TMPL:P{"categorieslabel"}%"
+  url="%SCRIPTURL{"rest"}%/RenderPlugin/tag?topic=%BASEWEB%.%BASETOPIC%;name=RENDERFOREDIT;field=%TMPL:P{"catfield"}%;form=%TMPL:P{"formdefinition"}%;%IF{"defined '%TMPL:P{"catfield"}%'" then="value=%URLPARAM{"%TMPL:P{"catfield"}%"}%;"}%render=on;t=%GMTIME{"$epoch"}%"
+}%
 <span class="jqAjaxLoader">&nbsp;</span>
 <noautolink>
 <input type="hidden" name="%TMPL:P{"catfield"}%" value="%URLPARAM{"%TMPL:P{"catfield"}%" default="%ENCODE{"%FORMFIELD{"%TMPL:P{"catfield"}%"}%" type="entity"}%"}%" />
@@ -50,16 +44,10 @@
 
 %{<verbatim class="tml">}%
 %TMPL:DEF{"tagstab"}%<!-- -->
-%~~ TAB{"%TMPL:P{"tagslabel"}%" 
-~~~   url="%SCRIPTURL{"rest"}%/RenderPlugin/tag?
-*~~     topic=%BASEWEB%.%BASETOPIC%;
-*~~     name=RENDERFOREDIT;
-*~~     field=Tag;
-*~~     form=%TMPL:P{"formdefinition"}%;
-*~~
-%~~     IF{"defined 'Tag'" then="value=%URLPARAM{"Tag"}%;"}%
-*~~     render=on;t=%GMTIME{"$epoch"}%"
-~~~ }%
+%TAB{
+  "%TMPL:P{"tagslabel"}%" 
+  url="%SCRIPTURL{"rest"}%/RenderPlugin/tag?topic=%BASEWEB%.%BASETOPIC%;name=RENDERFOREDIT;field=Tag;form=%TMPL:P{"formdefinition"}%;%IF{"defined 'Tag'" then="value=%URLPARAM{"Tag"}%;"}%render=on;t=%GMTIME{"$epoch"}%"
+}%
 <span class="jqAjaxLoader">&nbsp;</span>
 %JQREQUIRE{"ui"}%<!-- -->
 %ADDTOZONE{

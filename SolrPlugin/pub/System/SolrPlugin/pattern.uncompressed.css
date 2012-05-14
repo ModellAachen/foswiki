@@ -23,7 +23,7 @@
   display:none; 
 }
 .foswikiLayoutTable {
-  boder-collapse:collapse;
+  border-collapse:collapse;
   border-spacing:0;
 }
 .foswikiLayoutTable td {

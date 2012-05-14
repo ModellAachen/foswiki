@@ -9,26 +9,28 @@ use Foswiki::Plugins::JQueryPlugin ();
 our @ISA = qw( Foswiki::Plugins::JQueryPlugin::Plugin );
 
 use Foswiki::Plugins::JQueryPlugin::Plugin ();
-use Foswiki::Plugins::BookmakerPlugin ();
+use Foswiki::Plugins::BookmakerPlugin      ();
 
 sub new {
-    my $class = shift;
+    my $class   = shift;
     my $session = shift || $Foswiki::Plugins::SESSION;
-    my $src = (DEBUG) ? '_src' : '';
+    my $src     = (DEBUG) ? '_src' : '';
 
-    my $this = $class->SUPER::new( 
-	$session,
-	name          => 'Bookmaker',
-	version       => $Foswiki::Plugins::BookmakerPlugin::RELEASE,
-	author        => 'Crawford Currie',
-	homepage      => 'http://c-dot.co.uk',
-	puburl        => '%PUBURLPATH%/%SYSTEMWEB%/BookmakerPlugin',
-	documentation => "$Foswiki::cfg{SystemWebName}.BookmakerPlugin",
-	summary       => $Foswiki::Plugins::BookmakerPlugin::SHORTDESCRIPTION,
-	css           => [ "bookmaker${src}.css", "../JSTreeContrib/themes/apple/style.css" ],
-	javascript    => [ "bookmaker${src}.js" ],
-	dependencies => [ 'JSTree' ]);
-    
+    my $this = $class->SUPER::new(
+        $session,
+        name          => 'Bookmaker',
+        version       => $Foswiki::Plugins::BookmakerPlugin::RELEASE,
+        author        => 'Crawford Currie',
+        homepage      => 'http://c-dot.co.uk',
+        puburl        => '%PUBURLPATH%/%SYSTEMWEB%/BookmakerPlugin',
+        documentation => "$Foswiki::cfg{SystemWebName}.BookmakerPlugin",
+        summary       => $Foswiki::Plugins::BookmakerPlugin::SHORTDESCRIPTION,
+        css =>
+          [ "bookmaker${src}.css", "../JSTreeContrib/themes/apple/style.css" ],
+        javascript   => ["bookmaker${src}.js"],
+        dependencies => ['JSTree']
+    );
+
     return $this;
 }
 

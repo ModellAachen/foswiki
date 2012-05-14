@@ -518,9 +518,10 @@
   };
 
   /************************************************************************/
-  $(document).ready(function() {
+  $(function() {
 
     var attachFileSizeLimit = foswiki.getPreference("TopicInteractionPlugin.attachFileSizeLimit") || 0;
+    attachFileSizeLimit *= 1024;
 
     defaults = {
       dragdrop: true,

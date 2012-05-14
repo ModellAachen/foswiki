@@ -10,7 +10,7 @@
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details, published at 
+# GNU General Public License for more details, published at
 # http://www.gnu.org/copyleft/gpl.html
 #
 ###############################################################################
@@ -18,7 +18,9 @@
 package Foswiki::Plugins::BlogPlugin::WebDB;
 
 use strict;
-use Foswiki::Plugins::DBCachePlugin::WebDB;
+use warnings;
+
+use Foswiki::Plugins::DBCachePlugin::WebDB ();
 use Time::Local;
 @Foswiki::Plugins::BlogPlugin::WebDB::ISA = ("Foswiki::Plugins::DBCachePlugin::WebDB");
 
@@ -36,14 +38,14 @@ use vars qw( %MON2NUM );
   Sep => 8,
   Oct => 9,
   Nov => 10,
-  Dec => 11);
-
+  Dec => 11
+);
 
 ###############################################################################
 sub new {
-  my ( $class, $web, $cacheName ) = @_;
+  my ($class, $web, $cacheName) = @_;
   $cacheName = '_BlogPluginWebDB' unless $cacheName;
-  my $this = bless( $class->SUPER::new($web, $cacheName), $class );
+  my $this = bless($class->SUPER::new($web, $cacheName), $class);
   return $this;
 }
 
@@ -66,8 +68,8 @@ sub onReload {
       $form = $topic->fastget($form);
       my $dateField = $form->fastget('Date');
       if ($dateField) {
-	my $createDate = parseTime($dateField);
-	$topic->set('createdate', $createDate);
+        my $createDate = parseTime($dateField);
+        $topic->set('createdate', $createDate);
       }
     }
   }
@@ -78,15 +80,16 @@ sub onReload {
 ###############################################################################
 sub parseTime {
   my $date = shift;
-  
+
   # try "31 Dec 2001 - 23:59"  (Foswiki date)
   if ($date =~ /([0-9]+)\s+([A-Za-z]+)\s+([0-9]+)[\s\-]+([0-9]+)\:([0-9]+)/) {
     my $year = $3;
-    $year -= 1900 if( $year > 1900 );
+    $year -= 1900 if ($year > 1900);
+
     # The ($2) will look up the constant so named
-    return timelocal( 0, $5, $4, $1, $MON2NUM{$2}, $year );
+    return timelocal(0, $5, $4, $1, $MON2NUM{$2}, $year);
   }
-  
+
   return 0;
 }
 

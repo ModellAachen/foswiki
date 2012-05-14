@@ -7,8 +7,10 @@
 use strict;
 use Data::Dumper qw( Dumper );
 ++$|;
+
 #open(STDERR,'>&STDOUT'); # redirect error to browser
 use LWP::UserAgent;
+
 #use LWP;
 use LWP::Simple;
 use URI;
@@ -19,29 +21,33 @@ use Pod::Usage;
 
 my $optsConfig = {
     'list-uninstalled' => 0,
-    'list-versions' => 0,
-#
-    status => 0,
+    'list-versions'    => 0,
+
+    #
+    status  => 0,
     verbose => 0,
-    debug => 0,
-    help => 0,
-    man => 0,
+    debug   => 0,
+    help    => 0,
+    man     => 0,
 };
 
-GetOptions( $optsConfig,
-	    'list-uninstalled',
-	    'list-versions',
-	    'status',
-# miscellaneous/generic options
-	    'help', 'man', 'debug', 'verbose|v',
-	    );
-pod2usage( 1 ) if $optsConfig->{help};
-pod2usage({ -exitval => 1, -verbose => 2 }) if $optsConfig->{man};
-print STDERR Dumper( $optsConfig ) if $optsConfig->{debug};
+GetOptions(
+    $optsConfig,
+    'list-uninstalled',
+    'list-versions',
+    'status',
+
+    # miscellaneous/generic options
+    'help', 'man', 'debug', 'verbose|v',
+);
+pod2usage(1) if $optsConfig->{help};
+pod2usage( { -exitval => 1, -verbose => 2 } ) if $optsConfig->{man};
+print STDERR Dumper($optsConfig) if $optsConfig->{debug};
 
 if ( $optsConfig->{status} ) {
-    print Dumper( $optsConfig );
+    print Dumper($optsConfig);
 }
+
 #print STDERR Dumper( $optsConfig ) if $optsConfig->{debug};
 
 ################################################################################
@@ -50,16 +56,19 @@ if ( $optsConfig->{status} ) {
 #$ua->agent( 'Foswiki CpanContrib calc-cpan-dependencies.pl/0.1' );
 
 #*calc_cpan_dependencies = \&calc_cpan_dependences_webservice;
-my @deps = map { &calc_cpan_dependencies_webservice( $_ ) } @ARGV;
+my @deps = map { &calc_cpan_dependencies_webservice($_) } @ARGV;
 my @versions = map { [ $_ => eval "use $_; \$${_}::VERSION" ] } @deps;
 print "@versions: " . Dumper( \@versions ) if $optsConfig->{debug};
 
-print join( ', ', map { "$_->[0] (" . ($_->[1]||'') . ')' } @versions ), "\n"
-    if $optsConfig->{'list-versions'};
+print join( ', ', map { "$_->[0] (" . ( $_->[1] || '' ) . ')' } @versions ),
+  "\n"
+  if $optsConfig->{'list-versions'};
 
-print join( ' ', $optsConfig->{'list-uninstalled'}
-	    ? map { $_->[0] } grep { not defined $_->[1] } @versions
-            : @deps ), "\n";
+print join( ' ',
+    $optsConfig->{'list-uninstalled'}
+    ? map { $_->[0] } grep { not defined $_->[1] } @versions
+    : @deps ),
+  "\n";
 
 exit 0;
 
@@ -70,12 +79,16 @@ sub calc_cpan_dependencies_webservice {
     print "calculating dependencies for $module\n" if $optsConfig->{verbose};
 
     my @deps;
-    ( my $uri = URI->new( 'http://cpandeps.cantrell.org.uk/' ))->query_form( xml => 1, module => $module );
-    if ( my $deps_xml = LWP::Simple::get( $uri ) ) {
-	my $ref = XML::Simple::XMLin( $deps_xml );
-	my @modules = reverse sort { $a->{depth} <=> $b->{depth} } @{$ref->{dependency}} if $ref->{dependency};
-	@deps = map { $_->{module} } @modules;
-    } else {
+    ( my $uri = URI->new('http://cpandeps.cantrell.org.uk/') )
+      ->query_form( xml => 1, module => $module );
+    if ( my $deps_xml = LWP::Simple::get($uri) ) {
+        my $ref = XML::Simple::XMLin($deps_xml);
+        my @modules =
+          reverse sort { $a->{depth} <=> $b->{depth} } @{ $ref->{dependency} }
+          if $ref->{dependency};
+        @deps = map { $_->{module} } @modules;
+    }
+    else {
     }
 
     return @deps;
@@ -85,6 +98,7 @@ sub calc_cpan_dependencies_webservice {
 ################################################################################
 
 __DATA__
+
 =head1 NAME
 
 calc-cpan-dependencies.pl - calculate CPAN module dependency requirements

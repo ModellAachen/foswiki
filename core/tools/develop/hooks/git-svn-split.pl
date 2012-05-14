@@ -72,15 +72,20 @@ sub createSubModule {
     require Net::GitHub;
     my $token  = getGitHubToken;
     my $github = Net::GitHub->new(
-        owner => 'foswiki',
-        repo  => $module,
+
+        # V3 no longer support application tokens. Using user + pass as fallback
+        # owner => 'foswiki',
+        # repo  => $module,
+        # token => $token,
         login => 'foswiki',
-        token => $token,
+        pass  => $token,
     );
     $github->repos->create(
-        $module,
-        "Foswiki module $module",
-        "http://foswiki.org/Extensions/$module", 1
+        {
+            name        => $module,
+            description => "Foswiki module $module",
+            homepage    => "http://foswiki.org/Extensions/$module"
+        }
     );
     warn
       "\tAdding: git submodule add git\@github.com:foswiki/$module.git $module"
@@ -148,7 +153,13 @@ for my $module ( sort keys %modifiedPlugin ) {
     for my $branch ( sort keys %{ $modifiedPlugin{$module} } ) {
         warn "Updating module $module, branch $branch" if $verbose;
         $submodule->run( checkout => $branch );
-        $submodule->run( svn      => 'rebase' );
+
+        # Create local branch if it doesn't exist
+        unless ( eval { $submodule->run( 'symbolic-ref' => 'HEAD' ) } ) {
+            $submodule->run( checkout => '-b' => $branch );
+            $submodule->run( push => '-f', origin => $branch );
+        }
+        $submodule->run( svn => 'rebase' );
     }
     $submodule->run( push => '--all' );
 }

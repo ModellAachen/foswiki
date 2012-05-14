@@ -92,8 +92,7 @@ sub set_up {
     $this->{tmpdatafile}  = $Foswiki::cfg{TempfileDir} . '/tmpity-tmp.gif';
     $this->{tmpdatafile2} = $Foswiki::cfg{TempfileDir} . '/tmpity-tmp2.gif';
     $this->{test_web2}    = $this->{test_web} . 'Extra';
-    my $webObject = Foswiki::Meta->new( $this->{session}, $this->{test_web2} );
-    $webObject->populateNewWeb();
+    my $webObject = $this->populateNewWeb( $this->{test_web2} );
     $webObject->finish();
 
     return;
@@ -280,13 +279,9 @@ sub test_moveWeb {
     my $this = shift;
     $Foswiki::cfg{EnableHierarchicalWebs} = 1;
 
-    my $webObject =
-      Foswiki::Meta->new( $this->{session}, $this->{test_web} . "Blah" );
-    $webObject->populateNewWeb();
+    my $webObject = $this->populateNewWeb( $this->{test_web} . "Blah" );
     $webObject->finish();
-    $webObject =
-      Foswiki::Meta->new( $this->{session}, $this->{test_web} . "Blah/SubWeb" );
-    $webObject->populateNewWeb();
+    $webObject = $this->populateNewWeb( $this->{test_web} . "Blah/SubWeb" );
     $webObject->finish();
 
     $this->assert( Foswiki::Func::webExists( $this->{test_web} . 'Blah' ) );
@@ -878,8 +873,7 @@ sub test_subweb_attachments {
 
     #$web = Assert::TAINT($web);
     #
-    my $webObject = Foswiki::Meta->new( $this->{session}, $web );
-    $webObject->populateNewWeb();
+    my $webObject = $this->populateNewWeb($web);
     $webObject->finish();
 
     my $stream =
@@ -1001,9 +995,7 @@ sub test_getrevinfo {
     my $now   = time();
     $Foswiki::cfg{EnableHierarchicalWebs} = 1;
 
-    my $webObject =
-      Foswiki::Meta->new( $this->{session}, $this->{test_web} . "/Blah" );
-    $webObject->populateNewWeb();
+    my $webObject = $this->populateNewWeb( $this->{test_web} . "/Blah" );
     $webObject->finish();
 
     Foswiki::Func::saveTopicText( $this->{test_web},        $topic, 'blah' );
@@ -1571,6 +1563,14 @@ sub test_normalizeWebTopicName {
         'Wibble.Web2.Topic' );
     $this->assert_str_equals( 'Wibble/Web2', $w );
     $this->assert_str_equals( 'Topic',       $t );
+
+    ( $w, $t ) =
+      Foswiki::Func::normalizeWebTopicName( '', 'Sandbox.ALLOWTOPICCHANGE' );
+    $this->assert_str_equals( 'Sandbox',          $w );
+    $this->assert_str_equals( 'ALLOWTOPICCHANGE', $t );
+    ( $w, $t ) = Foswiki::Func::normalizeWebTopicName( '', 'ALLOWTOPICCHANGE' );
+    $this->assert_str_equals( $Foswiki::cfg{UsersWebName}, $w );
+    $this->assert_str_equals( 'ALLOWTOPICCHANGE',          $t );
 
     return;
 }
@@ -2626,6 +2626,113 @@ sub test_getScriptUrlPath_spec {
     $this->_test_path_func( \&Foswiki::Func::getScriptUrlPath );
 
     return;
+}
+
+# Verify that saveTopicText uses embedded meta
+sub test_saveTopicTextEmbeddedMeta {
+    my $this     = shift;
+    my $topic    = 'SaveTopicText2';
+    my $origtext = <<'NONNY';
+%META:TOPICINFO{author="BaseUserMapping_123" comment="save topic" date=".*?" format="1.1" reprev="1" version="1"}%
+'Tis some text
+and a trailing newline
+
+%META:FORM{name="TestForm"}%
+%META:FIELD{name="FORM" attributes="" title="Blah" value="FORM GOOD"}%
+%META:FILEATTACHMENT{name="IMG_0608.JPG" attr="" autoattached="1" comment="A Comment" date="1162233146" size="762004" user="Main.AUser" version="1"}%
+NONNY
+    Foswiki::Func::saveTopicText( $this->{test_web}, $topic, $origtext );
+
+    my $rawtext = Foswiki::Func::readFile(
+        $Foswiki::cfg{DataDir} . '/' . $this->{test_web} . "/$topic.txt" );
+    $this->assert_str_not_equals( $origtext, $rawtext );
+
+    my $readtext = Foswiki::Func::readTopicText( $this->{test_web}, $topic );
+
+    #lets start by making sure that the readTopic == what is on disk
+    $this->assert_str_equals( $rawtext, $readtext );
+
+    my @orig_metas;
+    $origtext =~ s/^(\%META:[^}]*}%)/push(@orig_metas, $1)/gems;
+
+    #print STDERR "\n   orig  ".join("\n   * ", @orig_metas)."\n";
+    $this->assert_equals( 4, scalar(@orig_metas) );
+    my @raw_metas;
+    $rawtext =~ s/^(\%META:[^}]*}%)/push(@raw_metas, $1)/gems;
+
+#print STDERR "\n   raw  ".join("\n   * ", @raw_metas)."\n";
+#in 1.0.10 the FILEATTACHMENT is removed - presumably because the file is not there?
+#in 1.1 the FILEATTACHMENT is kept - frustrating.
+#TODO: check this
+    $this->assert_equals( 4, scalar(@raw_metas) );
+
+#TOPICINFO from commit
+#make sure that the save changed the topicinfo (this is the 1.1.0 introduced bug (fixed in 1.1.4) where by we use the TOPICINFO passed to saveTopicText literally, without recording who actually called save)
+    $this->assert_str_not_equals( shift @orig_metas, shift @raw_metas );
+
+    #FORM
+    $this->assert_str_equals( shift @orig_metas, shift @raw_metas );
+
+    #FIELD
+    $this->assert_str_equals( shift @orig_metas, shift @raw_metas );
+
+    #leaving only the FILEATTACHMENT
+    $this->assert_str_equals( shift @orig_metas, shift @raw_metas );
+
+    #$this->assert_matches(qr/FILEATTACHMENT/, shift @orig_metas);
+    $this->assert_equals( 0, scalar(@raw_metas) );
+    $this->assert_equals( 0, scalar(@orig_metas) );
+
+    my ( $meta, $text ) = Foswiki::Func::readTopic( $this->{test_web}, $topic );
+
+    #make sure that the save extracted the META:
+    $this->assert_does_not_match( qr/%META/, $text );
+
+    return;
+}
+
+sub test_getUrlHost {
+    my ($this) = @_;
+
+    my $query;
+
+    require Unit::Request;
+    $query = Unit::Request->new("");
+
+    #$query->path_info("/$this->{test_web}/$this->{test_topic}");
+    $Foswiki::cfg{DefaultUrlHost} = 'http://foswiki.org';
+
+    $query->setUrl('http://localhost/Main/SvenDowideit');
+    $this->createNewFoswikiSession( undef, $query );
+    $this->assert_str_equals( $Foswiki::cfg{DefaultUrlHost},
+        Foswiki::Func::getUrlHost() );
+
+    $query->setUrl('http://localhost:8080/Main/SvenDowideit');
+    $this->createNewFoswikiSession( undef, $query );
+    $this->assert_str_equals( 'http://localhost:8080',
+        Foswiki::Func::getUrlHost() );
+
+    $query->setUrl('https://localhost/Main/SvenDowideit');
+    $this->createNewFoswikiSession( undef, $query );
+    $this->assert_str_equals( 'https://localhost',
+        Foswiki::Func::getUrlHost() );
+
+    $query->setUrl('https://localhost:8080/Main/SvenDowideit');
+    $this->createNewFoswikiSession( undef, $query );
+    $this->assert_str_equals( 'https://localhost:8080',
+        Foswiki::Func::getUrlHost() );
+
+    $Foswiki::cfg{RemovePortNumber} = 1;
+    $query->setUrl('http://localhost:8080/Main/SvenDowideit');
+    $this->createNewFoswikiSession( undef, $query );
+    $this->assert_str_equals( $Foswiki::cfg{DefaultUrlHost},
+        Foswiki::Func::getUrlHost() );
+
+    $query->setUrl('https://localhost:8080/Main/SvenDowideit');
+    $this->createNewFoswikiSession( undef, $query );
+    $this->assert_str_equals( 'https://localhost',
+        Foswiki::Func::getUrlHost() );
+
 }
 
 1;

@@ -9,6 +9,7 @@ use FoswikiFnTestCase();
 our @ISA = qw( FoswikiFnTestCase );
 
 use Foswiki();
+use Foswiki::Func();
 use Foswiki::UI::View();
 use HTML::Tidy();
 use Error qw( :try );
@@ -78,8 +79,8 @@ sub set_up {
     $this->SUPER::set_up();
 
     #the test web is made using the '_empty' web - not so useful here
-    my $webObject = Foswiki::Meta->new( $this->{session}, $this->{test_web} );
-    $webObject->populateNewWeb(
+    my $webObject = $this->populateNewWeb(
+        $this->{test_web},
         '_default',
         {
             ALLOWWEBCHANGE => '',
@@ -309,7 +310,7 @@ sub put_field {
 
 sub add_form_and_data {
     my ( $this, $web, $topic, $form ) = @_;
-    my $meta = Foswiki::Meta->new( $this->{session}, $web, $topic );
+    my ($meta) = Foswiki::Func::readTopic( $web, $topic );
     $meta->put( 'FORM', { name => $form } );
     put_field( $meta, 'IssueName', 'M', 'Issue Name', '_An issue_' );
     put_field(
@@ -394,7 +395,8 @@ sub verify_switchboard_function {
         else {
             for ($output) {    # Remove OK warnings
                                # Empty title, no easy fix and harmless
-s/^$testcase \(\d+:\d+\) Warning: trimming empty <(?:h1|span|ins|noscript)>\n?$//gm;
+                               # Empty style, see Item11608
+s/^$testcase \(\d+:\d+\) Warning: trimming empty <(?:h1|span|style|ins|noscript)>\n?$//gm;
 s/^$testcase \(\d+:\d+\) Warning: inserting implicit <(?:ins)>\n?$//gm;
                 s/^\s*$//;
             }

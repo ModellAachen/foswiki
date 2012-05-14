@@ -1,16 +1,6 @@
 # ---+ Extensions
 # ---++ StringifierContrib
 
-# **STRING**
-# Comma seperated list of webs to skip
-$Foswiki::cfg{StringifierContrib}{SkipWebs} = 'Trash';
-
-# **STRING**
-# List of topics to skip.
-# Topics can be in the form of Web.MyTopic, or if you want a topic to be excluded from all webs just enter MyTopic.
-# For example: Main.WikiUsers, WebStatistics
-$Foswiki::cfg{StringifierContrib}{SkipTopics} = '';
-
 # **SELECT antiword,wv,abiword**
 # Select which MS Word indexer to use (you need to have antiword, abiword or wvText installed)
 # <dl>
@@ -63,6 +53,72 @@ $Foswiki::cfg{StringifierContrib}{docx2txtCmd} = '../tools/docx2txt.pl';
 # **COMMAND**
 # Path to your xlsx2txt.pl command (used to convert MS excel recent documents: .xlsx)
 $Foswiki::cfg{StringifierContrib}{xls2txtCmd} = '../tools/xls2txt.pl';
+
+# **STRING EXPERT**
+# Set this to the charset encoding produced by the abiword helper program. 
+# This is most probably either 'utf-8' or 'iso-8859-1'.
+# Values differ depending on the version and system configuration.
+$Foswiki::cfg{StringifierContrib}{CharSet}{abiword} = 'utf-8';
+
+# **STRING EXPERT**
+# Set this to the charset encoding produced by the antiword helper program. 
+# This is most probably either 'utf-8' or 'iso-8859-1'.
+# Values differ depending on the version and system configuration.
+$Foswiki::cfg{StringifierContrib}{CharSet}{antiword} = 'utf-8';
+
+# **STRING EXPERT**
+# Set this to the charset encoding produced by the docx2txt helper program. 
+# This is most probably either 'utf-8' or 'iso-8859-1'.
+# Values differ depending on the version and system configuration.
+$Foswiki::cfg{StringifierContrib}{CharSet}{docx2txt} = 'utf-8';
+
+# **STRING EXPERT**
+# Set this to the charset encoding produced by the html2text helper program. 
+# This is most probably either 'utf-8' or 'iso-8859-1'.
+# Values differ depending on the version and system configuration.
+$Foswiki::cfg{StringifierContrib}{CharSet}{html2text} = 'utf-8';
+
+# **STRING EXPERT**
+# Set this to the charset encoding produced by the odt2txt helper program. 
+# This is most probably either 'utf-8' or 'iso-8859-1'.
+# Values differ depending on the version and system configuration.
+$Foswiki::cfg{StringifierContrib}{CharSet}{odt2txt} = 'utf-8';
+
+# **STRING EXPERT**
+# Set this to the charset encoding produced by the pdftotext helper program. 
+# This is most probably either 'utf-8' or 'iso-8859-1'.
+# Values differ depending on the version and system configuration.
+$Foswiki::cfg{StringifierContrib}{CharSet}{pdftotext} = 'iso-8859-1';
+
+# **STRING EXPERT**
+# Set this to the charset encoding produced by the pptx2txt helper program. 
+# This is most probably either 'utf-8' or 'iso-8859-1'.
+# Values differ depending on the version and system configuration.
+$Foswiki::cfg{StringifierContrib}{CharSet}{pptx2txt} = 'utf-8';
+
+# **STRING EXPERT**
+# Set this to the charset encoding produced by the text extractor. 
+# This is most probably either 'utf-8' or 'iso-8859-1'.
+# Values differ depending on the version and system configuration.
+$Foswiki::cfg{StringifierContrib}{CharSet}{text} = 'utf-8';
+
+# **STRING EXPERT**
+# Set this to the charset encoding produced by the wv helper program. 
+# This is most probably either 'utf-8' or 'iso-8859-1'.
+# Values differ depending on the version and system configuration.
+$Foswiki::cfg{StringifierContrib}{CharSet}{wv} = 'utf-8';
+
+# **STRING EXPERT**
+# Set this to the charset encoding produced by the xls2txt helper programm.
+# This is most probably either 'utf-8' or 'iso-8859-1'.
+# Values differ depending on the version and system configuration.
+$Foswiki::cfg{StringifierContrib}{CharSet}{xls2txt} = 'utf-8';
+
+# **STRING EXPERT**
+# Set this to the charset encoding produced by thew xlsx text extractor.
+# This is most probably either 'utf-8' or 'iso-8859-1'.
+# Values differ depending on the version and system configuration.
+$Foswiki::cfg{StringifierContrib}{CharSet}{xlsx} = 'utf-8';
 
 # **BOOLEAN**
 # Debug setting

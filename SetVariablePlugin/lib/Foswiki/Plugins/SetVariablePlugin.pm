@@ -1,6 +1,6 @@
 # Plugin for Foswiki - The Free and Open Source Wiki, http://foswiki.org/
 #
-# Copyright (C) 2006-2011 Michael Daum http://michaeldaumconsulting.com
+# Copyright (C) 2006-2012 Michael Daum http://michaeldaumconsulting.com
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -23,20 +23,18 @@ use vars qw(
 );
 
 $VERSION = '$Rev: 4287 (2009-06-23) $';
-$RELEASE = '2.01';
+$RELEASE = '2.20';
 
 $SHORTDESCRIPTION = 'Flexible handling of topic variables';
 $NO_PREFS_IN_TOPIC = 1;
-
-use constant DEBUG => 0; #toggle me
 
 ###############################################################################
 sub initPlugin {
   my ($topic, $web, $user, $installWeb) = @_;
 
   Foswiki::Func::registerTagHandler('SETVAR', sub {
-    getCore()->handleSetVar(@_) if Foswiki::Func::getContext()->{save} || DEBUG;
-    return '' ;
+    getCore()->handleSetVar(@_) if Foswiki::Func::getContext()->{save};
+    return '<!-- -->' ;
   });
 
   Foswiki::Func::registerTagHandler('GETVAR', sub { 
@@ -44,16 +42,14 @@ sub initPlugin {
   });
 
   Foswiki::Func::registerTagHandler('DELVAR', sub { 
-    return getCore()->handleUnsetVar(@_) if Foswiki::Func::getContext()->{save} || DEBUG;
+    getCore()->handleUnsetVar(@_) if Foswiki::Func::getContext()->{save};
+    return '<!-- -->' ;
   });
 
   Foswiki::Func::registerTagHandler('UNSETVAR', sub { 
-    return getCore()->handleUnsetVar(@_) if Foswiki::Func::getContext()->{save} || DEBUG;
+    getCore()->handleUnsetVar(@_) if Foswiki::Func::getContext()->{save};
+    return '<!-- -->' ;
   });
-
-  Foswiki::Func::registerTagHandler('DEBUGRULES', sub {
-    return getCore()->handleDebugRules(@_); 
-  }) if DEBUG;
 
   $core = undef;
 

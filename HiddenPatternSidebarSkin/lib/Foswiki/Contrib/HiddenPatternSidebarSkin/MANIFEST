@@ -2,4 +2,5 @@
 data/System/HiddenPatternSidebarSkin.txt 0644 Documentation
 lib/Foswiki/Contrib/HiddenPatternSidebarSkin.pm 0644 Perl module
 templates/foswiki.hiddenpattern.tmpl 0644 the template that does the work.
+pub/System/HiddenPatternSidebarSkin/HiddenPatternSidebar.jpg 0644 Documentation
 

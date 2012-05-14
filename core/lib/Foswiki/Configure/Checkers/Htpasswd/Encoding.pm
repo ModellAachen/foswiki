@@ -23,9 +23,6 @@ sub check {
     }
     my $enc = $Foswiki::cfg{Htpasswd}{Encoding};
 
-    my $auto =
-      ( $Foswiki::cfg{Htpasswd}{AutoDetect} ) ? 'to autodetect' : 'for';
-
     if ( $Foswiki::cfg{Htpasswd}{AutoDetect} || $enc eq 'crypt' ) {
         my $f = $Foswiki::cfg{Htpasswd}{FileName};
         Foswiki::Configure::Load::expandValue($f);
@@ -37,54 +34,27 @@ sub check {
                 );
             }
             elsif ( -f $f ) {
-                $e .= $this->NOTE(
+                $e .= $this->WARN(
 '<b>Not Recommended:</b> crypt encoding only uses the first 8 characters of the password and silently ignores the rest.  However changing Encoding will invalidate existing passwords unless <tt>AutoDetect</tt> is enabled. See <a href="http://foswiki.org/Support/HtPasswdEncodingSupplement">HtPasswdEncodingSupplement</a> for more information'
                 );
             }
             else {
-                $e .= $this->WARN(
+                $e .= $this->ERROR(
 'crypt encoding only uses the first 8 characters of the password and silently ignores the rest.  No password file exists, so now is a good time choose a different encoding. See <a href="http://foswiki.org/Support/HtPasswdEncodingSupplement">HtPasswdEncodingSupplement</a> for more information'
                 );
             }
         }
     }
 
-    if ( $Foswiki::cfg{Htpasswd}{AutoDetect} || $enc eq 'htdigest-md5' ) {
-        my $n =
-          $this->checkPerlModule( 'Digest::MD5', "Required $auto md5 encoding",
-            0 );
+    my $check = {
+        'Digest::MD5'                => ['htdigest-md5'],
+        'Digest::SHA'                => ['sha1'],
+        'Crypt::PasswdMD5'           => [ 'apache-md5', 'crypt-md5' ],
+        'Crypt::Eksblowfish::Bcrypt' => ['bcrypt'],
+    };
 
-        if ( $n =~ m/Not installed/ ) {
-            $e .= $this->ERROR($n);
-        }
-        else {
-            $e .= $this->NOTE($n);
-        }
-    }
-
-    if ( $Foswiki::cfg{Htpasswd}{AutoDetect} || $enc eq 'sha1' ) {
-        my $n =
-          $this->checkPerlModule( 'Digest::SHA', "Required $auto sha1 encoding",
-            0 );
-
-        if ( $n =~ m/Not installed/ ) {
-            $e .= $this->ERROR($n);
-        }
-        else {
-            $e .= $this->NOTE($n);
-        }
-    }
-
-    if ( $Foswiki::cfg{Htpasswd}{AutoDetect} || $enc eq 'apache-md5' ) {
-        my $n = $this->checkPerlModule( 'Crypt::PasswdMD5',
-            "Required $auto apache-md5 encoding", 0 );
-
-        if ( $n =~ m/Not installed/ ) {
-            $e .= $this->ERROR($n);
-        }
-        else {
-            $e .= $this->NOTE($n);
-        }
+    foreach my $mod ( sort keys %$check ) {
+        $e .= $this->_checkPerl( $mod, $check->{$mod} );
     }
 
     if ( $Foswiki::cfg{Htpasswd}{AutoDetect} || $enc eq 'crypt-md5' ) {
@@ -98,9 +68,6 @@ sub check {
 
             if ( $n =~ m/Not installed/ ) {
                 $e .= $this->ERROR($n);
-            }
-            else {
-                $e .= $this->NOTE($n);
             }
         }
     }
@@ -118,6 +85,36 @@ sub check {
     return $e;
 }
 
+sub _checkPerl {
+    my ( $this, $module, $method_list ) = @_;
+    my $note = '';
+    my $n;
+    my $err   = 0;
+    my $mlist = '';
+
+    $n =
+      $this->checkPerlModule( $module, "Required to use or autodetect: XENC ",
+        0 );
+
+    foreach my $method (@$method_list) {
+        $err = 1 if ( $Foswiki::cfg{Htpasswd}{Encoding} eq $method );
+    }
+    $mlist = join( ', ', @$method_list );
+
+    $n =~ s/XENC/<tt>$mlist<\/tt> encoding./;
+
+    if ( $n =~ m/Not installed/ && $err ) {
+        $note .= $this->ERROR($n);
+    }
+    elsif ( $n =~ m/Not installed/ && $Foswiki::cfg{Htpasswd}{AutoDetect} ) {
+        $note .= $this->WARN($n);
+    }
+    else {
+        $note .= $this->NOTE($n);
+    }
+
+    return $note;
+}
 1;
 __END__
 Foswiki - The Free and Open Source Wiki, http://foswiki.org/

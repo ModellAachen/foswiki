@@ -52,9 +52,8 @@ sub set_up {
     try {
         $this->createNewFoswikiSession('AdminUser');
 
-        my $webObject =
-          Foswiki::Meta->new( $this->{session}, $this->{test_subweb} );
-        $webObject->populateNewWeb();
+        my $webObject = $this->populateNewWeb( $this->{test_subweb} );
+        $webObject->finish();
         $this->assert( $this->{session}->webExists( $this->{test_subweb} ) );
         ($topicObject) =
           Foswiki::Func::readTopic( $this->{test_subweb},
@@ -454,7 +453,8 @@ sub test_simple_textfile {
       $this->viewfile( "/$this->{test_web}/TestTopic1/one.txt", 1 );
 
     $this->assert_equals( "Test attachment one.txt\n", $text );
-    $this->assert_matches( qr/Content-Type: text\/plain; charset=ISO-8859-1/i,
+    $this->assert_matches(
+        qr/Content-Type: text\/plain; charset=$Foswiki::cfg{Site}{CharSet}/i,
         $headers );
     $this->assert_matches( 'Content-Disposition: inline; filename=one.txt',
         $headers );

@@ -1,0 +1,5 @@
+data/System/PageOptimizerPlugin.txt 0644
+lib/Foswiki/Plugins/PageOptimizerPlugin/Config.spec 0644
+lib/Foswiki/Plugins/PageOptimizerPlugin.pm 0644
+lib/Foswiki/Plugins/PageOptimizerPlugin/Stats.pm 0644
+pub/System/PageOptimizerPlugin/cache/README 0644

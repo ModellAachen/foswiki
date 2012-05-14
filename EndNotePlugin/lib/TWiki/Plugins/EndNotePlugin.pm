@@ -10,7 +10,7 @@
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details, published at 
+# GNU General Public License for more details, published at
 # http://www.gnu.org/copyleft/gpl.html
 
 # =========================
@@ -18,60 +18,61 @@ package TWiki::Plugins::EndNotePlugin;
 
 # =========================
 use vars qw(
-        $web $topic $user $installWeb $VERSION $pluginName
-        $debug @endnotes %endnote_nums
-    );
+  $web $topic $user $installWeb $VERSION $pluginName
+  $debug @endnotes %endnote_nums
+);
 
-$VERSION = '1.021';
-$pluginName = 'EndNotePlugin';  # Name of this Plugin
+$VERSION    = '1.021';
+$pluginName = 'EndNotePlugin';    # Name of this Plugin
 
 # =========================
-sub initPlugin
-{
+sub initPlugin {
     ( $topic, $web, $user, $installWeb ) = @_;
 
     # check for Plugins.pm versions
-    if( $TWiki::Plugins::VERSION < 1.021 ) {
-        TWiki::Func::writeWarning( "Version mismatch between $pluginName and Plugins.pm" );
+    if ( $TWiki::Plugins::VERSION < 1.021 ) {
+        TWiki::Func::writeWarning(
+            "Version mismatch between $pluginName and Plugins.pm");
         return 0;
     }
 
     # Get plugin debug flag
-    $debug = TWiki::Func::getPluginPreferencesFlag( "DEBUG" );
+    $debug = TWiki::Func::getPluginPreferencesFlag("DEBUG");
 
     # Plugin correctly initialized
-    TWiki::Func::writeDebug( "- TWiki::Plugins::${pluginName}::initPlugin( $web.$topic ) is OK" ) if $debug;
+    TWiki::Func::writeDebug(
+        "- TWiki::Plugins::${pluginName}::initPlugin( $web.$topic ) is OK")
+      if $debug;
     return 1;
 }
 
-
 # =========================
-sub storeEndNote
-{
+sub storeEndNote {
     my $i;
     my $anchor = "";
-    if (exists $endnote_nums{$_[0]}) {
-        $i = $endnote_nums{$_[0]};
-    } else {
-        @endnotes = (@endnotes, $_[0]);
-        $i = @endnotes;
-        $endnote_nums{$_[0]} = $i;
-        $anchor = "<a name=\"EndNote${i}text\"></a>"
+    if ( exists $endnote_nums{ $_[0] } ) {
+        $i = $endnote_nums{ $_[0] };
+    }
+    else {
+        @endnotes              = ( @endnotes, $_[0] );
+        $i                     = @endnotes;
+        $endnote_nums{ $_[0] } = $i;
+        $anchor                = "<a name=\"EndNote${i}text\"></a>";
     }
     return "${anchor}<sup>[[#EndNote${i}note][${i}]]</sup>";
 }
 
 # =========================
-sub printEndNotes
-{
+sub printEndNotes {
     my $c = @endnotes;
-    return "" if ($c == 0);
+    return "" if ( $c == 0 );
     my $result = "\n---\n\n";
-    my $i = 0;
+    my $i      = 0;
     my $n;
-    while ($i < $c) {
-        $n = $i + 1;
-        $result = $result . "\n#EndNote${n}note [[#EndNote${n}text][ *${n}:* ]] ${endnotes[$i]}\n\n"; 
+    while ( $i < $c ) {
+        $n      = $i + 1;
+        $result = $result
+          . "\n#EndNote${n}note [[#EndNote${n}text][ *${n}:* ]] ${endnotes[$i]}\n\n";
         $i = $n;
     }
     $result = $result . "---\n\n";
@@ -79,13 +80,13 @@ sub printEndNotes
 }
 
 # =========================
-sub startRenderingHandler
-{
+sub startRenderingHandler {
 ### my ( $text, $web ) = @_;   # do not uncomment, use $_[0], $_[1] instead
 
-    TWiki::Func::writeDebug( "- ${pluginName}::startRenderingHandler( $_[1] )" ) if $debug;
+    TWiki::Func::writeDebug("- ${pluginName}::startRenderingHandler( $_[1] )")
+      if $debug;
 
-    @endnotes = ();
+    @endnotes     = ();
     %endnote_nums = ();
     $_[0] =~ s/%ENDNOTE{(.*?)}%/&storeEndNote($1)/ge;
     $_[0] = $_[0] . printEndNotes();

@@ -85,11 +85,12 @@ FOOBARSOMETHING. This avoids namespace issues.
 =cut
 
 sub initPlugin {
-    my( $topic, $web, $user, $installWeb ) = @_;
+    my ( $topic, $web, $user, $installWeb ) = @_;
 
     # check for Plugins.pm versions
-    if( $TWiki::Plugins::VERSION < 1.026 ) {
-        TWiki::Func::writeWarning( "Version mismatch between $pluginName and Plugins.pm" );
+    if ( $TWiki::Plugins::VERSION < 1.026 ) {
+        TWiki::Func::writeWarning(
+            "Version mismatch between $pluginName and Plugins.pm");
         return 0;
     }
 
@@ -103,7 +104,8 @@ sub initPlugin {
 # The function used to handle the %EXAMPLETAG{...}% variable
 # You would have one of these for each variable you want to process.
 sub _FALLBACK {
-    my($session, $params, $theTopic, $theWeb) = @_;
+    my ( $session, $params, $theTopic, $theWeb ) = @_;
+
     # $session  - a reference to the TWiki session object (if you don't know
     #             what this is, just ignore it)
     # $params=  - a reference to a TWiki::Attrs object containing parameters.
@@ -114,14 +116,14 @@ sub _FALLBACK {
     # $theWeb   - name of the web in the query
     # Return: the result of processing the variable
 
-    my $topic = $params->{topic} || $params->{_DEFAULT};
+    my $topic      = $params->{topic}      || $params->{_DEFAULT};
     my $returntype = $params->{returntype} || 'fullname';
 
     my $weblist = $params->{otherwebs};
     $weblist = $theWeb . ',' . $weblist if $weblist;
     $weblist ||= $theWeb;
     $weblist =~ tr/ //d;
-    my @webs = split(',', $weblist);
+    my @webs = split( ',', $weblist );
 
     my $othertopics = $params->{othertopics};
     my $topiclist;
@@ -129,14 +131,15 @@ sub _FALLBACK {
     if ($othertopics) {
         $topiclist = $topic . ',' . $othertopics;
         $topiclist =~ tr/ //d;
-        @topiclist = split(',', $topiclist);
-    } else {
+        @topiclist = split( ',', $topiclist );
+    }
+    else {
         $topiclist[0] = $topic;
     }
 
     foreach my $aTopic (@topiclist) {
         foreach my $web (@webs) {
-            if (TWiki::Func::topicExists($web, $aTopic)) {
+            if ( TWiki::Func::topicExists( $web, $aTopic ) ) {
                 return "$web.$aTopic";
             }
         }

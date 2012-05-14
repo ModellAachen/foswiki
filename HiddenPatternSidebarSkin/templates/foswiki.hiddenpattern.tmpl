@@ -1,6 +1,33 @@
 %TMPL:INCLUDE{"foswiki"}%%{
 ---------------------------------------------------
-}%%TMPL:DEF{togglesidebar}%<div id="patternToggleSidebar">%JQREQUIRE{"cookie"}%%ADDTOZONE{"script" id="patternToggleSidebar" text="<script>
+}%%TMPL:DEF{togglesidebar}%<div id="patternToggleSidebarOuter" > %TMPL:P{"togglesidebar_js"}%
+<div id="patternToggleSidebar" href="#" onclick="patternToggleSidebar()" onmouseover="patternOpenSidebarTemporary()" title="toggle the side bar" >&#x2388;</div>
+</div>%TMPL:END%
+
+%TMPL:DEF{"main"}%<div class="foswikiPage"><div id="patternScreen">
+<div id="patternPageShadow">%TMPL:P{"metanavigation"}%
+<div id="patternPage">
+%TMPL:P{"startsidebarwrapper"}%<div id="patternOuter">
+<div id="patternFloatWrap">
+<div id="patternMain" class="">
+%TMPL:P{togglesidebar}%
+%TMPL:P{"topbarspacer"}%%TMPL:P{"horizontalnavigation"}%
+<div id="patternMainContents">%TMPL:P{"logo"}%%TMPL:P{"patterntopiccontents"}%
+</div>
+</div>%TMPL:P{"sidebar"}%
+</div>
+<div class="clear">&nbsp;</div>
+</div>%TMPL:P{"endsidebarwrapper"}%%TMPL:P{"topbar"}%%TMPL:P{"bottombar"}%
+</div>
+</div>
+</div>
+</div>%TMPL:END%
+
+%TMPL:DEF{"bodyend"}%</body></html>%TMPL:END%
+
+%TMPL:DEF{"textareabuttons"}%<span class="foswikiRight foswikiMakeVisible" style="text-align:left; margin:0 0 0 1em;"><span class="foswikiLeft patternTextareaButton patternButtonFontSelector" title="%MAKETEXT{"Switch to monotype or propotional font"}%">&nbsp;</span><span class="foswikiLeft patternTextareaButton patternButtonEnlarge" title="%MAKETEXT{"Enlarge edit box"}%">&nbsp;</span><span class="foswikiLeft patternTextareaButton patternButtonShrink" title="%MAKETEXT{"Shrink edit box"}%">&nbsp;</span></span>%TMPL:END%
+
+%TMPL:DEF{"togglesidebar_js"}%%JQREQUIRE{"cookie"}%%ADDTOZONE{"script" id="patternToggleSidebar" text="<script>
 patternToggleSidebar = function() {
     //by the by, i'm not display:none the patternSideBar, as that will cause the height of the browser page to change, which is also ugly.
     if ($.cookie('patternSidebar')) {
@@ -12,12 +39,15 @@ patternToggleSidebar = function() {
         $('#patternToggleSidebar').addClass('hiddenSideBar');
         $('#patternOuter').addClass('hiddenSideBar');
     }
+    $('#patternToggleSidebar').removeClass('temporarySideBar');
+
     return 1;
 };
 patternOpenSidebarTemporary = function() {
     if ($('#patternOuter').hasClass('hiddenSideBar') &&
             ($.cookie('patternSidebar'))) {
         $('#patternOuter').removeClass('hiddenSideBar');
+        $('#patternToggleSidebar').addClass('temporarySideBar');
     }
     return 1;
 };
@@ -25,6 +55,7 @@ patternCloseSidebarTemporary = function() {
     if ((! $('#patternOuter').hasClass('hiddenSideBar')) && 
             ($.cookie('patternSidebar'))) {
         $('#patternOuter').addClass('hiddenSideBar');
+        $('#patternToggleSidebar').removeClass('temporarySideBar');
     }
     return 1;
 };
@@ -49,8 +80,11 @@ $(function() {
 });
 </script>
 <style>
-.patternViewPage {
-    display:none;
+.patternNoViewPage .foswikiTopic {
+    margin-top: 0;
+}
+.patternViewPage #patternToggleSidebar {
+   display: inline;
 }
 #patternOuter.hiddenSideBar {
     margin-left: 3px;
@@ -59,46 +93,61 @@ $(function() {
     border-left: 3px solid %WEBBGCOLOR%;
     over-flow: hidden;
 }
+.patternNoViewPage  #patternToggleSidebar {
+  display: none;
+}
 #patternToggleSidebar { 
-background: %WEBBGCOLOR% url(%ICONURL{arrowleft}%) no-repeat;
+background: %WEBBGCOLOR% url(%ICONURL{arrowup}%) no-repeat 17px;
 left:0;
-padding-left:20px;
+padding-left:2px;
 padding-right:2px;
 position:absolute;
 top:57px;
-z-index:99999;
+z-index:99994;
 width: 220px;
+top:35px;
+font-size: 32px;
 }
 #patternToggleSidebar.hiddenSideBar { 
-    width: 90px;
+    width: 1em;
     height: 20px;
     overflow: hidden;
-    background: %WEBBGCOLOR% url(%ICONURL{arrowright}%) no-repeat;
+    background: %WEBBGCOLOR% url(%ICONURL{arrowdown}%) no-repeat 17px;
+}
+#patternToggleSidebar.temporarySideBar { 
+background: %WEBBGCOLOR% url(%ICONURL{arrowright}%) no-repeat 17px;
 }
 #patternToggleSidebar.hiddenSideBar a { 
     padding-left: 30px;
 }
-</style>"}%
-<div href="#" onclick="patternToggleSidebar()" onmouseover="patternOpenSidebarTemporary()" alt="toggle the side bar">toggle sidebar</div>
-</div>%TMPL:END%
-
-%TMPL:DEF{"main"}%<div class="foswikiPage"><div id="patternScreen">
-<div id="patternPageShadow">%TMPL:P{"metanavigation"}%
-<div id="patternPage">
-%TMPL:P{"startsidebarwrapper"}%<div id="patternOuter">
-<div id="patternFloatWrap">
-<div id="patternMain">%TMPL:P{togglesidebar}%%TMPL:P{"topbarspacer"}%%TMPL:P{"horizontalnavigation"}%
-<div id="patternMainContents">%TMPL:P{"logo"}%%TMPL:P{"patterntopiccontents"}%
-</div>
-</div>%TMPL:P{"sidebar"}%
-</div>
-<div class="clear">&nbsp;</div>
-</div>%TMPL:P{"endsidebarwrapper"}%%TMPL:P{"topbar"}%%TMPL:P{"bottombar"}%
-</div>
-</div>
-</div>
-</div>%TMPL:END%
-
-%TMPL:DEF{"bodyend"}%</body></html>%TMPL:END%
-
-%TMPL:DEF{"textareabuttons"}%<span class="foswikiRight foswikiMakeVisible" style="text-align:left; margin:0 0 0 1em;"><span class="foswikiLeft patternTextareaButton patternButtonFontSelector" title="%MAKETEXT{"Switch to monotype or propotional font"}%">&nbsp;</span><span class="foswikiLeft patternTextareaButton patternButtonEnlarge" title="%MAKETEXT{"Enlarge edit box"}%">&nbsp;</span><span class="foswikiLeft patternTextareaButton patternButtonShrink" title="%MAKETEXT{"Shrink edit box"}%">&nbsp;</span></span>%TMPL:END%
+.patternViewPage  .patternTopicActions  {
+    bottom: 0;
+    left: 0;
+    clear: both;
+    right: 0;
+    width: 100%;
+    text-align: center;
+    padding: 5px 20px;
+    z-index:99999;
+    background-color: rgba(255, 255, 255, 0.847656);
+    border-top: 2px solid #5687BC;
+    bottom: 0;
+    clear: both;
+    color: #FFFFFF;
+    height: 24px;
+    margin: 0;
+    min-height: 24px;
+    position: fixed;
+}
+#patternTopBar,
+#patternClearHeaderCenter,
+#patternClearHeaderLeft,
+#patternClearHeaderRight,
+#patternTopBarContents {
+   height:35px; /* top bar height; make room for header columns */
+   overflow:hidden;
+}
+#patternTopBarContents {
+    padding-top: 2px;
+}
+</style>"}%%TMPL:END%

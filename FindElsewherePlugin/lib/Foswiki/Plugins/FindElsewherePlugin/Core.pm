@@ -22,6 +22,7 @@ my $disablePluralToSingular;
 my $redirectable;
 my @webList;
 my $singleMixedAlphaNumRegex;
+my $otherWebs;
 
 my $EMESC = "\1";
 
@@ -31,7 +32,7 @@ sub initPlugin {
 
     $thisWeb = $_[1];
 
-    my $otherWebs = Foswiki::Func::getPreferencesValue("LOOKELSEWHEREWEBS");
+    $otherWebs = Foswiki::Func::getPreferencesValue("LOOKELSEWHEREWEBS");
     unless ( defined($otherWebs) ) {
 
         # Compatibility, deprecated
@@ -47,8 +48,12 @@ sub initPlugin {
         $otherWebs = "$Foswiki::cfg{SystemWebName},$Foswiki::cfg{UsersWebName}";
     }
 
-    # Item10460: Expand variables like %USERSWEB%
-    $otherWebs = Foswiki::Func::expandCommonVariables($otherWebs);
+ # Item10460: Expand some variables like %USERSWEB%
+ # WARNING: calling expandCommonVariables inside initPlugin is a bad thing to do
+ # as the engine isn't fully initialized at that point
+    $otherWebs =~ s/\%USERSWEB%/$Foswiki::cfg{UsersWebName}/g;
+    $otherWebs =~ s/\%SYSTEMWEB%/$Foswiki::cfg{SystemWebName}/g;
+    $otherWebs =~ s/\%SANDBOXWEB%/$Foswiki::cfg{SandboxWebName}/g;
 
     $findAcronyms =
       Foswiki::Func::getPreferencesValue("LOOKELSEWHEREFORACRONYMS") || "all";
@@ -64,23 +69,37 @@ sub initPlugin {
 
     $redirectable = Foswiki::Func::getPreferencesFlag("LOOKELSEWHEREFORLOCAL");
 
-    @webList = ();
-    foreach my $otherWeb ( split( /[,\s]+/, $otherWebs ) ) {
-        $otherWeb = Foswiki::Sandbox::untaint( $otherWeb,
-            \&Foswiki::Sandbox::validateWebName );
-        push( @webList, $otherWeb ) if $otherWeb;
-    }
-
     $singleMixedAlphaNumRegex = qr/[$Foswiki::regex{mixedAlphaNum}]/;
 
 }
 
 sub preRenderingHandler {
 
-    unless ( scalar(@webList) ) {
+    @webList = ();
 
-        # no point if there are no webs to search
-        return;
+    # Might still be unexpanded macros - expand if necessary
+    if ( $otherWebs =~ m/%/ ) {
+        $otherWebs = Foswiki::Func::expandCommonVariables($otherWebs);
+    }
+
+    foreach my $otherWeb ( split( /[,\s]+/, $otherWebs ) ) {
+        $otherWeb = Foswiki::Sandbox::untaint( $otherWeb,
+            \&Foswiki::Sandbox::validateWebName );
+        push( @webList, $otherWeb ) if $otherWeb;
+    }
+
+    if ( exists( $Foswiki::cfg{FindElsewherePlugin}{CairoLegacyLinking} )
+        && $Foswiki::cfg{FindElsewherePlugin}{CairoLegacyLinking} )
+    {
+
+        #very old, pre-nested webs linking rules.
+    }
+    else {
+        unless ( scalar(@webList) ) {
+
+            # no point if there are no webs to search
+            return;
+        }
     }
 
     # Find instances of WikiWords not in this web, but in the otherWeb(s)
@@ -294,6 +313,32 @@ sub _findTopicElsewhere {
             return $renderedLink;
         }
     }
+
+    if ( exists( $Foswiki::cfg{FindElsewherePlugin}{CairoLegacyLinking} )
+        && $Foswiki::cfg{FindElsewherePlugin}{CairoLegacyLinking} )
+    {
+
+        #pre-nested webs TWiki treated non-wikiwords more liberally
+        #print STDERR "===( $web, $topic )\n";
+        #replace space letter with uc(letter)
+        #$topic =~ s/\s(\w)/uc($1)/ge;
+        #remove all other non-wikiword links
+        $topic =~ s/[^$Foswiki::regex{mixedAlphaNum}]//g;
+
+        #test for existance
+        #print STDERR "------ exists($web, $topic)\n";
+
+        if ( Foswiki::Func::topicExists( $web, $topic ) ) {
+
+            # Topic found in one place
+            # If link text [[was in this form]], free it
+            $linkText =~ s/\[\[(.*)\]\]/$1/o;
+
+            #print STDERR "------==== >> [[$topic][$linkText]]\n";
+            return "[[$topic][$linkText]]";
+        }
+    }
+
     return $original;
 }
 
@@ -399,7 +444,7 @@ Copyright (C) 2002 Mike Barton, Marco Carnut, Peter HErnst
 Copyright (C) 2003 Martin Cleaver
 Copyright (C) 2004 Matt Wilkie
 Copyright (C) 2007 Crawford Currie http://c-dot.co.uk
-Copyright (C) 2008-2010 Foswiki Contributors
+Copyright (C) 2008-2012 Foswiki Contributors
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License

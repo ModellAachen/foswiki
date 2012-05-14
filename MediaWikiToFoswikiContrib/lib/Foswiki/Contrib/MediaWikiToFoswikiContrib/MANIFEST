@@ -6,7 +6,6 @@ data/_FoswikiPedia/TaggedTopic.txt 0644
 data/_FoswikiPedia/TopCategory.txt 0644
 data/_FoswikiPedia/TopicStub.txt 0644
 data/_FoswikiPedia/TopicType.txt 0644
-data/_FoswikiPedia/TWikiTopic.txt 0644
 data/_FoswikiPedia/WebAtom.txt 0644
 data/_FoswikiPedia/WebChanges.txt 0644
 data/_FoswikiPedia/WebHome.txt 0644
@@ -19,10 +18,9 @@ data/_FoswikiPedia/WebRss.txt 0644
 data/_FoswikiPedia/WebSearchAdvanced.txt 0644
 data/_FoswikiPedia/WebSearch.txt 0644
 data/_FoswikiPedia/WebStatistics.txt 0644
-data/_FoswikiPedia/WebTagCloud.txt 0644
-data/_FoswikiPedia/WebTopicCreator.txt 0644
 data/_FoswikiPedia/WebTopicEditTemplate.txt 0644
 data/_FoswikiPedia/WebTopicList.txt 0644
+data/_FoswikiPedia/WikiTopic.txt 0644
 data/System/MediaWikiToFoswikiContrib.txt 0644
 lib/CPAN/lib/Parse/MediaWikiDump.pm 0644
 lib/Foswiki/Contrib/MediaWikiToFoswikiContrib/Converter.pm 0644

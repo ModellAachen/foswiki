@@ -17,7 +17,7 @@ use strict;
 
 use vars qw( $VERSION $RELEASE $SHORTDESCRIPTION );
 
-$VERSION = '$Rev$';
-$RELEASE = '';
+$VERSION          = '$Rev$';
+$RELEASE          = '';
 $SHORTDESCRIPTION = 'Add Talk pages to Foswiki topics';
 

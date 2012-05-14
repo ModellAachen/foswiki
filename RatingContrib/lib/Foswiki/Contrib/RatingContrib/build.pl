@@ -7,5 +7,5 @@ use Foswiki::Contrib::Build;
 # Create the build object
 $build = new Foswiki::Contrib::Build('RatingContrib');
 
-$build->build($build->{target});
+$build->build( $build->{target} );
 

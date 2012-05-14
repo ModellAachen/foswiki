@@ -68,9 +68,11 @@ sub initPlugin {
     }
 
     # Get plugin preferences
-    $defaultRefresh = &Foswiki::Func::getPreferencesValue("NETGREPPLUGIN_REFRESH")
+    $defaultRefresh =
+      &Foswiki::Func::getPreferencesValue("NETGREPPLUGIN_REFRESH")
       || 15;
-    $defaultFilter = &Foswiki::Func::getPreferencesValue("NETGREPPLUGIN_FILTER");
+    $defaultFilter =
+      &Foswiki::Func::getPreferencesValue("NETGREPPLUGIN_FILTER");
     $defaultFormat = &Foswiki::Func::getPreferencesValue("NETGREPPLUGIN_FORMAT")
       || "(+1+)";
     $defaultSize = &Foswiki::Func::getPreferencesValue("NETGREPPLUGIN_SIZE")

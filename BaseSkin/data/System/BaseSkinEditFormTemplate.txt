@@ -1,0 +1,19 @@
+%{<verbatim class="tml">
+===================================================
+Base Skin topic template
+		
+===================================================
+}%%TMPL:INCLUDE{"edit"}%
+
+%TMPL:DEF{"focus"}%%TMPL:END%
+%TMPL:DEF{"titleaction"}%%MAKETEXT{"(edit form)"}% %TMPL:END%
+%TMPL:DEF{"pagetitle"}%<nop>%TOPIC% %MAKETEXT{"(edit form)"}%%TMPL:END%
+%TMPL:DEF{"footernote"}% %TMPL:END%
+
+%TMPL:DEF{"content"}%<div class='foswikiEditTextarea'>%TMPL:P{"formstart"}%%TMPL:P{"formbottom"}%
+<div class="foswikiHidden">
+<input type="hidden" id="topic" name="text" value="%TEXT%" /> 
+</div>
+%TMPL:P{"formend"}%</div>%TMPL:END%%{
+===================================================
+</verbatim>}%

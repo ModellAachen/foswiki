@@ -1,7 +1,7 @@
 /* 
  * serial scroller
  *
- * (c)opyright 2011 Michael Daum http://michaeldaumconsulting.com
+ * (c)opyright 2012 Michael Daum http://michaeldaumconsulting.com
 */
 (function($) {
 
@@ -121,7 +121,7 @@
   $(function() {
     $(".jqSerialPager:not(.jqInitedSerialPager)").livequery(function() {
       var $this = $(this),
-          opts = $.extend({}, defaults, $this.metadata());
+          opts = $.extend({}, defaults, $this.data(), $this.metadata());
 
       $this.addClass("jqInitedSerialPager").serialPager(opts);
     });

@@ -1,4 +1,4 @@
-%META:TOPICINFO{author="ProjectContributor" comment="reprev" date="1305111048" format="1.1" reprev="2" version="4"}%
+%META:TOPICINFO{author="micha" comment="reprev" date="1335189418" format="1.1" reprev="2" version="6"}%
 %META:TOPICPARENT{name="TopicType"}%
 %DBCALL{"RenderTopicInstaller" TYPE="TopicType" PARENT="TopicType"}%
 ---++ Documentation
@@ -10,7 +10,7 @@ varies only in its target topic (see TopicStub).
 
 This TopicType is similar to TopicFunctions but
 does not compute a specific function. Moreover it is useful to reduce
-redundancy of pure content, whereas TopicFunctions are part of a WikiWorkbench
+redundancy of pure content, whereas TopicFunctions are part of a !WikiWorkbench
 library and thus reduce redundancy in WikiApplications.
 
 See also: %TOPIC%Template
@@ -35,7 +35,7 @@ See also: %TOPIC%Template
 | TopicType | label | 1 | TopicStub | Document type  | |
 | <nop>TopicTitle | text | 75 | | title of this topic | |
 | Summary | text | 75 | | Short description of the role of this topic | |
-| WikiApplication| select | 1 |%FLEXWEBLIST{subwebs="Applications" header="none, " footer="WikiWorkbench" format="$name, "}%| Application this topic belongs to | |
+| WikiApplication| wikiapp | 1 | | Application this topic belongs to | |
 | Target | text | 75 | | Target web-topic | |
 | Section | text | 75 | | section inside the target topic | |
 

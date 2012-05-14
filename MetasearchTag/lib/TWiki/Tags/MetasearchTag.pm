@@ -32,10 +32,10 @@ use TWiki::Contrib::MoreFuncContrib;
 
 use vars qw($tagname);
 
-$tagname='METASEARCH';
+$tagname = 'METASEARCH';
 
 sub METASEARCH {
-    my ( $session, $params, $topic, $web) = @_;
+    my ( $session, $params, $topic, $web ) = @_;
 
     my $attrType = $params->{type} || 'FIELD';
 
@@ -48,11 +48,13 @@ sub METASEARCH {
         my $attrTopic = $params->{topic} || $topic || 'WebHome';
         $searchVal =
           "%META:TOPICPARENT[{].*name=\\\"($attrWeb\\.)?$attrTopic\\\".*[}]%";
-    } elsif ( $attrType eq 'topicmoved' ) {
+    }
+    elsif ( $attrType eq 'topicmoved' ) {
         my $attrTopic = $params->{topic} || '';
         $searchVal =
           "%META:TOPICMOVED[{].*from=\\\"$attrWeb\.$attrTopic\\\".*[}]%";
-    } else {
+    }
+    else {
         $searchVal = "%META:" . uc($attrType) . "[{].*";
         $searchVal .= "name=\\\"$params->{name}\\\".*"
           if ( defined $params->{name} );
@@ -80,14 +82,16 @@ sub METASEARCH {
             noempty      => 'on',
             inline       => 1,
         );
-    } else {
+    }
+    else {
         my $searchObj = TWiki::Contrib::MoreFuncContrib::getSearchObj($session);
         die "No search object" unless $searchObj;
-        $text = TWiki::Contrib::MoreFuncContrib::getSearchObj($session)->searchWeb(
+        $text =
+          TWiki::Contrib::MoreFuncContrib::getSearchObj($session)->searchWeb(
             _callback => sub {
                 my $ref = shift;
                 $$ref .= join( ' ', @_ );
-                },
+            },
             _cbdata   => \$text,
             search    => $searchVal,
             web       => $searchWeb,
@@ -99,13 +103,14 @@ sub METASEARCH {
             noempty   => 'on',
             template  => 'searchmeta',
             inline    => 1,
-        );
+          );
     }
 
     my $attrTitle = $params->{title} || '';
     if ($text) {
         $text = $attrTitle . $text;
-    } else {
+    }
+    else {
         my $attrDefault = $params->{default} || '';
         $text = $attrTitle . $attrDefault;
     }

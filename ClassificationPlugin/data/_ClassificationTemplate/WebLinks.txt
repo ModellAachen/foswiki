@@ -2,19 +2,16 @@
 %META:TOPICPARENT{name="WebPreferences"}%
 ---+ %TOPIC%
 <verbatim class="tml">
-%STARTINCLUDE%<!-- weblinks -->
-<noautolink>
-%IF{
+%STARTINCLUDE%%IF{
   "context SolrPluginEnabled" 
-  then="$percntINCLUDE{\"%WEB%.%TOPIC%\" section=\"solrsimilar\"}$percnt"
-}%
-%DBCALL{"%WEB%.%TOPIC%" section="recentchanges"}%
-</noautolink>
-<!-- //weblinks -->%STOPINCLUDE%
+  then="$percntINCLUDE{\"%SYSTEMWEB%.SolrSideBar\"}$percnt"
+  else="$percntINCLUDE{\"%WEB%.%TOPIC%\" section=\"recentchanges\"}$percnt"
+}%%STOPINCLUDE%
 </verbatim>
+
 ---++ Recent changes
 <verbatim class="tml">
-%STARTSECTION{"recentchanges"}%<!-- recentchanges -->
+%STARTSECTION{"recentchanges"}%<noautolink>
 %DBQUERY{
  web="%BASEWEB%" 
  order="modified" 
@@ -29,38 +26,11 @@
          OBJECT=\"$web.$topic\"
          TYPE=\"plain\"
        }$percnt<!-- -->
-       $percntGETTOPICTITLE{\"$web.$topic\"}$percnt<br />
+       $expand(topictitle)<br />
        <span class='foswikiTopicInfo foswikiSmallish'>$formfield(Summary)</span>
        %CLEAR%
      </a>
    </li>"
 }%
-<!-- //recentchanges -->%ENDSECTION{"recentchanges"}%
-</verbatim>
----++ Solr
-<verbatim class="tml">
-%STARTSECTION{"solrsimilar"}%<!-- solrsimilar -->
-%SOLRSIMILAR{"id:%BASEWEB%.%BASETOPIC%"
-   filter="web:%BASEWEB% type:topic"
-   header="<h2>Similar Topics</h2>$n<ul>" 
-   footer="</ul>"
-   format="<li>
-       <a href='%SCRIPTURLPATH{"view"}%/$web/$topic' title='score: $score'>
-         $percntDBCALL{\"Applications.RenderTopicThumbnail\"
-           OBJECT=\"$web.$topic\"
-           TYPE=\"plain\"
-         }$percnt<!-- -->
-         <!-- -->$title
-         $percntDBQUERY{
-           header=\"<br /><span class='foswikiTopicInfo foswikiSmallish'>\"
-           topic=\"$web.$topic\" 
-           format=\"$formfield(Summary)\"
-           footer=\"</span>\"
-         }$percnt
-         %CLEAR%
-       </a>
-     </li>"
-   separator="$n"
-   rows="5"
-}%<!-- //solrsimilar -->%ENDSECTION{"solrsimilar"}%
+</noautolink>%ENDSECTION{"recentchanges"}%
 </verbatim>

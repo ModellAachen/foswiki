@@ -11,7 +11,7 @@
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details, published at 
+# GNU General Public License for more details, published at
 # http://www.gnu.org/copyleft/gpl.html
 #
 # =========================
@@ -41,24 +41,23 @@
 #   getSessionValueHandler  ( $key )                                1.010  Use only in one Plugin
 #   setSessionValueHandler  ( $key, $value )                        1.010  Use only in one Plugin
 #
-# initPlugin is required, all other are optional. 
+# initPlugin is required, all other are optional.
 # For increased performance, all handlers except initPlugin are
 # disabled. To enable a handler remove the leading DISABLE_ from
 # the function name. Remove disabled handlers you do not need.
 #
-# NOTE: To interact with TWiki use the official TWiki functions 
+# NOTE: To interact with TWiki use the official TWiki functions
 # in the TWiki::Func module. Do not reference any functions or
 # variables elsewhere in TWiki!!
-
 
 # =========================
 package TWiki::Plugins::MrdIdPlugin;
 
 # =========================
 use vars qw(
-        $web $topic $user $installWeb $VERSION $RELEASE $pluginName
-        $debug $initialIdValue
-    );
+  $web $topic $user $installWeb $VERSION $RELEASE $pluginName
+  $debug $initialIdValue
+);
 
 # This should always be $Rev$ so that TWiki can determine the checked-in
 # status of the plugin. It is used by the build automation tools, so
@@ -70,145 +69,152 @@ $VERSION = '$Rev$';
 # of the version number in PLUGINDESCRIPTIONS.
 $RELEASE = 'Dakar';
 
-$pluginName = 'MrdIdPlugin';  # Name of this Plugin
+$pluginName = 'MrdIdPlugin';    # Name of this Plugin
 
 # =========================
-sub initPlugin
-{
-   ( $topic, $web, $user, $installWeb ) = @_;
+sub initPlugin {
+    ( $topic, $web, $user, $installWeb ) = @_;
 
-   # check for versions
-   if( $TWiki::Plugins::VERSION < 1.021 ) {
-      TWiki::Func::writeWarning( "Version mismatch between $pluginName and Plugins.pm" );
-      return 0;
-   }
-   
-   # Get plugin debug flag
-   $debug = TWiki::Func::getPluginPreferencesFlag( "DEBUG" );
+    # check for versions
+    if ( $TWiki::Plugins::VERSION < 1.021 ) {
+        TWiki::Func::writeWarning(
+            "Version mismatch between $pluginName and Plugins.pm");
+        return 0;
+    }
 
-   # Get the initial ID value for new ID tags.
-   $initialIdValue = TWiki::Func::getPluginPreferencesValue( "STARTINGIDVALUE" ) || "1";
+    # Get plugin debug flag
+    $debug = TWiki::Func::getPluginPreferencesFlag("DEBUG");
 
-   # Plugin correctly initialized
-   TWiki::Func::writeDebug( "- TWiki::Plugins::${pluginName}::initPlugin( $web.$topic ) is OK" ) if $debug;
-   return 1;
+    # Get the initial ID value for new ID tags.
+    $initialIdValue = TWiki::Func::getPluginPreferencesValue("STARTINGIDVALUE")
+      || "1";
+
+    # Plugin correctly initialized
+    TWiki::Func::writeDebug(
+        "- TWiki::Plugins::${pluginName}::initPlugin( $web.$topic ) is OK")
+      if $debug;
+    return 1;
 }
-
 
 sub _getNextId {
-   my $tag = shift;
+    my $tag = shift;
 
-   my $id = $initialIdValue;
+    my $id = $initialIdValue;
 
-   # The file locking stuff is stolen from the ActionTrackerPlugin
-   my $uidRegister = TWiki::Func::getDataDir() . "/mrdIdReg";
-   my $lockFile = "$uidRegister.lock";
+    # The file locking stuff is stolen from the ActionTrackerPlugin
+    my $uidRegister = TWiki::Func::getDataDir() . "/mrdIdReg";
+    my $lockFile    = "$uidRegister.lock";
 
-   # Could do this using flock but it's not guaranteed to be implemented on all systems.
-   # COVERAGE OFF lock file wait
-   while (-f $lockFile) {
-      sleep(1);
-   }
-   # COVERAGE ON
+# Could do this using flock but it's not guaranteed to be implemented on all systems.
+# COVERAGE OFF lock file wait
+    while ( -f $lockFile ) {
+        sleep(1);
+    }
 
-   open(FH, ">$lockFile") or die "Locking $lockFile: $!";
-   print FH "locked\n";
-   close(FH);
+    # COVERAGE ON
 
-   my $ids = "";
-   if (-f $uidRegister) {
-      open(FH, "<$uidRegister") or die "Reading $uidRegister: $!";
-      $ids = <FH>;
-      chomp($ids);
-      close(FH);
-   }
+    open( FH, ">$lockFile" ) or die "Locking $lockFile: $!";
+    print FH "locked\n";
+    close(FH);
 
-   # The ids is a single line of colon separated IDs of the form :TAGAnum:TAGBnum:...
-   # where TAGX is the TAG and num is the last assigned number.
-   if ($ids =~ /(.*:$tag)(\d+)(.*)/) {
-      # found the ID, increment the count
-      $id = $2 + 1;
-      $ids = "$1$id$3";
-   }
-   else {
-      # A new ID, add it to the end
-      $ids .= ":$tag$id";
-   }
+    my $ids = "";
+    if ( -f $uidRegister ) {
+        open( FH, "<$uidRegister" ) or die "Reading $uidRegister: $!";
+        $ids = <FH>;
+        chomp($ids);
+        close(FH);
+    }
 
-   open(FH, ">$uidRegister") or die "Writing $uidRegister: $!";
-   print FH "$ids\n";
-   close(FH);
-   unlink($lockFile) or die "Unlocking $lockFile: $!";
+# The ids is a single line of colon separated IDs of the form :TAGAnum:TAGBnum:...
+# where TAGX is the TAG and num is the last assigned number.
+    if ( $ids =~ /(.*:$tag)(\d+)(.*)/ ) {
 
-   return $id;
-}
+        # found the ID, increment the count
+        $id  = $2 + 1;
+        $ids = "$1$id$3";
+    }
+    else {
 
+        # A new ID, add it to the end
+        $ids .= ":$tag$id";
+    }
 
-# =========================
-sub commonTagsHandler
-{
-### my ( $text, $topic, $web ) = @_;   # do not uncomment, use $_[0], $_[1]... instead
+    open( FH, ">$uidRegister" ) or die "Writing $uidRegister: $!";
+    print FH "$ids\n";
+    close(FH);
+    unlink($lockFile) or die "Unlocking $lockFile: $!";
 
-   TWiki::Func::writeDebug( "- ${pluginName}::commonTagsHandler( $_[2].$_[1] )" ) if $debug;
-
-   # This is the place to define customized tags and variables
-   # Called by TWiki::handleCommonTags, after %INCLUDE:"..."%
-
-   $_[0] =~ s/%MRDID{\s*[iI][dD]=\"(.*?)\"\s*}%/$1/g;
+    return $id;
 }
 
 # =========================
-sub beforeSaveHandler
-{
+sub commonTagsHandler {
 ### my ( $text, $topic, $web ) = @_;   # do not uncomment, use $_[0], $_[1]... instead
 
-   TWiki::Func::writeDebug( "- ${pluginName}::beforeSaveHandler( $_[2].$_[1] )" ) if $debug;
+    TWiki::Func::writeDebug("- ${pluginName}::commonTagsHandler( $_[2].$_[1] )")
+      if $debug;
 
-   # This handler is called by TWiki::Store::saveTopic just before the save action.
-   # New hook in TWiki::Plugins $VERSION = '1.010'
+    # This is the place to define customized tags and variables
+    # Called by TWiki::handleCommonTags, after %INCLUDE:"..."%
 
-   my $id;
-   my $tag;
-   my $rest;
-   my $text = "";
-   foreach my $line (split(/\r?\n/, $_[0])) {
-      if ($line =~ /^(.*?%MRDID{)(.*?)(}%.*)$/) {
-         $text .= $1;
-         $id    = $2;
-         $rest  = $3;
-         # if the ID contains a number, we're done
-         if ($id !~ /\d+/o) {
-            # no number so generate one
-            $tag = $id;
-            # the tag can take two forms depending on where it occurs. If it is in the
-            # main part of the page it will look like id="NNN". If it occurs in the meta
-            # data (like a form), it will look like id=%_Q_%NNN%_Q_%
-            if ($tag =~ /"/) {
-               $tag =~ s/.*?\s*[iI][dD]=\"(.*)\"\s*.*/$1/;
-               $id = _getNextId($tag);
-               $id = " id=\"$tag$id\" ";
+    $_[0] =~ s/%MRDID{\s*[iI][dD]=\"(.*?)\"\s*}%/$1/g;
+}
+
+# =========================
+sub beforeSaveHandler {
+### my ( $text, $topic, $web ) = @_;   # do not uncomment, use $_[0], $_[1]... instead
+
+    TWiki::Func::writeDebug("- ${pluginName}::beforeSaveHandler( $_[2].$_[1] )")
+      if $debug;
+
+# This handler is called by TWiki::Store::saveTopic just before the save action.
+# New hook in TWiki::Plugins $VERSION = '1.010'
+
+    my $id;
+    my $tag;
+    my $rest;
+    my $text = "";
+    foreach my $line ( split( /\r?\n/, $_[0] ) ) {
+        if ( $line =~ /^(.*?%MRDID{)(.*?)(}%.*)$/ ) {
+            $text .= $1;
+            $id   = $2;
+            $rest = $3;
+
+            # if the ID contains a number, we're done
+            if ( $id !~ /\d+/o ) {
+
+                # no number so generate one
+                $tag = $id;
+
+    # the tag can take two forms depending on where it occurs. If it is in the
+    # main part of the page it will look like id="NNN". If it occurs in the meta
+    # data (like a form), it will look like id=%_Q_%NNN%_Q_%
+                if ( $tag =~ /"/ ) {
+                    $tag =~ s/.*?\s*[iI][dD]=\"(.*)\"\s*.*/$1/;
+                    $id = _getNextId($tag);
+                    $id = " id=\"$tag$id\" ";
+                }
+                else {
+                    $tag =~ s/.*?\s*[iI][dD]=%_Q_%(.*)%_Q_%\s*.*/$1/;
+                    $id = _getNextId($tag);
+                    $id = " id=%_Q_%$tag$id%_Q_% ";
+                }
             }
-            else {
-               $tag =~ s/.*?\s*[iI][dD]=%_Q_%(.*)%_Q_%\s*.*/$1/;
-               $id = _getNextId($tag);
-               $id = " id=%_Q_%$tag$id%_Q_% ";
-            }
-         }
-         $text .= "$id$rest\n";
-      }
-      elsif ($line =~ /^(.*?%MRDID)(%.*)$/) {
-         $text .= $1;
-         $rest  = $2;
-         $tag = "";
-         $id = _getNextId($tag);
-         $id = "id=\"$tag$id\"";
-         $text .= "{ $id }$rest\n";
-      }
-      else {
-         $text .= "$line\n";
-      }
-   }
-   $_[0] = $text;
+            $text .= "$id$rest\n";
+        }
+        elsif ( $line =~ /^(.*?%MRDID)(%.*)$/ ) {
+            $text .= $1;
+            $rest = $2;
+            $tag  = "";
+            $id   = _getNextId($tag);
+            $id   = "id=\"$tag$id\"";
+            $text .= "{ $id }$rest\n";
+        }
+        else {
+            $text .= "$line\n";
+        }
+    }
+    $_[0] = $text;
 }
 
 1;

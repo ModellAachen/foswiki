@@ -15,21 +15,19 @@ sub loadExtraConfig {
 
 sub test_simpleWorkingExprs {
     my $this = shift;
-    my $t = Foswiki::Func::expandCommonVariables(
-        "%PERL{\"'A String'\"}%");
-    $this->assert_equals('A String', $t);
-    $t = Foswiki::Func::expandCommonVariables(
-        "%PERL{\"101 - 59\"}%");
-    $this->assert_equals(42, $t);
+    my $t    = Foswiki::Func::expandCommonVariables("%PERL{\"'A String'\"}%");
+    $this->assert_equals( 'A String', $t );
+    $t = Foswiki::Func::expandCommonVariables("%PERL{\"101 - 59\"}%");
+    $this->assert_equals( 42, $t );
     $t = Foswiki::Func::expandCommonVariables(
         "%PERL{\"sub x{95};x()\"}%...%PERL{\"x()+164\"}%");
-    $this->assert_equals("95...259", $t);
+    $this->assert_equals( "95...259", $t );
 }
 
 # Disabled due to a bug in the heredoc parser
 sub test_hereDoc {
     my $this = shift;
-    my $t = <<'DRAGONS';
+    my $t    = <<'DRAGONS';
 HERE%PERL{<<HERE}%DRAGONS
 my %x = ( a=>'%TOPIC%' );
 $x{a} =~ s/%/x/g;
@@ -39,65 +37,60 @@ HERE
 !
 DRAGONS
     $t = Foswiki::Func::expandCommonVariables($t);
-    $this->assert_equals("HERE BE DRAGONS!\n", $t);
+    $this->assert_equals( "HERE BE DRAGONS!\n", $t );
 }
 
 sub test_syntaxError {
     my $this = shift;
-    my $t = Foswiki::Func::expandCommonVariables(
-        '%PERL{"-~-1+~+"}%');
-    $this->assert_matches(
-        qr/class='foswikiAlert'>%PERL error: syntax error/, $t);
+    my $t    = Foswiki::Func::expandCommonVariables('%PERL{"-~-1+~+"}%');
+    $this->assert_matches( qr/class='foswikiAlert'>%PERL error: syntax error/,
+        $t );
 }
 
 sub test_strict {
     my $this = shift;
-    my $t = Foswiki::Func::expandCommonVariables(
-        '%PERL{"x"}%');
+    my $t    = Foswiki::Func::expandCommonVariables('%PERL{"x"}%');
     $this->assert_matches(
-        qr/class='foswikiAlert'>%PERL error: Bareword "x" not allowed/,
-        $t);
+        qr/class='foswikiAlert'>%PERL error: Bareword "x" not allowed/, $t );
 }
 
 sub test_die {
     my $this = shift;
-    my $t = Foswiki::Func::expandCommonVariables(
-        '%PERL{"die \'pig dog rabbit\'"}%');
-    $this->assert_matches(
-        qr/class='foswikiAlert'>%PERL error: pig dog rabbit/, $t);
+    my $t =
+      Foswiki::Func::expandCommonVariables('%PERL{"die \'pig dog rabbit\'"}%');
+    $this->assert_matches( qr/class='foswikiAlert'>%PERL error: pig dog rabbit/,
+        $t );
 }
 
 sub test_warn {
     my $this = shift;
-    my $t = Foswiki::Func::expandCommonVariables(
+    my $t    = Foswiki::Func::expandCommonVariables(
         '%PERL{"warn(\'pig\', \'dog\'); 2"}%');
-    $this->assert_matches(
-        qr/2\s*<.*?class='foswikiAlert'>pigdog at line 1/s, $t);
+    $this->assert_matches( qr/2\s*<.*?class='foswikiAlert'>pigdog at line 1/s,
+        $t );
 }
 
 sub test_STDOUT {
     my $this = shift;
-    my $t = Foswiki::Func::expandCommonVariables(
+    my $t    = Foswiki::Func::expandCommonVariables(
         '%PERL{"print STDOUT \'pig dog rabbit\';\'\'"}%');
-    $this->assert_matches(
-        qr/pig dog rabbit/s, $t);
+    $this->assert_matches( qr/pig dog rabbit/s, $t );
 }
 
 sub test_STDERR {
     my $this = shift;
-    my $t = Foswiki::Func::expandCommonVariables(
+    my $t    = Foswiki::Func::expandCommonVariables(
         '%PERL{"print STDERR \'were wolf\';666"}%');
-    $this->assert_matches(
-        qr/666\s*<.*?class='foswikiAlert'>were wolf<\/pre>/s, $t);
+    $this->assert_matches( qr/666\s*<.*?class='foswikiAlert'>were wolf<\/pre>/s,
+        $t );
 }
 
 sub test_arithmeticError {
     my $this = shift;
-    my $t = Foswiki::Func::expandCommonVariables(
+    my $t    = Foswiki::Func::expandCommonVariables(
         '%PERL{"my ($x, $y) = (1, 0); my $z = $x / $y; $z;"}%');
     $this->assert_matches(
-        qr/class='foswikiAlert'>%PERL error: Illegal division by zero/,
-        $t);
+        qr/class='foswikiAlert'>%PERL error: Illegal division by zero/, $t );
 }
 
 1;

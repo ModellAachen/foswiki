@@ -6,72 +6,17 @@
 %TMPL:DEF{"breadcrumbs::tail"}%%TMPL:P{"sep"}%<a href="%SCRIPTURLPATH{"view"}%/%BASEWEB%/%BASETOPIC%?%QUERYSTRING%">%MAKETEXT{"Tools"}%</a>%TMPL:END%
 
 %{ ################################################################################ }%
-%TMPL:DEF{"message"}% <!-- message -->
-%TMPL:P{"cacheform"}%
-%TMPL:P{"languageform"}%
-<!-- //message -->%TMPL:END%
+%TMPL:DEF{"message"}% <span class='foswikiAlert'>deprecated use of template '%URLPARAM{"template" default="more"}%'</span>%TMPL:END%
 
 %{ ################################################################################ }%
-%TMPL:DEF{"content"}%<!-- content -->
+%TMPL:DEF{"content"}%<!-- -->
 %BUTTON{
   "%MAKETEXT{"Close"}%" 
   class="foswikiRight simple"
   target="%BASEWEB%.%BASETOPIC%" 
   icon="cross"
 }%
-%TMPL:P{"contenttitle"}%<!-- contenttitle// -->
-%TMPL:P{"message"}%<!-- message// -->
-<!-- // content -->%TMPL:END%
-
-%{ ################################################################################ }%
-%TMPL:DEF{"cacheform"}%<!-- cacheform -->
-<div class="foswikiFormSteps" style="%IF{"not {Cache}{Enabled}" then="display:none"}%">
-  <div class="foswikiFormStep">
-    <h2>%MAKETEXT{"Refresh topic caching"}%</h2>
-    %MAKETEXT{"Get a fresh page of the topic [_1]" args="[[%BASEWEB%.%BASETOPIC%]]"}%&nbsp;
-  </div>
-  <div class="foswikiFormStep foswikiFormButtons foswikiFormLast">
-    %BUTTON{"%MAKETEXT{"Refresh"}%" icon="arrow_refresh" target="%SCRIPTURLPATH{"view"}%/%BASEWEB%/%BASETOPIC%?refresh=on" }%
-    %CLEAR%
-  </div>
-</div>
-
-<div class="foswikiFormSteps" style="%IF{"not {Cache}{Enabled}" then="display:none"}%">
-  <div class="foswikiFormStep">
-    <h2>Dependencies</h2>
-    %MAKETEXT{"List of topics the current depends on."}%
-  </div>
-  <div id="dependencies" class="foswikiFormStep foswikiFormButtons foswikiFormLast">
-    %BUTTON{"Show Dependencies" 
-      onclick="jQuery(this).find('.jqButtonIcon').css('background-image','url(%PUBURLPATH%/%SYSTEMWEB%/JQueryPlugin/images/spinner.gif)');jQuery('#dependencies').load('%SCRIPTURLPATH{"rest"}%/RenderPlugin/tag?name=DISPLAYDEPENDENCIES;topic=%BASEWEB%.%BASETOPIC%;render=on');return false;"
-      icon="page_white_stack"
-    }%
-    %CLEAR%
-  </div>
-</div>
-<!-- //cacheform -->%TMPL:END%
-
-%{ ################################################################################ }%
-%TMPL:DEF{"languageform"}%<!-- languageform -->
-<div class="foswikiFormSteps" style='%IF{"context i18n_enabled" then="" else="display:none"}%'>
-  <form name="changelanguage" action="%SCRIPTURLPATH{"oops"}%/%BASEWEB%/%BASETOPIC%" method="post">
-    <input type="hidden" name="template" value="oopslanguagechanged" />
-    <input type="hidden" name="refresh" value="on" />
-    <div class="foswikiFormStep">
-      <h2>%MAKETEXT{"Change interface language"}%</h2>
-      <select name="language">
-      <option value="default">Default</option>
-      %LANGUAGES{format="<option $marker value=\"$langtag\">$langname</option>" selection="%LANGUAGE%" separator=" "}%
-      </select>
-
-      <input type="checkbox" class="foswikiCheckbox" name="todefault" id="todefault" onclick="document.changelanguage.language.value = (this.checked)?'default':'%LANGUAGE%';this.blur();">
-      <label for="todefault">%MAKETEXT{"Default language"}%</label>
-    </div>
-    <div class="foswikiFormStep foswikiFormButtons foswikiFormLast">
-      %BUTTON{"%MAKETEXT{"Submit"}%" type="save" icon="world"}%
-      %CLEAR%
-    </div>
-  </form>
-</div>
-<!-- //languageform -->%TMPL:END%
+%TMPL:P{"contenttitle"}%<!-- -->
+%TMPL:P{"message"}%<!-- -->
+<!-- -->%TMPL:END%
 

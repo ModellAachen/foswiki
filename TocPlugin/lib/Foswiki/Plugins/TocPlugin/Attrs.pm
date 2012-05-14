@@ -11,7 +11,7 @@
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details, published at 
+# GNU General Public License for more details, published at
 # http://www.gnu.org/copyleft/gpl.html
 #
 
@@ -24,20 +24,23 @@ use integer;
 # Parse a standard attribute string containing name=value pairs. The
 # value may be a word or a quoted string (no escapes!)
 sub new {
-    my ($class, $string) = @_;
+    my ( $class, $string ) = @_;
     my $this = {};
 
-    if (defined($string)) {
+    if ( defined($string) ) {
+
         # name="value" pairs
-        while ($string =~ s/([a-z]+)\s*=\s*\"([^\"]*)\"//o) {
+        while ( $string =~ s/([a-z]+)\s*=\s*\"([^\"]*)\"//o ) {
             $this->{$1} = $2;
         }
+
         # name=value pairs
-        while ($string =~ s/([a-z]+)\s*=\s*([^\s,\}]*)//o) {
+        while ( $string =~ s/([a-z]+)\s*=\s*([^\s,\}]*)//o ) {
             $this->{$1} = $2;
         }
+
         # simple name with no value (boolean)
-        while ($string =~ s/([a-z]+)//o) {
+        while ( $string =~ s/([a-z]+)//o ) {
             $this->{$1} = 1;
         }
     }
@@ -46,13 +49,13 @@ sub new {
 
 # PUBLIC Get an attr value; return undef if not set
 sub get {
-    my ($this, $attr) = @_;
+    my ( $this, $attr ) = @_;
     return $this->{$attr};
 }
 
 # PUBLIC Set an attr value; return previous value
 sub set {
-    my ($this, $attr, $val) = @_;
+    my ( $this, $attr, $val ) = @_;
     my $oval = $this->get($attr);
     $this->{$attr} = $val;
     return $oval;

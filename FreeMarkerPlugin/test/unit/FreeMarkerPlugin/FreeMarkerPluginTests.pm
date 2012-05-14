@@ -5,7 +5,7 @@ use strict;
 use Foswiki;
 use Foswiki::Func;
 
-my $DEBUG     = 0;
+my $DEBUG = 0;
 
 sub new {
     my $self = shift()->SUPER::new( 'FreeMarkerPluginTests', @_ );
@@ -31,15 +31,18 @@ sub set_up {
 sub test_empty {
     my ($this) = @_;
 
-	my $text;
-	my $actual;
-	my $expected;
-	
-	$text = '%STARTFREEMARKER{}%%ENDFREEMARKER%';
-	
-   	$actual =
-      Foswiki::Func::expandCommonVariables( $text, $this->{test_topic}, $this->{test_web} );
-    $actual = Foswiki::Func::renderText( $actual, $this->{test_web}, $this->{test_topic} );
+    my $text;
+    my $actual;
+    my $expected;
+
+    $text = '%STARTFREEMARKER{}%%ENDFREEMARKER%';
+
+    $actual =
+      Foswiki::Func::expandCommonVariables( $text, $this->{test_topic},
+        $this->{test_web} );
+    $actual =
+      Foswiki::Func::renderText( $actual, $this->{test_web},
+        $this->{test_topic} );
 
     $expected = '';
 
@@ -56,17 +59,20 @@ sub test_empty {
 sub test_assign_no_input {
     my ($this) = @_;
 
-	my $text;
-	my $actual;
-	my $expected;
-	
-	$text = '%STARTFREEMARKER{}%<#assign name>John</#assign>
+    my $text;
+    my $actual;
+    my $expected;
+
+    $text = '%STARTFREEMARKER{}%<#assign name>John</#assign>
 ${name}
 %ENDFREEMARKER%';
-	
-   	$actual =
-      Foswiki::Func::expandCommonVariables( $text, $this->{test_topic}, $this->{test_web} );
-    $actual = Foswiki::Func::renderText( $actual, $this->{test_web}, $this->{test_topic} );
+
+    $actual =
+      Foswiki::Func::expandCommonVariables( $text, $this->{test_topic},
+        $this->{test_web} );
+    $actual =
+      Foswiki::Func::renderText( $actual, $this->{test_web},
+        $this->{test_topic} );
 
     $expected = 'John';
 
@@ -83,16 +89,19 @@ ${name}
 sub test_substitute_with_input {
     my ($this) = @_;
 
-	my $text;
-	my $actual;
-	my $expected;
-	
-	$text = '%STARTFREEMARKER{name="John"}%${name}
+    my $text;
+    my $actual;
+    my $expected;
+
+    $text = '%STARTFREEMARKER{name="John"}%${name}
 %ENDFREEMARKER%';
-	
-   	$actual =
-      Foswiki::Func::expandCommonVariables( $text, $this->{test_topic}, $this->{test_web} );
-    $actual = Foswiki::Func::renderText( $actual, $this->{test_web}, $this->{test_topic} );
+
+    $actual =
+      Foswiki::Func::expandCommonVariables( $text, $this->{test_topic},
+        $this->{test_web} );
+    $actual =
+      Foswiki::Func::renderText( $actual, $this->{test_web},
+        $this->{test_topic} );
 
     $expected = 'John';
 
@@ -109,18 +118,22 @@ sub test_substitute_with_input {
 sub test_substitute_with_input_more_complex {
     my ($this) = @_;
 
-	my $text;
-	my $actual;
-	my $expected;
-	
-	$text = '%STARTFREEMARKER{headline="Welcome!" depth="4" class="foswikiHelp"}%<#if headline??>
+    my $text;
+    my $actual;
+    my $expected;
+
+    $text =
+'%STARTFREEMARKER{headline="Welcome!" depth="4" class="foswikiHelp"}%<#if headline??>
 <h${depth} class="${class}">${headline}</h${depth}>
 </#if>
 %ENDFREEMARKER%';
-	
-   	$actual =
-      Foswiki::Func::expandCommonVariables( $text, $this->{test_topic}, $this->{test_web} );
-    $actual = Foswiki::Func::renderText( $actual, $this->{test_web}, $this->{test_topic} );
+
+    $actual =
+      Foswiki::Func::expandCommonVariables( $text, $this->{test_topic},
+        $this->{test_web} );
+    $actual =
+      Foswiki::Func::renderText( $actual, $this->{test_web},
+        $this->{test_topic} );
 
     $expected = '<h4 class="foswikiHelp">Welcome!</h4>';
 
@@ -137,18 +150,21 @@ sub test_substitute_with_input_more_complex {
 sub test_input_list {
     my ($this) = @_;
 
-	my $text;
-	my $actual;
-	my $expected;
-	
-	$text = '%STARTFREEMARKER{users="[Ashton, Bonny, Zeta]"}%<#list users as x>
+    my $text;
+    my $actual;
+    my $expected;
+
+    $text = '%STARTFREEMARKER{users="[Ashton, Bonny, Zeta]"}%<#list users as x>
 - ${x}
 </#list>
 %ENDFREEMARKER%';
-	
-   	$actual =
-      Foswiki::Func::expandCommonVariables( $text, $this->{test_topic}, $this->{test_web} );
-    $actual = Foswiki::Func::renderText( $actual, $this->{test_web}, $this->{test_topic} );
+
+    $actual =
+      Foswiki::Func::expandCommonVariables( $text, $this->{test_topic},
+        $this->{test_web} );
+    $actual =
+      Foswiki::Func::renderText( $actual, $this->{test_web},
+        $this->{test_topic} );
     $expected = '- Ashton
 - Bonny
 - Zeta';
@@ -166,17 +182,20 @@ sub test_input_list {
 sub test_input_hash {
     my ($this) = @_;
 
-	my $text;
-	my $actual;
-	my $expected;
-	
-	$text = '%STARTFREEMARKER{
+    my $text;
+    my $actual;
+    my $expected;
+
+    $text = '%STARTFREEMARKER{
 vars="[{color:red, value:255},{color:green, value:100}]"}%${vars[1].color}
 %ENDFREEMARKER%';
-	
-   	$actual =
-      Foswiki::Func::expandCommonVariables( $text, $this->{test_topic}, $this->{test_web} );
-    $actual = Foswiki::Func::renderText( $actual, $this->{test_web}, $this->{test_topic} );
+
+    $actual =
+      Foswiki::Func::expandCommonVariables( $text, $this->{test_topic},
+        $this->{test_web} );
+    $actual =
+      Foswiki::Func::renderText( $actual, $this->{test_web},
+        $this->{test_topic} );
 
     $expected = 'green';
 
@@ -193,11 +212,11 @@ vars="[{color:red, value:255},{color:green, value:100}]"}%${vars[1].color}
 sub test_input_hash_with_arrays {
     my ($this) = @_;
 
-	my $text;
-	my $actual;
-	my $expected;
-	
-	$text = '%STARTFREEMARKER{
+    my $text;
+    my $actual;
+    my $expected;
+
+    $text = '%STARTFREEMARKER{
 vars="{
 	users    : [ Joe,    Fred ],
 	admins   : [ Julia,  Kate ],
@@ -206,10 +225,13 @@ vars="{
 - ${person}
 </#list>
 %ENDFREEMARKER%';
-	
-   	$actual =
-      Foswiki::Func::expandCommonVariables( $text, $this->{test_topic}, $this->{test_web} );
-    $actual = Foswiki::Func::renderText( $actual, $this->{test_web}, $this->{test_topic} );
+
+    $actual =
+      Foswiki::Func::expandCommonVariables( $text, $this->{test_topic},
+        $this->{test_web} );
+    $actual =
+      Foswiki::Func::renderText( $actual, $this->{test_web},
+        $this->{test_topic} );
 
     $expected = '- Joe
 - Fred
@@ -227,6 +249,7 @@ vars="{
 =pod
 
 =cut
+
 =pod
 sub _test_example {
     my ($this) = @_;

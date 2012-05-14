@@ -316,7 +316,7 @@ for more robustness.
 | queryfields | list of fields and their boosts giving each field a significance when a term was found in them. the format supported is fieldOne^2.3 fieldTwo fieldThree^0.4, which indicates that fieldOne has a boost of 2.3, fieldTwo has the default boost, and fieldThree has a boost of 0.4 ... this indicates that matches in fieldOne are much more significant than matches in fieldTwo, which are more significant than matches in fieldThree | see solrconfig.xml and %SYSTEMWEB%.SolrSearchBaseTemplate |
 | phrasefields | list of fields and their boosts similar to =queryfields=. this parameter may contain fields and boosts that _pharses_ (specified in quotes) are matched against. boosting those fields higher than their counterpart in =queryfields= allows you to prefer phrase matches over separate word matches | see solrconfig.xml and %SYSTEMWEB%.SolrSearchBaseTemplate |
 | *Faceting:* |||
-| facets | list of facets to be rendered during search; each facet can be a =title=name= pair specifying the facet name and the title label used to display it in the result; example: %BR% =%MAKETEXT<nop>{"Webs"}%=web, %MAKETEXT<nop>{"Applications"}%=field_TopicType_lst= | |
+| facets | list of facets to be rendered during search; each facet can be a =title=name= pair specifying the facet name and the title label used to display it in the result; example: %BR% =%MAKETEXT<nop>{"Webs"}%=web, %MAKETEXT<nop>{"Topic type"}%=field_TopicType_lst= | |
 | facetquery | query to be used for a facet query | |
 | facetoffset | used to page through a list of facets being returned by a search | |
 | facetlimit | maximum number of values to be displayed per facet; this is a list of pairs =name=integer= specifying a per-facet limit; example: =50, tag=100, contributor=10, category=10= will constraint the global limit of facet values to be returned to 50, tags to 100, list the top 10 contributors in the hit set as well as the 10 most used categories | 100 |
@@ -505,7 +505,7 @@ useful for spacial search.
 | spell | text_spell | multivalued | | used for spellchecking |
 | id | string | | stored | unique identifier for each document; this is the _external_ id usable in applications; there's an internal solr document id not related to this field |
 | collection | string | | stored | identifies a set of documents comming from the same content collection; by default all content stored in Foswiki (topics and attachments) is gathered in the =wiki= collection set in =Foswiki::cfg{SolrPlugin}{DefaultCollection}= |
-| language | string | | stored | language of the current document; this is derived from  =Foswiki::cfg{Site}{Locale}= but may be overwritten using the =CONTENT_LANGUAGE= preference |
+| language | string | | stored | language of the current document; this may be specified explicitly using the =CONTENT_LANGUAGE= preference, or set to "detect" to let the solr update chain detect the language automatically |
 | url | string | | stored | url used to  access the document being indexed |
 | type | type | | stored | holds the type facet of the document; this is "image" for all kinds of images, "video" for all kinds of videos, "topic" for Foswiki topics and the verbatim file extension for everything else; note: plugins like Foswiki:Extensions/MetaCommentPlugin might use specific types as well (like "comment" in this case) |
 | web | string | | stored | name of the web this document is located in |

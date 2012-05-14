@@ -13,18 +13,12 @@
   color:#444;
   font-family: Arial, 'Liberation Sans', FreeSans, sans-serif;
   font-size:13px;
-  line-height:1.39;
-}
-.natLoginBody {
-  background:#fff;
+  line-height:1.39em;
 }
 .foswikiEmulatedLink,
 a {
   color:#0055b5;
   text-decoration:underline;
-}
-.foswikiGrayText {
-  color:#808080;
 }
 .treeview a:hover,
 a:hover {
@@ -74,13 +68,6 @@ h1,
 }
 .blogCategoryTitle h1 a:hover {
   color:#fff;
-}
-.blogEntriesSticky {
-  background-color:#f5f5f5;
-  border:1px solid #e7e7e7;
-          border-radius: 5px;
-     -moz-border-radius: 5px; 
-  -webkit-border-radius: 5px; 
 }
 ul, ol {
   margin:1.3846em 0em 1.3846em 3.0769em; 
@@ -133,6 +120,9 @@ dt {
   background-repeat:repeat-x;
   background-position:0% 100%;
   padding:1.3846em 2.3076em 2.3076em;
+}
+.natPrintBody .natBodyContents {
+  margin:0px !important;
 }
 .natPrintBody .natMiddle {
   background-image:none;
@@ -212,11 +202,6 @@ dt {
 }
 .natWebMenu {
   padding-left:2.3076em; /* 30px */
-}
-
-/* ie7 fix */
-*:first-child+html .natBodyOff .natWebMenu ul {
-  height:32px;
 }
 
 .natMoreActionsMenu h3 {
@@ -370,30 +355,47 @@ dt {
   margin-top:0px;
 }
 
+.natLogin {
+  border:1px solid #d6d6d6;
+          border-radius:5px;
+     -moz-border-radius:5px;
+  -webkit-border-radius:5px;
+  background:#fff;
+          box-shadow: 0pt 2px 5px rgba(105, 105, 105,  0.7), 0px 0px 8px 5px rgba(247, 247, 247, 0.4) inset;
+     -moz-box-shadow: 0pt 2px 5px rgba(105, 105, 105,  0.7), 0px 0px 8px 5px rgba(247, 247, 247, 0.4) inset;
+  -webkit-box-shadow: 0pt 2px 5px rgba(105, 105, 105,  0.7), 0px 0px 8px 5px rgba(247, 247, 247, 0.4) inset;
+/*
+  -moz-box-shadow: 0px 3px 10px #bcbcbc;
+  -webkit-box-shadow: 0px 3px 10px #bcbcbc;
+  box-shadow: 0px 3px 10px #bcbcbc;
+*/
+}
+
+.natContact {
+  position:absolute;
+  bottom:-45px;
+  width:100%;
+  text-align:center;
+}
+
+.natLoginHeading {
+  position:absolute;
+  top:-45px;
+  width:100%;
+  color:#C60206;
+  margin-left:1em;
+}
+
 .natLogin .foswikiFormSteps {
-  background-color:#f6f6f6;
+  background-color:transparent;
   background-image:url(login_keys.png);
   background-repeat:no-repeat;
-  background-position:1.3em 0em;
+  background-position:1em 0em;
   margin:0px;
   border:0px;
-  border-left:2px solid #d6d6d6;
-  border-right:2px solid #d6d6d6;
-  border-bottom:2px solid #d6d6d6;
-}
-#natLoginBanner {
-  background:#e5e5e5;
-  color:#9C3063;
-  font-weight:bold;
-  margin:0px;
-  padding:13px 19px;
-  border-top:2px solid #d6d6d6;
-  border-left:2px solid #d6d6d6;
-  border-right:2px solid #d6d6d6;
-  border-bottom:1px solid #d6d6d6;
 }
 .natLogin .foswikiFormStep {
-  margin-left:12em;
+  margin-left:10em;
 }
 
 .natLogin #username,
@@ -802,10 +804,10 @@ td .foswikiFormDescription {
   padding:25px 0em 0em 2.3077em; /* 25px 0 0 30px */
 }
 .natTopRightContents {
-  padding:25px 2.3077em 0em 0em; /* 25px 30px 0 0 */
+  padding:40px 2.3077em 0em 0em; /* 40px 30px 0 0 */
 }
-.natWebTitle a span {
-  display:none;
+.natWebLogoName {
+  font-size:1.8em;
 }
 .natWebTitle a {
   float:left;
@@ -1028,21 +1030,19 @@ td .foswikiFormDescription {
   padding-left:0px;
 }
 
-.natSearchBox {
-  margin-top:1em;
-}
 .natSideBar .natSearchBox {
   margin:0px -1em;
   padding:0.3846em; /* 5px */
 }
 .natSearchBox form {
   position:relative;
-  padding-right:10px;
+  padding:0px;
 }
 .natSearchBox .foswikiInputField {
   color:#aaa; 
   background-position:0px 0px;
   padding:4px 0px 3px 5px;
+  margin:-4px 0px -3px -5px;
   /*width:11.5em;*/
 }
 
@@ -1054,7 +1054,7 @@ td .foswikiFormDescription {
   width:24px;
   height:24px;
   top:50%;
-  right:3px;
+  right:0px;
   margin:-12px 0px 0px 0px;
   border:0;
   padding:0;
@@ -1116,11 +1116,8 @@ h2 .foswikiTopicSummary {
 .natSyndicate {
   display:inline;
 }
-.natBottomBar {
-  padding:2.3076em;
-}
 .natBottomBarContents {
-  width:100%;
+  padding:2.3076em;
   text-align:left;
 }
 .natPageCacheBanner,
@@ -1133,6 +1130,7 @@ h2 .foswikiTopicSummary {
   margin-bottom:2.769em; /* 36 px*/
 }
 .natPageCacheBanner {
+  text-align:center;
   margin-top:2.769em; /* 36 px*/
 }
 .natCopyRight {

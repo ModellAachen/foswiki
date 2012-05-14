@@ -1,4 +1,4 @@
-%META:TOPICINFO{author="ProjectContributor" date="1275569295" format="1.1" reprev="2" version="3"}%
+%META:TOPICINFO{author="ProjectContributor" comment="reprev" date="1329397662" format="1.1" reprev="5" version="5"}%
 %META:TOPICPARENT{name="WebHome"}%
 ---+!! <nop>%WEB% Web Preferences
 
@@ -11,18 +11,18 @@
 
 ---++ Supplemental topics
    * WebTopicEditTemplate: template for new topics
-   * WebMenu: horizontal navitation
-   * WebLinks: sidebar links
-   * WebSideBar: sidebar navigation
+   * WebMenu: horizontal navitation (overrides %USERSWEB%.SiteMenu or %SYSTEMWEB%.SiteMenu)
+   * WebLinks: sidebar links (overrides %USERSWEB%.SiteLinks or %SYSTEMWEB%.SiteLinks)
+   * WebSideBar: sidebar navigation: (overrides %USERSWEB%.SiteSideBar or %SYSTEMWEB%.SiteSideBar)
 
 ---++ Application settings
-   * Set WEBFORMS = Applications.WikiTopic, Applications.ClassificationApp.ClassifiedTopic, Applications.ClassificationApp.CategorizedTopic, Applications.ClassificationApp.TaggedTopic
+   * Set WEBFORMS = Applications.ClassificationApp.ClassifiedTopic
 
 ---++ !ClassificationPlugin settings
    * #Set CLASSIFICATIONPLUGIN_AUTOREPARENT = on
 
 ---++ Cache settings
-   * Set WEBDEPENDENCIES = WebHome, WebTopicList, WebIndex, WebChanges, CategoryBrowser, WebRss, WebAtom, WebSearch
+   * Set WEBDEPENDENCIES = WebHome, WebTopicList, WebChanges, WebRss, WebAtom, WebSearch
 
 ---++ Access rights
 *Web*:

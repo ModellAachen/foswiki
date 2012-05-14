@@ -19,11 +19,14 @@
 =cut
 
 package Foswiki::Plugins::MongoDBPlugin::Meta;
-use Foswiki::Plugins::MongoDBPlugin;
+use strict;
+use warnings;
+
+use Foswiki::Plugins::MongoDBPlugin qw(writeDebug);
 
 #use Foswiki::Plugins::MongoDBPlugin::DB;
 
-use Foswiki::Meta;
+use Foswiki::Meta();
 
 #use Foswiki::Form;
 #our @ISA = ('Foswiki::Form');
@@ -31,7 +34,7 @@ use Foswiki::Meta;
 our @ISA = ('Foswiki::Meta');
 
 # Always use strict to enforce variable scoping
-use strict;
+use constant TRACE => 0;
 
 sub new {
     my $class   = shift;
@@ -43,7 +46,7 @@ sub new {
     #my $meta = new Foswiki::Meta($session, $web, $topic );
     my $meta = $class->SUPER::new( $session, $web, $topic );
 
-    #print STDERR ": make me a new MongoDB::Meta with $web.$topic \n";
+    writeDebug( "new $web.$topic", 3 ) if TRACE;
 
 #TODO: if $data is undef - see if its in mongoDB already, and if so, load it... ((OR... this should happen in the load/ mess))
 
@@ -108,7 +111,9 @@ sub reload {
             }
         );
 
-#print STDERR "----- meta->reload(".join(',', ($this->{_web}, $this->{_topic}, $rev))."\n";
+        writeDebug(
+            "reload(" . join( ',', ( $this->{_web}, $this->{_topic}, $rev ) ) )
+          if TRACE;
     }
     else {
         $data = $collection->find_one(
@@ -119,17 +124,24 @@ sub reload {
             }
         );
 
-#print STDERR "----- meta->reload(".join(',', ($this->{_web}, $this->{_topic}, 'norev'))."\n";
+        writeDebug( "reload("
+              . join( ',', ( $this->{_web}, $this->{_topic}, 'norev' ) ) )
+          if TRACE;
     }
 
     $this->loadFromBSONData($data);
+    writeDebug("loadedRev: $this->{_loadedRev}") if TRACE;
+
+    return;
 }
 
 sub loadFromBSONData {
     my $this = shift;
     my $data = shift;
 
-#print STDERR "======== loadFromBSONData (".$data->{_web}.")(".$data->{_topic}.")\n";
+    writeDebug(
+        ( $data->{_web} || 'undef' ) . '.' . ( $data->{_topic} || 'undef' ), 4 )
+      if TRACE;
 
     my @validKeys = keys(%Foswiki::Meta::VALIDATE);
 
@@ -140,7 +152,11 @@ sub loadFromBSONData {
         next unless ( defined( $data->{$key} ) );
         if ( $Foswiki::Meta::isArrayType{$key} ) {
 
-#print STDERR "---- $key == many (".scalar(@{$data->{$key}->{'__RAW_ARRAY'}}).")\n";
+            writeDebug(
+                "$key == many ("
+                  . scalar( @{ $data->{$key}->{'__RAW_ARRAY'} } ) . ")",
+                5
+            ) if TRACE;
             ##$this->{$key} = $data->{$key}->{'__RAW_ARRAY'};
             if ( defined( $data->{$key}->{'__RAW_ARRAY'} )
                 && scalar( @{ $data->{$key}->{'__RAW_ARRAY'} } ) > 0 )
@@ -156,8 +172,10 @@ sub loadFromBSONData {
         }
     }
 
-    #use Data::Dumper;
-    #print STDERR "--- FIELD: ".Dumper($this->{TOPICINFO})."\n";
+    require Data::Dumper if TRACE;
+    writeDebug( "TOPICINFO: " . Data::Dumper->Dump( [ $this->{TOPICINFO} ] ),
+        4 )
+      if TRACE;
     $this->{_text} = $data->{_text};
 
     #$this->{_indices} = $data->{_indices};

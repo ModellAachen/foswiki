@@ -124,10 +124,10 @@ sub manageInteraction {
     $_->blocking(0) foreach @_;
 
     my ( $inref, $outref, $error, $cgiState, $cgiBodyLeft, $done );
-    $inref = $this->{input_ref};
-    $outref = \'';
+    $inref    = $this->{input_ref};
+    $outref   = \'';
     $cgiState = 'headers';
-    $done = 0;
+    $done     = 0;
     my $clBodyLeft = -length($$inref);
     $clBodyLeft += $this->{headers}->content_length
       if $this->{headers}->content_length;
@@ -184,22 +184,23 @@ sub manageInteraction {
                 $rv = $cgih->add($outref);
                 if ($rv) {
                     my $res = HTTP::Response->new();
-                    if ($cgih->headers->content_type) {
+                    if ( $cgih->headers->content_type ) {
                         $res->code(200);
-                        $res->headers($cgih->headers);
+                        $res->headers( $cgih->headers );
                         $$outref = $res->as_string . $$outref;
                     }
-                    elsif ($cgih->headers->header('Location')) {
+                    elsif ( $cgih->headers->header('Location') ) {
                         $res->code(302);
-                        $res->headers($cgih->headers);
+                        $res->headers( $cgih->headers );
                         $$outref = $res->as_string . $$outref;
                     }
-                    elsif ($cgih->headers->header('Status')) {
-                        $res->code($cgih->hedaers->header('Status'));
-                        $res->headers($cgih->headers);
+                    elsif ( $cgih->headers->header('Status') ) {
+                        $res->code( $cgih->hedaers->header('Status') );
+                        $res->headers( $cgih->headers );
                         $$outref = $res->as_string . $$outref;
                     }
                     else {
+
                         # Error 500
                     }
                 }

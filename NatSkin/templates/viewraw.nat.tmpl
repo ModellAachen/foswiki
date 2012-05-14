@@ -8,7 +8,7 @@
     <textarea class="foswikiTextarea" rows="20" cols="80" style="width:99%; height:460px; resize:none;" readonly></textarea>
   </div>
  <a class="jqUIDialogButton {icon:'ui-icon-newwin', click: function() { window.location.href='%SCRIPTURL{"view"}%/%BASEWEB%/%BASETOPIC%?raw=text&skin=text&contenttype=text/plain&rev=%URLPARAM{"rev"}%'; }}">%MAKETEXT{"Open in separate window"}%</a>
- <a class="jqUIDialogButton {icon:'ui-icon-cancel', click: function() { $(this).dialog('close'); }}">%MAKETEXT{"Close"}%</a>
+ <a class="jqUIDialogButton jqUIDialogClose {icon:'ui-icon-cancel'}">%MAKETEXT{"Close"}%</a>
 </div>
 </noautolink>%TMPL:END%
 

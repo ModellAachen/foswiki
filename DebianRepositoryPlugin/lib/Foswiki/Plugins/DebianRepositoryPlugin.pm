@@ -22,37 +22,40 @@ package Foswiki::Plugins::DebianRepositoryPlugin;
 # Always use strict to enforce variable scoping
 use strict;
 
-require Foswiki::Func;    # The plugins API
-require Foswiki::Plugins; # For the API version
-require Foswiki::Sandbox; # for running external commands
+require Foswiki::Func;       # The plugins API
+require Foswiki::Plugins;    # For the API version
+require Foswiki::Sandbox;    # for running external commands
 
 our $VERSION = '$Rev: 7889 $'; # must be like this because of a Foswiki restriction
-our $RELEASE = '0.1.0';
-our $SHORTDESCRIPTION = 'automatically creates a Debian repository listing .deb attachments';
+our $RELEASE = '0.2.0';
+our $SHORTDESCRIPTION =
+  'automatically creates a Debian repository listing .deb attachments';
 our $NO_PREFS_IN_TOPIC = 1;
 
 use Cwd;
 use File::Basename;
 use vars qw(
-   $debian_repository_tool
-   $initialization_error_message
+  $debian_repository_tool
+  $initialization_error_message
 );
 
 BEGIN {
-   $debian_repository_tool = Cwd::abs_path(dirname(__FILE__) . '/../../../tools/debian-repository');
-   my ($output, $exit) = Foswiki::Sandbox->sysCommand("$debian_repository_tool --check-dependencies");
-   if ($exit > 0) {
-      $initialization_error_message = $output;
-   }
+    $debian_repository_tool =
+      Cwd::abs_path( dirname(__FILE__) . '/../../../tools/debian-repository' );
+    my ( $output, $exit ) = Foswiki::Sandbox->sysCommand(
+        "$debian_repository_tool --check-dependencies");
+    if ( $exit > 0 ) {
+        $initialization_error_message = $output;
+    }
 }
 
 sub initPlugin {
-    my( $topic, $web, $user, $installWeb ) = @_;
+    my ( $topic, $web, $user, $installWeb ) = @_;
 
     # check for Plugins.pm versions
-    if( $Foswiki::Plugins::VERSION < 2.0 ) {
+    if ( $Foswiki::Plugins::VERSION < 2.0 ) {
         Foswiki::Func::writeWarning( 'Version mismatch between ',
-                                     __PACKAGE__, ' and Plugins.pm' );
+            __PACKAGE__, ' and Plugins.pm' );
         return 0;
     }
 
@@ -61,19 +64,31 @@ sub initPlugin {
 }
 
 sub earlyInitPlugin {
-   return $initialization_error_message;
+    return $initialization_error_message;
 }
 
 sub afterAttachmentSaveHandler {
-   my( $attrHashRef, $topic, $web ) = @_;
-   my $filename = $attrHashRef->{attachment};
-   if ($filename =~ /\.deb$/) {
-      my $webPubDir = $Foswiki::cfg{PubDir} . '/' . $web;
-      my $topics = Foswiki::Func::getPreferencesValue('DEBIAN_REPOSITORY_TOPICS', $web);
-      my @topics = grep { $_ =~ m/$Foswiki::regex{webNameRegex}/ } split(/\s+/, $topics);
-      my $command = "$debian_repository_tool %DIRECTORY|F%" . (join(' ', map { ' ' . $_ } @topics));
-      Foswiki::Sandbox->sysCommand($command, DIRECTORY => $webPubDir);
-   }
+    my ( $attrHashRef, $topic, $web ) = @_;
+    my $filename = $attrHashRef->{attachment};
+    if ( $filename =~ /\.deb$/ ) {
+        my $webPubDir = $Foswiki::cfg{PubDir} . '/' . $web;
+        my $repoName =
+          Foswiki::Func::getPreferencesValue( 'DEBIAN_REPOSITORY_NAME', $web )
+          || 'debian';
+        my $topics =
+          Foswiki::Func::getPreferencesValue( 'DEBIAN_REPOSITORY_TOPICS', $web )
+          || '';
+        my @topics =
+          grep { $_ =~ m/$Foswiki::regex{webNameRegex}/ }
+          split( /\s+/, $topics );
+        my $command = "$debian_repository_tool %DIRECTORY|F% %REPONAME|S%"
+          . ( join( ' ', map { ' ' . $_ } @topics ) );
+        Foswiki::Sandbox->sysCommand(
+            $command,
+            DIRECTORY => $webPubDir,
+            REPONAME  => $repoName
+        );
+    }
 }
 
 1;

@@ -14,15 +14,15 @@ $VERSION = '$Rev$';
 # of the version number in PLUGINDESCRIPTIONS.
 $RELEASE = 'Dakar';
 
-
 my $pluginName = 'MacrosPlugin';
 
 sub initPlugin {
     my ( $topic, $web, $user, $installWeb ) = @_;
 
     # check for Plugins.pm versions
-    if( $TWiki::Plugins::VERSION < 1.000 ) {
-        TWiki::Func::writeWarning( "Version mismatch between $pluginName and Plugins.pm" );
+    if ( $TWiki::Plugins::VERSION < 1.000 ) {
+        TWiki::Func::writeWarning(
+            "Version mismatch between $pluginName and Plugins.pm");
         return 0;
     }
 
@@ -38,18 +38,19 @@ sub commonTagsHandler {
     return unless ( $_[0] =~ m/%SET\s+/mo );
 
     # Now process in order to ensure correct SET ordering
-    my %sets; # scope of this topic only
+    my %sets;    # scope of this topic only
     my $res;
 
-    foreach my $block ( split( /\n%SET\s+/, "\n$_[0]" )) {
+    foreach my $block ( split( /\n%SET\s+/, "\n$_[0]" ) ) {
         foreach my $set ( keys %sets ) {
             $block =~ s/\%$set\%/$sets{$set}/g;
         }
 
         if ( $block =~ s/^(\w+)[ \t]*=[ \t]*([^\r\n]*)\r*\n//o ) {
             my $setname = $1;
-            my $setval = $2;
-            $setval = TWiki::Func::expandCommonVariables( $setval, $topic, $web );
+            my $setval  = $2;
+            $setval =
+              TWiki::Func::expandCommonVariables( $setval, $topic, $web );
             $sets{$setname} = $setval;
             $block =~ s/\%$setname\%/$setval/g;
         }
@@ -73,13 +74,14 @@ sub _callMacro {
 
     ( $mweb, $mtop ) = TWiki::Func::normalizeWebTopicName( $web, $mtop );
 
-    if ( !TWiki::Func::topicExists( $mweb, $mtop )) {
-        return " <font color=red> No such macro $mtop in CALLMACRO\{$params\} </font> ";
-	}
-	my ($meta, $text ) = TWiki::Func::readTopic( $mweb, $mtop );
+    if ( !TWiki::Func::topicExists( $mweb, $mtop ) ) {
+        return
+" <font color=red> No such macro $mtop in CALLMACRO\{$params\} </font> ";
+    }
+    my ( $meta, $text ) = TWiki::Func::readTopic( $mweb, $mtop );
 
     foreach my $vbl ( keys %$attrs ) {
-        my $val = $attrs->get( $vbl );
+        my $val = $attrs->get($vbl);
         $text =~ s/%$vbl%/$val/g;
     }
 

@@ -32,7 +32,6 @@ the text had been included from another topic.
 
 =cut
 
-
 package Foswiki::Plugins::IconPlugin;
 
 # Always use strict to enforce variable scoping
@@ -135,7 +134,8 @@ sub initPlugin {
 # The function used to handle the %EXAMPLETAG{...}% macro
 # You would have one of these for each macro you want to process.
 sub _ICON {
-    my($session, $params, $theTopic, $theWeb) = @_;
+    my ( $session, $params, $theTopic, $theWeb ) = @_;
+
     # $session  - a reference to the Foswiki session object (if you don't know
     #             what this is, just ignore it)
     # $params=  - a reference to a Foswiki::Attrs object containing
@@ -151,25 +151,26 @@ sub _ICON {
     # For example, %EXAMPLETAG{'hamburger' sideorder="onions"}%
     # $params->{_DEFAULT} will be 'hamburger'
     # $params->{sideorder} will be 'onions'
-	
-	if (!defined $template)
-		{
-		#Load our template only once
-		Foswiki::Func::loadTemplate('icon'); #Load the template file first
-		#Then the def
-		$template=Foswiki::Func::expandTemplate('icon');		
-		}
-	
-	#SL: Be permisive for now, just return empty value if something goes wrong.
-	return '' unless defined $params->{_DEFAULT};
-	return '' unless defined $Foswiki::cfg{Plugins}{IconPlugin}{$params->{_DEFAULT}};	
-	
-	#Process our template and return the result
-	my $res=$template;
-	$res=~s/%ICONCLASS%/$Foswiki::cfg{Plugins}{IconPlugin}{$params->{_DEFAULT}}/;	
-	return $res;	
-}
 
+    if ( !defined $template ) {
+
+        #Load our template only once
+        Foswiki::Func::loadTemplate('icon');    #Load the template file first
+                                                #Then the def
+        $template = Foswiki::Func::expandTemplate('icon');
+    }
+
+    #SL: Be permisive for now, just return empty value if something goes wrong.
+    return '' unless defined $params->{_DEFAULT};
+    return ''
+      unless defined $Foswiki::cfg{Plugins}{IconPlugin}{ $params->{_DEFAULT} };
+
+    #Process our template and return the result
+    my $res = $template;
+    $res =~
+      s/%ICONCLASS%/$Foswiki::cfg{Plugins}{IconPlugin}{$params->{_DEFAULT}}/;
+    return $res;
+}
 
 =begin TML
 

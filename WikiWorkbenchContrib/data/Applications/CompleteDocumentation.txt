@@ -1,0 +1,30 @@
+%META:TOPICINFO{author="micha" comment="reprev" date="1335189404" format="1.1" reprev="5" version="7"}%
+%META:TOPICPARENT{name="WikiApplication"}%
+%TOC{depth="4" title="Table of Contents"}%
+
+---++ Description
+The !WikiWorkbench is a standardized way to write and deploy WikiApplications. It is WikiApplication to write WikiApplications. 
+ At its core it establishes a certain terminology (such as TopicTypes and TopicFunctions) that are common in non-web applications. A !WikiWorkbench implements a standard set of means to ease the administration of even large-scale WikiApplication. WikiApplications, i.e. its TopicFunctions ease the extraction of application documentation. Merging a set of applications obeying this framework into the same web grants a higher level of compatibility and re-usability.
+
+---++ Documentation
+%DBCALL{"RenderApplicationDocumentation" TYPE="TopicType" NAME="WikiWorkbench"}%
+%DBCALL{"RenderApplicationDocumentation" TYPE="DataForm" NAME="WikiWorkbench"}%
+%DBCALL{"RenderApplicationDocumentation" TYPE="TopicTemplate" NAME="WikiWorkbench"}%
+%DBCALL{"RenderApplicationDocumentation" TYPE="TopicView" NAME="WikiWorkbench"}%
+%DBCALL{"RenderApplicationDocumentation" TYPE="TopicFunction" NAME="WikiWorkbench"}%
+
+---++ Installation
+...
+
+---++ Manifest
+%DBCALL{"RenderApplicationManifest" NAME="WikiWorkbench"}%
+
+%META:FORM{name="Applications.WikiApplication"}%
+%META:FIELD{name="TopicType" title="TopicType" value="WikiApplication"}%
+%META:FIELD{name="TopicTitle" attributes="" title="<nop>TopicTitle" value=""}%
+%META:FIELD{name="Summary" attributes="c" title="Summary" value="WikiApplication to develop WikiApplications"}%
+%META:FIELD{name="Version" attributes="" title="Version" value="0.9"}%
+%META:FIELD{name="Author" attributes="" title="Author" value="Michael Daum"}%
+%META:FIELD{name="Copyright" attributes="" title="Copyright" value="&#169; 2006-2010 Michael Daum http://michaeldaumconsulting.com"}%
+%META:FIELD{name="License" attributes="" title="License" value="Applications.GnuGeneralPublicLicense"}%
+%META:FIELD{name="Dependencies" attributes="" title="Dependencies" value=""}%

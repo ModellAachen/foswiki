@@ -1,24 +1,34 @@
 <!-- template: javascript.nat.tmpl -->
 %TMPL:DEF{"defaultjavascript"}%<!-- -->
-%JQREQUIRE{"superfish, ui, ui::autocomplete, placeholder, farscroll, fluidfont, blockui, imagetooltip" warn="off"}%<!--  -->
+%JQREQUIRE{"superfish, ui, ui::autocomplete, placeholder, farscroll, fluidfont, blockui, imagetooltip, scrollto" warn="off"}%<!--  -->
 <!-- -->%TMPL:END%
 
-%TMPL:DEF{"fixRevisionPosition"}%<meta name='foswiki.NatSkin.fixRevisionPosition' content='true' />%TMPL:END%
-%TMPL:DEF{"initWebMenu"}%<meta name='foswiki.NatSkin.initWebMenu' content='true' />%TMPL:END%
-%TMPL:DEF{"initOverflows"}%<meta name='foswiki.NatSkin.initOverflows' content='false' />%TMPL:END%
-%TMPL:DEF{"initTopicActions"}%<meta name='foswiki.NatSkin.initTopicActions' content='true' />%TMPL:END%
-%TMPL:DEF{"initSideBar"}%<meta name='foswiki.NatSkin.initSideBar' content='true' />%TMPL:END%
-%TMPL:DEF{"initAutoComplete"}%<meta name='foswiki.NatSkin.initAutocomplete' content='false' />%TMPL:END%
-%TMPL:DEF{"initRedDot"}%<meta name='foswiki.NatSkin.initRedDot' content='true' />%TMPL:END%
+%TMPL:DEF{"fixRevisionPosition"}%'NatSkin.fixRevisionPosition': true%TMPL:END%
+%TMPL:DEF{"initWebMenu"}%'NatSkin.initWebMenu': true%TMPL:END%
+%TMPL:DEF{"initOverflows"}%'NatSkin.initOverflows': false%TMPL:END%
+%TMPL:DEF{"initTopicActions"}%'NatSkin.initTopicActions': true%TMPL:END%
+%TMPL:DEF{"initSideBar"}%'NatSkin.initSideBar': true%TMPL:END%
+%TMPL:DEF{"initAutoComplete"}%'NatSkin.initAutocomplete': false%TMPL:END%
+%TMPL:DEF{"initRedDot"}%'NatSkin.initRedDot': true%TMPL:END%
 
-%TMPL:DEF{"metaflags"}%<!-- -->
-%TMPL:P{"fixRevisionPosition"}%
-%TMPL:P{"initWebMenu"}%
-%TMPL:P{"initOverflows"}%
-%TMPL:P{"initTopicActions"}%
-%TMPL:P{"initSideBar"}%
-%TMPL:P{"initAutoComplete"}%
-%TMPL:P{"initRedDot"}%
+%TMPL:DEF{"metaflags"}%<literal>
+%ADDTOZONE{"script" 
+  requires="JQUERYPLUGIN::FOSWIKI::PREFERENCES"
+  id="NATSKIN::PREFERENCES"
+  text="<script>
+jQuery.extend(foswiki.preferences, {
+  %TMPL:P{"fixRevisionPosition"}%,
+  %TMPL:P{"initWebMenu"}%,
+  %TMPL:P{"initOverflows"}%,
+  %TMPL:P{"initTopicActions"}%,
+  %TMPL:P{"initSideBar"}%,
+  %TMPL:P{"initAutoComplete"}%,
+  %TMPL:P{"initRedDot"}%
+});
+</script>"
+}%</literal>%TMPL:END%
+
+</literal>%TMPL:END%
 <!-- -->%TMPL:END%
 
 %TMPL:DEF{"javascript"}%%TMPL:P{"defaultjavascript"}%%TMPL:END%

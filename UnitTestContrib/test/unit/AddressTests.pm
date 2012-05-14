@@ -8,7 +8,6 @@ our @ISA = qw( FoswikiTestCase );
 use Assert;
 use Data::Dumper;
 use Benchmark qw(:hireswallclock);
-use Foswiki::Address();
 use constant TRACE => 0;
 
 my $test_web             = 'Temporary' . __PACKAGE__ . 'TestWeb';
@@ -257,6 +256,14 @@ sub new {
     return $this;
 }
 
+sub skip {
+    my ( $this, $test ) = @_;
+
+    return $this->check_dependency('Foswiki,<,1.2')
+      ? 'Foswiki 1.1 has no Foswiki::Address'
+      : undef;
+}
+
 sub set_up {
     my ($this) = @_;
 
@@ -269,6 +276,9 @@ sub set_up {
 
     ( $this->{test_topicObject} ) =
       Foswiki::Func::readTopic( $this->{test_web}, $this->{test_topic} );
+    if ( $this->check_dependency('Foswiki,>=,1.2') ) {
+        require Foswiki::Address;
+    }
 
     return;
 }
@@ -346,12 +356,6 @@ HERE
             }
         }
     }
-
-    return;
-}
-
-sub test_nothing {
-    my ($this) = @_;
 
     return;
 }

@@ -1,0 +1,44 @@
+%META:TOPICINFO{author="ProjectContributor" comment="reprev" date="1330457480" format="1.1" reprev="2" version="2"}%
+---+ %TOPIC%
+Test client for the PingBackPlugin.
+
+<form action="%SCRIPTURL{"view"}%/%WEB%/%TOPIC%" method="POST" enctype="multipart/form-data">
+<input type="hidden" name="endPoint" value="%WEB%/%TOPIC%" />
+<input type="hidden" name="pingback_action" value="ping" />
+<div class="foswikiFormSteps">
+   <div class="foswikiFormStep">
+      <table class="foswikiLayoutTable">
+        <tr>
+          <th>%MAKETEXT{"Source"}%:</th>
+          <td>
+            <input type="text" name="source" value="%URLPARAM{"source" default="%SCRIPTURL{"view"}%/%WEB%/%TOPIC%"}%" size="50">
+          </td>
+        </tr>
+        <tr>
+          <th>%MAKETEXT{"Target"}%:</th>
+          <td><input type="text" name="target" value="%URLPARAM{"target" default="%SCRIPTURL{"view"}%/%SYSTEMWEB%/%TOPIC%"}%" size="50"></td>
+        </tr>
+      </table>
+   </div>
+   <div class="foswikiFormStep">
+---
+      %BUTTON{"%MAKETEXT{"Submit"}%" icon="tick" type="submit"}%
+      %CLEAR%
+   </div>
+</div>
+</form>
+
+<div class="foswikiFormDescription">
+   Enter source and target urls to create a ping. Normally, the system will generate
+   pings by itself by extracting external target urls from a source topic, or explicitely
+   using =%<nop>PINGBACK{"ping" target="http://...."}%=.
+
+   See also PingBackManager.
+</div>
+
+%PINGBACK%
+
+<!--
+   * Set ENABLEPINGBACK = on
+   * Set CACHEABLE = off
+-->

@@ -298,6 +298,8 @@ jQuery(function($) {
     });
 
     // work around blinking twisties
-    $this.find(".twistyPlugin").show();
+    setTimeout(function() {
+      $this.find(".twistyPlugin").show();
+    }, 1);
   });
 });

@@ -1,17 +1,30 @@
 # See bottom of file for license and copyright information
+package SpreadSheetPluginTests;
 use strict;
 use warnings;
 
-package SpreadSheetPluginTests;
-
-use FoswikiFnTestCase;
+use FoswikiFnTestCase();
 our @ISA = qw( FoswikiFnTestCase );
 
-use strict;
-use warnings;
-use Foswiki;
-use Foswiki::Plugins::SpreadSheetPlugin;
-use Foswiki::Plugins::SpreadSheetPlugin::Calc;
+use Foswiki();
+use Foswiki::Plugins::SpreadSheetPlugin();
+use Foswiki::Plugins::SpreadSheetPlugin::Calc();
+
+my %skip_tests = (
+    'SpreadSheetPluginTests::test_IF'       => '$IF not implemented',
+    'SpreadSheetPluginTests::test_LISTRAND' => '$LISTRAND not implemented',
+    'SpreadSheetPluginTests::test_LISTSHUFFLE' =>
+      '$LISTSHUFFLE not implemented',
+    'SpreadSheetPluginTests::test_SETIFEMPTY' => '$SETIFEMPTY not implemented',
+    'SpreadSheetPluginTests::test_T'          => '$T not implemented',
+    'SpreadSheetPluginTests::test_TODAY'      => '$TODAY not implemented',
+);
+
+sub skip {
+    my ( $this, $test ) = @_;
+
+    return defined $test ? $skip_tests{$test} : undef;
+}
 
 sub set_up {
     my $this = shift;
@@ -22,8 +35,8 @@ sub set_up {
     $this->{target_topic} = 'SpreadSheetTestTopic'
       || "$this->{test_topic}Target";
 
-    my $webObject = Foswiki::Meta->new( $this->{session}, $this->{target_web} );
-    $webObject->populateNewWeb();
+    my $webObject = $this->populateNewWeb( $this->{target_web} );
+    $webObject->finish();
 
 #$this->{session}->{store}->createWeb( $this->{session}->{user}, $this->{target_web} );
 
@@ -44,16 +57,17 @@ sub tear_down {
     my $this = shift;
 
 #$this->{session}->{store}->removeWeb( $this->{session}->{user}, $this->{target_web} );
-    my $webObject = Foswiki::Meta->new( $this->{session}, $this->{target_web} );
-    $webObject->removeFromStore();
+    $this->removeFromStore( $this->{target_web} );
 
     $this->SUPER::tear_down();
 }
 
 sub writeTopic {
     my ( $this, $web, $topic, $text ) = @_;
-    my $meta = new Foswiki::Meta( $this->{session}, $web, $topic, $text );
+    my ($meta) = Foswiki::Func::readTopic( $web, $topic );
+    $meta->text($text);
     $meta->save();
+    $meta->finish();
 
 #$this->{session}->{store}->saveTopic( $this->{session}->{user}, $web, $topic, $text, $meta );
 }
@@ -166,6 +180,18 @@ EXPECT
     $this->assert_equals( $expected, $actual );
 }
 
+sub test_CEILING {
+    my ($this) = @_;
+    $this->assert( $this->CALC('$CEILING(5)') == 5 );
+    $this->assert( $this->CALC('$CEILING(5.0)') == 5 );
+    $this->assert( $this->CALC('$CEILING(5.4)') == 6 );
+    $this->assert( $this->CALC('$CEILING(05.4)') == 6 );
+    $this->assert( $this->CALC('$CEILING(5.0040)') == 6 );
+    $this->assert( $this->CALC('$CEILING(-5.4)') == -5 );
+    $this->assert( $this->CALC('$CEILING(-05.4)') == -5 );
+    $this->assert( $this->CALC('$CEILING(-05.0040)') == -5 );
+}
+
 sub test_CHAR {
     my ($this) = @_;
     $this->assert( $this->CALC('$CHAR(65)') eq 'A' );
@@ -276,6 +302,17 @@ sub test_EVAL {
     $this->assert( $this->CALC('$EVAL( (5 * 3) / 2 + 1.1 )') == 8.6 );
     $this->assert( $this->CALC('$EVAL(2+08)') == 10 );
     $this->assert( $this->CALC('$EVAL(8.0068/2)') == 4.0034 );
+    $this->assert( $this->CALC('$EVAL(+68/2)') == 34 );
+    $this->assert( $this->CALC('$EVAL(-68/2)') == -34 );
+    $this->assert( $this->CALC('$EVAL(068/2)') == 34 );
+    $this->assert( $this->CALC('$EVAL(+068/2)') == 34 );
+    $this->assert( $this->CALC('$EVAL(-068/2)') == -34 );
+    $this->assert( $this->CALC('$EVAL(aaaaa068/2zzzzz)') == 34 );
+    $this->assert( $this->CALC('$EVAL(0068/2)') == 34 );
+    $this->assert( $this->CALC('$EVAL(.0068/2)') == 0.0034 );
+    $this->assert( $this->CALC('$EVAL(8.0068/2)') == 4.0034 );
+    $this->assert( $this->CALC('$EVAL(8.0068/8)') == 1.00085 );
+    $this->assert( $this->CALC('$EVAL(8.0068/08)') == 1.00085 );
 }
 
 sub test_EVEN {
@@ -319,6 +356,19 @@ sub test_FIND {
     $this->assert( $this->CALC('$FIND(f, fluffy)') == 1 );
     $this->assert( $this->CALC('$FIND(f, fluffy, 2)') == 4 );
     $this->assert( $this->CALC('$FIND(@, fluffy, 1)') == 0 );
+}
+
+sub test_FLOOR {
+    my ($this) = @_;
+    $this->assert( $this->CALC('$FLOOR(5)') == 5 );
+    $this->assert( $this->CALC('$FLOOR(5.0)') == 5 );
+    $this->assert( $this->CALC('$FLOOR(5.4)') == 5 );
+    $this->assert( $this->CALC('$FLOOR(05.4)') == 5 );
+    $this->assert( $this->CALC('$FLOOR(05.0040)') == 5 );
+    $this->assert( $this->CALC('$FLOOR(-5)') == -5 );
+    $this->assert( $this->CALC('$FLOOR(-5.4)') == -6 );
+    $this->assert( $this->CALC('$FLOOR(-05.4)') == -6 );
+    $this->assert( $this->CALC('$FLOOR(-05.004)') == -6 );
 }
 
 sub test_FORMAT {
@@ -812,6 +862,10 @@ sub test_REPEAT {
 sub test_REPLACE {
     my ($this) = @_;
     $this->assert( $this->CALC('$REPLACE(abcdefghijk, 6, 5, *)') eq 'abcde*k' );
+    $this->assert_equals( $this->CALC('$REPLACE(abcdefghijk, 6, 5, $comma)'),
+        'abcde,k' );
+    $this->assert_equals( $this->CALC('$REPLACE(abcdefghijk, 6, 5, $sp)'),
+        'abcde k' );
 }
 
 sub test_RIGHT {
@@ -1000,6 +1054,10 @@ sub test_SUBSTITUTE {
         $this->CALC('$SUBSTITUTE(Good morning, morning, day)') eq 'Good day' );
     $this->assert( $this->CALC('$SUBSTITUTE(Q2-2002, 2, 3)')   eq 'Q3-3003' );
     $this->assert( $this->CALC('$SUBSTITUTE(Q2-2002,2, 3, 3)') eq 'Q2-2003' );
+    $this->assert_equals( $this->CALC('$SUBSTITUTE(Q2-2003-2, -, $comma)'),
+        'Q2,2003,2' );
+    $this->assert_equals( $this->CALC('$SUBSTITUTE(Q2 2003 2, $sp, $comma)'),
+        'Q2,2003,2' );
     $this->assert(
         $this->CALC('$SUBSTITUTE(abc123def, [0-9], 9, , r)') eq 'abc999def' );
 }
@@ -1049,7 +1107,7 @@ EXPECT
 sub test_T {
     my ($this) = @_;
     warn '$T not implemented';
-###    $this->assert( $this->CALC( '$T(R1:C5)' ) eq '...' );
+    $this->assert( $this->CALC('$T(R1:C5)') eq '...' );
 }
 
 sub test_TIME {

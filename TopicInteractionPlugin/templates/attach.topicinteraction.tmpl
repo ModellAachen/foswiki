@@ -1,6 +1,9 @@
 %TMPL:INCLUDE{"attach"}%
 %TMPL:INCLUDE{"metadata"}%
 
+%TMPL:DEF{"attachments::hidden"}%%URLPARAM{"attachments_hidden" default="on"}%%TMPL:END%
+%TMPL:DEF{"attachments::showuploader"}%%URLPARAM{"attachments_showuploader" default="on"}%%TMPL:END%
+
 %TMPL:DEF{"content"}%<!-- content -->
 <div class="foswikiMetaData %IF{"not '%WEB%.%TOPIC%' allows 'change'" then="foswikiMetaDataNotAllowed"}%">
 %BUTTON{
@@ -9,11 +12,6 @@
   target="%BASEWEB%.%BASETOPIC%" 
   icon="cross"
 }%
-<h1>
-  <noautolink>%MAKETEXT{"Attachments at [_1]" args="%TMPL:P{"topictitle"}%"}%</noautolink>
-  <span class='foswikiAttachmentsCount foswikiSmall foswikiGrayText'>()</span>
-</h1>
-%CLEAR%
 <div>%TMPL:P{"attachments"}%</div>
 %TMPL:P{"metadata::css"}%
 %TMPL:P{"metadata::javascript"}%

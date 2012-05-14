@@ -17,7 +17,7 @@
 
 %TMPL:DEF{"webmenu"}%<div class="natWebMenu clearfix" id="natWebMenu">
   <div class="natWebMenuContents natWebMenuHidden"> 
-  %WEBCOMPONENT{"Menu"}% <!-- webmenu -->
+  %WEBCOMPONENT{"Menu"}% <!-- -->
   </div>
 </div>%TMPL:END%
 
@@ -59,43 +59,40 @@
 <table class="natLayoutTable" cellpadding="0" cellspacing="0" border="0" width="100%">
   <tr>
     <td class="natMiddle natMiddleLeft natSideBar natSideBarLeft">
-%TMPL:P{"sidebar_container"}%<!-- sidebar container// -->
+%TMPL:P{"sidebar_container"}%<!-- -->
     </td>
     <td class="natMain natMiddle">
-%TMPL:P{"contentheader_container"}%<!-- contentheader_container// -->
-%TMPL:P{"content_container"}%<!-- content_container// -->
-%TMPL:P{"contentfooter_container"}%<!-- contentfooter_container// -->
+%TMPL:P{"contentheader_container"}%<!-- -->
+%TMPL:P{"content_container"}%<!-- -->
+%TMPL:P{"contentfooter_container"}%<!-- -->
     </td> 
     <td class="natMiddle natMiddleRight natSideBar natSideBarRight">
-%TMPL:P{"rightsidebar_container"}%<!-- rightsidebar_container// -->
+%TMPL:P{"rightsidebar_container"}%<!-- -->
     </td> 
   </tr>
 </table> 
-<!-- //sidebar both -->%TMPL:END%
+<!-- -->%TMPL:END%
 
 %{ no sidebar }%
-%TMPL:DEF{"layout_sidebar_off"}%<!-- sidebar off -->
+%TMPL:DEF{"layout_sidebar_off"}%<!-- -->
 <table class="natLayoutTable" cellpadding="0" cellspacing="0" border="0" width="100%">
   <tr>
     <td class="natMain natMiddle natMiddleLeft natMainLeft natMiddleRight natMainRight natMiddleBoth natMainBoth">
-%TMPL:P{"contentheader_container"}%<!-- contentheader_container// -->
-%TMPL:P{"content_container"}%<!-- content_container// -->
-%TMPL:P{"contentfooter_container"}%<!-- contentfooter_container// -->
+%TMPL:P{"contentheader_container"}%<!-- -->
+%TMPL:P{"content_container"}%<!-- -->
+%TMPL:P{"contentfooter_container"}%<!-- -->
     </td> 
   </tr>
 </table> 
-<!-- //sidebar off-->%TMPL:END%
+<!-- -->%TMPL:END%
 
 %{ cache info }%
-%TMPL:P{"cacheinfo"}%<!-- -->
-%IF{"{Cache}{Enabled} and context view and $CACHEABLE != 'off'" 
+%TMPL:DEF{"cacheinfo"}%%IF{"{Cache}{Enabled} and context view and $CACHEABLE != 'off'" 
   then="<div class='natPageCacheBanner foswikiGrayText'>
-          %MAKETEXT{"This page has been cached at [_1]." args="%SERVERTIME%"}%
-          %MAKETEXT{"Get a fresh version <a href='[_1]'>here</a>." args="%SCRIPTURLPATH{view}%/%BASEWEB%/%BASETOPIC%?refresh=cache"}%
+          %MAKETEXT{"This page was cached on [_1]." args="%SERVERTIME%"}%
+          %MAKETEXT{"Get a fresh version <a href='[_1]' rel='nofollow'>here</a>." args="%SCRIPTURLPATH{view}%/%BASEWEB%/%BASETOPIC%?refresh=cache"}%
         </div>"
-  else="<!-- -->"
-}%
-<-- -->%TMPL:END%
+}%%TMPL:END%
 
 %{ assembly stage ---------------------------------------------------------- }%
 %TMPL:DEF{"defaultbody"}%<!-- -->
@@ -107,14 +104,15 @@
 %TMPL:P{context="natskin_menu_on" then="webmenu"}%<!-- -->
 %TMPL:P{context="natskin_sidebar_left" then="layout_sidebar_left"}%<!-- -->
 %TMPL:P{context="natskin_sidebar_right" then="layout_sidebar_right"}%<!-- -->
-%TMPL:P{context="natskin_sidebar_both" then="layout_sidebar_both"}%<!--  -->
+%TMPL:P{context="natskin_sidebar_both" then="layout_sidebar_both"}%<!-- -->
 %TMPL:P{context="natskin_sidebar_off" then="layout_sidebar_off"}%<!-- -->
   <div class="natBottomBar %IF{"context 'natskin_sidebar_right' or 'context natskin_sidebar_off'" then="natBottomBarLeft"}% %IF{"context 'natskin_sidebar_left' or context 'natskin_sidebar_off'" then="natBottomBarRight"}% %IF{"context 'natskin_sidebar_off'" then="natBottomBarBoth"}%">
     <div class="natBottomBarContents">
 %TMPL:P{"bottombar"}%<!-- -->
-    </div>
 %TMPL:P{"cacheinfo"}%<!-- -->
+    </div>
   </div>
+%TMPL:P{"scrolltop"}%<!-- -->
   <a name="PageBottom"></a>
 </div>
 %WEBCOMPONENT{"HtmlBottom"}%<!-- -->

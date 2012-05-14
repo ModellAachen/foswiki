@@ -53,7 +53,8 @@ Line before table: <pre class="tml">%<nop>TABLE{ sort="on" tableborder="0" cellp
 ---+++ Sorting
 Click on column heading text to sort by a column. Initial column will be sorted in descending order, click again to get ascending order.  The type of data in the cell is determined automatically:
 
-   * Date with supported date formats %TWISTY{mode="span" link="View date formats" remember="on"}%
+   * Date with supported date formats
+%TWISTY{mode="span" link="View date formats" remember="on"}%
       * Default Foswiki format
          * 31 Dec 2001 - 23:59
          * 31-Dec-2001 - 23:59
@@ -76,7 +77,8 @@ Click on column heading text to sort by a column. Initial column will be sorted 
          * 2001-12-31T
       * ISO dates may have a timezone specifier, either Z or a signed difference in hh:mm format. For example:
          * 2001-12-31T23:59:59+01:00
-         * 2001-12-31T23:59Z %ENDTWISTY%
+         * 2001-12-31T23:59Z
+%ENDTWISTY%
    * Number is digits, with optional decimal point
    * Otherwise treated as text
 
@@ -176,7 +178,7 @@ Information for programmers.
 |=.foswikiTableRow= + type + row number | Unique row identifier, for instance: =foswikiTableRowdataBg0= |
 
 ---+++ Images used by !TablePlugin
-Sort icons in the header are read from System.DocumentGraphics.
+Sort icons in the header are read from %SYSTEMWEB%.DocumentGraphics.
 | <img src="%ICONURL{tablesortup}%" width="11" height="13" alt="Sort table ascending" border="0" />  | Sort ascending | 
 | <img src="%ICONURL{tablesortdown}%" width="11" height="13" alt="Sort table descending" border="0" />  | Sort descending | 
 | <img src="%ICONURL{tablesortdiamond}%" width="11" height="13" alt="Sort table" border="0" />  | Generic sort button if header label is a link, not a sort link |
@@ -190,11 +192,12 @@ Sort icons in the header are read from System.DocumentGraphics.
 ---++ Plugin Info
 
 %TABLE{columnwidths="10%,90%"}%
-|  Copyright: | Copyright (C) 2001-2008 TWiki:Main/JohnTalintyre, Peter Thoeny, peter@thoeny.org and TWiki Contributors; &copy; 2008-2011 Foswiki Contributors |
+|  Copyright: | Copyright (C) 2001-2008 TWiki:Main/JohnTalintyre, Peter Thoeny, peter@thoeny.org and TWiki Contributors; &copy; 2008-2012 Foswiki Contributors |
 |  License: | GPL ([[http://www.gnu.org/copyleft/gpl.html][GNU General Public License]]) |
 |  Version: | %$VERSION% |
 |  Release: | %$RELEASE% |
 |  Change History: | <!-- specify latest version first -->&nbsp; |
+|  06 Apr 2012 | 1.140: Arthur Clemens: Foswikitask:Item11354 adds warning message when =include= parameter fails. |
 |  10 Jan 2012 | 1.139: Michael Daum: Foswikitask:Item11423 fixed disabling default table attributes when setting them to the empty string |
 |  12 Dec 2011 | 1.138: George Clark: Foswikitask:Item11350 TablePlugin issues a die if included table is not found. |
 |  05 Dec 2011 | 1.137: Paul Harvey: Foswikitask:Item11331: Further improvements for persistent perls. |

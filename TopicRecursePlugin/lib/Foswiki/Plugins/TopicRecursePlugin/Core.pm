@@ -29,14 +29,15 @@ sub extractParams {
     foreach my $item (@list) {
         $args{$item} = $params->{$item};
     }
-    $args{header} ||= '*Search: \'$rootquery\' from <nop>$root* $n';
-    $args{branchheader} ||= $args{header};
-    $args{format} ||= '$indent* [[$web.$topic][$topic]]';
-    $args{formatbranch} ||= $args{format};
-    $args{formatleaf}   ||= $args{format};
+    $args{header} ||=
+      '*Search: <code class="tml">$rootquery</code> from <nop>$root* $n';
+    $args{branchheader} ||= '';
+    $args{format}       ||= '$indent* [[$web.$topic][$topic]]';
+    $args{branchformat} ||= $args{format};
+    $args{leafformat}   ||= $args{format};
     $args{separator}    ||= '$n';
-    $args{footer}       ||= '*Total: $ntopics*';
-    $args{branchfooter} ||= $args{footer};
+    $args{footer}       ||= '$n*Total: $ntopics*$n';
+    $args{branchfooter} ||= '';
     $args{nodelimit}    ||= '50';
 
     return \%args;
@@ -64,7 +65,7 @@ sub TOPICRECURSE {
         writeDebug( "rootNode: $rootNode->{webtopic}", 'TOPICRECURSE', 4 );
         my $spec = extractParams(
             $params,
-            qw(header format formatbranch formatleaf separator footer branchheader branchfooter),
+            qw(header format branchformat leafformat separator footer branchheader branchfooter),
             qw(nodelimit depthlimit breadthlimit)
         );
         my @renderednodes = formatNodes( $rootNode, $spec );
@@ -72,9 +73,14 @@ sub TOPICRECURSE {
         writeDebug(
             "Separator: $separator, rendered: " . Dumper( \@renderednodes ),
             'TOPICRECURSE', 4 );
-        $result = renderNode( $rootNode, $spec->{header} )
-          . join( $separator,
-            @renderednodes, renderNode( $rootNode, $spec->{footer} ) );
+
+        $result = join( $separator, @renderednodes );
+        if ( length( $spec->{header} ) ) {
+            $result = renderNode( $rootNode, $spec->{header} ) . $result;
+        }
+        if ( length( $spec->{footer} ) ) {
+            $result .= renderNode( $rootNode, $spec->{footer} );
+        }
     }
     else {
         $result =
@@ -95,26 +101,31 @@ sub formatNodes {
 
     # Is a branch?
     if ( $node->hasNext() ) {
-        my $result = renderNode( $node, $spec->{formatbranch} );
+        my $result = renderNode( $node, $spec->{branchformat} );
 
         if ( not $node->isRoot() ) {
             push( @renderednodes, $result );
         }
-	while ( $node->hasNext() ) {
-        	my $child = $node->next();
-        	push( @renderednodes, formatNodes( $child, $spec ));
-	}
-	if(@renderednodes){
-		my $length = $#renderednodes;
-		$renderednodes[0] = $spec->{branchheader}.$renderednodes[0];
-		$renderednodes[1] = $spec->{branchheader}.$renderednodes[1];
-		$renderednodes[$length] = $renderednodes[$length].$spec->{branchfooter}.$spec->{branchfooter};
-	}
+        while ( $node->hasNext() ) {
+            my $child = $node->next();
+            push( @renderednodes, formatNodes( $child, $spec ) );
+        }
+        if ( not $node->isRoot() && scalar(@renderednodes) ) {
+            if ( length( $spec->{branchheader} ) ) {
+                $renderednodes[0] =
+                  renderNode( $node, $spec->{branchheader} )
+                  . $renderednodes[0];
+            }
+            if ( length( $spec->{branchfooter} ) ) {
+                $renderednodes[-1] .=
+                  renderNode( $node, $spec->{branchfooter} );
+            }
+        }
     }
     else {
 
         # is a leaf.
-        my $result = renderNode( $node, $spec->{formatleaf} );
+        my $result = renderNode( $node, $spec->{leafformat} );
 
         if ( not $node->isRoot() ) {
             push( @renderednodes, $result );
@@ -155,8 +166,16 @@ sub execToken {
     else {
         $result = $completetoken;
     }
-    writeDebug( '$' . ($tokenname || '') . '(' . ($tokenarg || '') . ') = \'' . ($result || '') . '\' depth:' . $node->{depth},
-        'execToken', 4 );
+    writeDebug(
+        '$'
+          . ( $tokenname || '' ) . '('
+          . ( $tokenarg  || '' )
+          . ') = \''
+          . ( $result || '' )
+          . '\' depth:'
+          . $node->{depth},
+        'execToken', 4
+    );
 
     return $result || '';
 }

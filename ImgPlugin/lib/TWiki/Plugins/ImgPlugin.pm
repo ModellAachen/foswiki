@@ -30,25 +30,27 @@ $RELEASE = 'Dakar';
 
 ###############################################################################
 sub initPlugin {
-  my ($baseTopic, $baseWeb) = @_;
+    my ( $baseTopic, $baseWeb ) = @_;
 
-  # check for Plugins.pm versions
-  if( $TWiki::Plugins::VERSION < 1.026 ) {
-    TWiki::Func::writeWarning( "Version mismatch between ImgPlugin and Plugins.pm" );
-    return 0;
-  }
+    # check for Plugins.pm versions
+    if ( $TWiki::Plugins::VERSION < 1.026 ) {
+        TWiki::Func::writeWarning(
+            "Version mismatch between ImgPlugin and Plugins.pm");
+        return 0;
+    }
 
-  # register the tag handlers
-  TWiki::Func::registerTagHandler( 'IMG', \&_IMG);
+    # register the tag handlers
+    TWiki::Func::registerTagHandler( 'IMG', \&_IMG );
 
-  # Plugin correctly initialized
-  return 1;
-} 
+    # Plugin correctly initialized
+    return 1;
+}
 
 # The function used to handle the %IMG{...}% tag
 # You would have one of these for each tag you want to process.
 sub _IMG {
-    my($session, $params, $theTopic, $theWeb) = @_;
+    my ( $session, $params, $theTopic, $theWeb ) = @_;
+
     # $session  - a reference to the TWiki session object (if you don't know
     #             what this is, just ignore it)
     # $params=  - a reference to a TWiki::Attrs object containing parameters.
@@ -59,41 +61,44 @@ sub _IMG {
     # $theWeb   - name of the web in the query
     # Return: the result of processing the tag
 
-    my $imgName = $params->{name} || $params->{_DEFAULT};
-    my $path = TWiki::Func::getPubUrlPath();
-    my $imgTopic = $params->{topic} || $theTopic;
-    my $imgWeb = $params->{web} || $theWeb;
-    my $altTag = $params->{alt} || '';
-    my $caption = $params->{caption};
+    my $imgName          = $params->{name} || $params->{_DEFAULT};
+    my $path             = TWiki::Func::getPubUrlPath();
+    my $imgTopic         = $params->{topic} || $theTopic;
+    my $imgWeb           = $params->{web} || $theWeb;
+    my $altTag           = $params->{alt} || '';
+    my $caption          = $params->{caption};
     my $captionplacement = $params->{captionplacement} || 'right';
     my $res;
 
-    my @attrs = ('align', 'border', 'height', 'width', 'id', 'class');
+    my @attrs = ( 'align', 'border', 'height', 'width', 'id', 'class' );
 
     my $txt = "<img src='$path/$imgWeb/$imgTopic/$imgName' ";
     $txt .= " alt='$altTag'";
-    while (my $key = shift @attrs) {
-	if (my $val = $params->{$key}) {
-	    $txt .= " $key='$val'";
-	}
+    while ( my $key = shift @attrs ) {
+        if ( my $val = $params->{$key} ) {
+            $txt .= " $key='$val'";
+        }
     }
     $txt .= " />";
 
-    if (defined($caption) && $caption) {
+    if ( defined($caption) && $caption ) {
         $res = <<HERE;
 <table>
    <tr>
 HERE
-        if ($captionplacement == 'right') {
+        if ( $captionplacement == 'right' ) {
             $res .= "<td>$txt</td>\n";
             $res .= "<td>$caption</td>\n";
-        } elsif ($captionplacement == 'left') {
+        }
+        elsif ( $captionplacement == 'left' ) {
             $res .= "<td>$caption</td>\n";
             $res .= "<td>$txt</td>\n";
-        } elsif ($captionplacement == 'top') {
+        }
+        elsif ( $captionplacement == 'top' ) {
             $res .= "<td>$caption</td></tr>\n";
             $res .= "<tr><td>$txt</td></tr>\n";
-        } elsif ($captionplacement == 'bottom') {
+        }
+        elsif ( $captionplacement == 'bottom' ) {
             $res .= "<td>$txt</td></tr>\n";
             $res .= "<tr><td>$caption</td></tr>\n";
         }
@@ -101,7 +106,8 @@ HERE
     </tr>
 </table>
 HERE
-    } else {
+    }
+    else {
         $res = $txt;
     }
 

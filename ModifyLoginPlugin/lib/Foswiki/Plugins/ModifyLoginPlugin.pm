@@ -41,7 +41,7 @@ package Foswiki::Plugins::ModifyLoginPlugin;
 # Always use strict to enforce variable scoping
 use strict;
 
-use Foswiki::Func ();       # The plugins API
+use Foswiki::Func    ();    # The plugins API
 use Foswiki::Plugins ();    # For the API version
 
 # $VERSION is referred to by Foswiki, and is the only global variable that
@@ -55,7 +55,8 @@ our $RELEASE = '2.0';
 
 # Short description of this plugin
 # One line description, is shown in the %SYSTEMWEB%.TextFormattingRules topic:
-our $SHORTDESCRIPTION = 'The plugin can modify a login by changing case or stripping all after @';
+our $SHORTDESCRIPTION =
+  'The plugin can modify a login by changing case or stripping all after @';
 
 # You must set $NO_PREFS_IN_TOPIC to 0 if you want your plugin to use
 # preferences set in the plugin topic. This is required for compatibility
@@ -133,20 +134,27 @@ sub initializeUserHandler {
 
     # Map path to special users unless you are already authenticated as an
     # AdminGroup member
-    if ( defined $Foswiki::cfg{Plugins}{ModifyLoginPlugin}{MapPathToUser}{$pathInfo} &&
-         ! Foswiki::Func::isAnAdmin( $loginName ) ) {
-        return $Foswiki::cfg{Plugins}{ModifyLoginPlugin}{MapPathToUser}{$pathInfo};
+    if (
+        defined $Foswiki::cfg{Plugins}{ModifyLoginPlugin}{MapPathToUser}
+        {$pathInfo}
+        && !Foswiki::Func::isAnAdmin($loginName) )
+    {
+        return $Foswiki::cfg{Plugins}{ModifyLoginPlugin}{MapPathToUser}
+          {$pathInfo};
     }
 
-    # Change case of login name
-    # This plugin assumes {Register}{AllowLoginName}, otherwise it will do nothing
-    
+  # Change case of login name
+  # This plugin assumes {Register}{AllowLoginName}, otherwise it will do nothing
+
     return $loginName unless $Foswiki::cfg{Register}{AllowLoginName};
 
-    if ( $Foswiki::cfg{Plugins}{ModifyLoginPlugin}{ChangeCase} eq 'lowercase' ) {
+    if ( $Foswiki::cfg{Plugins}{ModifyLoginPlugin}{ChangeCase} eq 'lowercase' )
+    {
         $loginName = lc($loginName);
     }
-    elsif ( $Foswiki::cfg{Plugins}{ModifyLoginPlugin}{ChangeCase} eq 'uppercase' ) {
+    elsif (
+        $Foswiki::cfg{Plugins}{ModifyLoginPlugin}{ChangeCase} eq 'uppercase' )
+    {
         $loginName = uc($loginName);
     }
 
@@ -154,7 +162,7 @@ sub initializeUserHandler {
     if ( $Foswiki::cfg{Plugins}{ModifyLoginPlugin}{StripAfterAtsign} ) {
         $loginName =~ s/@.*$//;
     }
-    
+
     return $loginName;
 }
 

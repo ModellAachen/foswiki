@@ -1,15 +1,11 @@
-bin/natsearch 0755
 data/System/NatSkinPlugin.txt 0644
 lib/Foswiki/Plugins/NatSkinPlugin/Config.spec 0644
-lib/Foswiki/Plugins/NatSkinPlugin/ContentType.pm 0644
 lib/Foswiki/Plugins/NatSkinPlugin/ExternalLink.pm 0644
 lib/Foswiki/Plugins/NatSkinPlugin/HtmlTitle.pm 0644
 lib/Foswiki/Plugins/NatSkinPlugin.pm 0644
 lib/Foswiki/Plugins/NatSkinPlugin/Revisions.pm 0644
-lib/Foswiki/Plugins/NatSkinPlugin/Search.pm 0644
 lib/Foswiki/Plugins/NatSkinPlugin/ThemeEngine.pm 0644
 lib/Foswiki/Plugins/NatSkinPlugin/UserActions.pm 0644
 lib/Foswiki/Plugins/NatSkinPlugin/Utils.pm 0644
 lib/Foswiki/Plugins/NatSkinPlugin/WebComponent.pm 0644
-lib/Foswiki/Plugins/NatSkinPlugin/WebLink.pm 0644
 lib/Foswiki/Plugins/NatSkinPlugin/WebLogo.pm 0644

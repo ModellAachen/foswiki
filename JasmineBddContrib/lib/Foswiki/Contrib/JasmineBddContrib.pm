@@ -10,7 +10,6 @@ our $RELEASE = '1.0.0';
 our $SHORTDESCRIPTION =
 "[[http://pivotal.github.com/jasmine/][Jasmine]] is a behavior-driven development framework for testing JavaScript code";
 
-
 1;
 __END__
 Foswiki - The Free and Open Source Wiki, http://foswiki.org/

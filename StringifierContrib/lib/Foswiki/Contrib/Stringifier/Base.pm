@@ -62,21 +62,22 @@ sub new {
     $self;
 }
 
-sub toUtf8 {
-    my ( $self, $string ) = @_;
+sub decode {
+    my ( $self, $string, $charSet ) = @_;
 
-    $string = Encode::encode('utf-8', $string);
+    $charSet ||= $Foswiki::cfg{Site}{CharSet};
+    $charSet = Encode::resolve_alias( $charSet );
 
-    return $string;
+    return Encode::decode( $charSet, $string );
 }
 
-sub fromUtf8 {
-    my ( $self, $string ) = @_;
+sub encode {
+    my ( $self, $string, $charSet ) = @_;
 
-    $string = Encode::decode('utf-8', $string);
-    $string = Encode::encode($Foswiki::cfg{Site}{CharSet}, $string);
+    $charSet ||= $Foswiki::cfg{Site}{CharSet};
+    $charSet = Encode::resolve_alias( $charSet );
 
-    return $string;
+    return Encode::encode( $charSet, $string );
 }
 
 1;

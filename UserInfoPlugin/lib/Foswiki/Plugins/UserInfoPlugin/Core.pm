@@ -1,6 +1,6 @@
 # Plugin for Foswiki - The Free and Open Source Wiki, http://foswiki.org/
 #
-# Copyright (C) 2005-2006 Michael Daum <micha@nats.informatik.uni-hamburg.de>
+# Copyright (C) 2005-2012 Michael Daum http://michaeldaumconsulting.com
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -15,61 +15,59 @@
 #
 
 package Foswiki::Plugins::UserInfoPlugin::Core;
+
 use strict;
-use vars qw($debug %MON2NUM);
-use Time::Local; # for timelocal
+use warnings;
 
-%MON2NUM = (
-  Jan => 0, Feb => 1, Mar => 2, Apr => 3, May => 4, Jun => 5,
-  Jul => 6, Aug => 7, Sep => 8, Oct => 9, Nov => 10, Dec => 11
-);
+use Foswiki::Func ();
+use Foswiki::Time ();
 
-$debug = 0; # toggle me
+use constant DEBUG => 0; # toggle me
 
 ###############################################################################
 # static
 sub writeDebug {
-  &Foswiki::Func::writeDebug("- UserInfoPlugin - " . $_[0]) if $debug;
+  #Foswiki::Func::writeDebug("- UserInfoPlugin - " . $_[0]) if DEBUG;
+  print STDERR "- UserInfoPlugin - " . $_[0] . "\n" if DEBUG;
 }
-
 
 ###############################################################################
 sub new {
-  my ($class, $id, $topic, $web) = @_;
+  my $class = shift;
+
   my $this = bless({}, $class);
 
   #writeDebug("building a new Core");
 
   # figure out where the sessions are
-  $this->{sessionDir} = $Foswiki::cfg{WorkingDir};
+  $this->{sessionDir} = $Foswiki::cfg{WorkingDir} . '/tmp';
   if (! -e $this->{sessionDir}) {
     $this->{sessionDir} = '/tmp';
   }
   
   # init properties
-  $this->{WikiGuest} = &Foswiki::Func::getDefaultUserName();
-  $this->{WikiGuest} = &Foswiki::Func::userToWikiName($this->{WikiGuest}, 1);
   $this->{ignoreHosts} = 
     Foswiki::Func::getPreferencesValue("USERINFOPLUGIN_IGNORE_HOSTS") || '';
-  $this->{ignoreHosts} = join('|', split(/,\s?/, $this->{ignoreHosts}));
+  $this->{ignoreHosts} = join('|', split(/\s*,\s*/, $this->{ignoreHosts}));
+
   my $usersString =
     Foswiki::Func::getPreferencesValue("USERINFOPLUGIN_IGNORE_USERS") || '';
-  my @users;
-  foreach my $user (split(/,\s?/, $usersString)) {
-    if ($user =~ /^(.*)\.(.*?)$/) {
-      push @users, $2;
-    }
-  }
-  $this->{ignoreUsers} = join('|', @users);
 
-  # ignore build-in users 
-  $this->{ignoreUsers} .= '|' if $this->{ignoreUsers};
-  $this->{ignoreUsers} .= 
-    $this->{WikiGuest} .
-    '|'.'AdminGroup' .
-    '|'.'UnknownUser' .
-    '|'.$Foswiki::cfg{Register}{RegistrationAgentWikiName} .
-    '|'.'ProjectContributor';
+  my @users;
+  foreach my $user (split(/\s*,\s*/, $usersString)) {
+    $user =~ s/^.*\.(.*?)$/$1/;
+    push @users, $user;
+  }
+
+  push @users, 
+    $Foswiki::cfg{DefaultUserWikiName},
+    $Foswiki::cfg{SuperAdminGroup},
+    $Foswiki::cfg{AdminUserWikiName},
+    $Foswiki::cfg{Register}{RegistrationAgentWikiName},
+    "UnknownUser",
+    "ProjectContributor";
+
+  $this->{ignoreUsers} = join('|', @users);
 
   writeDebug("ignoreHosts=$this->{ignoreHosts}");
   writeDebug("ignoreUsers=$this->{ignoreUsers}");
@@ -84,8 +82,8 @@ sub handleNrUsers {
   writeDebug("called handleNrUsers");
   return $this->{nrUsers} if defined $this->{nrUsers};
 
-  my $users = $this->getUsers();
-  $this->{nrUsers} = scalar(@$users);
+  my $it = Foswiki::Func::eachUser();
+  $this->{nrUsers} = scalar($it->all);
  
   writeDebug("got $this->{nrUsers} nr users");
   return $this->{nrUsers};
@@ -112,7 +110,7 @@ sub handleNrGuests {
   writeDebug("called handleNrGuests");
   return $this->{nrGuests} if defined $this->{nrGuests};
 
-  my (undef, $guests) = $this->getVisitorsFromSessionStore($this->{WikiGuest});
+  my (undef, $guests) = $this->getVisitorsFromSessionStore($Foswiki::cfg{DefaultUserWikiName});
   $this->{nrGuests} = scalar @$guests;
 
   writeDebug("got $this->{nrGuests} nr guests");
@@ -121,13 +119,11 @@ sub handleNrGuests {
 
 ###############################################################################
 sub handleNrLastVisitors {
-  my ($this, $attributes) = @_;
+  my ($this, $session, $params, $web, $topic) = @_;
 
   writeDebug("called handleNrLastVisitors");
 
-  $attributes = '' unless $attributes;
-
-  my $theDays = Foswiki::Func::extractNameValuePair($attributes, "days") || 1;
+  my $theDays = $params->{days} || 1;
   return $this->{nrLastVisitors}{$theDays} if defined $this->{nrLastVisitors}{$theDays};
 
   my $visitors = $this->getVisitors($theDays, undef, undef, $this->{ignoreUsers});
@@ -138,142 +134,165 @@ sub handleNrLastVisitors {
 }
 
 ###############################################################################
-sub handleCurrentVisitors {
-  my ($this, $attributes) = @_;
+sub handleVisitors {
+  my ($this, $session, $params, $web, $topic) = @_;
 
-  writeDebug("called handleCurrentVisitors");
-  $attributes = '' unless $attributes;
+  writeDebug("called handleVisitors");
 
-  my $theHeader = &Foswiki::Func::extractNameValuePair($attributes, "header") || '';
-  my $theFooter = &Foswiki::Func::extractNameValuePair($attributes, "footer") || '';
-  my $theFormat = &Foswiki::Func::extractNameValuePair($attributes, "format") ||
-    "\t* \$wikiusername";
-  my $theSep = &Foswiki::Func::extractNameValuePair($attributes, "sep") || '$n';
-  my $theMax = &Foswiki::Func::extractNameValuePair($attributes, "max") || 0;
+  my $theHeader = $params->{header} || '';
+  my $theFooter = $params->{footer} || '';
+  my $theFormat = $params->{format};
+  $theFormat = '   * $wikiusername' unless defined $theFormat;
+
+  my $theSep = $params->{sep} || $params->{separator};
+  $theSep = '$n' unless defined $theSep;
+
+  my $theMax = $params->{max} || 0;
   $theMax = 0 if $theMax eq "unlimited";
   
   # get current visitors
   my ($visitors) = $this->getVisitorsFromSessionStore(undef, $this->{ignoreUsers});
-  return '' if !@$visitors;
+  return '' unless @$visitors;
 
   # get more information from the logfiles
   $visitors = join('|', @$visitors);
   $visitors = $this->getVisitors(1, undef, $visitors, $this->{ignoreUsers});
 
-  my $result = '';
-  my $isFirst = 1;
-  my $n = $theMax;
-  my $counter = 0;
+  my @result = ();
+  my $index = 0;
   foreach my $visitor (sort {$a->{wikiname} cmp $b->{wikiname}} @$visitors) {
-    last if --$n == 0;
-    my $text = $result?$theSep:'';
-    $text .= $theFormat;
-    $result .= &replaceVars($text, {
-      'counter'=>++$counter,
+    last if $theMax && $index > $theMax;
+    my $line = $theFormat;
+
+    push @result, replaceVars($line, {
+      'index'=>$index,
       'wikiname'=>$visitor->{wikiname}, 
       'date'=>$visitor->{sdate},
       'time'=>$visitor->{time},
       'host'=>$visitor->{host},
       'topic'=>$visitor->{topic},
     });
+
+    $index++;
     #writeDebug("found visitor $visitor->{wikiname}");
   }
 
-  if ($counter) {
-    $result = $theHeader.$result.$theFooter;
-    $result = &replaceVars($result, {
-      'counter'=>$counter,
-    });
-  }
+  return '' unless @result;
+
+  my $result = replaceVars($theHeader).join(replaceVars($theSep), @result).replaceVars($theFooter);
+  $result =~ s/\$count/$index/g;
+  $result =~ s/\$total/$this->handleNrUsers()/ge;
   
   return $result;
 }
 
 ###############################################################################
 # render list of 10 most recently registered users.
-# this information is extracted from %MAINWEB%.WikiUsers
+# this information is extracted from %HOMEWEB%.WikiUsers
 sub handleNewUsers {
-  my ($this, $attributes) = @_;
+  my ($this, $session, $params, $web, $topic) = @_;
 
   writeDebug("called handleNewUsers");
-  $attributes = '' unless $attributes;
 
-  my $theHeader = &Foswiki::Func::extractNameValuePair($attributes, "header") || '';
-  my $theFooter = &Foswiki::Func::extractNameValuePair($attributes, "footer") || '';
-  my $theFormat = &Foswiki::Func::extractNameValuePair($attributes, "format") ||
-    "\t* \$date - \$wikiusername";
-  my $theSep = &Foswiki::Func::extractNameValuePair($attributes, "sep") || '$n';
-  my $theMax = &Foswiki::Func::extractNameValuePair($attributes, "max") || 10;
+  my $theHeader = $params->{header} || '';
+  my $theFooter = $params->{footer} || '';
+
+  my $theFormat = $params->{format};
+  $theFormat = '   * $date - $wikiusername' unless defined $theFormat;
+
+  my $theSep = $params->{sep} || $params->{separator};
+  $theSep = '$n' unless defined $theSep;
+
+  my $theMax = $params->{max};
+  $theMax = 10 unless defined $theMax;
   $theMax = 0 if $theMax eq "unlimited";
 
-  my $users = $this->getUsers();
+  my @users = ();
+  my $it = Foswiki::Func::eachUser();
+  while ($it->hasNext()) {
+    my $user = $it->next();
+    next if $user =~ $this->{ignoreUsers};
+    next unless Foswiki::Func::topicExists($Foswiki::cfg{UsersWebName}, $user);
+    my ($date) = Foswiki::Func::getRevisionInfo($Foswiki::cfg{UsersWebName}, $user, 1);
+    push @users, {
+      wikiname => $user,
+      date => $date,
+    };
+  }
 
-  my $n = $theMax;
-  my $counter = 0;
-  my $result = '';
-  foreach my $user (sort { $b->{date} <=> $a->{date}} @$users) {
-    last if --$n == 0;
-    my $text = $result?$theSep:'';
-    $text .= $theFormat;
-    $result .= &replaceVars($text, {
-      counter=>++$counter,
-      wikiname=>$user->{name}, 
-      date=>$user->{sdate}  
+  my $index = 0;
+  my @result = ();
+  foreach my $user (sort { $b->{date} <=> $a->{date}} @users) {
+    last if $theMax && $index > $theMax;
+
+    my $line = $theFormat;
+    push @result, replaceVars($line, {
+      index=>$index,
+      wikiname=>$user->{wikiname}, 
+      date => Foswiki::Func::formatTime($user->{date}, '$day $mon $year'),
     });
+
     #writeDebug("found new user $user->{name}");
+    $index++;
   }
 
-  if ($counter) {
-    $result = $theHeader.$result.$theFooter;
-    $result = &replaceVars($result, {
-      'counter'=>$counter,
-    });
-  }
+  return '' unless @result;
+
+  my $result = replaceVars($theHeader).join(replaceVars($theSep), @result).replaceVars($theFooter);
+  $result =~ s/\$count/$index/g;
+  $result =~ s/\$total/$this->handleNrUsers()/ge;
 
   return $result;
 }
 
 ###############################################################################
 sub handleLastVisitors {
-  my ($this, $attributes) = @_;
+  my ($this, $session, $params, $web, $topic) = @_;
 
   writeDebug("called handleLastVisitors");
-  $attributes = '' unless $attributes;
 
-  my $theHeader = &Foswiki::Func::extractNameValuePair($attributes, "header") || '';
-  my $theFooter = &Foswiki::Func::extractNameValuePair($attributes, "footer") || '';
-  my $theFormat = Foswiki::Func::extractNameValuePair($attributes, "format" ) ||
-    "\t* \$date - \$wikiusername";
-  my $theSep = Foswiki::Func::extractNameValuePair($attributes, "sep" ) || '$n';
-  my $theMax = Foswiki::Func::extractNameValuePair($attributes, "max") || 0;
-  $theMax = 0 if $theMax eq 'unlimited';
-  my $theDays = Foswiki::Func::extractNameValuePair($attributes, "days") || 1;
+  my $theHeader = $params->{header} || '';
+  my $theFooter = $params->{footer} || '';
+
+  my $theFormat = $params->{format};
+  $theFormat = '   * $date - $wikiusername' unless defined $theFormat;
+
+  my $theSep = $params->{sep} || $params->{separator};
+  $theSep = '$n' unless defined $theSep;
+
+  my $theMax = $params->{max};
+  $theMax = 0 unless defined $theMax;
+  $theMax = 0 if $theMax eq "unlimited";
+
+  my $theDays = $params->{days} || 1;
 
   my $visitors = $this->getVisitors($theDays, $theMax, undef, $this->{ignoreUsers});
 
   # garnish the collected data
-  my $result = '';
-  my $counter = 0;
+  my @result = ();
+  my $index = 0;
   foreach my $visitor (sort {$b->{date} <=> $a->{date}} @$visitors) {
-    my $text = $result?$theSep:'';
-    $text .= $theFormat;
-    $result .= &replaceVars($text, {
-      'counter'=>++$counter,
+    last if $theMax && $index > $theMax;
+
+    my $line = $theFormat;
+    push @result, replaceVars($line, {
+      'index'=>$index,
       'wikiname'=>$visitor->{wikiname}, 
       'date'=>$visitor->{sdate},
       'time'=>$visitor->{time},
       'host'=>$visitor->{host},
       'topic'=>$visitor->{topic},
     });
+
     #writeDebug("found last visitor $visitor->{wikiname}");
+    $index++;
   }
 
-  if ($counter) {
-    $result = $theHeader.$result.$theFooter;
-    $result = &replaceVars($result, {
-      'counter'=>$counter,
-    });
-  }
+  return '' unless @result;
+
+  my $result = replaceVars($theHeader).join(replaceVars($theSep), @result).replaceVars($theFooter);
+  $result =~ s/\$count/$index/g;
+  $result =~ s/\$total/$this->handleNrUsers()/ge;
 
   return $result;
 }
@@ -300,10 +319,10 @@ sub getVisitorsFromSessionStore {
 
     #writeDebug("reading $sessionFile");
   
-    my $dump = &Foswiki::Func::readFile($sessionFile);
+    my $dump = Foswiki::Func::readFile($sessionFile);
     next unless $dump;
 
-    my $wikiName = $this->{WikiGuest};
+    my $wikiName = $Foswiki::cfg{DefaultUserWikiName};
     if ($dump =~ /['"]?AUTHUSER['"]? => ["'](.*?)["']/) {
       $wikiName = $1;
     }
@@ -317,13 +336,13 @@ sub getVisitorsFromSessionStore {
     if ($host) {
       #writeDebug("host=$host");
       next if $host =~ /$this->{ignoreHosts}/;
-      $guests{$host} = 1 if $wikiName eq $this->{WikiGuest};
+      $guests{$host} = 1 if $wikiName eq $Foswiki::cfg{DefaultUserWikiName};
     }
 
     next if $users{$wikiName};
     next if $excludeNames && $wikiName =~ /$excludeNames/;
     next if $includeNames && $wikiName !~ /$includeNames/;
-    #writeDebug("found $wikiName");
+    writeDebug("found $wikiName");
     $users{$wikiName} = 1;
   }
 
@@ -331,39 +350,6 @@ sub getVisitorsFromSessionStore {
   my @guests = keys %guests;
 
   return (\@users, \@guests);
-}
-
-###############################################################################
-# extracts all users from Main.WikiUsers
-sub getUsers {
-  my $this = shift;
-
-  #writeDebug("called getUsers");
-  return $this->{users} if defined $this->{users};
-  
-  my $wikiUsersTopicname = $Foswiki::cfg{UsersTopicName};
-  my $mainWeb = &Foswiki::Func::getMainWebname();
-
-  my (undef, $topicText) = &Foswiki::Func::readTopic($mainWeb, $wikiUsersTopicname);
-  my @users;
-  foreach my $line ( split( /\n/, $topicText) ) {
-    #writeDebug("line=$line");
-    next unless $line =~ m/[\t|(?: {3})]\*\s([A-Z][a-zA-Z0-9]+)\s\-\s(?:(.*)\s\-\s)?(.*)/;
-    my $name = $1;
-    my $date = $3;
-    #writeDebug("name=$name");
-    next if $name =~ /$this->{ignoreUsers}/;
-    my %user = (
-      'sdate' => $date,
-      'date' => parseDate($date),
-      'name' => $name
-    );
-    push @users, \%user;
-  }
-
-  $this->{users} = \@users;
-
-  return $this->{users};
 }
 
 ###############################################################################
@@ -376,139 +362,39 @@ sub getVisitors {
 
   writeDebug("getVisitors()");
   writeDebug("theDays=$theDays") if $theDays;
-  #writeDebug("theMax=$theMax") if $theMax;
-  #writeDebug("includeNames=$includeNames") if $includeNames;
-  #writeDebug("excludeNames=$excludeNames") if $excludeNames;
-  my $mainWeb = &Foswiki::Func::getMainWebname();
+  writeDebug("theMax=$theMax") if $theMax;
+  writeDebug("includeNames=$includeNames") if $includeNames;
+  writeDebug("excludeNames=$excludeNames") if $excludeNames;
   my @lastVisitors = ();
   my %seen;
 
-  if (defined &Foswiki::Func::eachEventSince) {
-      # Round "now" to today
-      my $then = (time() / (24 * 60 * 60)) * (24 * 60 * 60);
-      $then -= ($theDays * 24 * 60 * 60);
-      $then = int($then / (24 * 60 * 60)) * 24 * 60 * 60;
-      my $it = Foswiki::Func::eachEventSince($then);
-      while ($it->hasNext()) {
-          my $e = $it->next();
+  # Round "now" to today
+  my $then = (time() / (24 * 60 * 60)) * (24 * 60 * 60);
+  $then -= ($theDays * 24 * 60 * 60);
+  $then = int($then / (24 * 60 * 60)) * 24 * 60 * 60;
+  my $it = Foswiki::Func::eachEventSince($then);
+  while ($it->hasNext()) {
+      my $e = $it->next();
 
-          my $wikiName = Foswiki::Func::getWikiName($e->[1]);
+      my $wikiName = Foswiki::Func::getWikiName($e->[1]);
 
-          # check back
-          next unless Foswiki::Func::topicExists($mainWeb, $wikiName);
+      # check back
+      next unless Foswiki::Func::topicExists($Foswiki::cfg{UsersWebName}, $wikiName);
 
-          # create visitor struct
-          my $visitor = {
-              'sdate'    => Foswiki::Time::formatTime($e->[0], 'iso'),
-              'date'     => $e->[0],
-              'wikiname' => $wikiName,
-              'time'     =>  Foswiki::Time::formatTime($e->[0], '$min:$sec'),
-              'topic'    => $e->[3],
-              'host'     => $e->[5],
-          };
-          # store
-          $seen{$wikiName} = $visitor;
-      }
-      @lastVisitors = values %seen;
-  } else {
-      # get the logfile mask
-      my $logFileGlob;
-      $logFileGlob = $Foswiki::cfg{LogFileName};
-      $logFileGlob =~ s/%DATE%/*/go;
-  
-      # go through the logfiles and collect visitor data
-      my $isDone = 0;
-      my $days = 0;
-      my $n = $theMax;
-      my $currentDate = '';
-      my @logFiles = reverse glob $logFileGlob;
-      foreach my $logFilename (@logFiles) {
-          #writeDebug("reading $logFilename");
-
-          # read one logfile
-          my $fileContents = Foswiki::Func::readFile($logFilename);
-    
-          # analysis
-          my $nrVisitors = 0;
-          foreach my $line (reverse split(/\n/, $fileContents)) {
-              my @fields = split(/\|/, $line);
-              if (!$fields[2]) {
-                  #writeDebug("Hm, line '$line' has no wikiName");
-                  next;
-              }
-
-              # date
-              my $date = substr($fields[1], 1, 11);
-              $date =~ s/^\s+//g;
-              $date =~ s/\s+$//g;
-              if ($currentDate ne $date) {
-                  $currentDate = $date;
-                  $days++;
-              }
-              #writeDebug("date=$date, currentDate=$currentDate, days=$days");
-
-              # termination criteria
-              if (--$n == 0 || ($theDays && $days > $theDays)) {
-                  $isDone = 1;
-                  last;
-              }
-
-              # wikiname
-              my $wikiName = $fields[2];
-              $wikiName =~ s/^\s+//g;
-              $wikiName =~ s/\s+$//g;
-              next unless $wikiName;
-              # SMELL: RegistrationAgent, UknownUser, ProjectContributor, etc.
-              next if $wikiName =~ /^TWiki/o; # exclude default user
-              
-              $wikiName =~ s/^.*?\.(.*)$/$1/g;
-              
-              next if $excludeNames && $wikiName =~ /$excludeNames/;
-              next if $includeNames && $wikiName !~ /$includeNames/;
-              next if $seen{"$wikiName"};
-              
-              # check back
-              next unless Foswiki::Func::topicExists($mainWeb, $wikiName);
-
-              # host
-              my $host = $fields[6];
-              $host =~ s/^\s+//g;
-              $host =~ s/\s+$//g;
-              next if $host =~ /$this->{ignoreHosts}/;
-
-              # topic
-              my $thisTopic = $fields[4];
-              $thisTopic =~ s/^\s+//g;
-              $thisTopic =~ s/\s+$//g;
-
-              # date, time
-              my $time = substr($fields[1], 15, 5);
-              my $timeMark = 
-                $days * 24 +
-                  substr($fields[1], 15, 2) * 60 + 
-                    substr($fields[1], 18, 2);
-
-              # create visitor struct
-              my $visitor = {
-                  'wikiname'=>$wikiName,
-                  'sdate'=>$date,
-                  'date'=>parseDate($date),
-                  'time'=>$time,
-                  'host'=>$host,
-                  'topic'=>$thisTopic,
-              };
-              #writeDebug("found visitor $wikiName in the logs");
-              
-              # store
-              push @lastVisitors, $visitor;
-              $seen{"$wikiName"} = 1;
-              $nrVisitors++;
-          }
-          #writeDebug("found $nrVisitors visitors in file $logFilename");
-          
-          last if $isDone;
-      }
+      # create visitor struct
+      my $visitor = {
+          'sdate'    => Foswiki::Time::formatTime($e->[0], '$day $mon $year'),
+          'date'     => $e->[0],
+          'wikiname' => $wikiName,
+          'time'     =>  Foswiki::Time::formatTime($e->[0], '$min:$sec'),
+          'topic'    => $e->[3],
+          'host'     => $e->[5],
+      };
+      # store
+      $seen{$wikiName} = $visitor;
   }
+
+  @lastVisitors = values %seen;
 
   return \@lastVisitors;
 }
@@ -522,8 +408,8 @@ sub replaceVars {
 
   if (defined $data) {
     if (defined $data->{wikiname}) {
-      $data->{username} = &Foswiki::Func::wikiToUserName($data->{wikiname});
-      $data->{wikiusername} = &Foswiki::Func::userToWikiName($data->{wikiname});
+      $data->{username} = Foswiki::Func::wikiToUserName($data->{wikiname});
+      $data->{wikiusername} = Foswiki::Func::userToWikiName($data->{wikiname});
     }
 
     foreach my $key (keys %$data) {
@@ -531,28 +417,14 @@ sub replaceVars {
     }
   }
 
+  $format =~ s/\$perce?nt/\%/go;
+  $format =~ s/\$nop\b//go;
   $format =~ s/\$n/\n/go;
-  $format =~ s/\$quot/\"/go;
-  $format =~ s/\$percnt/\%/go;
   $format =~ s/\$dollar/\$/go;
-  $format =~ s/\\/\//go;
 
   #writeDebug("returns '$format'");
 
   return $format;
 }
 
-###############################################################################
-# static
-# parse dates of the format "31 Dec 2001"
-sub parseDate {
-
-  if ($_[0] =~ /([0-9]+)\s+([A-Za-z]+)\s+([0-9]+)/) {
-    return timelocal( 0, 0, 0, $1, $MON2NUM{$2}, $3 );
-  }
-
-  return 0; # never reach
-}
-
-###############################################################################
 1;

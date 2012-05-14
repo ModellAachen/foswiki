@@ -1,0 +1,88 @@
+%META:TOPICINFO{author="ProjectContributor" comment="pending" date="1332146098" format="1.1" version="2"}%
+---+!! %TOPIC%
+%SHORTDESCRIPTION%
+
+%TOC%
+
+---++ Description
+
+This plugin is used to clean up the html page foswiki renders by rewriting
+and/or removing code not required in html5. It also compresses all stylesheets and
+javascript code used in a page thus reducing the number of http requests that are
+normally required to load a page including all of its assets.
+
+These changes only apply to output of type =text/html=, not to any other kind of output.
+
+---++ Rewrite of html markup
+
+The following list of transformations is performed:
+
+   * all one-liner html comments are removed
+   * any markup following the closing =&lt;/html>= is removed
+   * sequences of =&lt;p>&lt;/p>&lt;p>&lt;/p>...= are collapsed into one
+   * script blocks of type =text/javascript= don't need a =type= argument anymore as
+     that's the default in html5
+   * style blocks of type =text/css= don't need a =type= argument anymore as
+     that's the default in html5
+   * citations produced by foswiki's =&gt;= at the beginning of a line are
+     collapsed into one =&lt;div>= block of type =foswikiCite=, or =foswikiBlockCite=
+     when there are multiple citation lines following
+   * =&lt;verbatim>= blocks contained in template comments are rewritten to look nicer
+     for better readability of view templates coded in topics
+
+---++ Combining and compressing stylesheets and javascript
+
+<nop>%TOPIC% is reading all css and js files loaded into a page and combines them into
+one each. Only stylesheets for =media="all"= are processed. Media-specific styles
+aren't touched. All css files are parsed and rewritten so that contained =@import()=
+and =url()= statements are working as expected.
+
+The combined css (js) files are cached and reused by pages that have the same
+profile of assets loaded into the page. Or expressed the other way around: each page
+that differs in the set of assets will get its own combined stylesheet (javascript).
+This is still object of optimization. 
+
+<nop>%TOPIC% is able to gather statistics about how often specific css (js)
+files have been used while combining them with others.  This feature is
+switched off by default but can be enabled using the ={GatherStatistics}=
+switch in =configure=. Once statistics are enabled, the plugin will record css
+and js use.  Results can be printed out using the =statistics= REST handler.
+For now, this is a rather crude statistic how often css (js) file have been
+used per pages visited. E.g. a value of 100% means: this asset has been used on
+all pages, whereas lower values indicate a decreasing frequency of those files
+being used.
+
+All css and js files will be cached in plain text as well as encoded =gzip= compressed
+for browsers supporting on-the-fly decompression of js and css files.
+
+The cache of stylesheets and javascript files can be refreshed manually by using
+the =refresh= url parameter:
+
+   * %SCRIPTURL{"view"}%/%WEB%/%TOPIC%?refresh=on (or cache): refresh the css and js cache for the current page
+   * %SCRIPTURL{"view"}%/%WEB%/%TOPIC%?refresh=css : refresh the css files of the current page
+   * %SCRIPTURL{"view"}%/%WEB%/%TOPIC%?refresh=js : refresh the js files of the current page
+   * %SCRIPTURL{"view"}%/%WEB%/%TOPIC%?refresh=all : purge the complete cache 
+
+---++ Installation Instructions
+
+%$INSTALL_INSTRUCTIONS%
+
+---++ Info
+<!--
+   * Set SHORTDESCRIPTION = %$SHORTDESCRIPTION%
+-->
+
+|  Author(s): | Michael Daum|
+|  Copyright: | &copy; 2012 Michael Daum http://michaeldaumconsulting.com |
+|  License: | [[http://www.gnu.org/licenses/gpl.html][GPL (Gnu General Public License)]] |
+|  Release: | %$RELEASE% |
+|  Version: | %$VERSION% |
+|  Change History: | <!-- versions below in reverse order -->&nbsp; |
+|  07 May 2012: | added feature to make at least some &lt;p>s real paragraphs for improved typographics |
+|  02 Apr 2012: | added ={ExcludeJavaScript}= and ={ExcludeCss}= feature to specify files not to be processed by the asset optimizer |
+|  26 Mar 2012: | added flags to turn on/off specific optimizations |
+|  20 Mar 2012: | added statistics module |
+|  19 Mar 2012: | initial checkin |
+|  Dependencies: | %$DEPENDENCIES% |
+|  Home page: | Foswiki:Extensions/%TOPIC% |
+|  Support: | Foswiki:Support/%TOPIC% |

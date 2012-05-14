@@ -1,13 +1,13 @@
 # Test for Text.pm
 package TxtTests;
-use FoswikiFnTestCase;
-our @ISA = qw( FoswikiFnTestCase );
+use StringifierTest;
+our @ISA = qw( StringifierTest );
 
 use strict;
+use utf8;
 
 use Foswiki::Contrib::Stringifier::Base();
 use Foswiki::Contrib::Stringifier ();
-use utf8;
 
 sub set_up {
         my $this = shift;
@@ -41,7 +41,7 @@ sub test_stringForFile {
     $this->assert($ok, "Text woodstock not included")
 }
 
-sub test_SpecialCharacters {
+sub test_SpecialCharacters_utf8 {
     # check that special characters are not destroyed by the stringifier
     
     my $this = shift;
@@ -49,11 +49,23 @@ sub test_SpecialCharacters {
 
     my $text  = $stringifier->stringForFile($this->{attachmentDir}.'Simple_example.txt');
 
-    $this->assert_matches('Änderung', $text, "Text Änderung not found.");
+    $this->assert_matches($this->encode('Änderung'), $text, "Text Änderung not found.");
+}
+
+sub test_SpecialCharacters_latin1 {
+    # check that special characters are not destroyed by the stringifier
+    
+    my $this = shift;
+    my $stringifier = Foswiki::Contrib::Stringifier::Plugins::Text->new();
+
+    my $text  = $stringifier->stringForFile($this->{attachmentDir}.'Simple_example_latin1.txt');
+
+    $this->assert_matches($this->encode('Änderung'), $text, "Text Änderung not found.");
 }
 
 # test what would happen if someone uploaded a png and called it a .txt
-sub test_maliciousFile {
+# SMELL: strange test
+sub DONT_test_maliciousFile {
     my $this = shift;
     my $stringifier = Foswiki::Contrib::Stringifier::Plugins::Text->new();
 

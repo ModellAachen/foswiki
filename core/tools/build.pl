@@ -44,13 +44,14 @@ sub new {
 
     if ( my $gitdir = findPathToDir('.git') ) {
         $cvs = 'git';
-        print
-"detected git installation at $gitdir\n*Note: svn will still be used to query the Repository for the list of release tags.\n";
+        print "detected git installation at $gitdir\n"
+          . "*Note*: svn will still be used to query the Repository"
+          . " for the list of release tags.\n";
 
      # Verify that all files are committed and all commits are dcommmited to svn
         my $gitstatus = `git status -uno`;
-        die
-          "***\nuncommitted changes in tree - build aborted\n***\n$gitstatus\n"
+        die "***\nuncommitted changes in tree - build aborted\n"
+          . "***\n$gitstatus\n"
           if ( $gitstatus =~ m/(modified:)|(new file:)|(deleted:)/ );
         my $gitlog = `git log -1`;
         die "***\n*** changes not yet dcommited - build aborted\n***\n$gitlog\n"
@@ -66,9 +67,10 @@ sub new {
         if ( $name eq '-auto' ) {
 
             #build a name from major.minor.patch.-auto.svnrev
-            my $rev = ( $cvs eq 'svn' ) ? `svn info ..` : `git svn info`;
-            $rev =~ /Revision: (\d*)/m;
-            $name      = 'Foswiki-' . getCurrentFoswikiRELEASE() . '-auto' . $1;
+            my $revlog = ( $cvs eq 'svn' ) ? `svn info ..` : `git svn info`;
+            my ($rev) = $revlog =~ /Revision: (\d*)/m;
+            $rev ||= 'LOCAL';
+            $name = 'Foswiki-' . getCurrentFoswikiRELEASE() . '-auto' . $rev;
             $autoBuild = 1;
         }
     }
@@ -367,11 +369,15 @@ $build->build( $build->{target} );
 
 #returns the version number portion in the $RELEASE line in Foswiki.pm
 sub getCurrentFoswikiRELEASE {
-    open( PM, '<', "../lib/Foswiki.pm" ) || die $!;
-    local $/ = undef;
-    my $content = <PM>;
-    close(PM);
-    $content =~ /\$RELEASE\s*=\s*'Foswiki-(.*?)'/;
-    return $1;
+    open( my $pm, '<', "../lib/Foswiki.pm" )
+      or die "Cannot open Foswiki.pm: $!";
+    while (<$pm>) {
+        if (/\$RELEASE\s*=\s*'Foswiki-(.*?)'/) {
+            close $pm;
+            return $1;
+        }
+    }
+    close $pm;
+    return 'UNKNOWN';
 }
 

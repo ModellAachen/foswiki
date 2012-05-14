@@ -17,11 +17,21 @@ msgstr ""
 msgid "%1 Web"
 msgstr ""
 
+#: data/Applications/ClassificationApp/WelcomeMessage.txt:12
+msgid "... and finally delete this message."
+msgstr ""
+
 #: data/Applications/ClassificationApp/NatSkinSearchViewTemplate.txt:21
 msgid "<span>%1</span> topics found"
 msgstr ""
 
+#: data/_ClassificationTemplate/WebHome.txt:81
+msgid "Add more text here"
+msgstr ""
+
 #: data/Applications/ClassificationApp/ClassifiedTopicEditTemplate.txt:24
+#: data/Applications/ClassificationApp/WebLeftBar.txt:11
+#: data/_ClassificationTemplate/WebHome.txt:9
 msgid "Categories"
 msgstr ""
 
@@ -37,8 +47,25 @@ msgstr ""
 msgid "Create New Topic"
 msgstr ""
 
+#: data/Applications/ClassificationApp/WelcomeMessage.txt:10
+msgid ""
+"Create [[%1][categories]] matching the subject fields covered in this web."
+msgstr ""
+
 #: data/Applications/ClassificationApp/RenderCategoryFactory.txt:25
 msgid "Create a new category in the %1 web"
+msgstr ""
+
+#: data/Applications/ClassificationApp/WelcomeMessage.txt:8
+msgid ""
+"Customize each section on this dashboard to your needs by hovering over the "
+"heading. It will display a pencil icon."
+msgstr ""
+
+#: data/Applications/ClassificationApp/WelcomeMessage.txt:11
+msgid ""
+"Edit this page and give it a name. This will be used as the display title "
+"linking to this web, e.g. in breadcrumbs and search interfaces."
 msgstr ""
 
 #: data/Applications/ClassificationApp/RenderCategoryFactory.txt:44
@@ -57,8 +84,8 @@ msgid ""
 "name will be derived from by default."
 msgstr ""
 
-#: data/Applications/ClassificationApp/CategoryViewTemplate.txt:40
-#: data/Applications/ClassificationApp/RenderClassifiedTopicView.txt:21
+#: data/Applications/ClassificationApp/CategoryViewTemplate.txt:41
+#: data/Applications/ClassificationApp/RenderClassifiedTopicView.txt:22
 msgid "Filed in %1"
 msgstr ""
 
@@ -83,6 +110,12 @@ msgstr ""
 
 #: data/_ClassificationTemplate/WebLeftBar.txt:5
 msgid "Index"
+msgstr ""
+
+#: data/Applications/ClassificationApp/WelcomeMessage.txt:9
+msgid ""
+"Install Foswiki:Extensions/NatSkin for best usability, design and "
+"readability of your content."
 msgstr ""
 
 #: data/Applications/ClassificationApp/CategorizedTopic.txt:19
@@ -116,12 +149,20 @@ msgstr ""
 msgid "Preferences"
 msgstr ""
 
+#: data/_ClassificationTemplate/WebHome.txt:56
+msgid "Quick links"
+msgstr ""
+
 #: data/_ClassificationTemplate/WebLeftBar.txt:9
 msgid "RSS Feed"
 msgstr ""
 
-#: data/_ClassificationTemplate/WebLinks.txt:24
+#: data/_ClassificationTemplate/WebLinks.txt:21
 msgid "Recent Changes"
+msgstr ""
+
+#: data/_ClassificationTemplate/WebHome.txt:34
+msgid "Recent changes"
 msgstr ""
 
 #: data/Applications/ClassificationApp/RenderTagEditor.txt:54
@@ -153,8 +194,12 @@ msgstr ""
 msgid "Show advanced options"
 msgstr ""
 
-#: data/Applications/ClassificationApp/RenderClassifiedTopicView.txt:31
+#: data/Applications/ClassificationApp/RenderClassifiedTopicView.txt:32
 msgid "Show all tags"
+msgstr ""
+
+#: data/Applications/ClassificationApp/WelcomeMessage.txt:6
+msgid "Some tips:"
 msgstr ""
 
 #: data/_ClassificationTemplate/WebLeftBar.txt:10
@@ -174,6 +219,7 @@ msgid "Summary"
 msgstr ""
 
 #: data/Applications/ClassificationApp/ClassifiedTopicEditTemplate.txt:28
+#: data/_ClassificationTemplate/WebHome.txt:19
 msgid "Tags"
 msgstr ""
 
@@ -198,12 +244,36 @@ msgstr ""
 msgid "Title"
 msgstr ""
 
+#: data/Applications/ClassificationApp/WebLeftBar.txt:13
+msgid "Tools"
+msgstr ""
+
 #: data/Applications/ClassificationApp/RenderCategoryFactory.txt:34
 msgid "Topic"
 msgstr ""
 
+#: data/_ClassificationTemplate/WebHome.txt:48
+msgid "Topic list"
+msgstr ""
+
+#: data/_ClassificationTemplate/WebHome.txt:66
+msgid "Topics tagged \"%1\""
+msgstr ""
+
 #: data/Applications/ClassificationApp/RenderCategoryEditor.txt:87
 msgid "Undo"
+msgstr ""
+
+#: data/_ClassificationTemplate/WebHome.txt:4
+msgid "Welcome"
+msgstr ""
+
+#: data/Applications/ClassificationApp/WelcomeMessage.txt:4
+msgid ""
+"You just created a new and empty web. That's why this dashboard might look "
+"at little silly in the beginning. As soon as you start creating more "
+"content, it will fill up with hopefully useful information that helps you "
+"keeping track of what's going on in this web."
 msgstr ""
 
 #: data/Applications/ClassificationApp/CategorizedTopicEditTemplate.txt:5
@@ -223,6 +293,10 @@ msgid "found in %1 other topic(s)"
 msgstr ""
 
 #: data/Applications/ClassificationApp/CategoryRenderIndexItem.txt:22
-#: data/Applications/ClassificationApp/RenderClassifiedTopicView.txt:31
+#: data/Applications/ClassificationApp/RenderClassifiedTopicView.txt:32
 msgid "more"
+msgstr ""
+
+#: data/Applications/ClassificationApp/WelcomeMessage.txt:8
+msgid "requires Foswiki:Extensions/EditChapterPlugin"
 msgstr ""

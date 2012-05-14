@@ -16,40 +16,42 @@
 ###############################################################################
 
 package Foswiki::Plugins::FilterPlugin::Core;
-use strict;
 
-use vars qw($currentTopic $currentWeb %seenAnchorNames $makeIndexCounter %filteredTopic);
+use strict;
+use warnings;
+
 use POSIX qw(ceil);
+use Foswiki::Plugins();
 use Foswiki::Func();
 
 use constant DEBUG => 0; # toggle me
 
 ###############################################################################
-sub init {
-  ($currentWeb, $currentTopic) = @_;
+sub new {
+  my ($class, $session) = @_;
 
-  %seenAnchorNames = ();
-  %filteredTopic = ();
-  $makeIndexCounter = 0;
+  $session ||= $Foswiki::Plugins::SESSION;
+
+  my $this = bless({
+    session => $session,
+    seenAnchorNames => {},
+    makeIndexCounter => 0,
+    filteredTopic => {},
+  }, $class);
+
+  return $this;
 }
-
-###############################################################################
-sub writeDebug {
-  print STDERR "- FilterPlugin - $_[0]\n" if DEBUG;
-}
-
 
 ###############################################################################
 sub handleFilterArea {
-  my ($theAttributes, $theMode, $theText) = @_;
+  my ($this, $theAttributes, $theMode, $theText, $theWeb, $theTopic) = @_;
 
   $theAttributes ||= '';
   #writeDebug("called handleFilterArea($theAttributes)");
 
   my %params = Foswiki::Func::extractParameters($theAttributes);
-  return handleFilter(\%params, $theMode, $theText);
+  return $this->handleFilter(\%params, $theMode, $theText, $theWeb, $theTopic);
 }
-
 
 ###############################################################################
 # filter a topic or url thru a regular expression
@@ -61,7 +63,7 @@ sub handleFilterArea {
 #    * expand
 #
 sub handleFilter {
-  my ($params, $theMode, $theText) = @_;
+  my ($this, $params, $theMode, $theText, $theWeb, $theTopic) = @_;
 
   #writeDebug("called handleFilter(".$params->stringify.")");
   #writeDebug("theMode = '$theMode'");
@@ -81,10 +83,8 @@ sub handleFilter {
   my $theSort = $params->{sort} || 'off';
   my $theReverse = $params->{reverse} || '';
 
-  my $theTopic = $params->{_DEFAULT} || $params->{topic} || $currentTopic;
-  my $theWeb = $currentWeb;
-
-  ($theWeb, $theTopic) = Foswiki::Func::normalizeWebTopicName($theWeb, $theTopic);
+  my $thisTopic = $params->{_DEFAULT} || $params->{topic} || $theTopic;
+  ($theWeb, $theTopic) = Foswiki::Func::normalizeWebTopicName($theWeb, $thisTopic);
   $theWeb =~ s/\//\./g;
   
   $theText ||= $params->{text};
@@ -96,17 +96,18 @@ sub handleFilter {
   if (defined $theText) { # direct text
     $text = $theText;
   } else { # topic text
-    return '' if $filteredTopic{"$theWeb.$theTopic"};
-    $filteredTopic{"$theWeb.$theTopic"} = 1;
+    return '' if $this->{filteredTopic}{"$theWeb.$theTopic"};
+    $this->{filteredTopic}{"$theWeb.$theTopic"} = 1;
     (undef, $text) = Foswiki::Func::readTopic($theWeb, $theTopic);
+    $text = '' unless defined $text;
     if ($text =~ /^No permission to read topic/) {
-      return showError("$text");
+      return inlineError("$text");
     }
     if ($text =~ /%STARTINCLUDE%(.*)%STOPINCLUDE%/gs) {
       $text = $1;
       if ($theExpand eq 'on') {
-	$text = Foswiki::Func::expandCommonVariables($text, $currentTopic, $currentWeb);
-	$text = Foswiki::Func::renderText($text, $currentWeb);
+	$text = Foswiki::Func::expandCommonVariables($text);
+	$text = Foswiki::Func::renderText($text);
       }
     }
   }
@@ -117,6 +118,7 @@ sub handleFilter {
   my $skip = $theSkip;
   if ($theMode == 0) {
     # extraction mode
+
     my @result = ();
     while($text =~ /$thePattern/gms) {
       my $arg1 = $1;
@@ -221,10 +223,9 @@ sub handleFilter {
   }
   $result = $theNullFormat unless $result;
   $result = $theHeader.$result.$theFooter;
-  $result = Foswiki::Func::expandCommonVariables($result, $theTopic, $theWeb)
-    if expandVariables($result);
+  expandVariables($result);
 
-  delete $filteredTopic{"$theWeb.$theTopic"};
+  delete $this->{filteredTopic}{"$theWeb.$theTopic"};
 
   #writeDebug("result='$result'");
   return $result;
@@ -232,19 +233,19 @@ sub handleFilter {
 
 ###############################################################################
 sub handleSubst {
-  my ($session, $params, $theTopic, $theWeb) = @_;
-  return handleFilter($params, 1);
+  my ($this, $params, $theTopic, $theWeb) = @_;
+  return $this->handleFilter($params, 1, undef, $theWeb, $theTopic);
 }
 
 ###############################################################################
 sub handleExtract {
-  my ($session, $params, $theTopic, $theWeb) = @_;
-  return handleFilter($params, 0);
+  my ($this, $params, $theTopic, $theWeb) = @_;
+  return $this->handleFilter($params, 0, undef, $theWeb, $theTopic);
 }
 
 ###############################################################################
 sub handleMakeIndex {
-  my ($session, $params, $theTopic, $theWeb) = @_;
+  my ($this, $params, $theTopic, $theWeb) = @_;
 
   #writeDebug("### called handleMakeIndex(".$params->stringify.")");
   my $theList = $params->{_DEFAULT} || $params->{list} || '';
@@ -252,7 +253,7 @@ sub handleMakeIndex {
   my $theFormat = $params->{format};
   my $theSort = $params->{sort} || 'on';
   my $theSplit = $params->{split};
-  $theSplit = ',' unless defined $theSplit;
+  $theSplit = '\s*,\s*' unless defined $theSplit;
 
   my $theUnique = $params->{unique} || '';
   my $theExclude = $params->{exclude} || '';
@@ -413,7 +414,7 @@ sub handleMakeIndex {
         # create an anchor to this group
         my $anchor = '';
         if ($theGroup =~ /\$anchor/) {
-          $anchor = getAnchorName($session, $group);
+          $anchor = $this->getAnchorName($group);
           if ($anchor)  {
             push @anchors, {
               name=>$anchor,
@@ -484,25 +485,26 @@ sub handleMakeIndex {
     }
   }
   #writeDebug("anchors=$anchors");
-
   expandVariables($theHeader, count=>$listSize, anchors=>$anchors);
   expandVariables($theFooter, count=>$listSize, anchors=>$anchors);
 
-  $result = Foswiki::Func::expandCommonVariables(
+  $result = 
     "<div class='fltMakeIndexWrapper'>".
-      $theHeader.$result.$theFooter .
-    "</div>",$theTopic, $theWeb);
+      $theHeader.
+      $result.
+      $theFooter.
+    "</div>";
   #writeDebug("result=$result");
 
   # count MAKEINDEX calls
-  $makeIndexCounter++;
+  $this->{makeIndexCounter}++;
 
   return $result;
 }
 
 ###############################################################################
 sub handleFormatList {
-  my ($session, $params, $theTopic, $theWeb) = @_;
+  my ($this, $params, $theTopic, $theWeb) = @_;
   
   #writeDebug("handleFormatList(".$params->stringify().")");
 
@@ -515,7 +517,6 @@ sub handleFormatList {
   my $theHeader = $params->{header} || '';
   my $theFooter = $params->{footer} || '';
   my $theSplit = $params->{split};
-  $theSplit = '[,\s]+' unless defined $theSplit;
   my $theSeparator = $params->{separator};
   my $theLimit = $params->{limit} || -1; 
   my $theSkip = $params->{skip} || 0; 
@@ -530,9 +531,10 @@ sub handleFormatList {
   my $theNullFormat = $params->{null} || '';
   my $theTokenize = $params->{tokenize};
   my $theHideEmpty = Foswiki::Func::isTrue($params->{hideempty}, 1);
+  my $theReplace = $params->{replace};
 
   $theFormat = '$1' unless defined $theFormat;
-
+  $theSplit = '\s*,\s*' unless defined $theSplit;
   $theMarker = ' selected ' unless defined $theMarker;
   $theSeparator = ', ' unless defined $theSeparator;
 
@@ -564,8 +566,23 @@ sub handleFormatList {
 
   my @theList = split(/$theSplit/, $theList);
 
-  if ($theTokenize) {
-    @theList = map {(defined $tokens{$_}) ? $tokens{$_}:$_} @theList;
+  if ($theReplace) {
+    my %replace = map {$_ =~ /^(.*)=(.*)$/, $1=>$2} split(/\s*,\s*/, $theReplace);
+    
+    foreach my $item (@theList) {
+      foreach my $pattern (keys %replace) {
+        $item =~ s/$pattern/$replace{$pattern}/g;
+      }
+    }
+  }
+
+
+  if ($theTokenize && $tokenNr) {
+    foreach my $item (@theList) {
+      foreach my $token (keys %tokens) {
+        $item =~ s/$token/$tokens{$token}/g;
+      }
+    }
   }
 
   if ($theSort ne 'off') {
@@ -662,28 +679,25 @@ sub handleFormatList {
 
   $result = $theHeader.$result.$theFooter;
   $result =~ s/\$count/$count/g;
-  $result = Foswiki::Func::expandCommonVariables($result, $theTopic, $theWeb)
-    if expandVariables($result);
 
-  #writeDebug("result=$result");
-
+  expandVariables($result);
   return $result;
 }
 
 ###############################################################################
 sub getAnchorName {
-  my ($session, $text) = @_;
+  my ($this, $text) = @_;
 
-  $text = $text.'_'.$makeIndexCounter;
-  return '' if $seenAnchorNames{$text};
-  $seenAnchorNames{$text} = 1;
+  $text = $text.'_'.$this->{makeIndexCounter};
+  return '' if $this->{seenAnchorNames}{$text};
+  $this->{seenAnchorNames}{$text} = 1;
 
   if ($Foswiki::Plugins::VERSION > 2.0) {
     require Foswiki::Render::Anchors;
     my $anchor = Foswiki::Render::Anchors::make($text);
     return Foswiki::urlEncode($anchor);
   } else {
-    return $session->renderer->makeAnchorName($text);
+    return $this->{session}->renderer->makeAnchorName($text);
   }
 }
 
@@ -710,9 +724,14 @@ sub expandVariables {
 }
 
 ###############################################################################
-sub showError {
-  my ($errormessage) = @_;
-  return "<font size=\"-1\" color=\"#FF0000\">$errormessage</font>" ;
+sub inlineError {
+  return "<span class='foswikiAlert'>".$_[0]."</span>";
 }
+
+###############################################################################
+sub writeDebug {
+  print STDERR "- FilterPlugin - $_[0]\n" if DEBUG;
+}
+
 
 1;

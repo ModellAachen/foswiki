@@ -25,14 +25,16 @@ sub stringForFile {
     my ($self, $filename) = @_;
     
     # check it is a text file
-    return '' unless ( -T $filename );
+    return '' unless ( -e $filename );
 
-    my $cmd = $html2text . ' -nobs -ascii %FILENAME|F%';
+    my $cmd = $html2text . ' -nobs %FILENAME|F%';
     my ($text, $exit) = Foswiki::Sandbox->sysCommand($cmd, FILENAME => $filename);
-    
-    # encode text
+
+    $text = $self->decode($text, $Foswiki::cfg{StringifierContrib}{CharSet}{html2text} || 'utf-8');
+    $text = $self->encode($text);
     $text =~ s/<\?xml.*?\?>\s*//g;
-    return $self->fromUtf8($text);
+
+    return $text;
 }
 
 1;

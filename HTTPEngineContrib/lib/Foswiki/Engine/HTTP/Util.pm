@@ -9,7 +9,6 @@ use Error qw(:try);
 use Time::HiRes qw(time);
 use Errno qw(EINTR EWOULDBLOCK EAGAIN);
 
-
 sub readHeader {
     my ( $fd, $opts, $full ) = @_;
     my $sel        = IO::Select->new($fd);
@@ -101,10 +100,10 @@ sub readBody {
 
     my $body = HTTP::Body->new( $headers->header('Content-Type'),
         $headers->content_length );
-    $body->add( $$input_ref );
-    my $bytes_read = length( $$input_ref );
+    $body->add($$input_ref);
+    my $bytes_read = length($$input_ref);
 
-    my $sel = IO::Select->new( $fd );
+    my $sel = IO::Select->new($fd);
 
     while ( $bytes_read < $headers->content_length && $timeleft >= 0 ) {
         my $now   = time;

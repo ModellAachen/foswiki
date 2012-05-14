@@ -27,7 +27,7 @@ sub new {
     $this->{_children} = \@children;
     $this->{_parent}   = "";
     $this->{_name}     = $name || "";
-    $this->{_rendered}     = 0;
+    $this->{_rendered} = 0;
     return bless( $this, $class );
 }
 
@@ -117,21 +117,23 @@ sub toString {
 
 sub toHTML {
     my ($this) = shift;
-    #SL: BTW I'm not sure that function is being used at all anymore looks like Foswiki::Node::toHTMLFormat is being used instead
-    #This make sure we don't render a node more than once
-    #thus preventing endless loop when dealing with inconsitant relationship     
-    if ($this->{_rendered})
-        {
-        return "";        
-        }
-    #Mark this node as being rendered 
-    $this->{_rendered}=1;
+
+#SL: BTW I'm not sure that function is being used at all anymore looks like Foswiki::Node::toHTMLFormat is being used instead
+#This make sure we don't render a node more than once
+#thus preventing endless loop when dealing with inconsitant relationship
+    if ( $this->{_rendered} ) {
+        return "";
+    }
+
+    #Mark this node as being rendered
+    $this->{_rendered} = 1;
     my ( $nodeBeg, $nodeEnd, $childBeg, $childEnd ) = @_;
     my $res = $this->name();
     if ( scalar( @{ $this->children() } ) ) {
         $res = $res . $nodeBeg;
         foreach my $node ( @{ $this->children() } ) {
-            $res .= $childBeg
+            $res .=
+                $childBeg
               . $node->toHTML( $nodeBeg, $nodeEnd, $childBeg, $childEnd )
               . $childEnd;
         }

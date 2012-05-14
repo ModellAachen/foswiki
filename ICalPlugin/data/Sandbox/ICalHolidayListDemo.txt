@@ -1,0 +1,51 @@
+%META:TOPICINFO{author="ProjectContributor" comment="save topic" date="1336488720" format="1.1" reprev="79" version="79"}%
+%META:TOPICPARENT{name="WebHome"}%
+---+!! %TOPIC%
+
+<!--
+   * Set WEBMETADATA = System.EventTopic
+   * Set ICALPLUGIN_CALENDAR = Sandbox.ICalHolidayListDemo.events.ics
+-->
+
+<div class="jqTooltip {extraClass:'bubble', showBody: '--'}">
+%HOLIDAYLIST{
+  month="+0"
+  showstatsum="off"
+  showweekends="on"
+  navenable="on"
+  showmonthheader="on"
+  name=""
+  monthheaderformat="%B %Y"
+}%
+</div>
+
+<!--
+%FORMATICAL{
+  attachment="events.ics"
+  separator="$n"
+  sort="on"
+  class="yellow"
+  start="%URLPARAM{"hlpstart1" default="%GMTIME{"01 $mon $year"}%"}%"
+  span="1 month"
+  eventformat="   * $day $month $year - $percntIF{\"'$location'!=''\" then=\"[[$location][$summary]]\" else=\"$summary\"}$percnt - $description - class($class)"
+  rangeformat="   * $day $month $year - $eday $emonth $eyear - $percntIF{\"'$location'!=''\" then=\"[[$location][$summary]]\" else=\"$summary\"}$percnt - $description - class($class)"
+}%
+-->
+
+<noautolink>
+%RENDERMETADATA{
+  "event"
+  TopicTitle_title="Title"
+}%
+
+%NEWMETADATA{"event" title="Add event"}%
+%CLEAR%
+
+%INCLUDE{"%SYSTEMWEB%.EventTopic" section="init"}%
+
+%META:FILEATTACHMENT{name="events.ics" attachment="events.ics" attr="" comment="" date="1336488720" size="1345" user="ProjectContributor" version="1"}%
+%META:PREFERENCE{name="NATSKIN_SIDEBAR" title="NATSKIN_SIDEBAR" type="Local" value="off"}%
+%META:EVENT{name="id1" EndDate="10 Mar 2012" Interval="" Month="" MonthDay="" Recurrence="weekly" StartDate="6 Mar 2012" Summary="" TopicTitle="CeBIT" WeekDay="tu, we, th, fr, sa" YearDay=""}%
+%META:EVENT{name="id2" EndDate="17 Mar 2012" Interval="" Month="" MonthDay="" Recurrence="daily" StartDate="6 Mar 2012" Summary="" TopicTitle="Test from Foswiki" WeekDay="" YearDay=""}%
+%META:EVENT{name="id3" EndDate="" Interval="" Month="" MonthDay="" Recurrence="none" StartDate="26 Apr 2012" Summary="" TopicTitle="Noch ein Gedicht" WeekDay="" YearDay=""}%
+%META:EVENT{name="id4" EndDate="" Interval="" Month="" MonthDay="" Recurrence="weekly" StartDate="" Summary="" TopicTitle="weekly test" WeekDay="mo" YearDay=""}%

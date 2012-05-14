@@ -1,5 +1,4 @@
 data/System/GenPDFPrincePlugin.txt 0644
 lib/Foswiki/Plugins/GenPDFPrincePlugin/Config.spec 0644
 lib/Foswiki/Plugins/GenPDFPrincePlugin.pm 0644
-pub/System/GenPDFPrincePlugin/genpdf_GenPDFPrincePlugin.pdf 0644
 pub/System/GenPDFPrincePlugin/watermark.jpeg 0644

@@ -43,27 +43,29 @@ use Email::Simple;
 use constant FIELD_SEPARATOR => '::::';
 
 # These are fields that are multi-select fields, so when somebody
-# adds something to them, the verbs "added to " or "removed from" should 
+# adds something to them, the verbs "added to " or "removed from" should
 # be used instead of the verb "changed" or "set".
 # It's a hash, where the names of the fields are the keys, and the values are 1.
 # The fields are named as they appear in the "What" part of a bugmail "changes"
 # table.
 use constant MULTI_FIELDS => {
-    'CC' => 1, 'Group' => 1, 'Keywords' => 1,
-    'BugsThisDependsOn' => 1, 'OtherBugsDependingOnThis' => 1,
+    'CC'                       => 1,
+    'Group'                    => 1,
+    'Keywords'                 => 1,
+    'BugsThisDependsOn'        => 1,
+    'OtherBugsDependingOnThis' => 1,
 };
 
 # Some fields have such long names for the "What" column that their names
 # wrap. Normally, our code would think that those fields were two different
 # fields. So, instead, we store a list of strings to use as an argument
 # to "grep" for the field names that we need to "unwrap."
-use constant UNWRAP_WHAT => ( 
-    qr/^Attachment .\d+$/, qr/^Attachment .\d+ is$/, qr/^OtherBugsDep/, 
-);
+use constant UNWRAP_WHAT =>
+  ( qr/^Attachment .\d+$/, qr/^Attachment .\d+ is$/, qr/^OtherBugsDep/, );
 
-# Should be whatever Bugzilla::Util::find_wrap_point (or FindWrapPoint) 
+# Should be whatever Bugzilla::Util::find_wrap_point (or FindWrapPoint)
 # breaks on, in Bugzilla.
-use constant BREAKING_CHARACTERS => (' ',',','-');
+use constant BREAKING_CHARACTERS => ( ' ', ',', '-' );
 
 # The maximum width, in characters, of each field of the "diffs" table.
 use constant WIDTH_WHAT    => 19;
@@ -82,25 +84,27 @@ my $bug_log = dirname($0) . '/.bugmail.log';
 #####################################################################
 
 # When processing the "diffs" table in a bug, some lines wrap. This
-# function properly appends the "next" line for unwrapping to an 
+# function properly appends the "next" line for unwrapping to an
 # existing string.
 sub append_diffline ($$$$) {
-    my ($append_to, $prev_line, $append_line, $max_width) = @_;
+    my ( $append_to, $prev_line, $append_line, $max_width ) = @_;
     my $ret_line = $append_to;
 
     debug_print("Appending Line: [$append_line] Prev Line: [$prev_line]");
-    debug_print("Prev Line Len: " . length($prev_line) 
-        . " Max Width: $max_width");
+    debug_print(
+        "Prev Line Len: " . length($prev_line) . " Max Width: $max_width" );
 
     # If the previous line is the width of the entire column, we
     # assume that we were forcibly wrapped in the middle of a word,
     # and no space is needed. We only add the space if we were actually
     # given a non-empty string to append.
-    if ($append_line && length($prev_line) != $max_width) {
+    if ( $append_line && length($prev_line) != $max_width ) {
         debug_print("Adding a space unless we find a breaking character.");
+
         # However, sometimes even if we have a very short line, if it ended
         # in a "breaking character" like '-' then we also don't need a space.
-        $ret_line .= " " unless grep($prev_line =~ /$_$/, BREAKING_CHARACTERS);
+        $ret_line .= " "
+          unless grep( $prev_line =~ /$_$/, BREAKING_CHARACTERS );
     }
     $ret_line .= $append_line;
     debug_print("Appended Line: [$ret_line]");
@@ -109,26 +113,26 @@ sub append_diffline ($$$$) {
 
 # Prints a string if debugging is on. Appends a newline so you don't have to.
 sub debug_print ($) {
-    (print STDERR $_[0] . "\n") if $debug;
+    ( print STDERR $_[0] . "\n" ) if $debug;
 }
 
 # Helps with generate_log for Flag messages.
 sub flag_action ($$) {
-    my ($new, $old) = @_;
+    my ( $new, $old ) = @_;
 
     my $line = "";
 
-    my ($flag_name, $action, $requestee) = split_flag($new);
-    debug_print("Parsing Flag Change: Name: [$flag_name] Action: [$action]") 
-        if $new;
+    my ( $flag_name, $action, $requestee ) = split_flag($new);
+    debug_print("Parsing Flag Change: Name: [$flag_name] Action: [$action]")
+      if $new;
 
-    if (!$new) {
+    if ( !$new ) {
         $line .= " cancelled $old";
     }
-    elsif ($action eq '+') {
+    elsif ( $action eq '+' ) {
         $line .= " granted $flag_name";
     }
-    elsif ($action eq '-') {
+    elsif ( $action eq '-' ) {
         $line .= " denied $flag_name";
     }
     else {
@@ -149,17 +153,17 @@ sub flag_action ($$) {
 # array, where the first item is the old flag string, and the
 # new flag string is the second item.
 sub parse_flags ($$) {
-    my ($new, $old) = @_;
+    my ( $new, $old ) = @_;
 
     my %flags;
-    foreach my $old_item (split /\s*,\s*/, $old) {
+    foreach my $old_item ( split /\s*,\s*/, $old ) {
         my ($flag_name) = split_flag($old_item);
-        $flags{$flag_name} = [$old_item, ''];
+        $flags{$flag_name} = [ $old_item, '' ];
     }
-    foreach my $new_item (split /\s*,\s*/, $new) {
+    foreach my $new_item ( split /\s*,\s*/, $new ) {
         my ($flag_name) = split_flag($new_item);
-        if (!exists $flags{$flag_name}) {
-            $flags{$flag_name} = ['', $new_item];
+        if ( !exists $flags{$flag_name} ) {
+            $flags{$flag_name} = [ '', $new_item ];
         }
         else {
             $flags{$flag_name}[1] = $new_item;
@@ -175,18 +179,18 @@ sub split_flag ($) {
     my ($flag) = @_;
     if ($flag) {
         $flag =~ /\s*([^\?]+)(\+|-|\?)(?:\((.*)\))?$/;
-        return ($1, $2, $3);
+        return ( $1, $2, $3 );
     }
     return ();
 }
 
-# Cuts the whitespace off the ends of a string. 
+# Cuts the whitespace off the ends of a string.
 # Lovingly borrowed from Bugzilla::Util.
 sub trim ($) {
     my ($str) = @_;
     if ($str) {
-      $str =~ s/^\s+//g;
-      $str =~ s/\s+$//g;
+        $str =~ s/^\s+//g;
+        $str =~ s/\s+$//g;
     }
     return $str;
 }
@@ -206,64 +210,70 @@ sub parse_diffs ($) {
 
     # Read in the What | Removed | Added table.
     # End|of|table will never get run
-    my @diff_table = grep (/^.*\|.*\|.*$/, @body);
+    my @diff_table = grep ( /^.*\|.*\|.*$/, @body );
+
     # The first line is the "What|Removed|Added" line, so goes away.
     shift(@diff_table);
 
-    my ($prev_what, $prev_added, $prev_removed);
+    my ( $prev_what, $prev_added, $prev_removed );
+
     # We can't use foreach because we need to modify @diff_table.
-    while (defined (my $line = shift @diff_table)) {
+    while ( defined( my $line = shift @diff_table ) ) {
         $line =~ /^(.*)\|(.*)\|(.*)$/;
-        my ($what, $removed, $added) = (trim($1), trim($2), trim($3));
+        my ( $what, $removed, $added ) = ( trim($1), trim($2), trim($3) );
+
         # These are used to set $prev_removed and $prev_added later.
-        my ($this_removed, $this_added) = ($removed, $added);
-        
+        my ( $this_removed, $this_added ) = ( $removed, $added );
+
         debug_print("---RawLine: $what|$removed|$added\n");
 
         # If we have a field name in the What field.
         if ($what) {
+
             # If this is a two-line "What" field...
-            if( grep($what =~ $_, UNWRAP_WHAT) ) {
+            if ( grep( $what =~ $_, UNWRAP_WHAT ) ) {
+
                 # Then we need to grab the next line right now.
                 my $next_line = shift @diff_table;
                 debug_print("Next Line: $next_line");
                 $next_line =~ /^(.*)\|(.*)\|(.*)$/;
-                my ($next_what, $next_removed, $next_added) = 
-                    (trim($1), trim($2), trim($3));
+                my ( $next_what, $next_removed, $next_added ) =
+                  ( trim($1), trim($2), trim($3) );
 
                 debug_print("Two-line What: [$what][$next_what]");
-                $what    = append_diffline($what, $what, $next_what, 
-                                           WIDTH_WHAT);
+                $what = append_diffline( $what, $what, $next_what, WIDTH_WHAT );
                 if ($next_added) {
                     debug_print("Two-line Added: [$added][$next_added]");
-                    $added   = append_diffline($added, $added, 
-                                               $next_added, WIDTH_ADDED);
+                    $added = append_diffline( $added, $added, $next_added,
+                        WIDTH_ADDED );
                 }
                 if ($next_removed) {
                     debug_print("Two-line Removed: [$removed][$next_removed]");
-                    $removed = append_diffline($removed, $removed, 
-                        $next_removed, WIDTH_REMOVED);
+                    $removed =
+                      append_diffline( $removed, $removed, $next_removed,
+                        WIDTH_REMOVED );
                 }
             }
 
-            $changes{$what} = [$removed, $added];
+            $changes{$what} = [ $removed, $added ];
             debug_print("Filed as $what: $removed => $added");
 
             # We only set $prev_what if we actually had a $what to put in it.
             $prev_what = $what;
         }
+
         # Otherwise we're getting data from a previous What.
         else {
-            my $new_removed = append_diffline($changes{$prev_what}[0],
-                $prev_removed, $removed, WIDTH_REMOVED);
-            my $new_added   = append_diffline($changes{$prev_what}[1],
-                $prev_added, $added, WIDTH_ADDED);
+            my $new_removed = append_diffline( $changes{$prev_what}[0],
+                $prev_removed, $removed, WIDTH_REMOVED );
+            my $new_added = append_diffline( $changes{$prev_what}[1],
+                $prev_added, $added, WIDTH_ADDED );
 
-            $changes{$prev_what} = [$new_removed, $new_added];
+            $changes{$prev_what} = [ $new_removed, $new_added ];
             debug_print("Filed as $prev_what: $removed => $added");
         }
 
-        ($prev_removed, $prev_added) = ($this_removed, $this_added);
+        ( $prev_removed, $prev_added ) = ( $this_removed, $this_added );
     }
 
     return %changes;
@@ -274,20 +284,20 @@ sub parse_diffs ($) {
 # Returns undef if the bug should not be entered into the log.
 sub parse_mail ($) {
     my ($mail_lines) = @_;
-    my $mail_text = join('', @$mail_lines);
+    my $mail_text = join( '', @$mail_lines );
     my $email = Email::Simple->new($mail_text);
 
-    debug_print("Parsing Message " . $email->header('Message-ID'));
+    debug_print( "Parsing Message " . $email->header('Message-ID') );
 
     my $body = $email->body;
-    my @body_lines = split("\n", $body);
+    my @body_lines = split( "\n", $body );
 
     my %bug_info;
 
     # Bug ID
     my $subject = $email->header('Subject');
 
-    if ($subject !~ /^\s*\[Bug (\d+)\] /i) {
+    if ( $subject !~ /^\s*\[Bug (\d+)\] /i ) {
         debug_print("Not bug: $subject");
         return undef;
     }
@@ -296,8 +306,10 @@ sub parse_mail ($) {
 
     # Ignore Dependency mails
     # XXX - This should probably be an option in the mozbot instead
-    if (my ($dep_line) = 
-        grep /bug (\d+), which changed state\.\s*$/, @body_lines) 
+    if (
+        my ($dep_line) =
+        grep /bug (\d+), which changed state\.\s*$/, @body_lines
+      )
     {
         debug_print("Dependency change ignored: $dep_line.");
         return undef;
@@ -305,7 +317,7 @@ sub parse_mail ($) {
 
     # Product
     $bug_info{'product'} = $email->header('X-Bugzilla-Product');
-    unless ($bug_info{'product'}) {
+    unless ( $bug_info{'product'} ) {
         debug_print("X-Bugzilla-Product header not found.");
         return undef;
     }
@@ -313,30 +325,33 @@ sub parse_mail ($) {
 
     # Component
     $bug_info{'component'} = $email->header('X-Bugzilla-Component');
-    unless ($bug_info{'component'}) {
+    unless ( $bug_info{'component'} ) {
         debug_print("X-Bugzilla-Component header not found.");
         return undef;
     }
     debug_print("Component '$bug_info{component}' found.");
 
     # New or Changed, and getting who did it.
-    if ($subject =~ /^\s*\[Bug \d+\]\s*New: /i) {
+    if ( $subject =~ /^\s*\[Bug \d+\]\s*New: /i ) {
         $bug_info{'new'} = 1;
         debug_print("Bug is New.");
         my ($reporter) = grep /^\s+ReportedBy:\s/, @body_lines;
         $reporter =~ s/^\s+ReportedBy:\s//;
         $bug_info{'who'} = $reporter;
     }
-    elsif ( my ($changer_line) = grep /^\S+\schanged:$/, @body_lines) {
+    elsif ( my ($changer_line) = grep /^\S+\schanged:$/, @body_lines ) {
         $changer_line =~ /^(\S+)\s/;
         $bug_info{'who'} = $1;
     }
-    elsif ( my ($comment_line) = 
-                grep /^-+.*Comment.*From /i, @body_lines )
+    elsif (
+        my ($comment_line) =
+        grep /^-+.*Comment.*From /i, @body_lines
+      )
     {
         $comment_line =~ /^-+.*Comment.*From (\S+) /i;
         $bug_info{'who'} = $1;
-    } else {
+    }
+    else {
         debug_print("Could not determine who made the change.");
         return undef;
     }
@@ -344,7 +359,7 @@ sub parse_mail ($) {
 
     # Attachment
     my $attachid;
-    if (($attachid) = grep /^Created an attachment \(id=\d+\)/, @body_lines) {
+    if ( ($attachid) = grep /^Created an attachment \(id=\d+\)/, @body_lines ) {
         $attachid =~ /^Created an attachment \(id=(\d+)\)/;
         $bug_info{'attach_id'} = $1;
         debug_print("attach_id: $bug_info{attach_id}");
@@ -352,7 +367,7 @@ sub parse_mail ($) {
 
     # Duplicate
     my $dupid;
-    if (($dupid) = grep /marked as a duplicate of \d+/, @body_lines) {
+    if ( ($dupid) = grep /marked as a duplicate of \d+/, @body_lines ) {
         $dupid =~ /marked as a duplicate of (\d+)/;
         $bug_info{'dup_of'} = $1;
         debug_print("Got dup_of: $bug_info{dup_of}");
@@ -364,10 +379,10 @@ sub parse_mail ($) {
         last if $check_line =~ /^-* Additional Comments From /;
         $comments_start_at++;
     }
-    
+
     debug_print("Comments start at line $comments_start_at.");
-    my @diff_lines = @body_lines[0 .. ($comments_start_at - 1)];
-    my %diffs = parse_diffs(\@diff_lines);
+    my @diff_lines = @body_lines[ 0 .. ( $comments_start_at - 1 ) ];
+    my %diffs = parse_diffs( \@diff_lines );
     $bug_info{'diffs'} = \%diffs;
 
     return \%bug_info;
@@ -383,33 +398,52 @@ sub parse_mail ($) {
 sub generate_log ($) {
     my ($bug_info) = @_;
 
-    my $prefix = $bug_info->{'bug_id'} . FIELD_SEPARATOR 
-                 . $bug_info->{'product'} . FIELD_SEPARATOR
-                 . $bug_info->{'component'} . FIELD_SEPARATOR
-                 . $bug_info->{'who'} . FIELD_SEPARATOR;
+    my $prefix =
+        $bug_info->{'bug_id'}
+      . FIELD_SEPARATOR
+      . $bug_info->{'product'}
+      . FIELD_SEPARATOR
+      . $bug_info->{'component'}
+      . FIELD_SEPARATOR
+      . $bug_info->{'who'}
+      . FIELD_SEPARATOR;
 
     my @lines;
 
     # New bugs are easy to handle, so let's handle them first.
-    if ($bug_info->{'new'}) {
-        push(@lines, $prefix . 'NewBug' . FIELD_SEPARATOR 
-            # Old and New are empty.
-            . FIELD_SEPARATOR . FIELD_SEPARATOR
-            . "New $bug_info->{product} bug $bug_info->{bug_id}"
-            . " filed by $bug_info->{who}.");
+    if ( $bug_info->{'new'} ) {
+        push(
+            @lines,
+            $prefix 
+              . 'NewBug'
+              . FIELD_SEPARATOR
+
+              # Old and New are empty.
+              . FIELD_SEPARATOR
+              . FIELD_SEPARATOR
+              . "New $bug_info->{product} bug $bug_info->{bug_id}"
+              . " filed by $bug_info->{who}."
+        );
     }
 
-    if ($bug_info->{'attach_id'}) {
-        push(@lines, $prefix . 'NewAttach' . FIELD_SEPARATOR
-            # Old and New are empty.
-            . FIELD_SEPARATOR . FIELD_SEPARATOR
-            . "$bug_info->{'who'} added attachment $bug_info->{'attach_id'}"
-            . " to bug $bug_info->{'bug_id'}.");
+    if ( $bug_info->{'attach_id'} ) {
+        push(
+            @lines,
+            $prefix
+              . 'NewAttach'
+              . FIELD_SEPARATOR
+
+              # Old and New are empty.
+              . FIELD_SEPARATOR
+              . FIELD_SEPARATOR
+              . "$bug_info->{'who'} added attachment $bug_info->{'attach_id'}"
+              . " to bug $bug_info->{'bug_id'}."
+        );
     }
 
     # And now we handle changes by going over all the diffs, one by one.
-    my %diffs = %{$bug_info->{'diffs'}};
-    foreach my $field (keys %diffs) {
+    my %diffs = %{ $bug_info->{'diffs'} };
+    foreach my $field ( keys %diffs ) {
         my $old = $diffs{$field}[0];
         my $new = $diffs{$field}[1];
 
@@ -419,78 +453,94 @@ sub generate_log ($) {
         my $attach_id = $3;
 
         # Flags get a *very* special handling.
-        if ($field =~ /Flag$/) {
-            my %flags = parse_flags($new, $old);
-            foreach my $flag (keys %flags) {
-                my ($old_flag, $new_flag) = @{$flags{$flag}};
-                my $line = $prefix . $field . FIELD_SEPARATOR
-                           . $old_flag . FIELD_SEPARATOR
-                           . $new_flag . FIELD_SEPARATOR
-                           . $bug_info->{'who'};
-                $line .= flag_action($new_flag, $old_flag);
-                if ($field =~ /^Attachment/) {
+        if ( $field =~ /Flag$/ ) {
+            my %flags = parse_flags( $new, $old );
+            foreach my $flag ( keys %flags ) {
+                my ( $old_flag, $new_flag ) = @{ $flags{$flag} };
+                my $line =
+                    $prefix 
+                  . $field
+                  . FIELD_SEPARATOR
+                  . $old_flag
+                  . FIELD_SEPARATOR
+                  . $new_flag
+                  . FIELD_SEPARATOR
+                  . $bug_info->{'who'};
+                $line .= flag_action( $new_flag, $old_flag );
+                if ( $field =~ /^Attachment/ ) {
                     $line .= " for attachment $attach_id";
                 }
                 $line .= " on bug $bug_info->{bug_id}.";
-                push(@lines, $line);
+                push( @lines, $line );
             }
         }
 
         # All other, non-Flag fields.
         else {
-            my $line = $prefix . $field . FIELD_SEPARATOR 
-                       . $old . FIELD_SEPARATOR . $new . FIELD_SEPARATOR 
-                       . $bug_info->{who};
-            # Some fields require the verbs "added" and "removed", like the 
+            my $line =
+                $prefix 
+              . $field
+              . FIELD_SEPARATOR
+              . $old
+              . FIELD_SEPARATOR
+              . $new
+              . FIELD_SEPARATOR
+              . $bug_info->{who};
+
+            # Some fields require the verbs "added" and "removed", like the
             # CC field.
-            if (MULTI_FIELDS->{$field}) {
-                ($line .= " added $new to") if $new;
-                ($line .= " and") if $new && $old;
-                ($line .= " removed $old from") if $old;
+            if ( MULTI_FIELDS->{$field} ) {
+                ( $line .= " added $new to" )     if $new;
+                ( $line .= " and" )               if $new && $old;
+                ( $line .= " removed $old from" ) if $old;
                 $line .= " the $field field on bug $bug_info->{bug_id}.";
             }
+
             # If we didn't remove anything, only added something.
-            elsif (!$old) {
+            elsif ( !$old ) {
                 $line .= " set the $field field on bug"
-                         . " $bug_info->{bug_id} to $new";
+                  . " $bug_info->{bug_id} to $new";
+
                 # Hack for "RESOLVED DUPLICATE" messages.
-                $line .= ' of bug ' . $bug_info->{dup_of} if exists $bug_info->{dup_of};
+                $line .= ' of bug ' . $bug_info->{dup_of}
+                  if exists $bug_info->{dup_of};
                 $line .= '.';
             }
+
             # If we didn't add anything, only removed something.
-            elsif (!$new) {
+            elsif ( !$new ) {
                 $line .= " cleared the $field '$old' from bug"
-                         . " $bug_info->{bug_id}.";
+                  . " $bug_info->{bug_id}.";
             }
+
             # If we changed a field from one value to another.
             else {
-                $line .= " changed the $field on bug" 
-                         . " $bug_info->{bug_id} from $old to $new.";
+                $line .= " changed the $field on bug"
+                  . " $bug_info->{bug_id} from $old to $new.";
             }
-            push(@lines, $line);
+            push( @lines, $line );
         }
     }
 
     debug_print("Generated Log Lines.");
     debug_print("Log Line: $_") foreach (@lines);
-    
-    return join("\n", @lines);
+
+    return join( "\n", @lines );
 }
 
 # Takes a string and appends it to the buglog.
 sub append_log ($) {
     my ($string) = @_;
 
-    (open FILE, ">>" . $bug_log)
-        or die "Couldn't open bug log file $bug_log: $!";
+    ( open FILE, ">>" . $bug_log )
+      or die "Couldn't open bug log file $bug_log: $!";
     debug_print("Waiting for a lock on the log...");
-    flock(FILE, LOCK_EX);
+    flock( FILE, LOCK_EX );
     print FILE $string . "\n";
-    flock(FILE, LOCK_UN);
+    flock( FILE, LOCK_UN );
     debug_print("Printed lines to log and unlocked file.");
     close FILE;
 }
-
 
 #####################################################################
 # Main Script
@@ -498,17 +548,18 @@ sub append_log ($) {
 
 debug_print("\n\n");
 
-unless (-e $bug_log) {
+unless ( -e $bug_log ) {
     print STDERR "$bug_log does not exist, so I assume that mozbot is not"
-                 . " running. Discarding incoming message.\n";
+      . " running. Discarding incoming message.\n";
     exit;
 }
 
 my @mail_array = <STDIN>;
-my $bug_info = parse_mail(\@mail_array);
+my $bug_info   = parse_mail( \@mail_array );
 
-if (defined $bug_info) {
+if ( defined $bug_info ) {
     my $log_lines = generate_log($bug_info);
+
     # If we got an email with just a comment, $log_lines will be empty.
     append_log($log_lines) if $log_lines;
 }

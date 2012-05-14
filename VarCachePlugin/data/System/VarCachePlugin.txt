@@ -1,78 +1,71 @@
 %META:TOPICINFO{author="ProjectContributor" date="1141669952" format="1.0" version="1.4"}%
 ---+ Variable Cache Plugin 
 
-This Plugin caches Foswiki macros in selected topics for faster page rendering.
+%$SHORTDESCRIPTION%
 
 Most topics in a typical Foswiki installation are rendered within a small deviation in terms of speed. Exceptions are topics that contain a lot of dynamic content. This is mainly caused by CPU or I/O intensive [[%SYSTEMWEB%.Macros][Macros]], such as =%<nop>SEARCH{}%= and =%<nop>INCLUDE{}%=. 
 
-This Plugin caches all =%<nop>VARIABLES%= located in a topic so that the topic can get rendered as quickly as one without variables. An outdated cache gets refreshed when a user is looking at a topic; in which case it will take longer to render the page. Time-based refresh can also be disabled in favor of an on-demand cache update.
+This plugin caches all =%<nop>MACROS%= located in a topic so that the topic can get rendered as quickly as one without macros. An outdated cache gets refreshed when a user is looking at a topic; in which case it will take longer to render the page. Time-based refresh can also be disabled in favor of an on-demand cache update.
 
 The rendering of Foswiki topic markup to HTML is not cached. That is, user specific HTML rendering based on skin settings is not affected by the caching.
 
+%X% This plugin assumes topics are stored in files on disk. As such it will work with the standard Foswiki store implementations; it will *not*, however, work any non-caching database store.
+
 ---++ Syntax Rules and Cache Update Rules
 
-	* Add a =%<nop>VARCACHE{}%= variable to the topic you want to cache
-		* It supports these parameters:
-		  | *Parameter* | *Description* | *Default* |
-		  | =refresh="24"= | Cache refresh period in hours, e.g. maximum age of cache | =REFRESH= Plugin setting |
-		  | =cachemsg="..."= | Message shown when looking at a cached topic %BR% __Note:__ Use =$age= to indicate the age of cache, =$link= to indicate the refresh URL | =CACHEMSG= Plugin setting |
-		  | =updatemsg="..."= | Message shown after a cache refresh %BR% __Note:__ Use =$link= to indicate the refresh URL | =UPDATEMSG= Plugin setting |
-	* The =%<nop>VARCACHE{}%= variable gets:
-		* replaced with the =cachemsg= message when looking at a cached topic
-		* replaced with the =updatemsg= message if the cache has just been updated
-		* removed if caching is not active, e.g. when the topic gets rendered dynamically
-	* The cache gets updated on topic view if:
-		* the cache does not exist (e.g. after adding the =%<nop>VARCACHE{}%= variable)
-		* the cache is older then the cache refresh period (unless refresh if set to 0)
-		* the cache is older then the topic (e.g. the topic has been updated)
-		* the topic is accessed with a =?varcache=refresh= URL parameter (usually by following the <u>refresh</u> link in the cache message)
-	* The topic is rendered dynamically without caching when:
-		* the topic has URL parameters other then =varcache= (e.g. to show dynamic content properly, such as table sorting, filtering, searching)
-		* the topic is previewed after editing
-	* Limitations:
-		* The cache is not user specific. For example, all users see the expanded =%<nop>WIKIUSERNAME%= of the person who refreshed the cache (on demand or by looking at a topic with an exired cache)
+Add a =%<nop>VARCACHE{}%= variable to the topic you want to cache
+%INCLUDE{"VarVARCACHE" section="detail"}%
 
----++ Plugin Settings
+=%<nop>VARCACHE{}%= gets:
+   * replaced with the =cachemsg= message when looking at a cached topic
+   * replaced with the =updatemsg= message if the cache has just been updated
+   * removed if caching is not active, e.g. when the topic gets rendered dynamically
+The cache gets updated on topic view if:
+   * the cache does not exist (e.g. after adding the =%<nop>VARCACHE{}%= variable)
+   * the cache is older then the cache refresh period (unless refresh if set to 0)
+   * the cache is older then the topic (e.g. the topic has been updated)
+   * the topic is accessed with a =?varcache=refresh= URL parameter (usually by following the <u>refresh</u> link in the cache message)
+The topic is rendered dynamically without caching when:
+   * the topic has URL parameters other then =varcache= (e.g. to show dynamic content properly, such as table sorting, filtering, searching)
+   * the topic is previewed after editing
+Limitations:
+   * The cache is not user specific. For example, all users see the expanded =%<nop>WIKIUSERNAME%= of the person who refreshed the cache (on demand or by looking at a topic with an expired cache)
 
-Plugin settings are stored as preferences values. You can override the defaults for these preferences in %LOCALSITEPREFS%, the <nolink>%WEBPREFSTOPIC%</nolink> topic of the current web, or in individual topics that use the plugin.  *Changing them here will have no effect!* This allows you to upgrade the plugin without having to worry about losing your settings.
+---++ Settings
 
-	* One line description, is shown in the %SYSTEMWEB%.TextFormattingRules topic:
-		* Set VARCACHEPLUGIN_SHORTDESCRIPTION = Cache Foswiki macros in selected topics for faster page rendering
+Settings are stored as preferences values. You can override the defaults for these preferences in %LOCALSITEPREFS%, the <nolink>%WEBPREFSTOPIC%</nolink> topic of the current web, or in individual topics that use the plugin.
 
-	* Debug plugin: (See output in =data/debug.txt=)
-		* Set VARCACHEPLUGIN_DEBUG = 0
+%X% *Changing them here will have no effect!*
 
-	* Default refresh period in hours. No automatic refresh: =0=, default: =24=
-		* Set VARCACHEPLUGIN_REFRESH = 24
+   * One line description, is shown in the %SYSTEMWEB%.TextFormattingRules topic:
+      * Set VARCACHEPLUGIN_SHORTDESCRIPTION = Cache Foswiki macros in selected topics for faster page rendering
 
-	* Cache help messages. Use =$age= to indicate age of cache, =$link= to indicate the refresh URL
-		* Set VARCACHEPLUGIN_CACHEMSG = This topic was cached $age ago ([<nop>[$link][refresh]])
-		* Set VARCACHEPLUGIN_UPDATEMSG = This topic is now cached ([<nop>[$link][refresh]])
-		* #Set VARCACHEPLUGIN_CACHEMSG = <a href="$link"><img src="%ATTACHURLPATH%/cachetopic.gif" alt="This topic was cached $age ago. Click icon to refresh." width="16" height="16" border="0" /></a>
-		* #Set VARCACHEPLUGIN_UPDATEMSG = <a href="$link"><img src="%ATTACHURLPATH%/cachetopic.gif" alt="This topic is now cached. Click icon to refresh." width="16" height="16" border="0" /></a>
+   * Default refresh period in hours. No automatic refresh: =0=, default: =24=
+      * Set VARCACHEPLUGIN_REFRESH = 24
 
+   * Cache help messages. Use =$age= to indicate age of cache, =$link= to indicate the refresh URL
+      * Set VARCACHEPLUGIN_CACHEMSG = This topic was cached $age ago ([<nop>[$link][refresh]])
+      * Set VARCACHEPLUGIN_CACHEMSG = <a href="$link"><img src="%ATTACHURLPATH%/cachetopic.gif" alt="This topic was cached $age ago. Click icon to refresh." width="16" height="16" border="0" /></a>
+      * Set VARCACHEPLUGIN_UPDATEMSG = This topic is now cached ([<nop>[$link][refresh]])
+      * Set VARCACHEPLUGIN_UPDATEMSG = <a href="$link"><img src="%ATTACHURLPATH%/cachetopic.gif" alt="This topic is now cached. Click icon to refresh." width="16" height="16" border="0" /></a>
 
 ---++ Installation Instructions
 
 %$INSTALL_INSTRUCTIONS%
 
----++ Plugin Info
+---++ Info
 
-|  Plugin Author: | Original: TWiki:Main/PeterThoeny, In Foswiki context Foswiki:Main.KennethLavrsen |
-|  Copyright: | &copy; 2004-2007, TWIKI.NET, &copy; 2008-2011 Foswiki Contributors |
+|  Author: | Design and original implementation: !PeterThoeny |
+|  Copyright: | &copy; 2004-2007, TWIKI.NET and TWiki Contributors %BR% &copy; 2008-2012 Foswiki Contributors |
 |  License: | GPL ([[http://www.gnu.org/copyleft/gpl.html][GNU General Public License]]) |
 |  Plugin Release: | %$RELEASE% |
 |  Plugin Version: | %$VERSION% |
 |  Change History: | <!-- versions below in reverse order -->&nbsp; |
-|  1.1 (28 Jul 2011) | Minor bugfix -- Foswiki:Main.CrawfordCurrie |
-|  05 May 2011: | Foswikitask:Item10713: cache is now stored in the plugins work area, not under =pub=; Foswikitask:Item10712: No longer read preferences from plugin topic -- Foswiki:Main.AndrewJones |
-|  29 Jan 2009: | Foswiki version |
-|  06 Jan 2006: | Small fix for TWiki 4.0 |
-|  16 Jul 2004: | Doc improvements (no code change) |
-|  15 Jul 2004: | Initial version |
+| 1.2 (23 Mar 2012)  | Foswikitask:Item5414: support header zones -- Foswiki:Main.CrawfordCurrie |
+| 1.1 (28 Jul 2011)  | Minor bugfix -- Foswiki:Main.CrawfordCurrie |
+| 1.0 (05 May 2011)  | Foswikitask:Item10713: cache is now stored in the plugins work area, not under =pub= %BR% Foswikitask:Item10712: No longer read preferences from plugin topic -- Foswiki:Main.AndrewJones |
+|  29 Jan 2009: | Foswiki version -- Foswiki:Main.KennethLavrsen |
 |  Plugin Home: | http://foswiki.org/Extensions/%TOPIC% |
 |  Support: | http://foswiki.org/Support/%TOPIC% |
-
-__Related Topics:__ [[%SYSTEMWEB%.Plugins][Plugins]], %SYSTEMWEB%.DeveloperDocumentationCategory, %SYSTEMWEB%.AdminDocumentationCategory, %SYSTEMWEB%.DefaultPreferences, %USERSWEB%.SitePreferences
 
 %META:FILEATTACHMENT{name="cachetopic.gif" attr="h" comment="Cache icon 16x16 pixel" date="1089949592" path="cachetopic.gif" size="935" user="ProjectContributor" version="1.1"}%

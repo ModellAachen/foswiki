@@ -1,7 +1,7 @@
 ###############################################################################
 # NatSkinPlugin.pm - Plugin handler for the NatSkin.
 # 
-# Copyright (C) 2003-2011 MichaelDaum http://michaeldaumconsulting.com
+# Copyright (C) 2003-2012 MichaelDaum http://michaeldaumconsulting.com
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -18,6 +18,8 @@
 
 package Foswiki::Plugins::NatSkinPlugin::UserActions;
 use strict;
+use warnings;
+
 use Foswiki::Func ();
 use Foswiki::Meta ();
 use Foswiki::Plugins ();
@@ -209,7 +211,7 @@ sub getEditUrl {
   my $whiteBoard = Foswiki::Func::getPreferencesValue('WHITEBOARD');
   my $editAction = Foswiki::Func::getPreferencesValue('EDITACTION') || '';
 
-  if (!Foswiki::Plugins::NatSkinPlugin::Utils::isTrue($whiteBoard, 1) || $editAction eq 'form') {
+  if (!Foswiki::Func::isTrue($whiteBoard, 1) || $editAction eq 'form') {
     $url .= '&action=form';
   } elsif ($editAction eq 'text') {
     $url .= '&action=text';

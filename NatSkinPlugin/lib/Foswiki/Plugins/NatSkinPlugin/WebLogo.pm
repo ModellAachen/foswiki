@@ -1,7 +1,7 @@
 ###############################################################################
 # NatSkinPlugin.pm - Plugin handler for the NatSkin.
 # 
-# Copyright (C) 2003-2010 MichaelDaum http://michaeldaumconsulting.com
+# Copyright (C) 2003-2012 MichaelDaum http://michaeldaumconsulting.com
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -18,6 +18,7 @@
 
 package Foswiki::Plugins::NatSkinPlugin::WebLogo;
 use strict;
+use warnings;
 use Foswiki::Func ();
 use Foswiki::Plugins::NatSkinPlugin::ThemeEngine ();
 
@@ -55,6 +56,10 @@ sub render {
   $result =~ s/\$style/renderStyle()/ge;
   $result =~ s/\$alt/renderAlt()/ge;
   $result =~ s/\$name/renderName()/ge;
+  $result =~ s/\$perce?nt/\%/go;
+  $result =~ s/\$nop//go;
+  $result =~ s/\$n/\n/go;
+  $result =~ s/\$dollar/\$/go;
 
   return $result;
 
@@ -137,13 +142,13 @@ sub renderLogo {
   my $name = renderName();
 
   if ($name) {
-    $result = '<span class="natWebLogo">$name</span>';
+    $result = '<span class="natWebLogo natWebLogoName">$name</span>';
   } else {
     my $image = renderSrc();
     if ($image) {
-      $result = '<img class="natWebLogo" src="$src" alt="$alt" border="0" />';
+      $result = '<img class="natWebLogo natWebLogoImage" src="$src" alt="$alt" border="0" />';
     } else {
-      $result = '<span class="natWebLogo">%WIKITOOLNAME%</span>';
+      $result = '<span class="natWebLogo natWebLogoName">%WIKITOOLNAME%</span>';
     }
   }
 

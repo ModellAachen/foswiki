@@ -11,8 +11,8 @@ package Foswiki::Plugins::FamilyTreePlugin;
 
 use strict;
 
-our $VERSION = '$Rev$';
-our $RELEASE = '4 Oct 2010';
+our $VERSION          = '$Rev$';
+our $RELEASE          = '4 Oct 2010';
 our $SHORTDESCRIPTION = 'A simple genealogy database';
 our $node;
 

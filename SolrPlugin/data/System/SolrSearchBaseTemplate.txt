@@ -37,13 +37,15 @@
   tag_search
   catchall
   substrings^0.5
+  charnorm^0.5
 %TMPL:END%
 %TMPL:DEF{"solr::phrasefields"}%
   web_search^8.0 
   topic_search^4.0 
   title_search^3.0
-  substrings^0.5
   catchall
+  substrings^0.5
+  charnorm^0.5
 %TMPL:END%
 %TMPL:DEF{"solr::defaultserialpageropts"}%prevText:'%MAKETEXT{"prev"}%', nextText:'%MAKETEXT{"next"}%'%TMPL:END%
 %TMPL:DEF{"solr::incontribs"}%%TMPL:P{"solr::input::checkboxes::inmycontribs"}%%TMPL:END%
@@ -56,17 +58,18 @@
   then="-web_search:Applications"
 }%%TMPL:END%
 %TMPL:DEF{"solr::facets"}%
-  %MAKETEXT{"Recently changed"}%=facetquery,
+  %MAKETEXT{"Recent changes"}%=facetquery,
   %MAKETEXT{"Media"}%=type,
   %MAKETEXT{"Category"}%=category,
   %MAKETEXT{"Tag"}%=tag,
-  %MAKETEXT{"Application"}%=field_TopicType_lst,
+  %MAKETEXT{"Topic type"}%=field_TopicType_lst,
   %MAKETEXT{"Collection"}%=collection,
   %MAKETEXT{"Language"}%=language,
-  %MAKETEXT{"Top contributors"}%=contributor,
+  %MAKETEXT{"Author"}%=author,
 %TMPL:END%
 %TMPL:DEF{"solr::extramapping"}%
   %MAKETEXT{"Contributor"}%=contributor,
+  %MAKETEXT{"Author"}%=Author,
   %MAKETEXT{"Timespan"}%=date,
   %MAKETEXT{"Keyword"}%=keyword,
   %MAKETEXT{"English"}%=en,
@@ -94,15 +97,20 @@
   %MAKETEXT{"1 year"}%=date:[NOW-1YEAR TO NOW],
   %MAKETEXT{"older"}%=date:[* TO NOW/YEAR]
 %TMPL:END%
-%TMPL:DEF{"solr::hidesinglefacets"}%web, type, collection, language, contributor, field_TopicType_lst, facetquery%TMPL:END%
+%TMPL:DEF{"solr::hidesinglefacets"}%web, type, collection, language, author, field_TopicType_lst, facetquery%TMPL:END%
 %TMPL:DEF{"solr::disjunctivefacets"}%%TMPL:END%
 %TMPL:DEF{"solr::combinedfacets"}%%TMPL:END%
 %TMPL:DEF{"solr::facet::include::web"}%%TMPL:END%
 %TMPL:DEF{"solr::facet::exclude::web"}%%TMPL:END%
 %TMPL:DEF{"solr::facet::include::field_TopicType_lst"}%%TMPL:END%
-%TMPL:DEF{"solr::facet::exclude::field_TopicType_lst"}%ApplicationLicense|TopicStub|TopicType|ClassifiedTopic|TaggedTopic|CategorizedTopic|DataForm|WikiTopic|WebTool|ApplicationTopic|DocuTopic|TopicView|TopicTemplate|TopicFunction|WikiApplication%TMPL:END%
+%TMPL:DEF{"solr::facet::exclude::field_TopicType_lst"}%%IF{
+  "not $USERNAME ingroup 'AdminGroup'"
+  then="ApplicationLicense|TopicStub|TopicType|ClassifiedTopic|TaggedTopic|CategorizedTopic|DataForm|WikiTopic|WebTool|ApplicationTopic|DocuTopic|TopicView|TopicTemplate|TopicFunction|WikiApplication"
+}%%TMPL:END%
 %TMPL:DEF{"solr::facet::include::contributor"}%%TMPL:END%
-%TMPL:DEF{"solr::facet::exclude::contributor"}%UnknownUser|WikiGuest|(TWiki|Project)Contributor|AdminGroup|RegistrationAgent|AdminUser|TestUser%TMPL:END%
+%TMPL:DEF{"solr::facet::exclude::contributor"}%UnknownUser|WikiGuest|(TWiki|Project|Foswiki)Contributor|AdminGroup|RegistrationAgent|AdminUser|TestUser%TMPL:END%
+%TMPL:DEF{"solr::facet::include::author"}%%TMPL:P{"solr::facet::include::contributor"}%%TMPL:END%
+%TMPL:DEF{"solr::facet::exclude::author"}%%TMPL:P{"solr::facet::exclude::contributor"}%%%TMPL:END%
 %TMPL:DEF{"solr::facet::include::type"}%%TMPL:END%
 %TMPL:DEF{"solr::facet::exclude::type"}%%TMPL:END%
 %TMPL:DEF{"solr::facet::include::collection"}%%TMPL:END%
@@ -186,7 +194,6 @@ jQuery(function($) {
   id="solr1"
   jump="%URLPARAM{"jump"}%"
   lucky="%URLPARAM{"lucky"}%"
-  contributor="%URLPARAM{"contributor"}%"
   display="%URLPARAM{"display" default="%TMPL:P{"solr::defaultdisplay"}%"}%"
   origtopic="%URLPARAM{"origtopic" default="%BASEWEB%.%BASETOPIC%"}%"
   type="%URLPARAM{"type" default="%TMPL:P{"solr::defaultquerytype"}%"}%"
@@ -205,7 +212,7 @@ jQuery(function($) {
   facetdateend="%TMPL:P{"solr::facetdateend"}%"
   facetdategap="%TMPL:P{"solr::facetdategap"}%"
   facetdateother="%TMPL:P{"solr::facetdategother"}%"
-  facetlimit="50,tag=100,contributor=10,category=50"
+  facetlimit="50,tag=100,author=10,category=50"
   facetsort="%TMPL:P{"solr::facetsort"}%"
   filter="%URLPARAM{"filter" multiple="on" separator=", "}%"
   web="%URLPARAM{"web" default="%TMPL:P{"solr::defaultweb"}%"}%" 
@@ -288,13 +295,13 @@ jQuery(function($) {
     pageropts=""
   }%
   %TMPL:P{"solr::facet"
-    id="contributor"
+    id="author"
     format="$percntSPACEOUT{$key}$percnt&nbsp;($count)"
     title="$percntSPACEOUT{$key}$percnt"
     value="$id:$key"
     input="checkbox"
-    include="%TMPL:P{"solr::facet::include::contributor"}%"
-    exclude="%TMPL:P{"solr::facet::exclude::contributor"}%"
+    include="%TMPL:P{"solr::facet::include::author"}%"
+    exclude="%TMPL:P{"solr::facet::exclude::author"}%"
     extraclass=""
     pageropts=""
   }%
@@ -390,7 +397,7 @@ jQuery(function($) {
    called in "solr::sidebar" macro. 
 
    Parameters:
-      * id - the identifier of the current facet, e.g. category, contributor
+      * id - the identifier of the current facet, e.g. category, author
              this must be included in the "solr::facets" list
       * format - format of a single facet value 
       * value - when a facet value is selected this value is added to the next query
@@ -785,10 +792,7 @@ jQuery(function($) {
 }%
 %TMPL:DEF{"solr::inputstep"}%<!-- -->
 <div class='foswikiFormStep'>
-<div class='foswikiRight'>
-%TMPL:P{"solr::sortby"}%
-%TMPL:P{"solr::displayas"}%
-</div>
+<div class='foswikiLeft'>
 <table class='foswikiNullTable'>
   <tr>
     <td>
@@ -808,6 +812,11 @@ jQuery(function($) {
   </tr>
 </table>
 %TMPL:P{"solr::input::checkboxes"}%
+</div>
+<div class='foswikiRight'>
+%TMPL:P{"solr::sortby"}%
+%TMPL:P{"solr::displayas"}%
+</div>
 %CLEAR%
 </div>
 <!-- -->%TMPL:END%

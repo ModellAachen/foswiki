@@ -335,12 +335,6 @@ BEGIN {
         $Foswiki::cfg{isVALID} = 1;
     }
 
-    if ( $Foswiki::cfg{WarningsAreErrors} ) {
-
-        # Note: Warnings are always errors if ASSERTs are enabled
-        $SIG{'__WARN__'} = sub { die @_ };
-    }
-
     if ( $Foswiki::cfg{UseLocale} ) {
         require locale;
         import locale();
@@ -486,9 +480,9 @@ BEGIN {
     my $emailAtom = qr([A-Z0-9\Q!#\$%&'*+-/=?^_`{|}~\E])i;    # Per RFC 5322
 
     # Valid TLD's at http://data.iana.org/TLD/tlds-alpha-by-domain.txt
-    # Version 2011083000, Last Updated Tue Aug 30 14:07:02 2011 UTC
-    my $validTLD =
-qr(AERO|ARPA|ASIA|BIZ|CAT|COM|COOP|EDU|GOV|INFO|INT|JOBS|MIL|MOBI|MUSEUM|NAME|NET|ORG|PRO|TEL|TRAVEL|XXX)i;
+    # Version 2012022300, Last Updated Thu Feb 23 15:07:02 2012 UTC
+    my $validTLD = $Foswiki::cfg{Email}{ValidTLD}
+      || qr(AERO|ARPA|ASIA|BIZ|CAT|COM|COOP|EDU|GOV|INFO|INT|JOBS|MIL|MOBI|MUSEUM|NAME|NET|ORG|PRO|TEL|TRAVEL|XXX)i;
 
     $regex{emailAddrRegex} = qr(
        (?:                            # LEFT Side of Email address
@@ -771,7 +765,7 @@ sub writeCompletePage {
             # is conditionally loaded under the control of the
             # templates, and we have to be *sure* it gets loaded.
             my $src = $this->{prefs}->getPreference('FWSRC') || '';
-            $this->addToZone( 'head', 'JavascriptFiles/strikeone', <<JS );
+            $this->addToZone( 'script', 'JavascriptFiles/strikeone', <<JS );
 <script type="text/javascript" src="$Foswiki::cfg{PubUrlPath}/$Foswiki::cfg{SystemWebName}/JavascriptFiles/strikeone$src.js"></script>
 JS
             $usingStrikeOne = 1;
@@ -792,7 +786,15 @@ JS
 
     # SMELL: can't compute; faking content-type for backwards compatibility;
     # any other information might become bogus later anyway
-    my $hdr = "Content-type: " . $contentType . "\r\n";
+    # Validate format of content-type (defined in rfc2616)
+    my $tch = qr/[^\[\]()<>@,;:\\"\/?={}\s]/o;
+    if ( $contentType =~ /($tch+\/$tch+(\s*;\s*$tch+=($tch+|"[^"]*"))*)$/oi ) {
+        $contentType = $1;
+    }
+    else {
+        $contentType = "text/plain;contenttype=invalid";
+    }
+    my $hdr = "Content-type: " . $1 . "\r\n";
 
     # Call final handler
     $this->{plugins}->dispatch( 'completePageHandler', $text, $hdr );
@@ -805,7 +807,7 @@ JS
         {
             $cachedPage = $this->{cache}->cachePage( $contentType, $text );
             $this->{cache}->renderDirtyAreas( \$text )
-              if $cachedPage->{isDirty};
+              if $cachedPage && $cachedPage->{isdirty};
         }
         else {
 
@@ -929,8 +931,8 @@ sub generateHTTPHeaders {
             $hopts->{'Vary'}             = 'Accept-Encoding';
 
             # check if we take the version from the cache
-            if ( $cachedPage && !$cachedPage->{isDirty} ) {
-                $text = $cachedPage->{text};
+            if ( $cachedPage && !$cachedPage->{isdirty} ) {
+                $text = $cachedPage->{data};
             }
             else {
                 require Compress::Zlib;
@@ -938,7 +940,7 @@ sub generateHTTPHeaders {
             }
         }
         elsif ($cachedPage
-            && !$cachedPage->{isDirty}
+            && !$cachedPage->{isdirty}
             && $Foswiki::cfg{HttpCompress} )
         {
 
@@ -960,9 +962,9 @@ sub generateHTTPHeaders {
         # if we have a cached page on the server side
         if ($cachedPage) {
             my $etag         = $cachedPage->{etag};
-            my $lastModified = $cachedPage->{lastModified};
+            my $lastModified = $cachedPage->{lastmodified};
 
-            $hopts->{'ETag'} = $etag;
+            $hopts->{'ETag'}          = $etag         if $etag;
             $hopts->{'Last-Modified'} = $lastModified if $lastModified;
 
             # only send a 304 if both criteria are true
@@ -1038,35 +1040,28 @@ sub _isRedirectSafe {
 =begin TML
 
 ---++ ObjectMethod redirectto($url) -> $url
-Gets a redirect url from CGI parameter 'redirectto', if present on the query.
 
-If the redirectto CGI parameter specifies a valid redirection target it is
-returned; otherwise the original URL passed in the parameter is returned.
+If the CGI parameter 'redirectto' is present on the query, then will validate
+that it is a legal redirection target (url or topic name). If 'redirectto'
+is not present on the query, performs the same steps on $url.
 
-Conditions for a valid redirection target are:
-   * The target matches the linkProtocolPattern regex, and redirection
-     to the url _isRedirectSafe
-   * The target specified a topic, or a Web.Topic (redirect will be to
-     'view')
+Returns undef if the target is not valid, and the target URL otherwise.
 
 =cut
 
 sub redirectto {
     my ( $this, $url ) = @_;
-    ASSERT($url) if DEBUG;
 
     my $redirecturl = $this->{request}->param('redirectto');
-    return $url unless $redirecturl;
+    $redirecturl = $url unless $redirecturl;
+
+    return unless $redirecturl;
 
     if ( $redirecturl =~ m#^$regex{linkProtocolPattern}://#o ) {
 
         # assuming URL
-        if ( _isRedirectSafe($redirecturl) ) {
-            return $redirecturl;
-        }
-        else {
-            return $url;
-        }
+        return $redirecturl if _isRedirectSafe($redirecturl);
+        return;
     }
 
     # assuming 'web.topic' or 'topic'
@@ -1079,7 +1074,7 @@ sub redirectto {
     my @attrs = ();
     push( @attrs, '#' => $anchor ) if $anchor;
 
-    return $this->getScriptUrl( 1, 'view', $w, $t, @attrs );
+    return $this->getScriptUrl( 0, 'view', $w, $t, @attrs );
 }
 
 =begin TML
@@ -1100,16 +1095,17 @@ sub splitAnchorFromUrl {
 
 =begin TML
 
----++ ObjectMethod redirect( $url, $passthrough )
+---++ ObjectMethod redirect( $url, $passthrough, $status )
 
    * $url - url or topic to redirect to
    * $passthrough - (optional) parameter to pass through current query
      parameters (see below)
+   * $status - HTTP status code (30x) to redirect with. Defaults to 302.
 
 Redirects the request to =$url=, *unless*
    1 It is overridden by a plugin declaring a =redirectCgiQueryHandler=
      (a dangerous, deprecated handler!)
-   1 =$session->{request}= is =undef= or
+   1 =$session->{request}= is =undef=
 Thus a redirect is only generated when in a CGI context.
 
 Normally this method will ignore parameters to the current query. Sometimes,
@@ -1129,7 +1125,7 @@ server.
 =cut
 
 sub redirect {
-    my ( $this, $url, $passthru ) = @_;
+    my ( $this, $url, $passthru, $status ) = @_;
     ASSERT( defined $url ) if DEBUG;
 
     return unless $this->{request};
@@ -1199,8 +1195,11 @@ sub redirect {
     # Foswiki::Response::redirect doesn't automatically pass on the cookies
     # for us, so we have to do it explicitly; otherwise the session cookie
     # won't get passed on.
-    $this->{response}
-      ->redirect( -url => $url, -cookies => $this->{response}->cookies() );
+    $this->{response}->redirect(
+        -url     => $url,
+        -cookies => $this->{response}->cookies(),
+        -status  => $status,
+    );
 }
 
 =begin TML
@@ -1664,6 +1663,9 @@ sub new {
     # Set command_line context if there is no query
     $initialContext ||= defined($query) ? {} : { command_line => 1 };
 
+    # This foswiki supports : paragraph indent
+    $initialContext->{SUPPORTS_PARA_INDENT} = 1;
+
     $query ||= new Foswiki::Request();
     my $this = bless( { sandbox => 'Foswiki::Sandbox' }, $class );
 
@@ -1695,10 +1697,13 @@ sub new {
 
     $this->{context} = $initialContext;
 
-    if ( $Foswiki::cfg{Cache}{Enabled} ) {
-        require Foswiki::PageCache;
-        $this->{cache} = new Foswiki::PageCache($this);
+    if ( $Foswiki::cfg{Cache}{Enabled} && $Foswiki::cfg{Cache}{Implementation} )
+    {
+        eval "require $Foswiki::cfg{Cache}{Implementation}";
+        ASSERT( !$@, $@ ) if DEBUG;
+        $this->{cache} = $Foswiki::cfg{Cache}{Implementation}->new();
     }
+
     my $prefs = new Foswiki::Prefs($this);
     $this->{prefs}   = $prefs;
     $this->{plugins} = new Foswiki::Plugins($this);
@@ -1718,15 +1723,21 @@ sub new {
     if ( $url && $url =~ m{^([^:]*://[^/]*).*$} ) {
         $this->{urlHost} = $1;
 
+        if ( $Foswiki::cfg{RemovePortNumber} ) {
+            $this->{urlHost} =~ s/\:[0-9]+$//;
+        }
+
         # If the urlHost in the url is localhost, this is a lot less
         # useful than the default url host. This is because new CGI("")
         # assigns this host by default - it's a default setting, used
         # when there is nothing better available.
-        if ( $this->{urlHost} eq 'http://localhost' ) {
-            $this->{urlHost} = $Foswiki::cfg{DefaultUrlHost};
-        }
-        elsif ( $Foswiki::cfg{RemovePortNumber} ) {
-            $this->{urlHost} =~ s/\:[0-9]+$//;
+        if ( $this->{urlHost} =~ /^(https?:\/\/)localhost$/i ) {
+            my $protocol = $1;
+
+#only replace localhost _if_ the protocol matches the one specified in the DefaultUrlHost
+            if ( $Foswiki::cfg{DefaultUrlHost} =~ /^$protocol/i ) {
+                $this->{urlHost} = $Foswiki::cfg{DefaultUrlHost};
+            }
         }
     }
     else {
@@ -2279,9 +2290,10 @@ sub inlineAlert {
         # Error in the template system.
         $text = $topicObject->renderTML(<<MESSAGE);
 ---+ Foswiki Installation Error
-Template '$template' not found.
+Template 'oops$template' not found or returned no text, expanding $def.
 
 Check your configuration settings for {TemplateDir} and {TemplatePath}
+or check for syntax errors in templates,  or a missing TMPL:END.
 MESSAGE
     }
 
@@ -2526,7 +2538,7 @@ an <em>entity</em>, <strong class=html>&amp;lt;</strong>. Similarly, "&gt;"
 is escaped as <strong class=html>&amp;gt;</strong>, and "&amp;" is escaped
 as <strong class=html>&amp;amp;</strong>. If an attribute value contains a
 double quotation mark and is delimited by double quotation marks, then the
-quote should be escaped as <strong class=html>&amp;quot;</strong>.</p>
+quote should be escaped as <strong class=html>&amp;quot;</strong>.
 
 Other entities exist for special characters that cannot easily be entered
 with some keyboards..."
@@ -2710,9 +2722,12 @@ sub spaceOutWikiWord {
     # Both could have the value 0 so we cannot use simple = || ''
     $word = defined($word) ? $word : '';
     $sep  = defined($sep)  ? $sep  : ' ';
+    $word =~ s/([$regex{upperAlpha}])([$regex{numeric}])/$1$sep$2/go;
+    $word =~ s/([$regex{numeric}])([$regex{upperAlpha}])/$1$sep$2/go;
     $word =~
 s/([$regex{lowerAlpha}])([$regex{upperAlpha}$regex{numeric}]+)/$1$sep$2/go;
-    $word =~ s/([$regex{numeric}])([$regex{upperAlpha}])/$1$sep$2/go;
+    $word =~
+s/([$regex{upperAlpha}])([$regex{upperAlpha}])(?=[$regex{lowerAlpha}])/$1$sep$2/go;
     return $word;
 }
 

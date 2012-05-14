@@ -82,11 +82,12 @@ FOOBARSOMETHING. This avoids namespace issues.
 =cut
 
 sub initPlugin {
-    my( $topic, $web, $user, $installWeb ) = @_;
+    my ( $topic, $web, $user, $installWeb ) = @_;
 
     # check for Plugins.pm versions
-    if( $TWiki::Plugins::VERSION < 1.026 ) {
-        TWiki::Func::writeWarning( "Version mismatch between $pluginName and Plugins.pm" );
+    if ( $TWiki::Plugins::VERSION < 1.026 ) {
+        TWiki::Func::writeWarning(
+            "Version mismatch between $pluginName and Plugins.pm");
         return 0;
     }
 
@@ -95,9 +96,13 @@ sub initPlugin {
 
     # Get plugin preferences, variables defined by:
     #   * Set EXAMPLE = ...
-    $debug = TWiki::Func::getPreferencesValue( "\U$pluginName\E_DEBUG" );
-    $default{'border'} = TWiki::Func::getPreferencesValue( "\U$pluginName\E_BORDER" ) || "1px dashed #22638c";
-    $default{'float'} = TWiki::Func::getPreferencesValue( "\U$pluginName\E_FLOAT" ) || "right";
+    $debug = TWiki::Func::getPreferencesValue("\U$pluginName\E_DEBUG");
+    $default{'border'} =
+      TWiki::Func::getPreferencesValue("\U$pluginName\E_BORDER")
+      || "1px dashed #22638c";
+    $default{'float'} =
+      TWiki::Func::getPreferencesValue("\U$pluginName\E_FLOAT") || "right";
+
     # There is also an equivalent:
     # $exampleCfgVar = TWiki::Func::getPluginPreferencesValue( 'EXAMPLE' );
     # that may _only_ be called from the main plugin package.
@@ -106,7 +111,7 @@ sub initPlugin {
 
     TWiki::Func::registerTagHandler( 'LIGHTBOX', \&_LIGHTBOX );
 
-    # Allow a sub to be called from the REST interface 
+    # Allow a sub to be called from the REST interface
     # using the provided alias
     # TWiki::Func::registerRESTHandler('example', \&restExample);
 
@@ -117,7 +122,8 @@ sub initPlugin {
 # The function used to handle the %EXAMPLETAG{...}% variable
 # You would have one of these for each variable you want to process.
 sub _LIGHTBOX {
-    my($session, $params, $theTopic, $theWeb) = @_;
+    my ( $session, $params, $theTopic, $theWeb ) = @_;
+
     # $session  - a reference to the TWiki session object (if you don't know
     #             what this is, just ignore it)
     # $params=  - a reference to a TWiki::Attrs object containing parameters.
@@ -132,19 +138,33 @@ sub _LIGHTBOX {
     # $params->{_DEFAULT} will be 'hamburger'
     # $params->{sideorder} will be 'onions'
 
-    my $tmb = $params->{thumbnail};
-    my $img = $params->{image};
-    my $txt = $params->{caption} || '';
+    my $tmb  = $params->{thumbnail};
+    my $img  = $params->{image};
+    my $txt  = $params->{caption} || '';
     my $long = $params->{fullcaption} || $txt;
-    
+
     my $border = $params->{border} || $default{'border'};
-    my $float = $params->{float} || $default{'float'};
-    
-    my $a = '<div class="section clearfix" align="'.$float.
-        '" style="border:'.$border.';padding:4px; position: relative; float: '.$float.';">';
-    
+    my $float  = $params->{float}  || $default{'float'};
+
+    my $a =
+        '<div class="section clearfix" align="' 
+      . $float
+      . '" style="border:'
+      . $border
+      . ';padding:4px; position: relative; float: '
+      . $float . ';">';
+
     $a .= '<div class="thumbnail">';
-    $a .= '<a href="%ATTACHURLPATH%/'.$img.'" rel="lightbox" title="'.$long.'"><img src="%ATTACHURLPATH%/'.$tmb.'"  alt="'.$txt.'"meeting King"/></a>';
+    $a .=
+        '<a href="%ATTACHURLPATH%/' 
+      . $img
+      . '" rel="lightbox" title="'
+      . $long
+      . '"><img src="%ATTACHURLPATH%/'
+      . $tmb
+      . '"  alt="'
+      . $txt
+      . '"meeting King"/></a>';
     $a .= '</div></div>';
 
     &addLightboxJS;
@@ -181,56 +201,70 @@ handler.
 =cut
 
 sub commonTagsHandler {
+
     # do not uncomment, use $_[0], $_[1]... instead
     ### my ( $text, $topic, $web ) = @_;
 
-    TWiki::Func::writeDebug( "- ${pluginName}::commonTagsHandler( $_[2].$_[1] )" ) if $debug;
+    TWiki::Func::writeDebug("- ${pluginName}::commonTagsHandler( $_[2].$_[1] )")
+      if $debug;
 
     # do custom extension rule, like for example:
     # $_[0] =~ s/%XYZ%/&handleXyz()/ge;
     # $_[0] =~ s/%XYZ{(.*?)}%/&handleXyz($1)/ge;
 
-    $_[0] =~ s/%BEGINLIGHTBOX{(.*?)}%(.*?)%ENDLIGHTBOX%/&handleLightBox($1,$2)/ges;
+    $_[0] =~
+      s/%BEGINLIGHTBOX{(.*?)}%(.*?)%ENDLIGHTBOX%/&handleLightBox($1,$2)/ges;
 
 }
 
 sub addLightboxJS {
-    my $header = '<link rel="stylesheet" href="%PUBURL%/TWiki/LightboxPlugin/lightbox.css" type="text/css" media="screen" />'.
-        '<script type="text/javascript" src="%PUBURL%/TWiki/LightboxPlugin/lightbox.js"></script>';
-      
-    TWiki::Func::addToHEAD('LIGHTBOX_JS',$header);
+    my $header =
+'<link rel="stylesheet" href="%PUBURL%/TWiki/LightboxPlugin/lightbox.css" type="text/css" media="screen" />'
+      . '<script type="text/javascript" src="%PUBURL%/TWiki/LightboxPlugin/lightbox.js"></script>';
+
+    TWiki::Func::addToHEAD( 'LIGHTBOX_JS', $header );
 }
 
 sub handleLightBox {
-    my ($prefs,$text) = @_;
+    my ( $prefs, $text ) = @_;
 
-    my %opts = ( 'caption' => '', 
-                 'border' => $default{'border'},
-                 'float' => $default{'float'}
-                 );
+    my %opts = (
+        'caption' => '',
+        'border'  => $default{'border'},
+        'float'   => $default{'float'}
+    );
 
-    my %opts2 = TWiki::Func::extractParameters( $prefs );
-    foreach my $k (keys %opts2) {
+    my %opts2 = TWiki::Func::extractParameters($prefs);
+    foreach my $k ( keys %opts2 ) {
         my $b = $opts2{$k};
 
         # remove leading/trailing whitespace from key names
-        (my $a = $k) =~ s/^\s*|\s*$//;
+        ( my $a = $k ) =~ s/^\s*|\s*$//;
 
         $opts{$a} = $b;
     }
 
-    my $ret = '<div class="section clearfix" align="'.$opts{'float'}.
-        '" style="border:'.$opts{'border'}.';padding:4px; position: relative; float: '.$opts{'float'}.';">';
-    
+    my $ret =
+        '<div class="section clearfix" align="'
+      . $opts{'float'}
+      . '" style="border:'
+      . $opts{'border'}
+      . ';padding:4px; position: relative; float: '
+      . $opts{'float'} . ';">';
+
     $ret .= '<div class="thumbnail">';
-    $ret .= '<a href="%ATTACHURLPATH%/'.$opts{'image'}.'" rel="lightbox" title="'.$opts{'caption'}.'">';
-    $ret .= '<img src="%ATTACHURLPATH%/'.$opts{'thumbnail'}.'" /></a><br>';
+    $ret .=
+        '<a href="%ATTACHURLPATH%/'
+      . $opts{'image'}
+      . '" rel="lightbox" title="'
+      . $opts{'caption'} . '">';
+    $ret .= '<img src="%ATTACHURLPATH%/' . $opts{'thumbnail'} . '" /></a><br>';
     $ret .= $text;
     $ret .= '</div></div>';
 
     &addLightboxJS;
 
-    return( $ret );
+    return ($ret);
 }
 
 1;

@@ -1,12 +1,27 @@
 <!-- template: searchbox.nat.tmpl -->
-%TMPL:DEF{"searchbox"}%<!-- search box go-->
+%TMPL:DEF{"searchbox"}%<!-- -->
 <div class="natSearchBox">
 <form name="searchbox" id="searchbox" action="%SCRIPTURLPATH{"view"}%/%BASEWEB%/WebSearch" >
-  <input type="hidden" name="jump" value="on" />
-  <input type="hidden" name="origtopic" value="%BASEWEB%.%BASETOPIC%" />
   <input type="text" class="foswikiInputField" placeholder="%MAKETEXT{"search"}%" size="20" title="%MAKETEXT{"Enter topic name or a search string"}%" name="search" value="%TMPL:P{"searchvalue"}%" accesskey="f" /> 
   <input type="submit" class="foswikiSubmit" value="" />
 </form>
 </div>
-<!-- //search box-->%TMPL:END%
+%TMPL:P{context="SolrPluginEnabled" "searchbox::solr::javascript"}%<!-- -->
+<!-- -->%TMPL:END%
+
 %TMPL:DEF{"searchvalue"}%%URLPARAM{"search" encode="entity"}%%TMPL:END%
+%TMPL:DEF{"searchbox::solr::javascript"}%<literal>
+<script>
+jQuery(function($) {
+  $("#searchbox").submit(function() {
+    var $this = $(this),
+        action = $this.attr("action"),
+        search = $this.find("input[name='search']"),
+        href = action + ((search && search.val())?'#q='+search.val():'');
+
+    window.location.href = href;
+    return false;
+  });
+});
+</script>
+</literal>%TMPL:END%

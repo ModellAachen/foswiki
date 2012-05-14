@@ -74,7 +74,8 @@ sub initPlugin {
 #TODO: need to extract and abstract so I cna write  DBI, Syslog, Foswiki::Logger, MongoDB 'writers'
 sub writeLog {
     my $logtype = shift || 'topic';
-    my $text = shift;		#this is actually a hash whenever possible - like Monitor::monitorMacro
+    my $text = shift
+      ;  #this is actually a hash whenever possible - like Monitor::monitorMacro
 
 #totally non-blocking tick - one file per foswiki op - will scale up to the point where there are too many
 #requests for the FS to deal with
@@ -112,13 +113,18 @@ sub writeLog {
     if ( defined($text) ) {
         print TICK "\n==============\n";
         if ( ref($text) eq 'HASH' ) {
-		#as we're being more intellegent, we can also add a little more info here
-$text->{Store} = ();
-$text->{Store}{Implementation} = $Foswiki::cfg{Store}{Implementation};
-$text->{Store}{SearchAlgorithm} = $Foswiki::cfg{Store}{SearchAlgorithm};
-$text->{Store}{QueryAlgorithm} = $Foswiki::cfg{Store}{QueryAlgorithm};
-$text->{Store}{PrefsBackend} = $Foswiki::cfg{Store}{PrefsBackend};
-$text->{EnableHierarchicalWebs} = $Foswiki::cfg{EnableHierarchicalWebs};
+
+       #as we're being more intellegent, we can also add a little more info here
+            $text->{Store} = ();
+            $text->{Store}{Implementation} =
+              $Foswiki::cfg{Store}{Implementation};
+            $text->{Store}{SearchAlgorithm} =
+              $Foswiki::cfg{Store}{SearchAlgorithm};
+            $text->{Store}{QueryAlgorithm} =
+              $Foswiki::cfg{Store}{QueryAlgorithm};
+            $text->{Store}{PrefsBackend} = $Foswiki::cfg{Store}{PrefsBackend};
+            $text->{EnableHierarchicalWebs} =
+              $Foswiki::cfg{EnableHierarchicalWebs};
 
             use Data::Dumper;
             print TICK 'HASH ' . Dumper($text);
@@ -149,7 +155,8 @@ sub earlyInitPlugin {
     if ( $Foswiki::cfg{DebugLogPlugin}{MonitorMacros} ) {
         foreach my $tag ( keys( %{ $Foswiki::cfg{DebugLogPlugin}{Monitor} } ) )
         {
-            Monitor::monitorMACRO( $tag, $Foswiki::cfg{DebugLogPlugin}{Monitor}{$tag}, \&writeLog );
+            Monitor::monitorMACRO( $tag,
+                $Foswiki::cfg{DebugLogPlugin}{Monitor}{$tag}, \&writeLog );
         }
     }
 
@@ -173,16 +180,19 @@ cache and security plugins.
 =cut
 
 sub completePageHandler {
-#    my( $html, $httpHeaders ) = @_;
-#    # modify $_[0] or $_[1] if you must change the HTML or headers
-#    # You can work on $html and $httpHeaders in place by using the
-#    # special perl variables $_[0] and $_[1]. These allow you to operate
-#    # on parameters as if they were passed by reference; for example:
-#    # $_[0] =~ s/SpecialString/my alternative/ge;
+
+    #    my( $html, $httpHeaders ) = @_;
+    #    # modify $_[0] or $_[1] if you must change the HTML or headers
+    #    # You can work on $html and $httpHeaders in place by using the
+    #    # special perl variables $_[0] and $_[1]. These allow you to operate
+    #    # on parameters as if they were passed by reference; for example:
+    #    # $_[0] =~ s/SpecialString/my alternative/ge;
     if (   ( $Foswiki::cfg{DebugLogPlugin}{RequestTimes} )
-        or ( $Foswiki::cfg{DebugLogPlugin}{MonitorMacros} ) ) {
+        or ( $Foswiki::cfg{DebugLogPlugin}{MonitorMacros} ) )
+    {
         my $times = Monitor::getRunTimeSoFar();
-        $Foswiki::Plugins::SESSION->{response}->pushHeader('X-Foswiki-Monitor-DebugLogPlugin-Rendertime', $times);
+        $Foswiki::Plugins::SESSION->{response}
+          ->pushHeader( 'X-Foswiki-Monitor-DebugLogPlugin-Rendertime', $times );
     }
 }
 

@@ -1,20 +1,10 @@
 %META:TOPICINFO{author="ProjectContributor" date="1212998722" format="1.1" version="1.2"}%
 %META:TOPICPARENT{name="WebHome"}%
----+!! %TOPIC%
-%FORMFIELD{"Summary"}%
-%DBCALL{"%FORMFIELD{"Target"}%" remote="on" section="%FORMFIELD{"Section"}%"}%
-<!--
-   * Set EDIT_TEMPLATE = Applications.FormEdit
-   * Set VIEW_TEMPLATE = Applications.HiddenFormView
--->
-See also: [[%FORMFIELD{"Target"}%]]
-
-
 
 %META:FORM{name="Applications.TopicStub"}%
-%META:FIELD{name="TopicType" attributes="" title="TopicType" value="Applications.WebTool, TopicStub"}%
+%META:FIELD{name="TopicType" attributes="" title="TopicType" value="WebTool, TopicStub"}%
 %META:FIELD{name="TopicTitle" attributes="" title="<nop>TopicTitle" value="Category Browser"}%
 %META:FIELD{name="Summary" attributes="" title="Summary" value=""}%
-%META:FIELD{name="TWikiApplication" attributes="" title="TWikiApplication" value="ClassificationApp"}%
+%META:FIELD{name="WikiApplication" attributes="" title="WikiApplication" value="ClassificationApp"}%
 %META:FIELD{name="Target" attributes="" title="Target" value="Applications/ClassificationApp.CategoryBrowser"}%
 %META:FIELD{name="Section" attributes="" title="Section" value=""}%

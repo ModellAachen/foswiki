@@ -31,7 +31,8 @@ use strict;
 use Assert;
 use Foswiki::LoginManager::TemplateLogin;
 
-@Foswiki::LoginManager::PhpBB3Login::ISA = ('Foswiki::LoginManager::TemplateLogin');
+@Foswiki::LoginManager::PhpBB3Login::ISA =
+  ('Foswiki::LoginManager::TemplateLogin');
 
 sub new {
     my ( $class, $session ) = @_;
@@ -50,9 +51,9 @@ add phpBB3 cookie to the session management
 =cut
 
 sub loadSession {
-    my $this  = shift;
+    my $this    = shift;
     my $foswiki = $this->{foswiki};
-    my $query = $foswiki->{cgiQuery};
+    my $query   = $foswiki->{cgiQuery};
 
     ASSERT( $this->isa('Foswiki::LoginManager::PhpBB3Login') ) if DEBUG;
 
@@ -72,7 +73,8 @@ sub loadSession {
         #return $passwordHandler->checkPassword($this->{login}, $password);
 
         if ( defined($user)
-            && $foswiki->{users}->checkPassword( $user->login(), $password, 1 ) )
+            && $foswiki->{users}->checkPassword( $user->login(), $password, 1 )
+          )
         {
             $authUser = $id;
         }

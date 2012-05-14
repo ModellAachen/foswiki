@@ -57,9 +57,10 @@ sub expand {
     }
 
     $rpId++;
-    
+
     Foswiki::Func::addToZone( 'head', "RackPlannerPlugin_JS",
-   "<script src='%PUBURL%/%SYSTEMWEB%/$pluginName/rackplannertooltips.js' language='javascript' type='text/javascript'></script>");
+"<script src='%PUBURL%/%SYSTEMWEB%/$pluginName/rackplannertooltips.js' language='javascript' type='text/javascript'></script>"
+    );
 
     return ( $options{'dir'} =~ /^(leftright|rightleft)$/i )
       ? &_renderHorizontal( &_fetch( &_getTopicText() ) )
@@ -745,13 +746,12 @@ sub _renderUnitColumn {
         my $f = $options{'unitcolumnformat'};
         my $u = abs($unit);
         $f =~ s/%U/$u/g;
-        $f =
-          "<span style=\"background-color:"
+        $f = "<span style=\"background-color:"
           . (
             defined $options{'unitcolumnbgcolor'}
             ? $options{'unitcolumnbgcolor'}
-            : "#f0f0f0" )
-          . "\">$f</span>";
+            : "#f0f0f0"
+          ) . "\">$f</span>";
         $text .= $cgi->Tr(
             $cgi->td(
                 {

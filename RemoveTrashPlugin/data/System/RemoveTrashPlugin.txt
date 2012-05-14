@@ -1,0 +1,30 @@
+%META:TOPICPARENT{name="Plugins"}%
+<!--
+One line description, required for extensions repository catalog.
+   * Set SHORTDESCRIPTION = A simple plugin for 'emptying' the Trash web.
+-->
+---+!! Remove Trash Plugin
+
+%SHORTDESCRIPTION%
+
+%RED% *NB* %ENDCOLOR% Currently this plugin only works on systems which use Unix-style file separators (i.e. '/').
+
+This plugin provides the [[VarREMOVETRASH][REMOVETRASH]] macro, which provides a button to 'empty' the Trash web. 
+
+You need to be a member of Main.AdminGroup to be able to perform the deletion.
+
+---++ Preferences
+
+The root of your Foswiki installation must be specified in =$Foswiki::cfg{Plugins}{RemoveTrashPlugin}{FoswikiRoot}=; by default it is set to '/var/www/foswiki'.
+
+---++ Info
+
+|  Author: | AlexisHazell |
+|  Copyright: | &copy; 2012, Foswiki Contributors |
+|  License: | GPL ([[http://www.gnu.org/copyleft/gpl.html][GNU General Public License]]) |
+|  Version: | 0.1.0 |
+|  Change&nbsp;History: | <!-- versions below in reverse order -->&nbsp; |
+|  0.1.0 (16 Apr 2012): | Initial version |
+|  Home: | http://foswiki.org/Extensions/%TOPIC% |
+|  Support: | http://foswiki.org/Support/%TOPIC% |
+

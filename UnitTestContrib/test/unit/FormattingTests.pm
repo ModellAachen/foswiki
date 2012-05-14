@@ -1,14 +1,15 @@
-use strict;
-
 # tests for basic formatting
 
 package FormattingTests;
+use strict;
+use warnings;
 
 use FoswikiFnTestCase();
 our @ISA = qw( FoswikiFnTestCase );
 
 use Foswiki();
 use Foswiki::Func();
+use Foswiki::Render();
 use Benchmark qw( :hireswallclock);
 use Error qw( :try );
 
@@ -109,9 +110,91 @@ my %link_tests = (
     },
 );
 
+# in       - input to renderTML
+# out      - renderTML output
+# out11316 - renderTML prior to Item11316 (orig. empty <p></p> tag behaviour)
+my %sanity_tests = (
+    para_no_NLs               => { in => 'Foo',        out => 'Foo' },
+    para_NL_end               => { in => "Foo\n",      out => 'Foo' },
+    para_NL_begin             => { in => "\nFoo",      out => "\nFoo" },
+    para_NL_between           => { in => "Foo\nBar",   out => "Foo\nBar" },
+    para_NL_between_and_end   => { in => "Foo\nBar\n", out => "Foo\nBar" },
+    para_NL_between_and_begin => { in => "\nFoo\nBar", out => "\nFoo\nBar" },
+    para_NLs_wrap =>
+      { in => "\nFoo\n", out => '<p>Foo</p>', out_11316 => "\nFoo" },
+    para_NLs_wrap_and_begin =>
+      { in => "\n\nFoo\n", out => '<p>Foo</p>', out_11316 => "\n<p></p>\nFoo" },
+    para_NLs_wrap_and_begin2 => {
+        in        => "\n\n\nFoo\n",
+        out       => '<p>Foo</p>',
+        out_11316 => "\n<p></p>\n<p></p>\nFoo"
+    },
+    para_NLs_wrap_and_end =>
+      { in => "\nFoo\n\n", out => '<p>Foo</p>', out_11316 => "\nFoo" },
+    para_NLs_wrap_and_end2 => {
+        in        => "\nFoo\n\n\n",
+        out       => '<p>Foo</p>',
+        out_11316 => "\nFoo\n<p></p>"
+    },
+    para_NLs_wrap_and_end3 => {
+        in        => "\nFoo\n\n\n\n",
+        out       => '<p>Foo</p>',
+        out_11316 => "\nFoo\n<p></p>\n<p></p>"
+    },
+    para_2NL_between => {
+        in        => "Foo\n\nBar",
+        out       => "<p>Foo</p>\n<p>Bar</p>",
+        out_11316 => "Foo\n<p></p>\nBar"
+    },
+    para_2NL_between_and_begin => {
+        in        => "\nFoo\n\nBar",
+        out       => "<p>Foo</p>\n<p>Bar</p>",
+        out_11316 => "\nFoo\n<p></p>\nBar"
+    },
+    para_2NL_between_and_end => {
+        in        => "Foo\n\nBar\n",
+        out       => "<p>Foo</p>\n<p>Bar</p>",
+        out_11316 => "Foo\n<p></p>\nBar"
+    },
+    para_2NL_between_and_wrap => {
+        in        => "\nFoo\n\nBar\n",
+        out       => "<p>Foo</p>\n<p>Bar</p>",
+        out_11316 => "\nFoo\n<p></p>\nBar"
+    },
+    para_2NL_between_and_wrap_and_begin => {
+        in        => "\n\nFoo\n\nBar\n",
+        out       => "<p>Foo</p>\n<p>Bar</p>",
+        out_11316 => "\n<p></p>\nFoo\n<p></p>\nBar"
+    },
+    para_2NL_between_and_wrap_and_begin2 => {
+        in        => "\n\n\nFoo\n\nBar\n",
+        out       => "<p>Foo</p>\n<p>Bar</p>",
+        out_11316 => "\n<p></p>\n<p></p>\nFoo\n<p></p>\nBar"
+    },
+);
+
 sub new {
-    my $self = shift()->SUPER::new( 'Formatting', @_ );
-    return $self;
+    my ( $class, @args ) = @_;
+    my $this = $class->SUPER::new( 'Formatting', @args );
+
+    $this->_gen_sanity_tests();
+
+    return $this;
+}
+
+sub skip {
+    my ( $this, $test ) = @_;
+
+    return $this->SUPER::skip_test_if(
+        $test,
+        {
+            condition => { with_dep => 'Foswiki,<,1.2' },
+            tests     => {
+                'FormattingTests::test_lists' =>
+                  'Post-Foswiki 1.1.x TML syntax',
+            }
+        }
+    );
 }
 
 sub set_up {
@@ -119,26 +202,30 @@ sub set_up {
 
     $this->SUPER::set_up();
     $this->{sup} = $this->{session}->getScriptUrl( 0, 'view' );
-    my $topicObject =
-      Foswiki::Meta->new( $this->{session}, $this->{test_web}, 'H_',
-        "BLEEGLE" );
+    my ($topicObject) = Foswiki::Func::readTopic( $this->{test_web}, 'H_' );
+    $topicObject->text("BLEEGLE");
     $topicObject->save();
-    $topicObject =
-      Foswiki::Meta->new( $this->{session}, $this->{test_web},
-        'Underscore_topic', "BLEEGLE" );
+    $topicObject->finish();
+    ($topicObject) =
+      Foswiki::Func::readTopic( $this->{test_web}, 'Underscore_topic' );
+    $topicObject->text("BLEEGLE");
     $topicObject->save();
-    $topicObject =
-      Foswiki::Meta->new( $this->{session}, $this->{test_web},
-        $Foswiki::cfg{HomeTopicName}, "BLEEGLE" );
+    $topicObject->finish();
+    ($topicObject) =
+      Foswiki::Func::readTopic( $this->{test_web},
+        $Foswiki::cfg{HomeTopicName} );
+    $topicObject->text("BLEEGLE");
     $topicObject->save();
-    $topicObject =
-      Foswiki::Meta->new( $this->{session}, $this->{test_web},
-        'Numeric1Wikiword', "BLEEGLE" );
+    $topicObject->finish();
+    ($topicObject) =
+      Foswiki::Func::readTopic( $this->{test_web}, 'Numeric1Wikiword' );
+    $topicObject->text("BLEEGLE");
     $topicObject->save();
     $Foswiki::cfg{AntiSpam}{RobotsAreWelcome} = 1;
     $Foswiki::cfg{AntiSpam}{EmailPadding}     = 'STUFFED';
     $Foswiki::cfg{AntiSpam}{EntityEncode}     = 1;
     $Foswiki::cfg{AllowInlineScript}          = 1;
+    $topicObject->finish();
 }
 
 sub tear_down {
@@ -161,13 +248,37 @@ sub loadExtraConfig {
     $Foswiki::cfg{Plugins}{RenderListPlugin}{Enabled} = 0;
 }
 
+sub _gen_sanity_tests {
+    my $this = shift;
+
+    while ( my ( $test, $params ) = each %sanity_tests ) {
+        my $fn       = __PACKAGE__ . '::test_' . $test;
+        my $input    = $params->{in};
+        my $expected = $params->{out};
+
+        if ( exists $params->{out_11316} && !defined $Foswiki::Render::VERSION )
+        {
+            $expected = $params->{out_11316};
+        }
+
+        no strict 'refs';
+        *{$fn} = sub {
+            my $this   = shift;
+            my $result = $this->{test_topicObject}->renderTML($input);
+
+            $this->assert_str_equals( $expected, $result );
+        };
+        use strict 'refs';
+    }
+}
+
 # This formats the text up to immediately before <nop>s are removed, so we
 # can see the nops.
 sub do_test {
     my ( $this, $expected, $actual, $noHtml ) = @_;
     my $session = $this->{session};
 
-    $this->{test_topicObject}->expandMacros($actual);
+    $actual = $this->{test_topicObject}->expandMacros($actual);
     $actual = $this->{test_topicObject}->renderTML($actual);
     if ($noHtml) {
         $this->assert_equals( $expected, $actual );
@@ -175,6 +286,24 @@ sub do_test {
     else {
         $this->assert_html_equals( $expected, $actual );
     }
+}
+
+# Formatting and WikiWord in Input Field
+sub test_escapedWikwordFormfield {
+    my $this = shift;
+
+    $this->expect_failure( with_dep => 'Foswiki,<,1.2' );
+    $this->annotate(
+        "Formatting in input field should not be rendered: Item11480");
+
+    my $expected = <<EXPECTED;
+<input type="text" value="!WikiWord !WikiWord !WikiWord *bold* __boldItalic__ " />
+EXPECTED
+
+    my $actual = <<ACTUAL;
+<input type="text" value="!WikiWord !WikiWord !WikiWord *bold* __boldItalic__ " />
+ACTUAL
+    $this->do_test( $expected, $actual );
 }
 
 # current topic WikiWord
@@ -199,6 +328,28 @@ EXPECTED
 
     my $actual = <<ACTUAL;
 $Foswiki::cfg{HomeTopicName}
+ACTUAL
+    $this->do_test( $expected, $actual );
+}
+
+# Item11671
+sub test_Item11671 {
+    my $this     = shift;
+    my $expected = <<EXPECTED;
+Create A New Wiki Word
+Year 2012 A New Year
+A 100 Bottle Test
+Finishing A 100
+Test 100 A
+SOS Titanic
+EXPECTED
+    my $actual = <<ACTUAL;
+%SPACEOUT{"CreateANewWikiWord"}%
+%SPACEOUT{"Year2012ANewYear"}%
+%SPACEOUT{"A100BottleTest"}%
+%SPACEOUT{"FinishingA100"}%
+%SPACEOUT{"Test100A"}%
+%SPACEOUT{"SOSTitanic"}%
 ACTUAL
     $this->do_test( $expected, $actual );
 }
@@ -920,7 +1071,7 @@ sub test_USInHeader {
     $Foswiki::cfg{RequireCompatibleAnchors} = 0;
 
     my $expected = <<EXPECTED;
-<nop><h3><a name="Test_with_link_in_header:_Underscore_topic"></a>Test with link in header: Underscore_topic</h3>
+<nop><h3 id="Test_with_link_in_header:_Underscore_topic">Test with link in header: Underscore_topic</h3>
 EXPECTED
 
     my $actual = <<ACTUAL;
@@ -1307,8 +1458,6 @@ None
    : Sunny
 Pleasant
 ACTUAL
-    $this->expect_failure( 'Post-Foswiki 1.1.x TML syntax',
-        with_dep => 'Foswiki,<,1.2' );
     $this->do_test( $expected, $actual );
 }
 
@@ -1633,7 +1782,6 @@ sub _check_rendered_linktext {
     my $addrObj;
     my $part;
 
-    require Foswiki::Address;
     require HTML::Entities;
     print "[[$linktext]]\n\t$html\n" if TRACE;
     $this->assert( $html !~ $editpathregex,
@@ -1655,18 +1803,11 @@ sub _check_rendered_linktext {
     else {
         $expectedAddress = "$this->{test_web}.$this->{test_topic}";
     }
-    $addrObj = Foswiki::Address->new(
-        string => $address,
-        web    => $this->{test_web},
-        topic  => $this->{test_topic},
-        isA    => 'topic'
-    );
-    $expectedAddrObj = Foswiki::Address->new(
-        string => $expectedAddress,
-        web    => $this->{test_web},
-        topic  => $this->{test_topic},
-        isA    => 'topic'
-    );
+    my ( $actualWeb, $actualTopic ) =
+      Foswiki::Func::normalizeWebTopicName( $this->{test_web}, $address );
+    my ( $expectedWeb, $expectedTopic ) =
+      Foswiki::Func::normalizeWebTopicName( $this->{test_web},
+        $expectedAddress );
     print "\tfrag: "
       . ( defined $fragment ? $fragment : 'undef' )
       . ",\tquery: "
@@ -1674,8 +1815,8 @@ sub _check_rendered_linktext {
       . ",\taddr: "
       . ( defined $address ? $address : 'undef' ) . "\n"
       if TRACE;
-    $this->assert_str_equals( $expectedAddrObj->stringify(),
-        $addrObj->stringify(), "address mismatch checking [[$linktext]]" );
+    $this->assert_str_equals( "$expectedWeb.$expectedTopic",
+        "$actualWeb.$actualTopic", "address mismatch checking [[$linktext]]" );
     $this->assert_deep_equals( $expected->{query}, $query,
         "query mismatch checking [[$linktext]]" );
     $this->assert_deep_equals( $expected->{fragment}, $fragment,
@@ -1690,7 +1831,6 @@ sub _check_rendered_linktext {
 sub test_sanity_link_tests {
     my $this = shift;
 
-    $this->expect_failure('TODO: fix Item11366 ampersand escaping in squabs');
     $this->_create_link_test_fixtures();
     while ( my ( $linktext, $expected ) = each %link_tests ) {
 
@@ -1706,7 +1846,9 @@ sub test_sanity_link_tests {
 sub test_ampersand_querystring {
     my ($this) = shift;
 
-    $this->expect_failure('TODO: fix Item11366 ampersand escaping in squabs');
+    $this->expect_failure( 'Test does\'t cater to ShortURL configurations',
+        using => 'ShortURLs' );
+
     $this->_check_rendered_linktext(
         "$this->{test_topic}?q=r&s=t",
         {

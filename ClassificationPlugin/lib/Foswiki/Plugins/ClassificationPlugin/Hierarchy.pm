@@ -15,10 +15,11 @@
 package Foswiki::Plugins::ClassificationPlugin::Hierarchy;
 
 use strict;
-use Foswiki::Plugins::DBCachePlugin::Core;
-use Foswiki::Plugins::ClassificationPlugin::Category;
-use Storable;
-require Foswiki::Prefs;
+use Foswiki::Plugins::DBCachePlugin::Core ();
+use Foswiki::Plugins::ClassificationPlugin::Category ();
+use Storable ();
+use Foswiki::Prefs ();
+use Foswiki::Func ();
 
 use constant OBJECTVERSION => 0.81;
 use constant CATWEIGHT => 1.0; # used in computeSimilarity()
@@ -45,10 +46,10 @@ sub new {
   my $cacheFile = Foswiki::Plugins::ClassificationPlugin::Core::getCacheFile($web);
   
   my $session = $Foswiki::Plugins::SESSION;
-  my $refresh = '';
   my $query = Foswiki::Func::getCgiQuery();
+  my $refresh = '';
   $refresh = $query->param('refresh') || '' if defined $session;
-  $refresh = ($refresh =~ /on|class/)?1:0;
+  $refresh = ($refresh =~ /on|class|cat/)?1:0;
 
   unless ($refresh) {
     eval {

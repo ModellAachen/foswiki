@@ -1612,7 +1612,7 @@ sub test_param_sort_fileComment {
 "%ATTACHMENTLIST{topic=\"*\" format=\"\$hidden:\$fileComment\" separator=\"|\" sort=\"\$fileComment\"}%";
 
     my $expected =
-'hidden:do not read|hidden:you|:|:|:aAbB|:do not read either|:johnny|:me';
+      'hidden:do not read|hidden:you|:|:|:aAbB|:do not read either|:johnny|:me';
 
     $this->_do_test( $testTopic1, $expected, $source );
 }

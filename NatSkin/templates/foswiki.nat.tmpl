@@ -23,7 +23,7 @@
 %TMPL:DEF{"USERS_ACTION"}%<a class='natUserAction' href='%SCRIPTURLPATH{"view"}%/%USERSWEB%/%WIKIUSERSTOPIC%'>%TMPL:P{"USERS"}%</a>%TMPL:END%
 %TMPL:DEF{"USERS_ACTION_RESTRICTED"}%<span class='natUserAction natDisabledUserAction'>%TMPL:P{"USERS"}%</span>%TMPL:END%
 
-%TMPL:DEF{"ACCOUNT"}%<span class='natTopicActionShortLabel'>%SPACEOUT{"%WIKINAME%"}%</span>%TMPL:END%
+%TMPL:DEF{"ACCOUNT"}%<span class='natTopicActionShortLabel'> [[%WIKIUSERNAME%]] </span>%TMPL:END%
 %TMPL:DEF{"ACCOUNT_ACTION"}%<a class="natUserAction" rel="nofollow" href="%SCRIPTURLPATH{"view"}%/%USERSWEB%/%WIKINAME%">%JQICON{"user"}%%TMPL:P{"ACCOUNT"}%</a>%TMPL:END%
 %TMPL:DEF{"ACCOUNT_ACTION_RESTRICTED"}%<span class="natUserAction">%JQICON{"user"}%%TMPL:P{"ACCOUNT"}%</span>%TMPL:END%
 
@@ -102,13 +102,13 @@
 %TMPL:DEF{"DELETE"}% %TMPL:P{"DELETE_SHORT"}%%TMPL:P{"DELETE_LONG"}%%TMPL:END%
 %TMPL:DEF{"DELETE_SHORT"}%<span class='natTopicActionShortLabel'>%MAKETEXT{"Delete"}%</span>%TMPL:END%
 %TMPL:DEF{"DELETE_LONG"}%<span class='natTopicActionLongLabel'>%MAKETEXT{"Delete this topic"}%</span>%TMPL:END%
-%TMPL:DEF{"DELETE_ACTION"}%<a class="natTopicAction" rel="nofollow" href="%SCRIPTURLPATH{"rename"}%/%BASEWEB%/%BASETOPIC%?newweb=%TRASHWEB%&currentwebonly=on">%JQICON{"bin"}%%TMPL:P{"DELETE"}%</a>%TMPL:END%
+%TMPL:DEF{"DELETE_ACTION"}%<a class="natTopicAction" rel="nofollow" href="%SCRIPTURLPATH{"rename"}%/%BASEWEB%/%BASETOPIC%?newweb=%TRASHWEB%%IF{"not context SolrPluginEnabled" then="&currentwebonly=on"}%">%JQICON{"bin"}%%TMPL:P{"DELETE"}%</a>%TMPL:END%
 %TMPL:DEF{"DELETE_ACTION_RESTRICTED"}%<span class="natTopicAction natDisabledTopicAction">%JQICON{"bin"}%%TMPL:P{"DELETE"}%</span>%TMPL:END%
 
 %TMPL:DEF{"MOVE"}% %TMPL:P{"MOVE_SHORT"}%%TMPL:P{"MOVE_LONG"}%%TMPL:END%
 %TMPL:DEF{"MOVE_SHORT"}%<span class='natTopicActionShortLabel'>%MAKETEXT{"Move"}%</span>%TMPL:END%
 %TMPL:DEF{"MOVE_LONG"}%<span class='natTopicActionLongLabel'>%MAKETEXT{"Rename or move this topic"}%</span>%TMPL:END%
-%TMPL:DEF{"MOVE_ACTION"}%<a class="natTopicAction" rel="nofollow" href="%SCRIPTURLPATH{"rename"}%/%BASEWEB%/%BASETOPIC%?currentwebonly=on">%JQICON{"page_white_go"}%%TMPL:P{"MOVE"}%</a>%TMPL:END%
+%TMPL:DEF{"MOVE_ACTION"}%<a class="natTopicAction" rel="nofollow" href="%SCRIPTURLPATH{"rename"}%/%BASEWEB%/%BASETOPIC%%IF{"not context SolrPluginEnabled" then="?currentwebonly=on"}%">%JQICON{"page_white_go"}%%TMPL:P{"MOVE"}%</a>%TMPL:END%
 %TMPL:DEF{"MOVE_ACTION_RESTRICTED"}%<span class="natTopicAction natDisabledTopicAction">%JQICON{"page_white_go"}%%TMPL:P{"MOVE"}%</span>%TMPL:END%
 
 %TMPL:DEF{"HISTORY"}% %TMPL:P{"HISTORY_SHORT"}%%TMPL:P{"HISTORY_LONG"}%%JQREQUIRE{"ui::dialog"}%%TMPL:END%
@@ -263,6 +263,8 @@
 
 %TMPL:DEF{"logo"}%%NATWEBLOGO%%TMPL:END%
 
+%TMPL:DEF{"poweredby"}%<a href="http://foswiki.org" class="natPoweredBy" title="foswiki.org"><span><img src="%PUBURLPATH%/%SYSTEMWEB%/NatSkin/foswiki-logo.png" height="40" /></span>%MAKETEXT{"Powered by Foswiki"}%</a>%TMPL:END%
+
 %TMPL:DEF{"useractions"}%<!-- useractions -->
 %USERACTIONS{
   guest="<div class='natGreeter natGuestGreeter'>$login$sep$register</div>"
@@ -326,6 +328,8 @@
  text="<script src='%PUBURLPATH%/%SYSTEMWEB%/%id%.js'></script>"
  requires="%requires%"
 }%%TMPL:END%
+
+%TMPL:DEF{"msie::compatibility"}%<meta http-equiv='X-UA-Compatible' content='ie=edge,chrome=1' />%TMPL:END%
 
 %TMPL:DEF{"JavascriptFiles/foswikiArray"}%%TMPL:P{"LIBJS" id="JavascriptFiles/foswikiArray" requires="JQUERYPLUGIN::FOSWIKI"}%%TMPL:END%
 %TMPL:DEF{"JavascriptFiles/foswikiCSS"}%%TMPL:P{"LIBJS" id="JavascriptFiles/foswikiCSS" requires="JQUERYPLUGIN::FOSWIKI"}%%TMPL:END%

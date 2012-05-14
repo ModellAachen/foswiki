@@ -1,6 +1,6 @@
 # Plugin for mediawiki2foswiki
 #
-# Copyright (C) 2007-2009 Michael Daum http://michaeldaumconsulting.com
+# Copyright (C) 2007-2012 Michael Daum http://michaeldaumconsulting.com
 #
 # Copy/Rename this file to YourOwnPlugin.pm and rename the package line below
 

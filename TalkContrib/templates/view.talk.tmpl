@@ -17,8 +17,7 @@
 %{ link back to the topic itself }%
 %TMPL:DEF{"talktopicaction"}%%IF{"$TOPIC ~ '*%TMPL:P{talktopic}%'" then="%TMPL:P{viewtopicactionbutton}%" else="%TMPL:P{talktopicactionbutton}%"}%%TMPL:END%
 
-
-%TMPL:DEF{"top:toolbarbuttons"}%%TMPL:P{"talktopicaction"}%%TMPL:P{"activatable_edit_or_create"}%%TMPL:P{"activatable_attach"}%%TMPL:END%
+%TMPL:DEF{"top:toolbarbuttons"}%%TMPL:P{"talktopicaction"}%%TMPL:PREV%%TMPL:END%
 
 %TMPL:DEF{"topicactionbuttons"}%%TMPL:P{"talktopicaction"}%%TMPL:P{sep}%%TMPL:P{"action_activatable_edit_or_create"}%%TMPL:P{"action_activatable_attach"}%%TMPL:P{"action_printable"}%%TMPL:P{"action_revisions"}%%TMPL:P{"action_backlinks_simple"}%%TMPL:P{"action_raw_or_view"}%%TMPL:P{"action_activatable_raw_edit"}%%TMPL:P{"activatable_more"}%%TMPL:END%
 

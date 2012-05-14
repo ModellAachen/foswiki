@@ -28,9 +28,9 @@ use Assert;
 use Foswiki::Func    ();    # The plugins API
 use Foswiki::Plugins ();    # For the API version
 
-our $VERSION = '$Rev: 11239 $';
-our $RELEASE = '1.0.0';
-our $SHORTDESCRIPTION = 'Explore, install, and package wiki applications';
+our $VERSION           = '$Rev: 11239 $';
+our $RELEASE           = '1.0.0';
+our $SHORTDESCRIPTION  = 'Explore, install, and package wiki applications';
 our $NO_PREFS_IN_TOPIC = 1;
 
 sub initPlugin {
@@ -44,7 +44,8 @@ sub initPlugin {
     }
 
     Foswiki::Func::registerTagHandler( 'APPSTORE_TRYME', \&_APPSTORE_TRYME );
-    Foswiki::Func::registerTagHandler( 'APPSTORE_PACKAGEME', \&_APPSTORE_PACKAGEME );
+    Foswiki::Func::registerTagHandler( 'APPSTORE_PACKAGEME',
+        \&_APPSTORE_PACKAGEME );
 
     # Plugin correctly initialized
     return 1;
@@ -52,7 +53,7 @@ sub initPlugin {
 
 # $session  - a reference to the Foswiki session object
 #             (you probably won't need it, but documented in Foswiki.pm)
-# $params=  - a reference to a Foswiki::Attrs object containing 
+# $params=  - a reference to a Foswiki::Attrs object containing
 #             parameters.
 #             This can be used as a simple hash that maps parameter names
 #             to values, with _DEFAULT being the name for the default
@@ -65,13 +66,13 @@ sub initPlugin {
 # macro call in the final text.
 sub _APPSTORE_TRYME {
     require Foswiki::Plugins::WikiAppStorePlugin::Macros;
-    ASSERT(!$@) if DEBUG;
+    ASSERT( !$@ ) if DEBUG;
     Foswiki::Plugins::WikiAppStorePlugin::Macros::TRYME(@_);
 }
 
 sub _APPSTORE_PACKAGEME {
     require Foswiki::Plugins::WikiAppStorePlugin::Macros;
-    ASSERT(!$@) if DEBUG;
+    ASSERT( !$@ ) if DEBUG;
     Foswiki::Plugins::WikiAppStorePlugin::Macros::PACKAGEME(@_);
 }
 

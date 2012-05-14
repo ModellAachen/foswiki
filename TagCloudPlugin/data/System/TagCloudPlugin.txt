@@ -1,16 +1,7 @@
-%META:TOPICINFO{author="ProjectContributor" date="1231362374" format="1.1" version="1.2"}%
-<!--
-
-   PLEASE DO NOT EDIT THIS TOPIC
-
-   It is automatically generated from the subversion repository, and any changes
-   you make will simply be overwritten the next time a release is generated.
-
-   Instead, you could check your fix in, raise a bug in the Bugs web, or mail the author.
--->
+%META:TOPICINFO{author="ProjectContributor" comment="save topic" date="1335351111" format="1.1" reprev="2" version="2"}%
 ---+!! <nop>%TOPIC%
 %TOC%
-%STARTINCLUDE%
+%STARTSECTION{"exampletext"}%
 
 ---++ Description
 This plugin helps rendering tag clouds.
@@ -132,7 +123,7 @@ might contain the following pseudo variables:
    * =$nop=: is removed from the format string
    * =$group=: grouping format string, see above
 
-%STOPINCLUDE%
+%ENDSECTION{"exampletext"}%
 
 ---++ Example
 
@@ -140,7 +131,7 @@ Cloud for the above text:
 
 *You type*:
 <verbatim>
-%TAGCLOUD{"$percntINCLUDE{\"%WEB%.%TOPIC%\"}$percnt"
+%TAGCLOUD{"$percntINCLUDE{\"%WEB%.%TOPIC%\" section=\"exampletext\"}$percnt"
   header="<div style=\"text-align:center; padding:15px;line-height:180%\">"
   format="<span style=\"font-size:$weightpx;line-height:90%\"><a style=\"color:$fadeRGB(104,144,184,0,102,255);text-decoration:none\" title=\"$count\">$term</a></span>"
   footer="</div>"
@@ -179,7 +170,6 @@ Cloud for the above text:
 
 ---++ Plugin Installation Instructions
 %$INSTALL_INSTRUCTIONS%
-
 
 ---++ Plugin Info
 

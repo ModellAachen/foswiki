@@ -18,7 +18,7 @@ package Foswiki::Plugins::SkillsPlugin::UserSkill;
 use strict;
 
 use Foswiki::Plugins::SkillsPlugin::SkillNode ();
-our @ISA = ( 'Foswiki::Plugins::SkillsPlugin::SkillNode' );
+our @ISA = ('Foswiki::Plugins::SkillsPlugin::SkillNode');
 
 # Object to represent the skill as stored in users meta data
 sub new {
@@ -32,7 +32,7 @@ sub new {
 }
 
 sub serializable {
-    my ($this, $field) = @_;
+    my ( $this, $field ) = @_;
     return 1 if $field eq 'rating';
     return $this->SUPER::serializable($field);
 }
@@ -42,15 +42,17 @@ sub toMeta {
     my $this = shift;
     my $out;
 
-    if ($this->hasChildren()) {
+    if ( $this->hasChildren() ) {
         $out = '';
-        foreach my $kid (@{$this->{childNodes}}) {
+        foreach my $kid ( @{ $this->{childNodes} } ) {
             $out .= $kid->toMeta();
         }
-    } else {
+    }
+    else {
         $out = "%META:USERSKILL{name=\"$this->{name}\"";
-        $out .= ' rating="'.(defined $this->{rating}?$this->{rating}:'').'"';
-        $out .= ' path="'.$this->{parent}->getPath().'"';
+        $out .= ' rating="'
+          . ( defined $this->{rating} ? $this->{rating} : '' ) . '"';
+        $out .= ' path="' . $this->{parent}->getPath() . '"';
         $out .= " comment=\"$this->{text}\"" if $this->{text};
         $out .= "}%\n";
     }
@@ -59,22 +61,23 @@ sub toMeta {
 
 # Add leaf skill nodes to Foswiki::Meta
 sub saveToMeta {
-    my ($this, $meta) = @_;
+    my ( $this, $meta ) = @_;
     my $out;
 
-    if ($this->hasChildren()) {
+    if ( $this->hasChildren() ) {
         $out = '';
-        foreach my $kid (@{$this->{childNodes}}) {
+        foreach my $kid ( @{ $this->{childNodes} } ) {
             $out .= $kid->saveToMeta($meta);
         }
-    } elsif (defined $this->{rating} && $this->{name}) {
+    }
+    elsif ( defined $this->{rating} && $this->{name} ) {
         my @path = $this->getPathArray();
-        pop(@path); # get rid of the skill off the path
+        pop(@path);    # get rid of the skill off the path
         $meta->putKeyed(
             'SKILLS',
             {
                 name     => $this->{name},
-                category => join('/', @path),
+                category => join( '/', @path ),
                 rating   => $this->{rating},
                 comment  => $this->{text}
             }
@@ -84,9 +87,10 @@ sub saveToMeta {
 
 sub stringify {
     my $this = shift;
-    if (!$this->hasChildren()) {
+    if ( !$this->hasChildren() ) {
         return $this->toMeta();
-    } else {
+    }
+    else {
         return $this->SUPER::stringify();
     }
 }

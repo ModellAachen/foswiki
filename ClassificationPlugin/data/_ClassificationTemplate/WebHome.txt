@@ -1,21 +1,95 @@
-%META:TOPICINFO{author="ProjectContributor" comment="reprev" date="1275569240" format="1.1" reprev="3" version="3"}%
----+!! %WEB%
+%META:TOPICINFO{author="ProjectContributor" comment="reprev" date="1329401804" format="1.1" reprev="6" version="6"}%
+---+!! %WEBLINK%
 
-<h2 >What's new?</h2>
-<div class="clsMakeIndexWrapper">
-%MAKEINDEX{
-  "%DBQUERY{
-    order="modified"
-    reverse="on"
-    limit="16"
-    exclude="^(WebChanges|WebPreferences|WebTopicLinks|WebIndex|WebNotify|WebHome|WebRss|WebAtom|WebStatistics|WebLinks)"
-    format="$expand(topictitle);$web;$topic$n"
-  }%"
-  pattern="(.*);(.*);(.*)"
-  split="\n"
-  format="$percntDBCALL{\"$2.$3->RenderIndexItem\"}$percnt"
-  group=""
-  cols="2"
-  sort="off"
+---++ %MAKETEXT{"Welcome"}%
+%DBCALL{"Applications.ClassificationApp.WelcomeMessage"}%
+
+<div class="foswikiGrid">
+<div class="foswikiCol8 border">
+---++ %MAKETEXT{"Categories"}%
+<verbatim class="jqLoader {section:'parties'}">
+%STARTSECTION{"parties"}%<!-- -->
+%DBCALL{"Applications.ClassificationApp.RenderCategory" 
+   CAT="TopCategory"
+}%
+<!-- -->%ENDSECTION{"parties"}%
+</verbatim>
+%STOPCHAPTER%
+---
+---++ %MAKETEXT{"Tags"}%
+<verbatim class="jqLoader {section:'tagcloud'}">
+%STARTSECTION{"tagcloud"}%<!-- -->
+<div class="hyphenate">
+%DBCALL{"Applications.ClassificationApp.RenderSolrTagCloud" 
+  LIMIT="100"
+  THEWEB="%BASEWEB%"
 }%
 </div>
+%CLEAR%
+<!-- -->%ENDSECTION{"tagcloud"}%
+</verbatim>
+</div>
+%STOPCHAPTER%
+<div class="foswikiCol4 last">
+---++ %MAKETEXT{"Recent changes"}%
+<verbatim class="jqLoader {section:'recentchanges'}">
+%STARTSECTION{"recentchanges"}%<!-- -->
+%DBCALL{"Applications.RenderRecentChanges" 
+  HEIGHT="40em"
+}%
+<!-- -->%ENDSECTION{"recentchanges"}%
+</verbatim>
+%STOPCHAPTER%
+</div>
+<div class="foswikiCol12">
+---
+</div>
+<div class="foswikiCol4 border">
+---++ %MAKETEXT{"Topic list"}%
+   * ...
+   * ...
+   * ...
+
+%STOPCHAPTER%
+</div>
+<div class="foswikiCol4 border">
+---++ %MAKETEXT{"Quick links"}%
+   * [[Categories]]
+   * [[ClassifiedTopics]]
+   * WebPreferences
+   * WebTopicList
+   * WebStatistics
+   * WebNotify
+%STOPCHAPTER%
+</div>
+<div class="foswikiCol4 last">
+---++ %MAKETEXT{"Topics tagged \"[_1]\"" args="%QUERYTAG%"}%
+<!--
+   * Set QUERYTAG = test
+-->
+
+%DBQUERY{
+  "Tag=~'\b%QUERYTAG%\b'"
+  exclude=".*(Template|Formulare)$"
+  format="   1 [[$web.$topic]]"
+  sort="on"
+}%
+%STOPCHAPTER%
+</div>
+</div><!-- end of grid -->
+---
+---++ %MAKETEXT{"Add more text here"}%
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam aliquam molestie scelerisque. Aenean accumsan ante cursus nisl dapibus sed rhoncus lacus bibendum. Quisque eros libero, feugiat porttitor semper quis, commodo et magna. Sed fermentum lacinia dolor vitae iaculis. Nulla dapibus commodo orci non lacinia. Aliquam erat volutpat. Proin in nulla ut libero fringilla iaculis vitae sit amet purus. Vivamus ut convallis lacus. Nulla turpis eros, tincidunt sit amet accumsan non, molestie ut eros. Nunc porta rhoncus dui vitae interdum. Praesent rhoncus mollis quam, vel egestas mi rhoncus at. Quisque vestibulum magna sed justo laoreet at ultricies quam adipiscing. Vivamus sit amet sem justo, id ultrices sem. Vestibulum risus ipsum, congue eu varius sit amet, luctus eget velit. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.
+
+%STOPCHAPTER%
+
+<!-- %JQREQUIRE{"loader, infinitescroll"}% %REDDOT% %IMAGE% -->
+<!--
+   * Set CACHEEXPIRE = +5min
+   * Set CACHEABLE = on
+   * Set REDDOT_REDIRECT = %BASEWEB%.%BASETOPIC%
+-->
+
+%META:PREFERENCE{name="NATSKIN_SIDEBAR" title="NATSKIN_SIDEBAR" type="Local" value="off"}%
+%META:PREFERENCE{name="DISPLAYREVISIONINFO" title="DISPLAYREVISIONINFO" type="Local" value="off"}%

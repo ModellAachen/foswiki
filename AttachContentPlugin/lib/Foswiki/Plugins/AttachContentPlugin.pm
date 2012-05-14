@@ -58,8 +58,8 @@ sub initPlugin {
     return 1;
 }
 
-sub _startAttach {}
-sub _endAttach {}
+sub _startAttach { }
+sub _endAttach   { }
 
 =pod
 

@@ -49,6 +49,8 @@ sub import {
         $soft = 1 if $ENV{FOSWIKI_ASSERTS} and $ENV{FOSWIKI_ASSERTS} eq 'soft';
         *DEBUG = *ASSERTS_ON;
         Assert->export_to_level( 1, @_ );
+
+        $SIG{'__WARN__'} = sub { die @_ };
     }
     else {
         my $caller = caller;

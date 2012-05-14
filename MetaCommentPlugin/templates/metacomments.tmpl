@@ -19,8 +19,24 @@
         $percntTMPL:P{\"comments::replier\"}$percnt"
 }%<!-- -->
 </div>
-%JQREQUIRE{"ui, blockui, simplemodal, form"}%<!-- -->
 <!-- -->%TMPL:END%
+
+%{ ################################################################################ 
+   metacomments::init - loads all required css and js
+}%
+%TMPL:DEF{"metacomments::init"}%<!-- -->
+%JQREQUIRE{"ui, blockui, ui::dialog, form, simplemodal, form, jsonrpc, hoverintent"}%<!-- -->
+%ADDTOZONE{
+  "head" 
+  id="METACOMMENTPLUGIN::CSS" 
+  requires="JQUERYPLUGIN::SIMPLEMODAL" 
+  text="<link rel='stylesheet' href='%PUBURLPATH%/%SYSTEMWEB%/MetaCommentPlugin/metacomment.css' type='text/css' media='all' />"
+}%%ADDTOZONE{
+  "script" 
+  id="METACOMMENTPLUGIN::JS" 
+  requires="JQUERYPLUGIN::SIMPLEMODAL, JQUERYPLUGIN::FORM, JQUERYPLUGIN::JSONRPC" 
+  text="<script type='text/javascript' src='%PUBURLPATH%/%SYSTEMWEB%/MetaCommentPlugin/metacomment.js'></script>"
+}%%TMPL:END%
 
 %{ ################################################################################ 
    comments::topbar - renders the number of comments
@@ -127,9 +143,11 @@
       then="<div class='foswikiRight foswikiAlert cmtAlert'>(%MAKETEXT{"needs approval"}%)</div>"
     }$percnt<!-- -->
     <span class='foswikiSmallish foswikiGrayText'>
-      <span class='cmtAuthor'>[[%USERINFO{"$author" format="$wikiusername"}%]]</span>
+      <span class='cmtAuthor'>%IF{"istopic '%USERSWEB%.$author'" then="[[%USERSWEB%.$author]]" else="<nop>$author"}%</span>
       &#124;
       <span class='cmtDate'>$date</span>
+      &#124;
+      <a class='cmtPermLink' href='$permlink'>%MAKETEXT{"permlink"}%</a>
     </span>
     %CLEAR%
   </div>
@@ -184,9 +202,11 @@
       then="<div class='foswikiRight foswikiAlert cmtAlert'>(%MAKETEXT{"needs approval"}%)</div>"
     }$percnt<!-- -->
     <span class='foswikiSmallish foswikiGrayText'>
-      <span class='cmtAuthor'>[[%USERINFO{"$author" format="$wikiusername"}%]]</span>
+      <span class='cmtAuthor'>%IF{"istopic '%USERSWEB%.$author'" then="[[%USERSWEB%.$author]]" else="<nop>$author"}%</span>
       &#124;
       <span class='cmtDate'>$date</span>
+      &#124;
+      <a class='cmtPermLink' href='$permlink'>%MAKETEXT{"permlink"}%</a>
     </span>
     %CLEAR%
   </div> $subcomments
@@ -221,9 +241,11 @@
       then="<div class='foswikiRight foswikiAlert cmtAlert'>(%MAKETEXT{"needs approval"}%)</div>"
     }$percnt<!-- -->
     <span class='foswikiSmallish foswikiGrayText'>
-      <span class='cmtAuthor'>[[%USERINFO{"$author" format="$wikiusername"}%]]</span>
+      <span class='cmtAuthor'>%IF{"istopic '%USERSWEB%.$author'" then="[[%USERSWEB%.$author]]" else="<nop>$author"}%</span>
       &#124;
       <span class='cmtDate'>$date</span>
+      &#124;
+      <a class='cmtPermLink' href='$permlink'>%MAKETEXT{"permlink"}%</a>
     </span>
     %CLEAR% 
     <a name='bottomcomment$id'></a>
@@ -237,8 +259,8 @@
 }%
 %TMPL:DEF{"comments::confirmdelete"}%<!-- -->
 <div id="cmtConfirmDelete" style="display:none" class="foswikiDialog foswikiFormSteps">
+  <h2 class="foswikiDialogTitle jqSimpleModalDraggable">%MAKETEXT{"Delete comment [_1]?" args="<span class='cmtCommentNr'></span>"}%</h2>
   <div class="foswikiFormStep">
-    <h2 class="foswikiDialogTitle jqSimpleModalDraggable">%MAKETEXT{"Delete comment [_1]?" args="<span class='cmtCommentNr'></span>"}%</h2>
     %MAKETEXT{"Are you sure that you want to delete this comment posted by [_1] on [_2]?" 
       args="<span class='cmtAuthor'></span>, <span class='cmtDate'></span>"
     }%
@@ -256,8 +278,8 @@
 }%
 %TMPL:DEF{"comments::confirmapprove"}%<!-- -->
 <div id="cmtConfirmApprove" style="display:none" class="foswikiDialog foswikiFormSteps">
+  <h2 class="foswikiDialogTitle jqSimpleModalDraggable">%MAKETEXT{"Approve comment [_1]?" args="<span class='cmtCommentNr'></span>"}%</h2>
   <div class="foswikiFormStep">
-    <h2 class="foswikiDialogTitle jqSimpleModalDraggable">%MAKETEXT{"Approve comment [_1]?" args="<span class='cmtCommentNr'></span>"}%</h2>
     %MAKETEXT{"Are you sure that you want to approve this comment posted by [_1] on [_2]?" 
       args="<span class='cmtAuthor'></span>, <span class='cmtDate'></span>"
     }%

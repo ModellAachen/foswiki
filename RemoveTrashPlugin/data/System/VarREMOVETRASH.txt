@@ -1,0 +1,8 @@
+%META:TOPICINFO{author="ProjectContributor" date="1297286796" format="1.1" version="1"}%
+%META:TOPICPARENT{name="RemoveTrashPlugin"}%
+#VarREMOVETRASH
+---+++ REMOVETRASH -- macro to create a 'Remove trash' button
+   * The =%<nop>REMOVETRASH{}%= macro is handled by the RemoveTrashPlugin
+   * Syntax: =%<nop>REMOVETRASH%=
+   * Example: =%<nop>REMOVETRASH%=
+   * Related: RemoveTrashPlugin

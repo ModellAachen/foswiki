@@ -1,0 +1,34 @@
+%META:TOPICINFO{author="ProjectContributor" date="1157476251" format="1.1" version="1.1"}%
+---+!! %TOPIC%
+%TOC%
+
+This implements a pingback service for Foswiki. See the pingback specification at
+http://hixie.ch/specs/pingback/pingback
+
+There's a PingBackClient for testing. See also the PingBackManager.
+
+---++ Syntax Rules
+=%<nop>PINGBACK{...}%=
+
+---++ Plugin Installation Instructions
+%$INSTALL_INSTRUCTIONS%
+
+   * Test if it works by using the PingBackManager and ping the %TOPIC% topic;
+     ping-enable other topics by setting
+<verbatim>
+   * Set ENABLEPINGBACK = on
+</verbatim>
+
+---++ Plugin Info
+<!-- 
+   * Set SHORTDESCRIPTION = Pingback service for Foswiki
+-->
+|  Plugin Author: | Foswiki:Main.MichaelDaum |
+|  Copyright &copy;: | 2006,2012, Michael Daum http://michaeldaumconsulting.com |
+|  License: | GPL ([[http://www.gnu.org/copyleft/gpl.html][GNU General Public License]]) |
+|  Plugin Version: | v0.05-alpha |
+|  Change History: | &nbsp; |
+|  31 Aug 2006: | completed roundtrip of sending, receive and verifying |
+|  27 May 2006: | Initial version |
+|  Home: | Foswiki:Extensions/%TOPIC% |
+|  Support: | Foswiki:Support/%TOPIC% |

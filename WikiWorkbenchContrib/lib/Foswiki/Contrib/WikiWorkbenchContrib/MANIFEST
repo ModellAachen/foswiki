@@ -7,7 +7,6 @@ data/Applications/DataFormAttributeTemplate.txt 0644
 data/Applications/DataFormAttribute.txt 0644
 data/Applications/DataFormTemplate.txt 0644
 data/Applications/DataForm.txt 0644
-data/Applications/DocuTopicEditTemplate.txt 0644
 data/Applications/DocuTopic.txt 0644
 data/Applications/FirstSteps.txt 0644
 data/Applications/FormEditTemplate.txt 0644
@@ -67,10 +66,11 @@ data/Applications/WikiApplicationViewTemplate.txt 0644
 data/Applications/WikiTopicEditTemplate.txt 0644
 data/Applications/WikiTopic.txt 0644
 data/Applications/WikiTopicViewTemplate.txt 0644
-data/Applications/WikiWorkbench.txt 0644
+data/Applications/CompleteDocumentation.txt 0644
 data/System/WikiWorkbenchContrib.txt 0644
 data/_WikiApplicationTemplate/ApplicationLicense.txt 0644
 data/_WikiApplicationTemplate/ApplicationTopic.txt 0644
+data/_WikiApplicationTemplate/CompleteDocumentation.txt 0644
 data/_WikiApplicationTemplate/DataFormAttribute.txt 0644
 data/_WikiApplicationTemplate/DataForm.txt 0644
 data/_WikiApplicationTemplate/DocuTopic.txt 0644
@@ -95,6 +95,7 @@ data/_WikiApplicationTemplate/WebTopicList.txt 0644
 data/_WikiApplicationTemplate/WebTopicViewTemplate.txt 0644
 data/_WikiApplicationTemplate/WikiApplication.txt 0644
 data/_WikiApplicationTemplate/WikiTopic.txt 0644
+lib/Foswiki/Form/Wikiapp.pm 0644
 lib/Foswiki/Contrib/WikiWorkbenchContrib.pm 0644
 pub/Applications/twb.js 0644
 pub/System/WikiWorkbenchContrib/book.png 0644

@@ -153,8 +153,7 @@ sub getExternalResource {
             # Use MIME::Base64 at run-time if using outbound proxy with
             # authentication
             require MIME::Base64;
-            import MIME::Base64();
-            my $base64 = encode_base64( "$user:$pass", "\r\n" );
+            my $base64 = MIME::Base64::encode_base64( "$user:$pass", "\r\n" );
             $req .= "Authorization: Basic $base64";
         }
 
@@ -189,8 +188,9 @@ sub getExternalResource {
             $port = $proxyPort;
             if ($proxyUser) {
                 require MIME::Base64;
-                import MIME::Base64();
-                my $base64 = encode_base64( "$proxyUser:$proxyPass", "\r\n" );
+                my $base64 =
+                  MIME::Base64::encode_base64( "$proxyUser:$proxyPass",
+                    "\r\n" );
                 $req .= "Proxy-Authorization: Basic $base64";
             }
         }
@@ -483,15 +483,18 @@ s/([\n\r])(From|To|CC|BCC)(\:\s*)([^\n\r]*)/$1.$2.$3._fixLineLength($4)/geois;
     print $MAIL $text;
     close($MAIL);
 
-#SMELL: this is bizzare. on a freeBSD server, I've seen sendmail return 17152
-#(17152 >> 8) == 67 == EX_NOUSER - however, the mail log says that the error was
-#EX_TEMPFAIL == 75, and that (as per oreilly book) the email is cued. The email
-#does reach the user, but they are very confused because they were told that the
-#rego failed completely.
-#Sven has ameneded the oops_message for the verify emails to be less positive that
-#everything has failed, but.
+    # If you see 67 (17152) (== EX_NOUSER), then the mail is probably
+    # queued and will eventually reach the user, despite the error.
+    # The chances are good that you are seeing the same problem as we
+    # had on foswiki.org, finally solved by Olivier Raginel viz. The
+    # source address is:
+    #     From: webmaster@foswiki.org
+    # but sendmail thinks it's running on foswiki.org, and knows there is no
+    # 'webmaster' user, so it gets confused. The 'From:' in the mail must
+    # refer to a user account that exists locally. After we created a dummy
+    # 'webmaster' user, the error went away.
     die "ERROR: Exit code "
-      . ( $? << 8 )
+      . ( $? >> 8 )
       . " ($?) from Foswiki::cfg{MailProgram}"
       if $?;
 }

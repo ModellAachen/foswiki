@@ -27,7 +27,7 @@ Besides jQuery itself, !JQueryPlugin comes with a selection of third party plugi
 These are integrated into Foswiki either by means of a special [[#Macros][macro]], by means of "minimal markup", or initialized using
 a custom javascript initializer. This way the set of Foswiki macros that comes with !JQueryPlugin is kept rather low compared to the features available
 in third party plugins. "Minimal markup" is a way to avoid the need to write javascript code to initialize the interface. Instead, a special
-css class is added to an html element that triggers its initialization. See JQueryMetadata for an example.
+css class is added to an html element that triggers its initialization. See %SYSTEMWEB%.JQueryMetadata for an example.
 
 Use [[#VarJQREQUIRE][JQREQUIRE]] to make use of a specific jQuery plugin on a page. This will prepare the page by loading the required javascript
 and css components. If you need to make a feature available on each and every page of your site, you may add this plugin to the list of default plugins
@@ -45,7 +45,7 @@ them at Foswiki:Development.UsingJQueryWithFoswiki#adding_plugins.
 ---++ Writing your own Javascript
 
 Whether writing your own plugins or writing Javascript code in topics, you should observe the
-Foswiki JQueryCodingStandards.
+Foswiki %SYSTEMWEB%.JQueryCodingStandards.
 
 ---++ jQuery References and tutorials
    * [[http://docs.jquery.com/How_jQuery_Works][Getting the feet wet]]
@@ -132,11 +132,22 @@ reduce bandwidth and speed up interactive performance.
 
 ---++ Plugin Info
 |  Author(s): | Michael Daum |
-|  Copyright: | 2007-2011 Michael Daum http://michaeldaumconsulting.com |
+|  Copyright: | 2007-2012 Michael Daum http://michaeldaumconsulting.com, and Foswiki contributors. |
 |  License: | GPL |
 |  Release: | %$RELEASE% |
 |  Version: | %$VERSION% |
 |  Change History: | <!-- versions below in reverse order -->&nbsp; |
+|  10 Apr 2012: | (4.40) - Item11397, Item11742. \
+                  use a JSON instead of &lt;meta> to export preferences to javascript; \
+                  add jquery-1.7.2 (new default); \
+                  deprecate all jquery versions prior to 1.7.1 \
+                  improve docu and integration of scrollto and serialscroll; \
+                  removed deprecated foswiki.web, foswiki.topic etc properties |
+|  06 Apr 2012: | (4.33) - Item11511, Item11512.  Minor changes to improve JSON output and Javascript validations.%BR%\
+                   Item11685: deprecate simmplemodal, replace by jquery.ui.dialog.%BR%\
+                   Item11654: JQueryTmpl is discontinued upstream.%BR%\
+                   Item11383: Document jqUIDialogSubmit.%BR%\
+                   Item10383: !JQuerySimpleModal sample window isn't displayed properly. |
 |  20 Dec 2011: | (4.32) - re-release Foswiki 1.1.4 - Item11335 revert spinner changes, Item11371 - close suggestions list. |
 |  12 Dec 2011: | (4.31) - Foswiki 1.1.4 Release. Item11335 JQueryAjaxHelper examples don't work reliably. |
 |  22 Nov 2011: | (4.30) added jquery-1.7 and jquery-1.7.1; \
@@ -146,7 +157,7 @@ reduce bandwidth and speed up interactive performance.
                   and a warining for Chili highlighter corruption; \
                   fixed jquery.chili to allow other non-recipe css classes in verbatim sections; \
                   fixed jquery.cookie to return undefined instead of an empty Object when asking for an unknown cookie; \
-                  fixed <nop>JQueryAjaxHelper's =users= backend to return users and groups |
+                  fixed <nop>JQueryAjaxHelper's =users= backend to return users and groups \
                   improved jquery-ui-dialog integration |
 |  26 Oct 2011: | fixing compatibility of jquery.media with newer jqueries; \
                   fixed placement of jquery.tooltips when viewport at right bottom;\
@@ -237,7 +248,7 @@ reduce bandwidth and speed up interactive performance.
                   deprecated jquery.nifty; disabled JQSCRIPT and JQSTYLE |
 |  11 Nov 2009: | added jqGrid library; reorganized documentation |
 |  07 Nov 2009: | updated Superfish to 1.4.8 and added examples topic, added\
-                  supersubs plugin, moved JQuery examples from Sandbox to System |
+                  supersubs plugin, moved JQuery examples from %SANDBOXWEB% to %SYSTEMWEB% |
 |  29 Oct 2009: | added SCRIPTSUFFIX to foswiki var set (CDot) |
 |  14 Sep 2009: | added perls tubs for jquery.ui, so that you can pull it in via JQREQUIRE now; \
                   reworked plugin initialization to allow elements to be init'ed when loaded via ajax; \

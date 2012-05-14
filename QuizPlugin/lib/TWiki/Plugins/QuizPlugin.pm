@@ -5,12 +5,12 @@
 
 use strict;
 
-package TWiki::Plugins::QuizPlugin; 	# change the package name!!!
+package TWiki::Plugins::QuizPlugin;    # change the package name!!!
 
 use vars qw(
-            $web $topic $user $installWeb $VERSION $RELEASE
-            $quizNumber
-           );
+  $web $topic $user $installWeb $VERSION $RELEASE
+  $quizNumber
+);
 
 $VERSION = '$Rev$';
 $RELEASE = '1.000';
@@ -18,21 +18,21 @@ $RELEASE = '1.000';
 sub initPlugin {
     ( $topic, $web, $user, $installWeb ) = @_;
 
-    TWiki::Func::registerTagHandler('QUIZ', \&handleQuiz);
+    TWiki::Func::registerTagHandler( 'QUIZ', \&handleQuiz );
     $quizNumber = 1;
     return 1;
 }
 
 sub handleQuiz {
-    my($session, $attrs, $topic, $web) = @_;
-    my $name = $attrs->{_DEFAULT};
-    my $correct = $attrs->{correct};
+    my ( $session, $attrs, $topic, $web ) = @_;
+    my $name      = $attrs->{_DEFAULT};
+    my $correct   = $attrs->{correct};
     my $jumptopic = $attrs->{jump};
-    my $units = $attrs->{units} || '';
+    my $units     = $attrs->{units} || '';
 
-    if (!defined($correct)) {
-        return CGI::span({class=>'twikiAlert'},
-                         "Invalid quiz - need correct answer(s)");
+    if ( !defined($correct) ) {
+        return CGI::span( { class => 'twikiAlert' },
+            "Invalid quiz - need correct answer(s)" );
     }
 
     my $result = <<HEADER;
@@ -40,33 +40,35 @@ sub handleQuiz {
 <div class='twikiAlert'> Q$quizNumber: $name</div>
 HEADER
 
-    if ($attrs->{type} eq 'string') {
+    if ( $attrs->{type} eq 'string' ) {
         my $length = length($correct);
-        $result .= stringScript($quizNumber, $correct, $jumptopic);
+        $result .= stringScript( $quizNumber, $correct, $jumptopic );
         $result .= <<FIELD;
 <input type='text' name='field' size='$length' maxlength='$length'> $units <br />
 FIELD
     }
 
-    elsif ($attrs->{type} eq 'select') {
+    elsif ( $attrs->{type} eq 'select' ) {
         my $answers = $attrs->{choices};
-        $result .= someOfScript($quizNumber, $answers, $correct, $jumptopic);
-        my @corrects = split(/;/, $correct);
+        $result .= someOfScript( $quizNumber, $answers, $correct, $jumptopic );
+        my @corrects = split( /;/, $correct );
         my $type;
-        if (scalar(@corrects) > 1) {
+        if ( scalar(@corrects) > 1 ) {
             $type = "checkbox";
-        } else {
+        }
+        else {
             $type = 'radio';
         }
-        my @anslist = split(/;/, $answers);
+        my @anslist = split( /;/, $answers );
         foreach my $answer (@anslist) {
             $result .= <<ANSWER
 <input type='$type' name='field' value='$answer'> $answer <br />
 ANSWER
         }
-    } else {
-        return "<font color=red>Invalid quiz $attrs - need select " .
-          "or string</font><br>";
+    }
+    else {
+        return "<font color=red>Invalid quiz $attrs - need select "
+          . "or string</font><br>";
     }
 
     $result .= <<SUBMIT;
@@ -83,15 +85,15 @@ my $scriptHeader = "<script language=\"JavaScript\"> <!--HIDE\n";
 my $scriptFooter = "//STOP HIDING-->\n</script>\n";
 
 sub cheatScript {
-    my ($quizNumber,$set) = @_;
+    my ( $quizNumber, $set ) = @_;
     return "var first$quizNumber=1; function Cheat${quizNumber}() {
 	if (first$quizNumber==1) {
 		alert(\"You should try at least once before clicking on 'Show Solutions'!\");
 	} else { $set }}";
 }
 
-sub submitScript{
-    my ($quizNumber, $check, $jumpTopic) = @_;
+sub submitScript {
+    my ( $quizNumber, $check, $jumpTopic ) = @_;
     my $result = <<JS;
 function Submit${quizNumber}() {
  first$quizNumber=0;
@@ -99,9 +101,10 @@ function Submit${quizNumber}() {
   if (confirm("Correct!!! Click on OK to continue"))
 JS
     if ($jumpTopic) {
-	    $result .= "   window.location.replace('$jumpTopic');\n";
-    } else {
-        $result .= "   ;\n"
+        $result .= "   window.location.replace('$jumpTopic');\n";
+    }
+    else {
+        $result .= "   ;\n";
     }
     return $result . <<MOREJS;
  } else {
@@ -113,11 +116,11 @@ MOREJS
 
 # Generate script for someOf
 sub someOfScript {
-    my ($quizNumber, $legalAnswers, $correctAnswers, $jumpTopic) = @_;
+    my ( $quizNumber, $legalAnswers, $correctAnswers, $jumpTopic ) = @_;
 
-    my @possibles = split(/;/, $legalAnswers);
+    my @possibles = split( /;/, $legalAnswers );
     my %nameMap;
-    my @corrects = split(/;/, $correctAnswers);
+    my @corrects = split( /;/, $correctAnswers );
 
     my $n = 0;
     foreach my $poss (@possibles) {
@@ -125,40 +128,45 @@ sub someOfScript {
         $n++;
     }
 
-    my $set = "";
+    my $set   = "";
     my $check = "";
     foreach my $poss (@possibles) {
-        if ($check ne "") {
+        if ( $check ne "" ) {
             $check .= "&&";
         }
         $set .= $nameMap{$poss};
-        if ($correctAnswers !~ /\b$poss\b/) {
-            $set .= "=false;";
+        if ( $correctAnswers !~ /\b$poss\b/ ) {
+            $set   .= "=false;";
             $check .= "!";
-        } else {
+        }
+        else {
             $set .= "=true;";
         }
         $check .= $nameMap{$poss};
     }
 
-    return $scriptHeader .
-      cheatScript($quizNumber, $set) ."\n".
-	    submitScript($quizNumber, $check, $jumpTopic) .
-          $scriptFooter;
+    return
+        $scriptHeader
+      . cheatScript( $quizNumber, $set ) . "\n"
+      . submitScript( $quizNumber, $check, $jumpTopic )
+      . $scriptFooter;
 }
 
 # Generate script for string
 sub stringScript {
-    my ($quizNumber, $correctAnswer, $jumpTopic) = @_;
+    my ( $quizNumber, $correctAnswer, $jumpTopic ) = @_;
 
-    return $scriptHeader .
-      cheatScript($quizNumber,
-                  "window.document.quiz" . $quizNumber .
-                    ".field.value=\"$correctAnswer\";") ."\n".
-                      submitScript($quizNumber,
-                                   "window.document.quiz$quizNumber" . 
-                                     ".field.value==\"$correctAnswer\"", $jumpTopic) .
-                                       $scriptFooter;
+    return $scriptHeader
+      . cheatScript( $quizNumber,
+            "window.document.quiz"
+          . $quizNumber
+          . ".field.value=\"$correctAnswer\";" )
+      . "\n"
+      . submitScript(
+        $quizNumber,
+        "window.document.quiz$quizNumber" . ".field.value==\"$correctAnswer\"",
+        $jumpTopic
+      ) . $scriptFooter;
 }
 
 1;

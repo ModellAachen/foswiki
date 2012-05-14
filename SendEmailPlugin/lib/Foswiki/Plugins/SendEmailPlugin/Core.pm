@@ -38,7 +38,7 @@ my %ERROR_STATUS                 = (
     'noerror' => 1,
     'error'   => 2,
 );
-my %ERROR_STATUS_MESSAGE                 = (
+my %ERROR_STATUS_MESSAGE = (
     1 => 'success',
     2 => 'error',
 );
@@ -272,10 +272,12 @@ sub sendEmail {
     _debug("body=$body") if $body;
 
     # get template
-    my $templateName = $query->param('mailtemplate') || 'SendEmailPluginTemplate';
+    my $templateName = $query->param('mailtemplate')
+      || 'SendEmailPluginTemplate';
+
     # remove 'Template' at end - stupid TWiki solution from the old days
     $templateName =~ s/^(.*?)Template$/$1/;
-    
+
     my $template = Foswiki::Func::readTemplate($templateName);
     _debug("templateName=$templateName");
     unless ($template) {
@@ -302,7 +304,7 @@ HERE
 
     # send email
     $errorMessage = Foswiki::Func::sendEmail( $mail, 1 );
-    
+
     # finally
     my $errorStatus =
       $errorMessage ? $ERROR_STATUS{'error'} : $ERROR_STATUS{'noerror'};
@@ -337,8 +339,9 @@ sub handleSendEmailTag {
 
     return '' if !defined $errorStatus;
 
-    _debug("handleSendEmailTag errorStatus=" . _errorStatusMessage($errorStatus));
-    
+    _debug(
+        "handleSendEmailTag errorStatus=" . _errorStatusMessage($errorStatus) );
+
     unless ( defined $feedbackSuccess ) {
         $feedbackSuccess = $EMAIL_SENT_SUCCESS_MESSAGE
           || '';
@@ -414,7 +417,8 @@ sub _finishSendEmail {
 
     my $query = Foswiki::Func::getCgiQuery();
 
-    _debug("_finishSendEmail errorStatus=" . _errorStatusMessage($errorStatus))
+    _debug(
+        "_finishSendEmail errorStatus=" . _errorStatusMessage($errorStatus) )
       if $errorStatus;
     _debug("_finishSendEmail redirectUrl=$redirectUrl")
       if $redirectUrl;
@@ -495,9 +499,9 @@ sub _wrapHtmlNotificationContainer {
 }
 
 sub _errorStatusMessage {
-	my ($errorStatus) = @_;
-	
-	return $ERROR_STATUS_MESSAGE{$errorStatus};
+    my ($errorStatus) = @_;
+
+    return $ERROR_STATUS_MESSAGE{$errorStatus};
 }
 
 1;

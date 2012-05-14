@@ -1,4 +1,6 @@
 package TOCTests;
+use strict;
+use warnings;
 
 =pod
 
@@ -9,11 +11,10 @@ propagated into the TOC.
 
 =cut
 
-use FoswikiTestCase;
-use FoswikiFnTestCase;
+use FoswikiTestCase();
+use FoswikiFnTestCase();
 our @ISA = qw( FoswikiFnTestCase );
 
-use strict;
 use Foswiki;
 use Foswiki::UI::Edit;
 use Foswiki::Form;
@@ -62,9 +63,8 @@ sub setup_TOCtests {
     }
 
     # Now generate the TOC
-    my $topicObject =
-      Foswiki::Meta->new( $this->{session}, $this->{test_web},
-        $this->{test_topic} );
+    my ($topicObject) =
+      Foswiki::Func::readTopic( $this->{test_web}, $this->{test_topic} );
     my $res = $this->{session}->TOC( $text, $topicObject, $tocparams );
 
     eval 'use HTML::TreeBuilder; use HTML::Element;';
@@ -133,17 +133,15 @@ sub test_Item8592 {
 ---++ Followed by a level 2! headline
 ---++!! Another level 2 headline
 HERE
-    my $topicObject =
-      Foswiki::Meta->new( $this->{session}, $this->{test_web},
-        $this->{test_topic}, $text );
+    my ($topicObject) =
+      Foswiki::Func::readTopic( $this->{test_web}, $this->{test_topic} );
+    $topicObject->text($text);
     $topicObject->save();
     my $res = $topicObject->expandMacros($text);
     $res = $topicObject->renderTML($res);
 
     $this->assert_html_equals( <<HTML, $res );
-<a name="foswikiTOC"></a>
-<div class="foswikiToc">
- <ul>
+<div class="foswikiToc" id="foswikiTOC"> <ul>
   <li> <a href="#A_level_1_head_33line">A level 1 head!line</a>
    <ul>
     <li> <a href="#Followed_by_a_level_2_33_headline">
@@ -153,12 +151,13 @@ HERE
   </li>
  </ul> 
 </div>
-<nop><h1><a name="A_level_1_head_33line"></a>  A level 1 head!line </h1>
-<nop><h2><a name="Followed_by_a_level_2_33_headline"></a>
+<nop><h1 id="A_level_1_head_33line">  A level 1 head!line </h1>
+<nop><h2 id="Followed_by_a_level_2_33_headline">
  Followed by a level 2! headline </h2>
-<nop><h2><a name="Another_level_2_headline"></a>
+<nop><h2 id="Another_level_2_headline">
  Another level 2 headline </h2>
 HTML
+    $topicObject->finish();
 }
 
 sub test_Item9009 {
@@ -171,25 +170,26 @@ sub test_Item9009 {
 ---++ Followed by a level 2! headline
 ---++!! Another level 2 headline
 HERE
-    my $topicObject =
-      Foswiki::Meta->new( $this->{session}, $this->{test_web},
-        $this->{test_topic}, $text );
+    my ($topicObject) =
+      Foswiki::Func::readTopic( $this->{test_web}, $this->{test_topic} );
+    $topicObject->text($text);
     $topicObject->save();
 
     my $text2 = <<HERE;
 %TOC{"$this->{test_web}.$this->{test_topic}"}%
 HERE
-    my $topicObject2 =
-      Foswiki::Meta->new( $this->{session}, $this->{test_web},
-        $this->{test_topic} . "2", $text2 );
+    my ($topicObject2) =
+      Foswiki::Func::readTopic( $this->{test_web}, $this->{test_topic} . "2" );
+    $topicObject2->text($text2);
     $topicObject->save();
     my $res2 = $topicObject2->expandMacros($text2);
     $res2 = $topicObject->renderTML($res2);
+    $topicObject->finish();
 
     #return;
 
     $this->assert_html_equals( <<HTML, $res2 );
-<a name="foswikiTOC"></a><div class="foswikiToc"> <ul> 
+<div class="foswikiToc" id="foswikiTOC"> <ul> 
 <li> <a href="$url/TemporaryTOCTestsTestWebTOCTests/TestTopicTOCTests#A_level_1_head_33line">A level 1 head!line</a> <ul>
 <li> <a href="$url/TemporaryTOCTestsTestWebTOCTests/TestTopicTOCTests#Followed_by_a_level_2_33_headline">Followed by a level 2! headline</a>
 </li></ul>                                                                                                                              
@@ -207,20 +207,21 @@ sub test_Item2458 {
 %TOC%
 ---+ !WikiWord
 HERE
-    my $topicObject =
-      Foswiki::Meta->new( $this->{session}, $this->{test_web},
-        $this->{test_topic}, $text );
+    my ($topicObject) =
+      Foswiki::Func::readTopic( $this->{test_web}, $this->{test_topic} );
+    $topicObject->text($text);
     $topicObject->save();
     my $res = $topicObject->expandMacros($text);
     $res = $topicObject->renderTML($res);
 
     $this->assert_html_equals( <<HTML, $res );
-<a name="foswikiTOC"></a><div class="foswikiToc"> <ul>
+<div class="foswikiToc" id="foswikiTOC"> <ul>
 <li> <a href="#WikiWord"> <nop>WikiWord</a>
 </li></ul> 
 </div>
-<nop><h1><a name="WikiWord"></a>  <nop>WikiWord </h1>
+<nop><h1 id="WikiWord">  <nop>WikiWord </h1>
 HTML
+    $topicObject->finish();
 }
 
 sub test_TOC_SpecialCharacters {
@@ -274,16 +275,16 @@ sub test_TOC_SpecialCharacters {
 %TOC%
 $set->[1]
 HERE
-        my $topicObject = Foswiki::Meta->new(
-            $this->{session},    $this->{test_web},
-            $this->{test_topic}, $wikitext
-        );
+        my ($topicObject) =
+          Foswiki::Func::readTopic( $this->{test_web}, $this->{test_topic} );
+        $topicObject->text($wikitext);
         $topicObject->save();
         my $res = $topicObject->expandMacros($wikitext);
         $res = $topicObject->renderTML($res);
+        $topicObject->finish();
 
-        #print "RES $res \n\n";
-        $this->assert_matches( qr/href="#$expected".*name="$expected"/sm, $res,
+        # print "RES:$res \n\nEXPECTED:$expected\n\n";
+        $this->assert_matches( qr/href="#$expected".*id="$expected"/sm, $res,
 "$set->[2] - Expected Anchor/Link =  $expected  Actual HTML\n====\n$res\n====\n"
         );
     }

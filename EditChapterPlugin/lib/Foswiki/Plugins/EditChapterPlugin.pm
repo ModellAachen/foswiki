@@ -19,10 +19,11 @@ use strict;
 
 use Foswiki::Func();
 use Foswiki::Plugins();
+use Foswiki::Plugins::JQueryPlugin ();
 use Foswiki::Contrib::JsonRpcContrib ();
 
 our $VERSION = '$Rev$';
-our $RELEASE = '4.20';
+our $RELEASE = '4.31';
 our $NO_PREFS_IN_TOPIC = 1;
 our $SHORTDESCRIPTION = 'An easy sectional edit facility';
 our $core;
@@ -30,7 +31,6 @@ our $core;
 ###############################################################################
 sub initPlugin {
   $core = undef;
-
 
   Foswiki::Func::registerTagHandler('EXTRACTCHAPTER', sub {
     return getCore(shift)->handleEXTRACTCHAPTER(@_);
@@ -75,15 +75,6 @@ sub commonTagsHandler {
   return if $contenttype eq "application/pdf"; 
 
   getCore()->commonTagsHandler(@_);
-}
-
-###############################################################################
-sub postRenderingHandler {
-  return unless $core;
-  my $translationToken = $core->{translationToken};
-  $_[0] =~ s/$translationToken//g;
-  $_[0] =~ s/(<a name=["'])A_01_/$1/g; # cleanup anchors
-  $_[0] =~ s/(<a href=["']#)A_01_/$1/g; 
 }
 
 1;

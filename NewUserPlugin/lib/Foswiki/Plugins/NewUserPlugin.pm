@@ -21,6 +21,7 @@ use strict;
 use vars qw( $VERSION $RELEASE $SHORTDESCRIPTION $NO_PREFS_IN_TOPIC $done);
 use Foswiki::Func ();
 use Foswiki::Plugins ();
+use Error qw(:try);
 
 use constant DEBUG => 0; # toggle me
 
@@ -155,8 +156,11 @@ sub createUserTopic {
   $text =~ s/\%USERNAME\%/$loginName/go;
   $text =~ s/\%WIKINAME\%/$wikiName/go;
   $text =~ s/\%WIKIUSERNAME\%/$wikiUserName/go;
+  $text =~ s/\%EXPAND\{(.*?)\}\%/expandVariables($1, $wikiName, $usersWeb)/ge;
+  $text =~ s/\%STARTEXPAND\%(.*?)\%STOPEXPAND\%/Foswiki::Func::expandCommonVariables($1, $wikiName, $usersWeb)/ges;
 
   writeDebug("patching in RegistrationAgent");
+
   my $session = $Foswiki::Plugins::SESSION;
   my $origCUID = $session->{user};
   my $registrationAgentCUID = 
@@ -164,27 +168,14 @@ sub createUserTopic {
   #writeDebug("registrationAgentCUID=$registrationAgentCUID");
 
   $session->{user} = $registrationAgentCUID;
-
   writeDebug("saving new home topic $usersWeb.$wikiName");
-  my $errorMsg = Foswiki::Func::saveTopic($usersWeb, $wikiName, $meta, $text);
-  if ($errorMsg) {
-    writeWarning("error during save of $usersWeb.$wikiName: $errorMsg");
-    $session->{user} = $origCUID;
-    return;
-  } 
+  
+  try {
+    Foswiki::Func::saveTopic($usersWeb, $wikiName, $meta, $text);
+  } catch Error::Simple with {
+    writeWarning("error during save of $usersWeb.$wikiName: " . shift);
+  };
 
-  # expanding VARs in a second phase, after the topic file was created (to get correct $meta objects)
-  my $found = 0;
-  $found = 1 if $text =~ s/\%EXPAND\{(.*?)\}\%/&expandVariables($1, $wikiName, $usersWeb)/ge;
-  $found = 1 if $text =~ s/\%STARTEXPAND\%(.*?)\%STOPEXPAND\%/Foswiki::Func::expandCommonVariables($1, $wikiName, $usersWeb)/ges;
-
-  if ($found) {
-    writeDebug("expanding vars in new home topic $usersWeb.$wikiName");
-    $errorMsg = Foswiki::Func::saveTopicText($usersWeb, $wikiName, $text);
-    if ($errorMsg) {
-      writeWarning("error during save of var expanded version of $usersWeb.$wikiName: $errorMsg");
-    }
-  }
   $session->{user} = $origCUID;
 }
 

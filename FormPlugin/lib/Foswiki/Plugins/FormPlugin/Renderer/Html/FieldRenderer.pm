@@ -12,8 +12,6 @@ use CGI qw( :all -no_undef_params);
 use Foswiki::Plugins::FormPlugin::Constants;
 use Foswiki::Plugins::FormPlugin::Renderer::Html::FieldFactory;
 
-my $CURRENT_URL;
-
 =pod
 
 =cut
@@ -53,7 +51,7 @@ sub render {
 sub renderError {
     my ( $this, $message, $fieldName, $fieldData, $formData ) = @_;
 
-    my $currentUrl = _currentUrl();
+    my $currentUrl = $this->_currentUrl();
     my $fieldTitle;
     if ( defined $fieldData ) {
         $fieldName  = $fieldData->{options}->{name};
@@ -93,12 +91,13 @@ sub _formatErrorItem {
 =cut
 
 sub _currentUrl {
+    my ($this) = @_;
 
-    return $CURRENT_URL if $CURRENT_URL;
+    return $this->{CURRENT_URL} if $this->{CURRENT_URL};
 
     my $query = Foswiki::Func::getCgiQuery();
-    $CURRENT_URL = $query->url( -path_info => 1 );
-    return $CURRENT_URL;
+    $this->{CURRENT_URL} = $query->url( -path_info => 1 );
+    return $this->{CURRENT_URL};
 }
 
 =pod

@@ -1,0 +1,174 @@
+%META:TOPICPARENT{name="Plugins"}%
+<!--
+One line description, required for extensions repository catalog.
+   * Set SHORTDESCRIPTION = Import and export wiki data
+-->
+---+!! Import Export Plugin
+
+%SHORTDESCRIPTION%
+
+This plugin is intended to help import and export data (webs, topics, attachments) from your foswiki, or from some other source into your foswiki.
+
+Initially, it will import from an existing foswiki or twiki on the same filesystem, but I'm intending it to import using ssh, zip, or some custom mechanism.
+
+The data should then be able to transformed (for eg, twiki based topic links re-written to the new foswiki names)
+
+---++ Import into this foswiki
+
+(re-implement using a FOREACH over a IMPORTFROMHANDLER macro), and extract UI's so that others can add new handlers in their own contribs
+
+%IF{
+    "$USERNAME ingroup 'AdminGroup'"
+    else="Sorry, you can only import if you are in the AdminGroup (or sudo to it)"
+    then="%IF{
+            "context ImportExportPluginEnabled"
+            else="You need to enable the ImportExportPlugin in configure"
+            then="$dollarpercntINCLUDE{$dollarquot%SYSTEMWEB%.ImportExportPlugin$dollarquot section=$dollarquotimport-app$dollarquot}$dollarpercnt"
+        }%"
+}%
+
+---++ Check topics in this foswiki
+
+This checker was initially written to find links to missing topics or attachments (and to list external url's in case they could cause issues.
+
+In the process of rendering, It also lists all topics that cause a crash, so can help you debug issues caused by plugins.
+
+It will also report what MACRO's were not expanded, thus alerting you to potentially missing plugins.
+
+%IF{
+    "$USERNAME ingroup 'AdminGroup'"
+    else="Sorry, you can only check content if you are in the AdminGroup (or sudo to it)"
+    then="%IF{
+            "context ImportExportPluginEnabled"
+            else="You need to enable the ImportExportPlugin in configure"
+            then="$dollarpercntINCLUDE{$dollarquot%SYSTEMWEB%.ImportExportPlugin$dollarquot section=$dollarquotcheck-app$dollarquot}$dollarpercnt"
+        }%"
+}%
+
+---++ pre-development thinking
+
+   1 a set of ImportExportPlugin::From classes that implement =getListOfWebs=, =getListOfTopics=, =getListOfAttachments= and =getItem=
+   2 have a UI that allows the user to select the From class and add parameters to it
+      * From::FS and From::SSH would require permissions (somehow), whereas From::Zip or From::Http might work differently
+   3 given a From handler, the user can select a 'set' of items that are available (from a UI) and a destination, and hit 'go'
+   4 a set of ImportExportPlugin::Transforms can be selected to be used while importing a set (none, twiki->foswiki, cvs->forms topics, funny encoding->utf8, change topic name)
+
+
+
+---++ Installation
+%$INSTALL_INSTRUCTIONS%
+
+---++ Info
+
+|  Author: | Foswiki:Main.SvenDowideit |
+|  Copyright: | &copy; 2011, SvenDowideit@fosiki.com |
+|  License: | GPL ([[http://www.gnu.org/copyleft/gpl.html][GNU General Public License]]) |
+|  Release: | %$RELEASE% |
+|  Version: | %$VERSION% |
+|  Change&nbsp;History: | <!-- versions below in reverse order -->&nbsp; |
+|  0.6 (5 Mar 2012: | Initial version |
+|  Home: | http://foswiki.org/Extensions/%TOPIC% |
+|  Support: | http://foswiki.org/Support/%TOPIC% |
+
+
+<verbatim type=tml>
+%STARTSECTION{import-app}%
+%TABPANE% 
+ %TAB{"FS"}% 
+<form name="main" enctype="multipart/form-data" action="%SCRIPTURLPATH{"rest"}%/ImportExportPlugin/import" method="post">
+<table width="100%" summary="%MAKETEXT{"Attach a file"}%">
+<input type="hidden" name="fromtype" value="FS" />
+<tr>
+__you need to be foswiki admin to use this__
+  <td align="right">
+   %MAKETEXT{"local filesystem directory to import from"}%
+  </td><td>
+   <input type="text" name="fspath" value="/home/sven/src/twiki_backup" size="50" />
+  </td>
+ </tr>
+<tr>
+  <td align="right">
+   %MAKETEXT{"Import data from"}% 
+  </td><td>
+   <select name="importFrom">
+    <option value="wiki">wiki (enter path to dir containing both data and pub)</option>
+    <option value="topics">web topics (ignores attachments)</option>
+    <option value="attachments">add multiple files to a wiki  (ignores topics)</option>
+    </select>
+  </td>
+ </tr>
+<tr>
+  <td align="right">
+   %MAKETEXT{"filter list"}%
+  </td><td>
+   <select name="filterlist">
+    <option value="none">none</option>
+    <option value="twiki">convert from twiki</option>
+    </select>
+  </td>
+ </tr>
+  <td align="right">
+   %MAKETEXT{"Web names to import (comma separated)"}%
+  </td><td>
+   <input type="text" name="webs" value="Bugs,Know,Hsa,Plugins,Templates,Support,Sven" size="50" />
+  </td>
+ </tr>
+ <tr>
+  <td align="right">
+  </td><td>
+    <input type="submit" class="foswikiSubmit" value="%MAKETEXT{"Import"}%" />  </td>
+ </tr>
+</table>
+</form>
+ %ENDTAB% 
+ %TAB{"ZIP"}% 
+---+++ implement later
+upload zip, select topic and zip attachment or enter filesystem path to zip file
+ %ENDTAB% 
+ %TAB{"SSH"}% 
+---+++ implement later
+enter ssh path to FS? (or is this?)
+ %ENDTAB% 
+ %TAB{"foswiki"}% 
+---+++ implement later
+a way to copy one or more web's contents into one or more web
+ %ENDTAB% 
+%ENDTABPANE% 
+%ENDSECTION{import-app}%
+----------------------
+%STARTSECTION{check-app}%
+%TABPANE% 
+ %TAB{"Foswiki"}% 
+<form name="main" enctype="multipart/form-data" action="%SCRIPTURLPATH{"rest"}%/ImportExportPlugin/check" method="post">
+<table width="100%" summary="%MAKETEXT{""}%">
+<input type="hidden" name="fromtype" value="foswiki" />
+<tr>
+Will create a report in the Sandbox web ImportExportPluginCheckReport  __TODO: with restricted ACL?__
+  <td align="right">
+   %MAKETEXT{"webs to perform checks on"}%
+  </td><td>
+   <select name="webs" class="foswikiSelect"> %WEBLIST{ "<option $marker>$name</option>" webs="webtemplate,public" selection="Sandbox" separator=" "}%</select>
+  </td>
+ </tr>
+<tr>
+  <td align="right">
+   %MAKETEXT{"checks to perform"}%
+  </td><td>
+   <select name="filterlist">
+    <option value="none">none</option>
+    <option value="chklinks">check links (renders each topic to html then looks for urls)</option>
+    </select>
+  </td>
+ </tr>
+ <tr>
+  <td align="right">
+  </td><td>
+    <input type="submit" class="foswikiSubmit" value="%MAKETEXT{"Check"}%" />  </td>
+ </tr>
+</table>
+</form>
+ %ENDTAB% 
+%ENDTABPANE% 
+%ENDSECTION{check-app}%
+</verbatim>
+

@@ -14,7 +14,7 @@ use Foswiki::Func    ();    # The plugins API
 use Foswiki::Plugins ();    # For the API version
 
 our $VERSION = '$Rev$ (06-11-2010)';
-our $RELEASE = '0.1.0';
+our $RELEASE = '0.3.0';
 
 our $SHORTDESCRIPTION =
   'Query topics recursively, inspired by DBCachePlugin\'s DBRECURSE';

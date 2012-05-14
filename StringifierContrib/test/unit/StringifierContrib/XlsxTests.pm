@@ -1,13 +1,14 @@
 # Test for XLSX.pm
 package XlsxTests;
-use FoswikiFnTestCase;
-our @ISA = qw( FoswikiFnTestCase );
+use StringifierTest;
+our @ISA = qw( StringifierTest );
 
 use strict;
+use utf8;
 
 use Foswiki::Contrib::Stringifier::Base();
 use Foswiki::Contrib::Stringifier();
-use utf8;
+
 
 sub set_up {
     my $this = shift;
@@ -47,11 +48,11 @@ sub test_SpecialCharacters {
 
     my $text  = $stringifier->stringForFile($this->{attachmentDir}.'Simple_example.xlsx');
     
-    $this->assert($text =~ m\Größer\, "Text Größer not found.");
+    $this->assert_matches($this->encode('Größer'), $text, "Text Größer not found.");
 		  
     $text  = $stringifier->stringForFile($this->{attachmentDir}.'Portuguese_example.xlsx');
     
-    $this->assert($text =~ m\Formatação\, "Text Formatação not found.");		  
+    $this->assert_matches($this->encode('Formatação'), $text, "Text Formatação not found.");
     $this->assert(!($text =~ m\GENERAL\), "Bad string GENERAL appeares.");
 }
 
@@ -83,7 +84,8 @@ sub test_calculatedNumbers {
 
 # test for Passworded_example.xlsx
 # Note that the password for that file is: foswiki
-sub DIStest_passwordedFile {
+# SMELL: fails
+sub DONT_test_passwordedFile {
     my $this = shift;
     my $stringifier = Foswiki::Contrib::Stringifier::Plugins::XLSX->new();
 
@@ -93,7 +95,8 @@ sub DIStest_passwordedFile {
 }
 
 # test what would happen if someone uploaded a png and called it a .xlsx
-sub DIStest_maliciousFile {
+# SMELL: what's dat test
+sub DONT_test_maliciousFile {
     my $this = shift;
     my $stringifier = Foswiki::Contrib::Stringifier::Plugins::XLSX->new();
 

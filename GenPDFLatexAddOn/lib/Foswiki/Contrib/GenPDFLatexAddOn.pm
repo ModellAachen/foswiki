@@ -11,7 +11,7 @@ our $VERSION = '$Rev: 1340 $';
 # of the version number in PLUGINDESCRIPTIONS.
 our $RELEASE = '3.000';
 
-our $SHORTDESCRIPTION = 'Generate PDF files of Foswiki topics with nicely rendered mathematics.';
-
+our $SHORTDESCRIPTION =
+  'Generate PDF files of Foswiki topics with nicely rendered mathematics.';
 
 1;

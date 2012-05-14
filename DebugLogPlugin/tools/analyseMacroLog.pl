@@ -40,7 +40,9 @@ print <<HERE;
    * the other columns are the difference between the SEARCH macro's time - that 'benchmark'
    * so negative is good, positive is bad, and large positice needs fixing.
 HERE
-print "\n| *" . join( '* | *', @cfg_names ) . "* |*topic*  |*type*|*SEARCH*  |\n";
+print "\n| *"
+  . join( '* | *', @cfg_names )
+  . "* |*topic*  |*type*|*SEARCH*  |\n";
 map {
     analyseSearch(
         'RcsWrap-QueryAlgorithms::BruteForce-SearchAlgorithms::Forking-1',
@@ -117,7 +119,7 @@ sub analyseSearch
     my $SEARCH = $res->{details}[0]->{params}->{search} || 'huh';
     $SEARCH =~ s/\n/ \\\n/g;
     $SEARCH =~ s/\|/%VBAR%/g;
-    my $type = ($res->{details}[0]->{params}->{type}||'literal');
+    my $type = ( $res->{details}[0]->{params}->{type} || 'literal' );
 
     #print "\n------------------------------------\n";
     #print "SEARCH:\t$SEARCH\n";
@@ -148,20 +150,21 @@ sub analyseSearch
 
     #print "\n\nbenchmark\t $benchmark_minimum\n";
 
-    my @differences = ( [],[],[],[],[],[],[],[],[],[] );
+    my @differences = ( [], [], [], [], [], [], [], [], [], [] );
 
     #compare to benchmark_minimum
     for ( my $i = 0 ; $i < scalar( @{ $res->{details} } ) ; $i++ ) {
         my $date = ${ $res->{details} }[$i]->{date};
         $date =~ /^(\d\d):(\d\d):(\d\d):(\d\d):(\d\d):(\d\d)/;
-        my $ndate = $1.$2.$3.$4.$5.$6;
+        my $ndate = $1 . $2 . $3 . $4 . $5 . $6;
+
         #TODO: convert to integer
-        my $diff =
-          ${ $res->{details} }[$i]->{seconds} - $benchmark_minimum;
-        if (abs($diff) > 0.001) {
-            ${ $res->{details} }[$i]->{difference} =$diff;
-        } else {
-            ${ $res->{details} }[$i]->{difference} =0;#essentially pontless
+        my $diff = ${ $res->{details} }[$i]->{seconds} - $benchmark_minimum;
+        if ( abs($diff) > 0.001 ) {
+            ${ $res->{details} }[$i]->{difference} = $diff;
+        }
+        else {
+            ${ $res->{details} }[$i]->{difference} = 0;    #essentially pontless
         }
         push(
             @{ $res->{ ${ $res->{details} }[$i]->{id} } },
@@ -176,7 +179,8 @@ sub analyseSearch
         #print "count\t" . $cfgs{$cfg}->{count} . "\n";
 
         if ( $cfgs{$cfg}->{name} eq $benchmark_id ) {
-            $differences[ $cfgs{$cfg}->{count} ] = [{ndate=>0,date=>'', value=>$benchmark_minimum}];
+            $differences[ $cfgs{$cfg}->{count} ] =
+              [ { ndate => 0, date => '', value => $benchmark_minimum } ];
         }
         else {
 
@@ -184,9 +188,9 @@ sub analyseSearch
             push(
                 @{ $differences[ $cfgs{$cfg}->{count} ] },
                 {
-                        ndate=>$ndate,
-                        date=>$date, 
-                        value=>${ $res->{details} }[$i]->{difference}
+                    ndate => $ndate,
+                    date  => $date,
+                    value => ${ $res->{details} }[$i]->{difference}
                 }
             );
         }
@@ -195,20 +199,24 @@ sub analyseSearch
     print "| " . join(
         ' | ',
         map {
-#            if (ref($differences[ $cfgs{$_}->{count}]) eq 'ARRAY') {
-                join( ', ', map {
-                                    $_->{value} #.'___'.$_->{date}
-                                    #order so that we have the most recent first - that way the table sort reflects current goodness
-                                } sort {$b->{ndate} <=> $a->{ndate}} @{      
-                    $differences[ $cfgs{$_}->{count} ]
-                     }  )
-#              } else {
-#                  \('')
-#              }
+
+           #            if (ref($differences[ $cfgs{$_}->{count}]) eq 'ARRAY') {
+            join(
+                ', ',
+                map {
+                    $_->{value}    #.'___'.$_->{date}
+                       #order so that we have the most recent first - that way the table sort reflects current goodness
+                  } sort { $b->{ndate} <=> $a->{ndate} }
+                  @{ $differences[ $cfgs{$_}->{count} ] }
+              )
+
+              #              } else {
+              #                  \('')
+              #              }
           } keys(%cfgs)
       )
-      . "| "
-      . '[['.$res->{topic}.']]'
+      . "| " . '[['
+      . $res->{topic} . ']]'
       . "  |$type|$SEARCH  |\n";
 }
 

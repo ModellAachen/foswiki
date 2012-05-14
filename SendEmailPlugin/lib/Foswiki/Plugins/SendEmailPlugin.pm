@@ -19,10 +19,10 @@ package Foswiki::Plugins::SendEmailPlugin;
 use strict;
 use Foswiki::Func;
 
-our $VERSION    = '$Rev: 11069$';
-our $RELEASE    = '1.5.3';
-our $pluginName = 'SendEmailPlugin';
-our $SHORTDESCRIPTION = "Send e-mails through an e-mail form";
+our $VERSION           = '$Rev: 11069$';
+our $RELEASE           = '1.5.3';
+our $pluginName        = 'SendEmailPlugin';
+our $SHORTDESCRIPTION  = "Send e-mails through an e-mail form";
 our $NO_PREFS_IN_TOPIC = 1;
 our $topic;
 our $web;
@@ -38,7 +38,7 @@ sub initPlugin {
     }
 
     Foswiki::Func::registerTagHandler( 'SENDEMAIL', \&handleSendEmailTag );
-    
+
     # Plugin correctly initialized
     return 1;
 }

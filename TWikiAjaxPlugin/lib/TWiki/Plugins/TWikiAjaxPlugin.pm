@@ -41,7 +41,7 @@ $RELEASE = '1.0.1';
 # Name of this Plugin, only used in this module
 $pluginName = 'TWikiAjaxPlugin';
 
-$headerDone         = 0;
+$headerDone = 0;
 
 =pod
 
@@ -60,7 +60,7 @@ sub initPlugin {
     $debug = TWiki::Func::getPluginPreferencesFlag("DEBUG")
       || TWiki::Func::getPreferencesFlag("DEBUG");
 
-    TWiki::Func::registerTagHandler( 'AJAX',   \&_handleAjaxTag );
+    TWiki::Func::registerTagHandler( 'AJAX', \&_handleAjaxTag );
 
     # Plugin correctly initialized
     return 1;

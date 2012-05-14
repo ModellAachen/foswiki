@@ -1,0 +1,180 @@
+%META:TOPICINFO{author="ProjectContributor" comment="reprev" date="1335348584" format="1.1" reprev="4" version="5"}%
+---+!! %TOPIC%
+%SHORTDESCRIPTION%
+
+%TOC%
+
+---++ Description
+
+This plugin allows you to do two things:
+
+   1 read, parse and format ical files attached to a topic
+   1 cache event data stored in a System.DataForms or !MetaData into an ical file
+
+ICal is a format for storing calendar information in it. This format is supported by almost all calendar applications
+and tools. The most obvious way to get started with this plugin is to open your calendar tool of choise, export
+your calendar data as an ical file, and attach it to some wiki topic. This ical file will now be available as a kind
+of database holding calendar data and is accessible using the =%FORMATICAL= macro. This macro comes with a range
+of options to select specific parts of your ical data and format it to be displayed on the wiki page.
+
+The second function if this plugin is to _automatically generate_ an ical file based on Event information stored in 
+a Foswiki !DataForm. This !DataForm has to adhere to a certain structure to server as a source for Event information.
+A minimum example is provided in the EventTopic !DataForm definition.
+
+This !DataForm holds all the information, including recurrences of different types, to be convert into a VEVENT record to be stored in a given ical file.
+Whenever a topic with an !EventTopic !DataForm attached to it is modified or deleted, will the ICalPlugin take care of
+updating the ical file serving as a cache to all !EventTopic information available in the wiki (or part of the wiki).
+
+Note that the EventTopic requires a *TopicType* formfield which holds the list of types this form fulfills. The tag *EventTopic* in it is 
+mandatory for the !ICalPlugin to know that this !DataForm stores VEVENT data. Only then will a !DataForm be harvested to update
+the ical file associated with it.
+
+In addition to normal Foswiki !DataForms, the !ICalPlugin also supports event data to be stored in =%META:EVENT= records
+stored as Foswiki meta data. The format of a =%META:EVENT= record is exactly the same as defined in the !EventTopic.
+Event more, with the use of the Foswiki:Extensions/MetaDataPlugin, the !EventTopic !DataForm definition can be extended
+to your needs and all =%META:EVENT= records will follow as well. This however is more of a feature of the !MetaDataPlugin
+allowing you to store multiple !DataForm records as meta data records attached to one single topic. So instead
+of storing !EventTopic data one per wiki topic, you can also chose to store _all_ of your event records into a single
+topic in the =%META:EVENT= format.
+
+Finally, !ICalPlugin will update data harvested from !DataForms and event !MetaData into an ical file attached to some topic.
+Specify the address of this file using the =ICALPLUGIN_CALENDAR= preference variable like this:
+
+<verbatim>
+    * Set ICALPLUGIN_CALENDAR = MyWeb.MyTopic.calendar.ics
+</verbatim>
+
+This file can then be integrated into your calendar application on your desktop.
+
+---++ Examples
+
+An example is provided in the Sandbox.ICalHolidayListDemo. 
+
+---++ Syntax
+
+=%<nop>FORMATICAL{...}%=
+
+| *Parameter* | *Description* | *Default* |
+| topic | specifies the topic where to read the ical attachment file from | %<nop>BASETOPIC% |
+| attachment | the name of an ical calendar file attached to the topic specified in the =topic= parameter | calendar.ics |
+| raw | if set to =on= the selected result is returned in raw ical format | off |
+| start | starting time of the span within which to format ical events; this can be any date format understood by foswiki, e.g. 2012-02-13 or iso date format | current time |
+| span | time span starting at =start= for which to format the ical events | 1 month |
+| end | ending time of the span for which to format ical events; note that the parameters =span= and =end= exclude each other with =end= taking higher precedence | |
+| skip | number of items to skip while formating ical events; this parameter is used to implement paging within the selected time span | 0 |
+| limit | maximum number of events to format; if not specified, all events are rendered | |
+| sort | sorting criterion of ical events; common values are =start= (same as =on=), =end= or any other property of an ical event record  | off |
+| format | specifies the format string used to render an event within the selected time span | |
+| eventformat | format string used for a single event | =format= |
+| rangeformat | format string used to render a range event | =format= |
+| header | format string prepended to the result when any event data has been found within the specified time span | |
+| footer | format string appended to the result when any event data has been found within the specified time span| | 
+| separator | format string used to separate event records while formating them | |
+
+The format string parameters =format=, =eventformat= and =rangeformat= can take a range of variables to refer to properties of the event record about
+to be rendered. These are:
+
+   * $location
+   * $start
+   * $end
+   * $until
+   * $modified
+   * $created
+   * $description
+   * $attendee
+   * $organizer
+   * $summary
+
+Create, modified, start and end time properties of an ical event can be formatted in more detail using
+the following variables within the =format= strings.
+
+Variables referring to the start date:
+
+   * $sec, $second, $seconds
+   * $min, $minute, $minutes 
+   * $hour, $hours 
+   * $day
+   * $wday
+   * $dow
+   * $week
+   * $mon, $month
+   * $mo
+   * $year
+   * $ye
+   * $epoch 
+
+Variables referring to the end date are using an =e= prefix to the variables:
+
+   * $esec, $esecond, $eseconds
+   * $emin, $eminute, $eminutes 
+   * $ehour, $ehours 
+   * $eday
+   * $ewday
+   * $edow
+   * $eweek
+   * $emon, $emonth
+   * $emo
+   * $eyear
+   * $eye
+   * $eepoch 
+
+Variables referring to the create date of an event are using a =c= prefix:
+
+   * $csec, $csecond, $cseconds
+   * $cmin, $cminute, $cminutes 
+   * $chour, $chours 
+   * $cday
+   * $cwday
+   * $cdow
+   * $cweek
+   * $cmon, $cmonth
+   * $cmo
+   * $cyear
+   * $cye
+   * $cepoch 
+
+Variables referring to the modification date of an event use an =m= prefix:
+
+   * $msec, $msecond, $mseconds
+   * $mmin, $mminute, $mminutes 
+   * $mhour, $mhours 
+   * $mday
+   * $mwday
+   * $mdow
+   * $mweek
+   * $mmon, $mmonth
+   * $mmo
+   * $myear
+   * $mye
+   * $mepoch 
+
+Finally, the standard foswiki escape variables are expanded:
+
+   * $n
+   * $percnt
+   * $dollar 
+
+---++ Installation Instructions
+
+%$INSTALL_INSTRUCTIONS%
+
+---++ Info
+<!--
+   * Set SHORTDESCRIPTION = %$SHORTDESCRIPTION%
+-->
+
+|  Author(s): | Michael Daum|
+|  Copyright: | &copy; 2011-2012 Michael Daum http://michaeldaumconsulting.com |
+|  License: | [[http://www.gnu.org/licenses/gpl.html][GPL (Gnu General Public License)]] |
+|  Release: | %$RELEASE% |
+|  Version: | %$VERSION% |
+|  Change History: | <!-- versions below in reverse order -->&nbsp; |
+|  08 May 2012 | fixed processing of weekly recurrences without a <nop>StartDate |
+|  07 May 2012 | made dependency on Foswiki:Extensions/MetaDataPlugin optional |
+|  27 Apr 2012 | expand macros in ICALPLUGIN_CALENDAR variable; \
+                 process all meta data records whose !DataForm have a !TopicType of "EventTopic" |
+|  26 Apr 2012 | be more robust against malformed date strings |
+|  25 Apr 2012 | initial release |
+|  Dependencies: | %$DEPENDENCIES% |
+|  Home page: | Foswiki:Extensions/%TOPIC% |
+|  Support: | Foswiki:Support/%TOPIC% |

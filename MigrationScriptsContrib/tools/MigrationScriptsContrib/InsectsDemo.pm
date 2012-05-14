@@ -74,7 +74,7 @@ my $asUser  = 'admin';
 my @schema;
 
 sub gen_schema {
-    my $csv     = Text::CSV->new(
+    my $csv = Text::CSV->new(
         { auto_diag => 1, binary => 1 } )    # should set binary attribute.
       or die "Cannot use CSV: " . Text::CSV->error_diag();
     my ($topicObj) =
@@ -82,14 +82,14 @@ sub gen_schema {
         Foswiki::Func::normalizeWebTopicName( $saveweb, $csvtopic ) );
     my $fh = $topicObj->openAttachment( $csvfile, '<' );
 
-    foreach my $cell (@{$csv->getline($fh)}) {
+    foreach my $cell ( @{ $csv->getline($fh) } ) {
         push(
             @schema,
             {
-                name => $cell,
+                name  => $cell,
                 title => $cell,
-                type => 'text',
-                size => '100'
+                type  => 'text',
+                size  => '100'
             }
         );
     }
@@ -238,10 +238,10 @@ sub set_up {
     my $formTopicObj;
 
     if ( not Foswiki::Func::webExists($saveweb) ) {
-        Foswiki::Func::createWeb($saveweb, '_default');
+        Foswiki::Func::createWeb( $saveweb, '_default' );
     }
     if ( not Foswiki::Func::webExists($formWeb) ) {
-        Foswiki::Func::createWeb($formWeb, '_default');
+        Foswiki::Func::createWeb( $formWeb, '_default' );
     }
     $formTopicObj =
       Foswiki::Meta->new( $session, $formWeb, $formTopic, gen_form() );
@@ -313,7 +313,7 @@ sub genFIELDs {
 
 sub createTopic {
     my ( $count, $row ) = @_;
-    my $topicname = 'Insect' . sprintf("%06d", $count);
+    my $topicname = 'Insect' . sprintf( "%06d", $count );
     my $topicObject;
     my @rowFields;
 
@@ -370,9 +370,12 @@ sub get_csv {
         print "Downloading to $csvtopic/$csvfile from $csvurl\n";
         $response = $ua->get($csvurl);
         if ( $response->is_success ) {
-#        if (1) {
-            my $zipfile = File::Spec->catfile( File::Spec->splitdir($tmpdir), 'archive.zip' );
-            my $csvpath = File::Spec->catfile( File::Spec->splitdir($tmpdir), $csvfile);
+
+            #        if (1) {
+            my $zipfile = File::Spec->catfile( File::Spec->splitdir($tmpdir),
+                'archive.zip' );
+            my $csvpath =
+              File::Spec->catfile( File::Spec->splitdir($tmpdir), $csvfile );
             my $zip = Archive::Zip->new();
 
             # SMELL: Why does this need to be untainted?
@@ -383,13 +386,14 @@ sub get_csv {
             binmode $fh;
             print $fh $response->content;
             close($fh);
+
             if ( $zip->read($zipfile) == AZ_OK ) {
                 my $zipmember = $zip->memberNamed($csvfile);
                 $zipmember->extractToFileNamed($csvpath);
                 print "Extracting $csvfile from $zipfile\n";
                 $zip->extractMember($csvfile);
                 print "Attaching $csvfile to $csvtopic\n";
-                open( my $fh, '<', $csvpath) or die $!;
+                open( my $fh, '<', $csvpath ) or die $!;
                 $csvTopicObj->attach(
                     name    => $csvfile,
                     stream  => $fh,

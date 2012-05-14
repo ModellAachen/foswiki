@@ -39,12 +39,12 @@ see also:
 [[#NATREVISIONS][NATREVISIONS]]
 [[#PREVREV][PREVREV]], 
 
----+++ FORMBUTTON
-*Syntax*: =%<nop>FORMBUTTON{";lt;format>"}%=
+---+++ NATFORMBUTTON
+*Syntax*: =%<nop>NATFORMBUTTON{";lt;format>"}%=
 
-returns a link on to add or change the form attached to a topic. This
+returns a link to add or change the form attached to a topic. This
 will be shown on the edit screen depending on WEBFORMs being defined or not.
-More precisely FORMBUTTON returns
+More precisely NATFORMBUTTON returns
    * an empty string if there are no WEBFORMS defined
    * or an "Add form" link if there are but no form is attached yet
    * or a "Change form" link to change the current form
@@ -54,8 +54,8 @@ The optional =%lt;format>= string may contain the following variables
    * =$action=: the link text 
    * =$1=: the complete anchor including the link and the text
 
-For example =%<nop>FORMBUTTON{"| $1"}%= will generate a pipe and the formbutton
-if possible. See the =edit.nat.tmpl= template file of the !NatSkin.
+For example =%<nop>NATFORMBUTTON{"| $1"}%= will generate a pipe and the formbutton
+if possible. 
 
 ---+++ KNOWNSTYLES
 *Syntax*: =%<nop>KNOWNSTYLES%= 
@@ -201,7 +201,7 @@ See NatSkin#Installation_Instructions
    * Set SHORTDESCRIPTION = Theming engine for NatSkin
 -->
 |  Plugin Author: | Michael Daum |
-|  Copyright &copy;: | 2003-2010, Michael Daum http://michaeldaumconsulting.com |
+|  Copyright &copy;: | 2003-2012, Michael Daum http://michaeldaumconsulting.com |
 |  License: | GPL ([[http://www.gnu.org/copyleft/gpl.html][GNU General Public License]]) |
 |  Release: | %$RELEASE% |
 |  Version: | %$VERSION% |

@@ -1,8 +1,5 @@
 %META:TOPICINFO{author="ProjectContributor" comment="reprev" date="1305044315" format="1.1" reprev="3" version="3"}%
 ---+!! !MetaCommentPlugin
-<!--
-   * Set SHORTDESCRIPTION = %$SHORTDESCRIPTION%
--->
 %SHORTDESCRIPTION%
 
 %TOC%
@@ -130,6 +127,8 @@ Renders a discussion on a given topic
 Parameters:
 
    * topic: the topic to render the discussion for, defaults to the current topic
+   * web: the web where to search for meta comments
+   * search: a search expression to find matching topics whose meta comments are extracted
    * header: string prepended to the output
    * footer: string appended to the output
    * format: format string used to render each comment, defaults to =&lt;h3>$title&lt;/h3>$text=
@@ -158,20 +157,28 @@ When rendering a comment, the following variables can be used in the =format= st
    * $timestamp: the date when this comment was created; format in epoch seconds
    * $date: the date when this comment was created in Foswiki's default time format
    * $modified: the date this comment was last modified
+   * $isodate: the date when this comment was last modified in iso format
    * $evenodd: expands to =even= or =odd= while formatting all comments in the list; useful to implement zebra striped
      comments
    * $id: the unique identifier of this comment (stored in the =name= attribute of the comment)
    * $index: the running number of the current comment while rendering a list of comments
    * $ref: the identifier of the comment this one is a reply to; used in threaded commenting mode
    * $text: the actual comment
+   * $summary: a short summary of the text (the first 100 characters)
    * $title: the title of the comment
    * $subcomments: expands to the list of all comments that are a reply to the current one
+   * $web: the web this comment is in
+   * $topic: the topic this is a comment of
+   * $permlink: a link to this comment
 
 ---++ Installation Instructions
 
 %$INSTALL_INSTRUCTIONS%
 
 ---++ Info
+<!--
+   * Set SHORTDESCRIPTION = %$SHORTDESCRIPTION%
+-->
 
 |  Author(s): | Foswiki:Main/MichaelDaum |
 |  Copyright &copy;: | 2009-2012, Michael Daum http://michaeldaumconsulting.com |
@@ -179,6 +186,10 @@ When rendering a comment, the following variables can be used in the =format= st
 |  Release: | %$RELEASE% |
 |  Version: | %$VERSION% |
 |  Change History: | <!-- versions below in reverse order -->&nbsp; |
+|  08 May 2012: | 1.12 - fixed integration with !PatternSkin |
+|  28 Mar 2012: | 1.11 - added ability to search for all comments in a web; \
+                         improved comment rendering features; \
+                         added fixes for !PatternSkin |
 |  10 Jan 2012: | 1.10 - added german translation; \
                          added missing dependency on Foswiki:Extensions/RenderPlugin; \
                          backwards compatibility to older foswiki engines; \

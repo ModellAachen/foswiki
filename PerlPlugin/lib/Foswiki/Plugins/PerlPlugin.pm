@@ -29,16 +29,16 @@ package Foswiki::Plugins::PerlPlugin;
 
 use strict;
 
-use Safe ();
+use Safe       ();
 use IO::Scalar ();
 
 use Assert;
-use Foswiki::Func ();
+use Foswiki::Func    ();
 use Foswiki::Sandbox ();
 
-our $VERSION = '$Rev$';
-our $RELEASE = '1.1.3';
-our $SHORTDESCRIPTION = 'Embed perl scripts in Foswiki topics';
+our $VERSION           = '$Rev$';
+our $RELEASE           = '1.1.3';
+our $SHORTDESCRIPTION  = 'Embed perl scripts in Foswiki topics';
 our $NO_PREFS_IN_TOPIC = 1;
 
 # The Safe container
@@ -46,58 +46,66 @@ our $compartment;
 our $stderr;
 
 sub initPlugin {
-    my( $topic, $web, $user, $installWeb ) = @_;
+    my ( $topic, $web, $user, $installWeb ) = @_;
 
     # Delete any existing container so there is no reuse between mod_perl runs
     $compartment = undef;
 
-    Foswiki::Func::registerTagHandler('PERL', \&_PERL);
+    Foswiki::Func::registerTagHandler( 'PERL', \&_PERL );
 
     return 1;
 }
 
 sub _PERL {
-    my ($session, $params, $topic, $web) = @_;
+    my ( $session, $params, $topic, $web ) = @_;
 
     my $expr = $params->{_DEFAULT};
 
-    if (defined $params->{topic}) {
-        my ($w, $t) = Foswiki::Func::normalizeWebTopicName(
-            $web, $params->{topic});
-        if (!Foswiki::Func::checkAccessPermission(
-            'VIEW', Foswiki::Func::getWikiName(), undef, $t, $w)) {
-            return "<pre class='foswikiAlert'>%PERL error: Access to $w.$t denied</pre>";
+    if ( defined $params->{topic} ) {
+        my ( $w, $t ) =
+          Foswiki::Func::normalizeWebTopicName( $web, $params->{topic} );
+        if (
+            !Foswiki::Func::checkAccessPermission(
+                'VIEW', Foswiki::Func::getWikiName(),
+                undef, $t, $w
+            )
+          )
+        {
+            return
+"<pre class='foswikiAlert'>%PERL error: Access to $w.$t denied</pre>";
         }
-        (my $meta, $expr) = Foswiki::Func::readTopic($w, $t);
-        if ($expr =~ /%CODE(?:{\s*"perl".*?})?%(.*?)%ENDCODE%/s) {
-            $expr = $1; # implicit untaint
-        } else {
+        ( my $meta, $expr ) = Foswiki::Func::readTopic( $w, $t );
+        if ( $expr =~ /%CODE(?:{\s*"perl".*?})?%(.*?)%ENDCODE%/s ) {
+            $expr = $1;    # implicit untaint
+        }
+        else {
             $expr = Foswiki::Sandbox::untaintUnchecked($expr);
         }
-        ASSERT(UNTAINTED($expr)) if DEBUG;
+        ASSERT( UNTAINTED($expr) ) if DEBUG;
     }
     return "<pre class='foswikiAlert'>%PERL error: no code to execute</pre>"
       unless defined $expr;
 
-    if (!defined($compartment)){
+    if ( !defined($compartment) ) {
         $compartment = new Safe();
 
         # The compartment is created with ':default' ops enabled
         # :default = :base_core :base_mem :base_loop :base_orig :base_thread
-        if ($Foswiki::cfg{Plugins}{PerlPlugin}{Opcodes}{Permit}) {
+        if ( $Foswiki::cfg{Plugins}{PerlPlugin}{Opcodes}{Permit} ) {
             $compartment->permit(
-                @{$Foswiki::cfg{Plugins}{PerlPlugin}{Opcodes}{Permit}});
+                @{ $Foswiki::cfg{Plugins}{PerlPlugin}{Opcodes}{Permit} } );
         }
-        if ($Foswiki::cfg{Plugins}{PerlPlugin}{Opcodes}{Deny}) {
+        if ( $Foswiki::cfg{Plugins}{PerlPlugin}{Opcodes}{Deny} ) {
             $compartment->deny(
-                @{$Foswiki::cfg{Plugins}{PerlPlugin}{Opcodes}{Deny}});
+                @{ $Foswiki::cfg{Plugins}{PerlPlugin}{Opcodes}{Deny} } );
         }
 
         # Import symbols from Foswiki::Func
-        if (ref($Foswiki::cfg{Plugins}{PerlPlugin}{Share}) eq 'HASH') {
-            while (my ($package, $symbols) =
-                     each %{$Foswiki::cfg{Plugins}{PerlPlugin}{Share}}) {
-                $compartment->share_from($package, $symbols);
+        if ( ref( $Foswiki::cfg{Plugins}{PerlPlugin}{Share} ) eq 'HASH' ) {
+            while ( my ( $package, $symbols ) =
+                each %{ $Foswiki::cfg{Plugins}{PerlPlugin}{Share} } )
+            {
+                $compartment->share_from( $package, $symbols );
             }
         }
     }
@@ -106,6 +114,7 @@ sub _PERL {
     local $SIG{FPE} = sub {
         die "Floating point exception";
     };
+
     # Trap SIGALRM (process state will be undefined and we need to die, fast)
     local $SIG{ALRM} = sub {
         die "Alarm!";
@@ -116,7 +125,7 @@ sub _PERL {
     # can't get to File::Spec
     my $result;
     $compartment->permit('print');
-    $compartment->share_from('main', [ '*STDOUT', '*STDERR' ]);
+    $compartment->share_from( 'main', [ '*STDOUT', '*STDERR' ] );
 
     my $stdout = '';
     my $stderr = '';
@@ -124,14 +133,14 @@ sub _PERL {
     tie *STDOUT, 'IO::Scalar', \$stdout;
 
     {
-        local $SIG{'__DIE__'} = 'DEFAULT';
+        local $SIG{'__DIE__'}  = 'DEFAULT';
         local $SIG{'__WARN__'} = sub {
             my $mess = shift;
             $mess =~ s/ at \(eval \d+\)( line \d+.*)$/ at$1/;
             $stderr .= $mess;
         };
 
-        $result = $compartment->reval($expr, 1);
+        $result = $compartment->reval( $expr, 1 );
     }
     untie *STDOUT;
     untie *STDERR;
@@ -141,10 +150,10 @@ sub _PERL {
     # should really trap errors.
     $result = "<pre class='foswikiAlert'>%PERL error: $@</pre>" if $@;
     $result = '' unless defined $result;
-    if (length($stdout) > 0) {
+    if ( length($stdout) > 0 ) {
         $result .= $stdout;
     }
-    if (length($stderr)) {
+    if ( length($stderr) ) {
         $result .= "<pre class='foswikiAlert'>$stderr</pre>";
     }
     return $result;

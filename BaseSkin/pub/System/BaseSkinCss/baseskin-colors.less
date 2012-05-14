@@ -290,8 +290,8 @@ COLOR SCHEMES
 				color: @dropdown_menu_link_highlight;
 			}
 			.divider {
-				background-color: darken(@dropdown_menu_bg, 12%);
-				border-color: lighten(@dropdown_menu_bg, 10%);
+				background-color: darken(@dropdown_menu_bg, 5%);
+				border-color: lighten(@dropdown_menu_bg, 5%);
 			}
 		}
 
@@ -492,10 +492,6 @@ COLOR SCHEMES
 
 	/* extensions */
 	
-	#foswikiEditControlsContainer.foswikiBar {
-		border-color: @border_secondary;
-	}
-	
 	/* TinyMCE */
 	
 	.mceExternalToolbar,
@@ -513,14 +509,14 @@ COLOR SCHEMES
 	}
 }
 
-.foswikiColorLight(@background: #fff, @border: #ccc, @text: #444) {
+.foswikiColorLight(@background: #fff, @border: #eee, @text: #444) {
 
 	@pane_background: #fff;
 	@text_toned_down: #666;
 	@text_light: #bbb;
 	@text_shadow: 0 1px 0 rgba(255, 255, 255, 0.7);
 	@header_text: #333;
-	@header_h1_text: #33ab11;
+	@header_h1_text: #296f01;
 	@hint_text: #888;
 	@border_secondary: #e4e4e4;
 	@background_secondary: #f3f3f3;
@@ -547,7 +543,9 @@ COLOR SCHEMES
 	@input_shadow_focus: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 8px rgba(82, 168, 236, 0.6);
 	@alert_text: #f00;
 	@message_background: #fdf5d9;
-			
+	
+	@shadow: 0 2px 3px rgba(100, 100, 100, .2);
+	
 	.fw_color_scheme(
 		@background,
 		@border,
@@ -586,7 +584,12 @@ COLOR SCHEMES
 	);
 	
 	&.foswikiBar {
+		background-color: @background;
 		border-color: @border_secondary;
+	}
+	
+	&.foswikiShadow {
+		.box-shadow(@shadow);
 	}
 }
 
@@ -629,6 +632,8 @@ COLOR SCHEMES
 	@alert_text: #f00;
 	@message_background: #fdf5d9;
 	
+	@shadow: 0 2px 3px rgba(100, 100, 100, .2);
+
 	.fw_color_scheme(
 		@background,
 		@border,
@@ -667,7 +672,12 @@ COLOR SCHEMES
 	);
 	
 	&.foswikiBar {
+		background-color: @background;
 		border-color: @border_secondary;
+	}
+	
+	&.foswikiShadow {
+		.box-shadow(@shadow);
 	}
 }
 
@@ -744,20 +754,25 @@ COLOR SCHEMES
 	);
 	
 	&.foswikiBar {
+		background-color: @background;
 		border-color: @border_secondary;
+	}
+	
+	&.foswikiShadow {
+		.box-shadow();
 	}
 }
 
 // Set color scheme
 
 .foswikiColorPrimary {
-	.foswikiColorLight();
+	.foswikiColorLight(#fff);
 }
 .foswikiColorSecondary {
 	.foswikiColorSilver();
 }
 .foswikiColorNavigationSecondary {
-	.foswikiColorMiddle();
+	.foswikiColorLight();
 }
 .foswikiColorNavigationPrimary {
 	.foswikiColorDark();
@@ -781,4 +796,5 @@ COLOR SCHEMES
 body {
 	.foswikiColorSilver();
 }
+
 

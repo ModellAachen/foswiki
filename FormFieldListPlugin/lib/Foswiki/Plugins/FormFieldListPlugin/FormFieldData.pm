@@ -18,13 +18,13 @@ use strict;
 use overload ( '""' => \&as_string );
 
 my %sortKeys = (
-    '$fieldDefinition' => [ 'fieldDefinition',  'string' ],
-    '$name'      => [ 'name',  'string' ],
-    '$value'     => [ 'value', 'string' ],
-    '$fieldDate' => [ 'fieldDate',  'integer' ],
-    '$topicName' => [ 'topic', 'string' ],
-    '$topicDate' => [ 'date',  'integer' ],
-    '$topicUser' => [ 'user',  'string' ],
+    '$fieldDefinition' => [ 'fieldDefinition', 'string' ],
+    '$name'            => [ 'name',            'string' ],
+    '$value'           => [ 'value',           'string' ],
+    '$fieldDate'       => [ 'fieldDate',       'integer' ],
+    '$topicName'       => [ 'topic',           'string' ],
+    '$topicDate'       => [ 'date',            'integer' ],
+    '$topicUser'       => [ 'user',            'string' ],
 );
 
 our $EMPTY_VALUE_PLACEHOLDER = '_FORMFIELDLISTPLUGIN_EMPTY_';
@@ -40,13 +40,13 @@ sub new {
     $this->{'field'} = $field;
 
     # only copy sort keys to FormFieldData attributes
-    $this->{'name'}  = $name  || '';
-    $this->{'title'} = $name || $field->{'title'} || '';
+    $this->{'name'}  = $name             || '';
+    $this->{'title'} = $name             || $field->{'title'} || '';
     $this->{'value'} = $field->{'value'} || $EMPTY_VALUE_PLACEHOLDER;
-    $this->{'date'}  = undef;
-    $this->{'fieldDate'}  = '';
-    $this->{'topic'} = $topic;
-    $this->{'user'}  = undef;
+    $this->{'date'}      = undef;
+    $this->{'fieldDate'} = '';
+    $this->{'topic'}     = $topic;
+    $this->{'user'}      = undef;
 
     $this->{'web'}      = $web;
     $this->{'notfound'} = 0;
@@ -65,16 +65,16 @@ sub getCompareMode {
 }
 
 sub setTopicDate {
-    my ($this, $inDate) = @_;
+    my ( $this, $inDate ) = @_;
     $this->{date} = $inDate;
-    if (!$this->{'fieldDate'}) {
-    	$this->{'fieldDate'} = $inDate;
+    if ( !$this->{'fieldDate'} ) {
+        $this->{'fieldDate'} = $inDate;
     }
 }
 
 sub setFieldDate {
-    my ($this, $inDate) = @_;
-	$this->{'fieldDate'} = $inDate;
+    my ( $this, $inDate ) = @_;
+    $this->{'fieldDate'} = $inDate;
 }
 
 =pod

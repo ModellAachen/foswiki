@@ -39,10 +39,10 @@ expanding the template, and cannot be used elsewhere in Foswiki.  See
 ---++ How Template Directives Work
 Template directives look a lot like standard [[macros]].
    * =%<nop>TMPL:INCLUDE{"file"}%= includes a template file. The file is found as described [[#FindingTemplates][below]].
-   * =%<nop>TMPL:DEF{"block"}%= defines a block. *All* text between this and the next =%<nop>TMPL:END%= directive is removed and saved for later use with =%<nop>TMPL:P%=.
+   * =%<nop>TMPL:DEF{"name"}%= defines a block. *All* text between this and the next =%<nop>TMPL:END%= directive is removed and saved for later use with =%<nop>TMPL:P%=.
    * =%<nop>TMPL:END%= ends a block definition.
    * =%<nop>TMPL:PREV%=: returns the previous definition of the block being defined.
-   * =%<nop>TMPL:P{"var"}%= includes a previously defined block.
+   * =%<nop>TMPL:P{"name"}%= includes a previously defined block.
    * =%<nop>{...}%= is a comment. Whitespace either side of the comment
      (newlines, spaces, tabs etc) is treated as part of the comment, and
      removed when the comment is removed.
@@ -54,17 +54,25 @@ block twice, only the second definition is used.
 </blockquote>
 
 ---+++ Parameters to blocks
-=%<nop>TMPL:DEF%= and =%<nop>TMPL:P%= support simple parameters. For
-example, given the definition
+=%<nop>TMPL:DEF%= and =%<nop>TMPL:P%= support simple parameters.
+
+Parameters are only available in the immediate definition being included; they
+are not passed on to any other =TMPL:P= inside the =TMPL:DEF= being expanded
+unless they are passed on explicitly in a new parameter.
+
+
+---++++ Block parameters
+For example, we can define a parameter =P= inside a block:
 <verbatim class="tml">
 %TMPL:DEF{"x"}% x%P%z %TMPL:END%
 </verbatim>
-then
+then pass a value to that parameter:
 <verbatim class="tml">
 %TMPL:P{"x" P="y"}%
 </verbatim>
-will expand to =xyz=.
+This will expand to =xyz=.
 
+---++++ Block definition parameters
 Default parameter values can be set in the definition:
 <verbatim class="tml">
 %TMPL:DEF{"x" y="1"}% x%y%z %TMPL:END%
@@ -75,13 +83,24 @@ then
 </verbatim>
 will expand to =x1z=.
 
-Parameters are only available in the immediate definition being included; they
-are not passed on to any other =TMPL:P= inside the =TMPL:DEF= being expanded
-unless they are passed on explicitly in a new parameter.
+You can also use a parameter inside a default parameter:
+<verbatim class="tml">
+%TMPL:DEF{"x" y="%value%"}% x%y%z %TMPL:END%
+</verbatim>
+then
+<verbatim class="tml">
+%TMPL:P{"x" value="1000"}%
+</verbatim>
+will expand to =x1000z=.
 
-Any alphanumeric characters can be used in parameter names. TMPL:P parameters
+
+---++++ Naming
+Any alphanumeric characters can be used in parameter names. =TMPL:P= parameters
 override any other possible definition of the name, so you should not use
-parameter names that might clash with [[macros]].
+parameter names that might clash with [[Macros]].
+
+
+
 
 ---+++ Conditional expansion
 ---++++ Using context identifiers
@@ -172,11 +191,11 @@ The rules defined by the out-of-the-box setting of ={TemplatePath}= are:
    1 =templates/$web/$name.$skin.tmpl=
    2 =templates/$name.$skin.tmpl=
    3 =$web.$skinSkin$nameTemplate=
-   4 =System.$skinSkin$nameTemplate=
+   4 =%SYSTEMWEB%.$skinSkin$nameTemplate=
    5 =templates/$web/$name.tmpl=
    6 =templates/$name.tmpl=
    7 =$web.$nameTemplate=
-   8 =System.$nameTemplate=
+   8 =%SYSTEMWEB%.$nameTemplate=
 For example, let's say we are viewing a topic in web =%SANDBOXWEB%= and are searching for the template called =function=. The skin path is set to =custom,pattern=. The following locations will be considered in turn, until a template is found:
    1 =templates/%SANDBOXWEB%/function.custom.tmpl= _(rule 1)_ :skull:
    1 =templates/%SANDBOXWEB%/function.pattern.tmpl= _(rule 1)_ :skull:
@@ -184,12 +203,12 @@ For example, let's say we are viewing a topic in web =%SANDBOXWEB%= and are sear
    2 =templates/function.pattern.tmpl= _(rule 2)_
    3 =%SANDBOXWEB%.CustomSkinFunctionTemplate= _(rule 3)_
    3 =%SANDBOXWEB%.PatternSkinFunctionTemplate= _(rule 3)_
-   4 =System.CustomSkinFunctionTemplate= _(rule 4)_
-   4 =System.PatternSkinFunctionTemplate= _(rule 4)_
+   4 =%SYSTEMWEB%.CustomSkinFunctionTemplate= _(rule 4)_
+   4 =%SYSTEMWEB%.PatternSkinFunctionTemplate= _(rule 4)_
    5 =templates/%SANDBOXWEB%/function.tmpl= _(rule 5)_ :skull:
    6 =templates/function.tmpl= _(rule 6)_
    7 =%SANDBOXWEB%.FunctionTemplate= _(rule 7)_
-   8 =System.FunctionTemplate= _(rule 8)_
+   8 =%SYSTEMWEB%.FunctionTemplate= _(rule 8)_
 <blockquote class="foswikiHelp">%X% :skull: This usage is supported *for compatibility only* and is *deprecated*. Store web-specific templates in topics instead. </blockquote>
 
 When a skin name or template name is used to build a topic name, the first character is automatically capitalised.
@@ -232,9 +251,7 @@ is silently ignored, and the template path expansion continues.
 When writing new templates, it can sometimes it can be hard to work out
 where different parts of the generated output come from. To help you debug
 your new templates, the =Foswiki::Templates= module has a "trace" mode. In
-this mode, the output is annotated with HTML comments that are wrapped
-around the output generated by each template, as it is expanded. For example,
-when trace mode is off,
+this mode, the HTML source created is annotated with HTML comments that are wrapped around the output generated by each template, as it is expanded. For example, when trace mode is off,
 <verbatim class="tml">
 %TMPL:DEF{"x:y"}% de %TMPL:END%
 blah %TMPL:P{"x:y"}% blah
@@ -243,7 +260,7 @@ will expand to:
 <verbatim class="tml">
 blah  de  blah
 </verbatim>
-With tracing enabled, it will expand to:
+With tracing enabled, the HTML source will look like:
 <verbatim class="tml">
 blah <!--x:y--> de <!--/x:y--> blah
 </verbatim>

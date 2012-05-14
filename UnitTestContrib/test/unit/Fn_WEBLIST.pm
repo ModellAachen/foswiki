@@ -1,10 +1,12 @@
 # tests for the correct expansion of WEBLIST
 
 package Fn_WEBLIST;
+use strict;
+use warnings;
+
 use FoswikiFnTestCase;
 our @ISA = qw( FoswikiFnTestCase );
 
-use strict;
 use Foswiki;
 use Error qw( :try );
 
@@ -21,23 +23,17 @@ sub set_up {
 
     $this->SUPER::set_up();
     $Foswiki::cfg{EnableHierarchicalWebs} = 1;
-    my $webObject =
-      Foswiki::Meta->new( $this->{session}, "$this->{test_web}/Dive1" );
-    $webObject->populateNewWeb();
+    my $webObject = $this->populateNewWeb("$this->{test_web}/Dive1");
+    $webObject->finish();
 
-    $webObject =
-      Foswiki::Meta->new( $this->{session}, "$this->{test_web}/Dive1/Dive2" );
-    $webObject->populateNewWeb();
+    $webObject = $this->populateNewWeb("$this->{test_web}/Dive1/Dive2");
+    $webObject->finish();
 
-    $webObject =
-      Foswiki::Meta->new( $this->{session},
-        "$this->{test_web}/Dive1/Dive2/Dive3" );
-    $webObject->populateNewWeb();
+    $webObject = $this->populateNewWeb("$this->{test_web}/Dive1/Dive2/Dive3");
+    $webObject->finish();
 
-    $webObject =
-      Foswiki::Meta->new( $this->{session},
-        "$this->{test_web}/Dive1/_Dive2tmpl" );
-    $webObject->populateNewWeb();
+    $webObject = $this->populateNewWeb("$this->{test_web}/Dive1/_Dive2tmpl");
+    $webObject->finish();
 
     Foswiki::Func::readTemplate('foswiki');
     @allWebs      = Foswiki::Func::getListOfWebs('user,public,allowed');

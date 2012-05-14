@@ -48,7 +48,6 @@ $pluginName = 'TinyMCEUsabilityUpgradePlugin';
 
 # =========================
 
-
 sub initPlugin {
     my ( $topic, $web, $user, $installWeb ) = @_;
 

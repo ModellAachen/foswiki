@@ -2,8 +2,9 @@ package TWiki::Contrib::TWikiShellContrib::Help;
 
 use Exporter;
 
-@ISA=(Exporter);
-@EXPORT=qw(assembleHelp);
+@ISA    = (Exporter);
+@EXPORT = qw(assembleHelp);
+
 =pod
 ---++ TWiki::Contrib::TWikiShellContrib::Help
 
@@ -73,23 +74,24 @@ The programmer is responsible of the formating of the text.
 =cut
 
 use strict;
+
 sub assembleHelp {
-   my $doco=shift;
-   my @order=@_;
-   my $help='';
-   foreach my $section (@order) {
-      $help.=_section($section,$doco->{$section});
-   }
-   return $help;
+    my $doco  = shift;
+    my @order = @_;
+    my $help  = '';
+    foreach my $section (@order) {
+        $help .= _section( $section, $doco->{$section} );
+    }
+    return $help;
 
 }
 
 sub _section {
-   my ($section,$text)=@_;
-   return '' unless $text;
-   $section=uc $section;
-   $text=join("\n",map {"    ".$_;} split("\n",$text));
-   return "
+    my ( $section, $text ) = @_;
+    return '' unless $text;
+    $section = uc $section;
+    $text = join( "\n", map { "    " . $_; } split( "\n", $text ) );
+    return "
 $section
 $text
 ";

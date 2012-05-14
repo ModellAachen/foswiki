@@ -1,6 +1,6 @@
 # Plugin for mediawiki2foswiki
 #
-# Copyright (C) 2007-2008 Michael Daum http://michaeldaumconsulting.com
+# Copyright (C) 2007-2012 Michael Daum http://michaeldaumconsulting.com
 
 package EmptyMediaWiki2FoswikiPlugin;
 use strict;

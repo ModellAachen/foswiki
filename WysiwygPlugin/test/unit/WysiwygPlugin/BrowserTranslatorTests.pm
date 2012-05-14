@@ -6,14 +6,14 @@ package BrowserTranslatorTests;
 
 use Encode;
 
-use FoswikiSeleniumTestCase;
-use TranslatorBase;
+use FoswikiSeleniumTestCase();
+use TranslatorBase();
 our @ISA = qw( FoswikiSeleniumTestCase TranslatorBase );
 
-use BrowserEditorInterface;
-use Foswiki::Func;
-use Foswiki::Plugins::WysiwygPlugin::Handlers;
-use Foswiki::Plugins::WysiwygPlugin::Constants;
+use BrowserEditorInterface();
+use Foswiki::Func();
+use Foswiki::Plugins::WysiwygPlugin::Handlers();
+use Foswiki::Plugins::WysiwygPlugin::Constants();
 
 # The following big table contains all the testcases. These are
 # used to add a bunch of functions to the symbol table of this
@@ -32,7 +32,7 @@ use Foswiki::Plugins::WysiwygPlugin::Constants;
 # finaltml => optional expected tml from translating html. If not there,
 # will use tml. Only use where round-trip can't be closed because
 # we are testing deprecated syntax.
-# expect_failure => boolean, for tests that don't pass yet.
+# expect_failure => $reason, for tests that don't pass yet.
 my $data = [
     {
         exec => $TranslatorBase::ROUNDTRIP | $TranslatorBase::HTML2TML |
@@ -253,10 +253,9 @@ HERE
 HERE
     },
     {
-        name           => 'KennethsNewLineEatingTest2',
-        exec           => $TranslatorBase::ROUNDTRIP,
-        expect_failure => 1,
-        tml            => <<HERE,
+        name => 'KennethsNewLineEatingTest2',
+        exec => $TranslatorBase::ROUNDTRIP,
+        tml  => <<HERE,
 ---+++ Some test headline.
 
 Below is what could be an example of C code
@@ -281,10 +280,9 @@ if (imgs->labelsize_max) {
 HERE
     },
     {
-        name           => 'KennethsNewLineEatingTest3',
-        exec           => $TranslatorBase::ROUNDTRIP,
-        expect_failure => 1,
-        tml            => <<HERE,
+        name => 'KennethsNewLineEatingTest3',
+        exec => $TranslatorBase::ROUNDTRIP,
+        tml  => <<HERE,
 These two options are defined like this
 
 | *Option* | *Function* |
@@ -315,10 +313,9 @@ and in the config code you find this
 HERE
     },
     {
-        name           => 'KennethsNewLineEatingTest4',
-        exec           => $TranslatorBase::ROUNDTRIP,
-        expect_failure => 1,
-        tml            => <<HERE,
+        name => 'KennethsNewLineEatingTest4',
+        exec => $TranslatorBase::ROUNDTRIP,
+        tml  => <<HERE,
 ---+++ More code right after headline
 
 <verbatim>
@@ -340,7 +337,7 @@ HERE
     {
         name           => 'KennethsNewLineEatingTest5',
         exec           => $TranslatorBase::ROUNDTRIP,
-        expect_failure => 1,
+        expect_failure => 'TODO: Item2174 reintroducing Item5702?',
         tml            => <<HERE,
 ---+++ Some stuff protected by literal
 
@@ -371,7 +368,7 @@ HERE
     {
         name           => 'KennethsNewLineEatingTest6',
         exec           => $TranslatorBase::ROUNDTRIP,
-        expect_failure => 1,
+        expect_failure => 'TODO: Item2174 reintroducing Item5702?',
         tml            => <<HERE,
 
 ---+++ Plain text
@@ -413,7 +410,7 @@ HERE
     {
         name           => 'KennethsNewLineEatingTest7',
         exec           => $TranslatorBase::ROUNDTRIP,
-        expect_failure => 1,
+        expect_failure => 'TODO: Item2174 reintroducing Item5702?',
         tml            => <<HERE,
 
 ---+++ Literal after header
@@ -449,6 +446,7 @@ sub new {
     my $self = shift()->SUPER::new( 'BrowserTranslator', @_ );
 
     $self->{editor} = BrowserEditorInterface->new($self);
+    BrowserTranslatorTests->gen_compare_tests( 'verify', $data );
 
     return $self;
 }
@@ -465,7 +463,7 @@ sub _init {
     my %args = @_;
 
     if ( $args{expect_failure} ) {
-        $this->expect_failure();
+        $this->expect_failure( $args{expect_failure} );
     }
     $this->{editor}->init();
 
@@ -508,16 +506,14 @@ sub verify_editSaveTopicWithUnnamedUnicodeEntity {
 
     # Create the test topic
     my $topicName = $this->{test_topic} . "For9170";
-    my $topicObject =
-      Foswiki::Meta->new( $this->{session}, $this->{test_web}, $topicName,
-        "Before${testText}After\n" );
+    my ($topicObject) =
+      Foswiki::Func::readTopic( $this->{test_web}, $topicName );
+    $topicObject->text("Before${testText}After\n");
     $topicObject->save();
     $topicObject->finish();
 
     # Reload the topic and note the topic date
-    $topicObject =
-      Foswiki::Meta->new( $this->{session}, $this->{test_web}, $topicName );
-    $topicObject->load();
+    ($topicObject) = Foswiki::Func::readTopic( $this->{test_web}, $topicName );
     my $topicinfo                = $topicObject->get('TOPICINFO');
     my $dateBeforeSaveFromEditor = $topicinfo->{date};
     $this->assert( $dateBeforeSaveFromEditor,
@@ -531,13 +527,24 @@ sub verify_editSaveTopicWithUnnamedUnicodeEntity {
     # so that we can confirm that the save did write to the file
     sleep(1);
 
+    # PH Commented this out below in Item11440, it causes Foswiki to redirect
+    # back to the save oops "merged with new revision while you were
+    # editing..." screen, rather than view as the tests expect.
+    #
+    ## Write rubbish over the topic, which will be overwritten on save
+    #($topicObject) =
+    #  Foswiki::Func::readTopic( $this->{test_web}, $topicName);
+    #$topicObject->text("Rubbish");
+    #
+    #$topicObject->save();
+    #$topicObject->finish();
+    #undef $topicObject;
+
     # Save from the editor
     $this->{editor}->save();
 
     # Reload the topic and check that the content is as expected
-    $topicObject =
-      Foswiki::Meta->new( $this->{session}, $this->{test_web}, $topicName );
-    $topicObject->load();
+    ($topicObject) = Foswiki::Func::readTopic( $this->{test_web}, $topicName );
 
     # Make sure the topic really was saved
     $topicinfo = $topicObject->get('TOPICINFO');
@@ -548,6 +555,7 @@ sub verify_editSaveTopicWithUnnamedUnicodeEntity {
         $dateAfterSaveFromEditor );
 
     my $text = $topicObject->text();
+    $topicObject->finish();
 
     # Isolate the portion of interest
     $text =~ s/.*Before//ms or $this->assert( 0, $text );
@@ -621,14 +629,24 @@ sub compareHTML_TML {
     $this->assert_tml_equals( $args->{tml}, $actualTml, $args->{name} );
 }
 
-BrowserTranslatorTests->gen_compare_tests( 'verify', $data );
+# Item11440 - dummy test, do not remove. skip() is never called if list_tests()
+# returns nothing (why bother skipping zero tests), and this is the case with
+# the (default) empty $Foswiki::cfg{UnitTestContrib}{SeleniumRc}{Browsers}
+#
+# We would rather a bogus dummy test which gives a meaningful skip annotation
+# in the result summary, than to silently skip a suite which contains zero tests
+sub test_nothing {
+    my ($this) = @_;
+
+    return;
+}
 
 1;
 
 __END__
 Foswiki - The Free and Open Source Wiki, http://foswiki.org/
 
-Copyright (C) 2008-2010 Foswiki Contributors. Foswiki Contributors
+Copyright (C) 2008-2012 Foswiki Contributors. Foswiki Contributors
 are listed in the AUTHORS file in the root of this distribution.
 NOTE: Please extend that file, not this notice.
 

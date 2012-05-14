@@ -1,13 +1,13 @@
 # Test for ODT.pm
 package OdtTests;
-use FoswikiFnTestCase;
-our @ISA = qw( FoswikiFnTestCase );
+use StringifierTest;
+our @ISA = qw( StringifierTest );
 
 use strict;
+use utf8;
 
 use Foswiki::Contrib::Stringifier::Base();
 use Foswiki::Contrib::Stringifier();
-use utf8;
 
 sub set_up {
         my $this = shift;
@@ -39,8 +39,7 @@ sub test_stringForFile {
     my $ok = $text =~ /breitschlag/;
     $this->assert($ok, "Text breitschlag not included");
 
-    $ok = $text =~ /Grünkohl/;
-    $this->assert($ok, "Text Grühnkohl not included");
+    $this->assert_matches($this->encode('Grünkohl'), $text, "Text Grünkohl not found.");
 }
 
 1;

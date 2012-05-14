@@ -1,0 +1,74 @@
+%META:TOPICINFO{author="ProjectContributor" comment="reprev" date="1332761971" format="1.1" reprev="1" version="1"}%
+---+!! %TOPIC%
+
+%TWISTY{
+  showlink="Show !DataForm definition" 
+  hidelink="Hide !DataForm definition"
+  showimgleft="%ICONURLPATH{toggleopen-small}%"
+  hideimgleft="%ICONURLPATH{toggleclose-small}%"
+}%
+| *Name:*| *Type:* | *Size:* | *Values:* | *Description:* | *Attributes:* |
+| TopicType | label | 1 | TimeTracker | document type  | |
+| <nop>TopicTitle | text | 75 | | title of this topic | |
+| Summary | text | 75 | | short description of the role of this topic | c |
+| Rate | text | 6 | 100 | %MAKETEXT{"hourly rates"}% | c |
+| Tax | select | 1 | 0, 7, 19 | %MAKETEXT{"tax fee per effort in percent"}% | c |
+| Invoiced | radio | 2 | no, yes | %MAKETEXT{"flag indicating whether these efforts have already been invoiced"}% | |
+%ENDTWISTY%
+
+%TWISTY{link="%BUTTON{"%MAKETEXT{"New"}%" icon="add"}%%CLEAR%"}%
+<noautolink>
+<form class='createTopicForm' action="%SCRIPTURLPATH{"save"}%/%BASEWEB%/" method="post">
+<div class='foswikiFormSteps'>
+<input type="hidden" name="web" value="%BASEWEB%" />
+<input type="hidden" name="onlynewtopic" value="on" />
+<input type="hidden" name="onlywikiname" value="off" />
+<input type="hidden" name="topicparent" value="%BASEWEB%.%BASETOPIC%" />
+<input type="hidden" name="templatetopic" value="%BASEWEB%.%BASETOPIC%Template" />
+<input type="hidden" name="formtemplate" value="%BASEWEB%.%BASETOPIC%" />
+<input type="hidden" name="template" value="%BASEWEB%.%BASETOPIC%Edit" />
+<input type="hidden" name="topic" value="" class="jqWikiWord {source:'input[name=TopicTitle]'}" />
+<input type="hidden" name="action" value="form" />
+<input type="hidden" name="TopicType" value="%BASETOPIC%" />
+<h2>%MAKETEXT{"Create a new [_1]" args="<nop>%BASETOPIC%"}%</h2>
+%RENDERFOREDIT{
+  form="%BASEWEB%.%BASETOPIC%"
+  topic="%BASEWEB%.%BASETOPIC%Template"
+  fields="TopicTitle"
+  format="<div class='foswikiFormStep'><h3>$title:$mandatory</h3>$edit</div>"
+  TopicTitle_title="%MAKETEXT{"Title"}%"
+}%
+%RENDERFOREDIT{
+  form="%BASEWEB%.%BASETOPIC%"
+  topic="%BASEWEB%.%BASETOPIC%Template"
+  format="<div class='foswikiFormStep'><h3>$title:$mandatory</h3>$edit</div>"
+  includeattr="\bc\b"
+}%
+<div class="foswikiFormStep foswikiFormButtons foswikiFormLast">
+  %BUTTON{"%MAKETEXT{"Submit"}%" type="submit" icon="tick"}%
+  %CLEAR%
+</div>
+</div>
+</form> 
+</noautolink>
+%ENDTWISTY%
+%JQREQUIRE{"wikiword"}%<!-- -->
+
+%GRID{ 
+  query="TopicType=~'\bTimeTracker\b'"
+  columns="TopicTitle, Summary, Invoiced, Rate, Changed" 
+  rows="10"
+  filterbar="on" 
+  toolbar="on" 
+  rownumbers="on" 
+  pager="on" 
+  width="auto" 
+  height="auto"
+  sort="Changed"
+  reverse="on" 
+  TopicTitle_title="%MAKETEXT{"Title"}%"
+  Summary_title="%MAKETEXT{"Summary"}%"
+  Changed_title="%MAKETEXT{"Changed"}%"
+}% 
+
+%META:TOPICMOVED{by="micha" date="1332758791" from="Sandbox.TimeTrackerForm" to="Sandbox.TimeTracker"}%

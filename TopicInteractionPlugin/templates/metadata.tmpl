@@ -2,8 +2,8 @@
 %TMPL:DEF{"metadata"}%<!-- -->
 %TMPL:P{"metadata::start"}%
 %TMPL:P{"metadata::workflow"}%<!-- -->
-%TMPL:P{"metadata::attachments"}%<!-- -->
 %TMPL:P{"metadata::form"}%<!-- -->
+%TMPL:P{"metadata::attachments"}%<!-- -->
 %TMPL:P{"metadata::comments"}%<!-- -->
 %TMPL:P{"metadata::end"}%
 <!-- -->%TMPL:END%
@@ -60,7 +60,7 @@
 %JQREQUIRE{"tooltip, easing, ui, uploader, twisty, media"}%<!-- -->
 %IF{"context FlexPaperPluginEnabled" then="$percntFLEXPAPERINIT$percnt"}%<!-- -->
 %ADDTOZONE{"script" 
-  id="NATSKIN::METADATA::JS" 
+  id="METADATA::JS" 
   requires="JQUERYPLUGIN::LIVEQUERY, JQUERYPLUGIN::UI, JQUERYPLUGIN::UPLOAD" 
   text="<script src='%PUBURLPATH%/%SYSTEMWEB%/TopicInteractionPlugin/metadata.js'></script>"
 }%<!-- -->%TMPL:END%
@@ -68,13 +68,18 @@
 %{ ################################################################################ }%
 %TMPL:DEF{"metadata::css"}%<!-- -->
 %ADDTOZONE{"head" 
-  tag="NATSKIN::METADATA::CSS" 
+  id="METADATA::CSS" 
   requires="NATSKIN::CSS" 
   text="<link rel='stylesheet' href='%PUBURLPATH%/%SYSTEMWEB%/TopicInteractionPlugin/metadata.css' media='all' />"
 }%<!-- -->
+%TMPL:P{context="ImagePluginEnabled" then="metadata::css::imageplugin"}%<!-- -->
+<!-- -->%TMPL:END%
+
+%{ ################################################################################ }%
+%TMPL:DEF{"metadata::css::imageplugin"}%<!-- -->
 %ADDTOZONE{"head"
-  tag="IMAGEPLUGIN"
-  text="<link rel='stylesheet' href='%PUBURL%/%SYSTEMWEB%/ImagePlugin/style.css' media='all' />"
+  id="IMAGEPLUGIN"
+  text="<link rel='stylesheet' href='%PUBURLPATH%/%SYSTEMWEB%/ImagePlugin/style.css' media='all' />"
 }%<!-- -->%TMPL:END%
 
 %{ ################################################################################ }%
@@ -307,7 +312,10 @@
       <select class="foswikiSelect" name="bulkaction">
         <option class="foswikiOption" value="">%MAKETEXT{"Bulk action"}%</option>
         <option class="foswikiOption" value="createlink">%MAKETEXT{"Insert links"}%</option>
-        <option class="foswikiOption" value="createimagegallery">%MAKETEXT{"Create image gallery"}%</option>
+%IF{"context ImageGalleryPluginEnabled" 
+  then="        <option class='foswikiOption' value='createimagegallery'>%MAKETEXT{"Create image gallery"}%</option>"
+  else="<!-- -->"
+}%
         <option class="foswikiOption" value="download">%MAKETEXT{"Download"}%</option>
         <option class="foswikiOption" value="hide">%MAKETEXT{"Hide"}%</option>
         <option class="foswikiOption" value="unhide">%MAKETEXT{"Unhide"}%</option>

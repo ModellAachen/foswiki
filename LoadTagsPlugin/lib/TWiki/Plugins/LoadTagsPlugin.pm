@@ -74,11 +74,12 @@ FOOBARSOMETHING. This avoids namespace issues.
 =cut
 
 sub initPlugin {
-    my( $topic, $web, $user, $installWeb ) = @_;
+    my ( $topic, $web, $user, $installWeb ) = @_;
 
     # check for Plugins.pm versions
-    if( $TWiki::Plugins::VERSION < 1.026 ) {
-        TWiki::Func::writeWarning( "Version mismatch between $pluginName and Plugins.pm" );
+    if ( $TWiki::Plugins::VERSION < 1.026 ) {
+        TWiki::Func::writeWarning(
+            "Version mismatch between $pluginName and Plugins.pm");
         return 0;
     }
     _loadTags();
@@ -87,29 +88,34 @@ sub initPlugin {
 }
 
 sub _loadTags() {
-    foreach my $libDir ( @INC ) {
-        if( opendir( DIR, "$libDir/TWiki/Tags" ) ) {
-            foreach my $module ( grep { /^([A-Za-z0-9_]+Tag).pm$/ } readdir DIR ) {
+    foreach my $libDir (@INC) {
+        if ( opendir( DIR, "$libDir/TWiki/Tags" ) ) {
+            foreach
+              my $module ( grep { /^([A-Za-z0-9_]+Tag).pm$/ } readdir DIR )
+            {
                 $module =~ /^(.*)Tag\.pm$/;
                 my $tag = $1;
-                $module = 'TWiki/Tags/' . TWiki::Sandbox::untaintUnchecked($module);
+                $module =
+                  'TWiki/Tags/' . TWiki::Sandbox::untaintUnchecked($module);
                 $module =~ /^(.*)\.pm$/;
                 my $stripped = $module;
-                
-                if (do $module) {
+
+                if ( do $module ) {
                     $tag = $TWiki::tagname if $TWiki::tagname;
 
                     if ($tag) {
+
                         package TWiki;
                         if ($tag) {
-                            TWiki::Func::registerTagHandler($tag, \&$tag);
-                        } else {
+                            TWiki::Func::registerTagHandler( $tag, \&$tag );
+                        }
+                        else {
                             die $tag;
                         }
                     }
                 }
             }
-            closedir( DIR );
+            closedir(DIR);
         }
     }
     return 1;

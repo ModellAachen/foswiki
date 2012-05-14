@@ -20,7 +20,7 @@
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details, published at 
+# GNU General Public License for more details, published at
 # http://www.gnu.org/copyleft/gpl.html
 #
 # =========================
@@ -33,19 +33,20 @@ use TWiki::Plugins::XpTrackerPlugin::Common;
 use TWiki::Plugins::XpTrackerPlugin::HtmlUtil;
 
 #(RAF)
-#If this module is load using the "use" directive before the plugin is 
+#If this module is load using the "use" directive before the plugin is
 #initialized, $debug will be 0
 #(CC) this will not work in Dakar; TWiki::Func methods cannot be called before initPlugin.
 my $debug;
+
 #my $debug = &TWiki::Func::getPreferencesFlag( "XPTRACKERPLUGIN_DEBUG" );
 #&TWiki::Func::writeDebug( "- TWiki::Plugins::XpTrackerPlugin::ShowProjectIterations is loaded" ) if $debug;
 
-
 sub xpShowProjectIterations {
 
-    my ($project, $web) = @_;
+    my ( $project, $web ) = @_;
 
-    my $list = TWiki::Plugins::XpTrackerPlugin::HtmlUtil::emmitTwikiHeader(3,"All iterations for project ".$project);
+    my $list = TWiki::Plugins::XpTrackerPlugin::HtmlUtil::emmitTwikiHeader( 3,
+        "All iterations for project " . $project );
 
     $list .= "| *Team* ";
     $list .= "| *Iter* ";
@@ -60,29 +61,33 @@ sub xpShowProjectIterations {
     $list .= "| *Done* ";
     $list .= "| *Overrun* |\n";
 
-    my @projTeams = &TWiki::Plugins::XpTrackerPlugin::xpGetProjectTeams($project, $web);
-    foreach my $team (@projTeams){ 
-      
-        my @iterations=TWiki::Plugins::XpTrackerPlugin::Common::loadTeamIterations($web,$team);
-    
+    my @projTeams =
+      &TWiki::Plugins::XpTrackerPlugin::xpGetProjectTeams( $project, $web );
+    foreach my $team (@projTeams) {
+
+        my @iterations =
+          TWiki::Plugins::XpTrackerPlugin::Common::loadTeamIterations( $web,
+            $team );
+
         # write out all iterations to table
-    	foreach my $iteration (sort { $b->order <=> $a->order } @iterations) {
-    	    my $gaugeTxt =  TWiki::Plugins::XpTrackerPlugin::HtmlUtil::gaugeLite($iteration->done);
-            $list .= "| ".$team." ";
-            $list .= "| ".$iteration->name." ";
-            $list .= "| ".$iteration->summary." ";
-            $list .= "|  ".$iteration->startDate."  ";
-            $list .= "|  ".$iteration->endDate."  ";
-            $list .= "|  ".$iteration->length."  ";
-            $list .= "|  ".$iteration->est."  ";
-            $list .= "|  ".$iteration->spent."  ";
-            $list .= "|  ".$iteration->todo."  ";
-            $list .= "|  ".$gaugeTxt."  ";
-            $list .= "|  ".$iteration->done."%  ";
-            $list .= "|  ".$iteration->overrun."%  |\n";
+        foreach my $iteration ( sort { $b->order <=> $a->order } @iterations ) {
+            my $gaugeTxt = TWiki::Plugins::XpTrackerPlugin::HtmlUtil::gaugeLite(
+                $iteration->done );
+            $list .= "| " . $team . " ";
+            $list .= "| " . $iteration->name . " ";
+            $list .= "| " . $iteration->summary . " ";
+            $list .= "|  " . $iteration->startDate . "  ";
+            $list .= "|  " . $iteration->endDate . "  ";
+            $list .= "|  " . $iteration->length . "  ";
+            $list .= "|  " . $iteration->est . "  ";
+            $list .= "|  " . $iteration->spent . "  ";
+            $list .= "|  " . $iteration->todo . "  ";
+            $list .= "|  " . $gaugeTxt . "  ";
+            $list .= "|  " . $iteration->done . "%  ";
+            $list .= "|  " . $iteration->overrun . "%  |\n";
         }
 
-    }    
+    }
     return $list;
 }
 

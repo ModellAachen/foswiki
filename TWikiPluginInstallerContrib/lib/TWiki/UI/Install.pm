@@ -1,6 +1,6 @@
 # Foswiki - The Free and Open Source Wiki, http://foswiki.org/
 #
-# Copyright (C) 2006 Will Norris. All Rights Reserved. 
+# Copyright (C) 2006 Will Norris. All Rights Reserved.
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -61,72 +61,85 @@ sub install {
     die "progDir is tainted" if tainted $progDir;
 
     my $installOptions = {
-	tmpInstall => '/tmp/twiki/',		# SMELL
-#	module => $moduleFilename,
+        tmpInstall => '/tmp/twiki/',    # SMELL
 
-	mapTWikiDirs => {
-	    lib => { dest => $::twikiLibPath },			# SMELL?
-	    pub => { dest => $TWiki::cfg{PubDir} },
-	    data => { dest => $TWiki::cfg{DataDir} },
-	    templates => { dest => $TWiki::cfg{TemplateDir} },
-	    bin => { dest => $progDir, perms => 0755, },	# SMELL?
-	    locale => { dest => $TWiki::cfg{LocalesDir} },
-#	    log => ?,
-	},
+        #	module => $moduleFilename,
 
-	localDirConfig => {
-	    DefaultUrlHost   => $TWiki::cfg{DefaultUrlHost},
-	    ScriptUrlPath    => $TWiki::cfg{ScriptUrlPath},
-	    ScriptSuffix     => $TWiki::cfg{ScriptSuffix},
-	    PubUrlPath       => $TWiki::cfg{PubUrlPath},
-	    PubDir           => $TWiki::cfg{PubDir},
-	    TemplateDir      => $TWiki::cfg{TemplateDir},
-	    DataDir          => $TWiki::cfg{DataDir},
-	    LocalesDir       => $TWiki::cfg{LocalesDir},
-	    LogDir           => $TWiki::cfg{LogDir},
-	},
+        mapTWikiDirs => {
+            lib       => { dest => $::twikiLibPath },             # SMELL?
+            pub       => { dest => $TWiki::cfg{PubDir} },
+            data      => { dest => $TWiki::cfg{DataDir} },
+            templates => { dest => $TWiki::cfg{TemplateDir} },
+            bin       => { dest => $progDir, perms => 0755, },    # SMELL?
+            locale    => { dest => $TWiki::cfg{LocalesDir} },
+
+            #	    log => ?,
+        },
+
+        localDirConfig => {
+            DefaultUrlHost => $TWiki::cfg{DefaultUrlHost},
+            ScriptUrlPath  => $TWiki::cfg{ScriptUrlPath},
+            ScriptSuffix   => $TWiki::cfg{ScriptSuffix},
+            PubUrlPath     => $TWiki::cfg{PubUrlPath},
+            PubDir         => $TWiki::cfg{PubDir},
+            TemplateDir    => $TWiki::cfg{TemplateDir},
+            DataDir        => $TWiki::cfg{DataDir},
+            LocalesDir     => $TWiki::cfg{LocalesDir},
+            LogDir         => $TWiki::cfg{LogDir},
+        },
 
     };
 
-    my $url = $query->param( 'url' ) || '';
+    my $url = $query->param('url') || '';
+
     # FIX: use Sandbox
     $url =~ /(.*)/;
     $url = $1;
     die "url still tained" if tainted $url;
+
     # TODO: check url
     # TODO: verify url (trusted sites, .md5, or what???)
 
     -d $installOptions->{tmpInstall} || mkpath( $installOptions->{tmpInstall} );
-    my ( $module, $error ) = _getUrl({ url => $url });
-    my $moduleFilename = "$installOptions->{tmpInstall}/" . basename( $url );
+    my ( $module, $error ) = _getUrl( { url => $url } );
+    my $moduleFilename = "$installOptions->{tmpInstall}/" . basename($url);
     die "moduleFilename tainted" if tainted $moduleFilename;
     open( MODULE, '>', $moduleFilename ) or die $!;
-    binmode( MODULE );
+    binmode(MODULE);
     print MODULE $module;
     close MODULE;
 
-    my ( $text, $success, $plugins ) = TWiki::Contrib::TWikiInstallerContrib::_InstallTWikiExtension({ %$installOptions, module => $moduleFilename });
+    my ( $text, $success, $plugins ) =
+      TWiki::Contrib::TWikiInstallerContrib::_InstallTWikiExtension(
+        { %$installOptions, module => $moduleFilename } );
 
     unlink $moduleFilename;
 
-    open( LOCALSITE_CFG, '>>', $installOptions->{mapTWikiDirs}->{lib}->{dest} . '/LocalSite.cfg' ) or die $!;
+    open( LOCALSITE_CFG, '>>',
+        $installOptions->{mapTWikiDirs}->{lib}->{dest} . '/LocalSite.cfg' )
+      or die $!;
+
     # LocalSite.cfg
-    foreach my $plugin ( sort keys %$plugins )
-    {
-	print LOCALSITE_CFG "\$TWiki::cfg{Plugins}{$plugin}{Enabled} = 1;\n";
+    foreach my $plugin ( sort keys %$plugins ) {
+        print LOCALSITE_CFG "\$TWiki::cfg{Plugins}{$plugin}{Enabled} = 1;\n";
     }
     print LOCALSITE_CFG "1;\n";
     close LOCALSITE_CFG;
 
-    my ( $pluginTopicName ) = ( basename $moduleFilename ) =~ /(.*)\./;
-    $session->redirect( $session->getScriptUrl( 1, 'view', $TWiki::cfg{SystemWebName}, $pluginTopicName ) );
+    my ($pluginTopicName) = ( basename $moduleFilename ) =~ /(.*)\./;
+    $session->redirect(
+        $session->getScriptUrl(
+            1, 'view', $TWiki::cfg{SystemWebName},
+            $pluginTopicName
+        )
+    );
 }
 
 ################################################################################
 
-# url: 
+# url:
 sub _getUrl {
-    my ( $p ) = @_;
+    my ($p) = @_;
     my $url = $p->{url} or die qq{required parameter "url" not specified};
 
     use LWP::UserAgent;
@@ -134,13 +147,16 @@ sub _getUrl {
     use HTTP::Response;
 
     my $ua = LWP::UserAgent->new() or die $!;
-    $ua->agent( "TWiki remote installer v0.0.1" );
+    $ua->agent("TWiki remote installer v0.0.1");
     my $req = HTTP::Request->new( GET => $url );
+
     # TODO: what about http vs. https ?
-    $req->referer( "$ENV{SERVER_NAME}:$ENV{SERVER_PORT}$ENV{SCRIPT_NAME}" );
+    $req->referer("$ENV{SERVER_NAME}:$ENV{SERVER_PORT}$ENV{SCRIPT_NAME}");
     my $response = $ua->request($req);
 
-    return $response->is_error() ? ( undef, $response->status_line ) : ( $response->content(), '' );
+    return $response->is_error()
+      ? ( undef, $response->status_line )
+      : ( $response->content(), '' );
 }
 
 ################################################################################

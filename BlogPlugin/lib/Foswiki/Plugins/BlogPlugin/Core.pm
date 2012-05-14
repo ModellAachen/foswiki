@@ -10,7 +10,7 @@
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details, published at 
+# GNU General Public License for more details, published at
 # http://www.gnu.org/copyleft/gpl.html
 #
 ###############################################################################
@@ -21,21 +21,21 @@ use warnings;
 
 use Foswiki::Plugins::DBCachePlugin ();
 
-our $debug = 0; # toggle me
+our $debug = 0;    # toggle me
 
 ###############################################################################
 # static
 sub inlineError {
-  return "<span class='foswikiAlert'>" . $_[0] . "</span>" ;
+  return "<span class='foswikiAlert'>" . $_[0] . "</span>";
 }
 
 ###############################################################################
 # static
 sub writeDebug {
+
   #Foswiki::Func::writeDebug('- BlogPlugin - ' . $_[0]) if $debug;
   print STDERR "- BlogPlugin - $_[0]\n" if $debug;
 }
-
 
 ###############################################################################
 sub new {

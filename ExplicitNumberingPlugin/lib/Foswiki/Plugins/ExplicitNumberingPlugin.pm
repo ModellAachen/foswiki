@@ -67,7 +67,6 @@ sub initPlugin {
         return 0;
     }
 
-
     $debug = Foswiki::Func::getPreferencesFlag("EXPLICITNUMBERINGPLUGIN_DEBUG")
       || 0;
     $bold = Foswiki::Func::getPreferencesFlag("EXPLICITNUMBERINGPLUGIN_BOLD")
@@ -97,7 +96,8 @@ sub initPlugin {
 sub commonTagsHandler {
 ### my ( $text ) = @_;   # do not uncomment, use $_[0] instead
     Foswiki::Func::writeDebug(
-        'ExplicitNumbering  - Entering common tags handler') if ($debug);
+        'ExplicitNumbering  - Entering common tags handler')
+      if ($debug);
 
     return if $_[3];    # Called in an include; do not number yet.
 
@@ -110,10 +110,10 @@ sub commonTagsHandler {
       )
     {
         {
-            Foswiki::Func::writeDebug
-                ('ExplicitNumbering  - Disabled  - not view  context')
-                if $debug;
-            return ;
+            Foswiki::Func::writeDebug(
+                'ExplicitNumbering  - Disabled  - not view  context')
+              if $debug;
+            return;
         }
     }
 
@@ -122,8 +122,10 @@ sub commonTagsHandler {
     %Sequences = ();
 
     $_[0] = takeOutBlocks( $_[0], 'textarea', $removedTextareas );
-    $_[0] =~ s/(^---+\+*)(\#+)([[:digit:]]*)/$1.&makeHeading(length($2), $3)/gem;
-    $_[0] =~ s/\#\#(\w+\#)?([[:digit:]]+)?\.(\.*)([[:alpha:]]?)/&makeExplicitNumber($1,$2,length($3),$4)/ge;
+    $_[0] =~
+      s/(^---+\+*)(\#+)([[:digit:]]*)/$1.&makeHeading(length($2), $3)/gem;
+    $_[0] =~
+s/\#\#(\w+\#)?([[:digit:]]+)?\.(\.*)([[:alpha:]]?)/&makeExplicitNumber($1,$2,length($3),$4)/ge;
     putBackBlocks( \$_[0], $removedTextareas, 'textarea', 'textarea' );
 }
 
@@ -214,21 +216,20 @@ sub makeExplicitNumber {
 
 # =========================
 # SMELL:  Use the renderer to remove textarea blocks so that numbers inside of
-#         textarea tags don't increment.   Required to prevent conflicts with the 
+#         textarea tags don't increment.   Required to prevent conflicts with the
 #         EditChapterPlugin.  This has been requested to be added to Foswiki::Func
 
-# compatibility wrapper 
+# compatibility wrapper
 sub takeOutBlocks {
-  return Foswiki::takeOutBlocks(@_) if defined &Foswiki::takeOutBlocks;
-  return $Foswiki::Plugins::SESSION->{renderer}->takeOutBlocks(@_);
+    return Foswiki::takeOutBlocks(@_) if defined &Foswiki::takeOutBlocks;
+    return $Foswiki::Plugins::SESSION->{renderer}->takeOutBlocks(@_);
 }
 
 # =========================
-# compatibility wrapper 
+# compatibility wrapper
 sub putBackBlocks {
-  return Foswiki::putBackBlocks(@_) if defined &Foswiki::putBackBlocks;
-  return $Foswiki::Plugins::SESSION->{renderer}->putBackBlocks(@_);
+    return Foswiki::putBackBlocks(@_) if defined &Foswiki::putBackBlocks;
+    return $Foswiki::Plugins::SESSION->{renderer}->putBackBlocks(@_);
 }
-
 
 1;

@@ -60,9 +60,9 @@ sub data {
 sub formatNode {
     my ( $this, $node, $count, $level ) = @_;
 
-    return "" if ( ! $this->isInsideLevelBounds( $level ) );
-    
-    my $link = &Foswiki::Plugins::TreePlugin::getLinkName($node);
+    return "" if ( !$this->isInsideLevelBounds($level) );
+
+    my $link  = &Foswiki::Plugins::TreePlugin::getLinkName($node);
     my $label = $node->data('topic');
     return "[[$link][$label]]";
 }
@@ -70,23 +70,23 @@ sub formatNode {
 sub formatBranch {
     my ( $this, $node, $childrenText, $count, $level ) = @_;
 
-    return if ( $childrenText eq '');
-    
-    return $this->formatNode($node, $count, $level) unless $childrenText;
+    return if ( $childrenText eq '' );
+
+    return $this->formatNode( $node, $count, $level ) unless $childrenText;
 
     # $childrenText not empty
-    my $insideLevelBounds = $this->isOneOffLevelBounds( $level );
-    my $formattedText = $this->formatNode($node, $count, $level);    
-    return ( $insideLevelBounds ) 
-      ? $formattedText . $this->closeBranch( $childrenText )
+    my $insideLevelBounds = $this->isOneOffLevelBounds($level);
+    my $formattedText = $this->formatNode( $node, $count, $level );
+    return ($insideLevelBounds)
+      ? $formattedText . $this->closeBranch($childrenText)
       : $formattedText . $childrenText;
 }
 
 sub closeBranch {
     my ( $this, $text ) = @_;
-    
+
     return $this->data("nodeBeg") . $text . $this->data("nodeEnd");
-    
+
 }
 
 sub formatChild {
@@ -94,13 +94,13 @@ sub formatChild {
 
     my $res = $node->toHTMLFormat( $this, $count, $level );
     return "" if ( $res eq '' );
-    
-    my $withinBounds = $this->isInsideLevelBounds( $level );
+
+    my $withinBounds = $this->isInsideLevelBounds($level);
 
     my $formattedText = "";
-    $formattedText .= $this->data("childBeg") if ( $withinBounds );
+    $formattedText .= $this->data("childBeg") if ($withinBounds);
     $formattedText .= $res;
-    $formattedText .= $this->data("childEnd") if ( $withinBounds );
+    $formattedText .= $this->data("childEnd") if ($withinBounds);
     return $formattedText;
 }
 

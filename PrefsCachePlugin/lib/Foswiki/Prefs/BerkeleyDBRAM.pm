@@ -3,11 +3,11 @@ package Foswiki::Prefs::BerkeleyDBRAM;
 
 use strict;
 
-use Foswiki::Prefs::TopicRAM ();
+use Foswiki::Prefs::TopicRAM    ();
 use Foswiki::Prefs::BaseBackend ();
 use BerkeleyDB;
 
-our @ISA = ( 'Foswiki::Prefs::TopicRAM' );
+our @ISA = ('Foswiki::Prefs::TopicRAM');
 
 use Error qw(:try);
 
@@ -20,41 +20,44 @@ our $refcnt = 0;
 sub new {
     my ( $class, $topicObject ) = @_;
 
-    my $this = bless({}, 'Foswiki::Prefs::TopicRAM');
-    $this->{values} = {};
-    $this->{local}  = {};
+    my $this = bless( {}, 'Foswiki::Prefs::TopicRAM' );
+    $this->{values}      = {};
+    $this->{local}       = {};
     $this->{topicObject} = $topicObject;
 
     _initDB();
 
     # SMELL: This really, really needs locking
-    my $uid = $db{$topicObject->getPath()};
-    if (! defined $uid ) {
+    my $uid = $db{ $topicObject->getPath() };
+    if ( !defined $uid ) {
+
         # Parse the topic into this object
         require Foswiki::Prefs::Parser;
         Foswiki::Prefs::Parser::parse( $topicObject, $this );
 
         # Transfer values into the DB for next time
         my $lock = $db->cds_lock();
-        my $uid = ++$db{UID};
-        $db{$topicObject->getPath()} = $uid;
-        while (my ($k, $v) = each %{$this->{values}}) {
+        my $uid  = ++$db{UID};
+        $db{ $topicObject->getPath() } = $uid;
+        while ( my ( $k, $v ) = each %{ $this->{values} } ) {
             $db{"${uid}V$k"} = $v;
         }
-        $db{"${uid}_V"} = join(',', keys %{$this->{values}});
-        while (my ($k, $v) = each %{$this->{local}}) {
+        $db{"${uid}_V"} = join( ',', keys %{ $this->{values} } );
+        while ( my ( $k, $v ) = each %{ $this->{local} } ) {
             $db{"${uid}L$k"} = $v;
         }
-        $db{"${uid}_L"} = join(',', keys %{$this->{local}});
+        $db{"${uid}_L"} = join( ',', keys %{ $this->{local} } );
         $db->db_sync();
         $lock->cds_unlock();
-    } else {
+    }
+    else {
+
         # Load from the DB
-        foreach my $k (split(",", $db{"${uid}_V"} || '')) {
-            $this->{values}{$k} = $db{"${uid}V$k"}
+        foreach my $k ( split( ",", $db{"${uid}_V"} || '' ) ) {
+            $this->{values}{$k} = $db{"${uid}V$k"};
         }
-        foreach my $k (split(",", $db{"${uid}_L"} || '')) {
-            $this->{local}{$k} = $db{"${uid}L$k"}
+        foreach my $k ( split( ",", $db{"${uid}_L"} || '' ) ) {
+            $this->{local}{$k} = $db{"${uid}L$k"};
         }
     }
     $refcnt++;
@@ -66,7 +69,7 @@ sub finish {
     my $this = shift;
 
     $this->SUPER::finish();
-    if ($db && --$refcnt <= 0) {
+    if ( $db && --$refcnt <= 0 ) {
         $db->db_close();
         $db = undef;
     }
@@ -78,14 +81,14 @@ sub invalidate {
     my ($topicObject) = @_;
 
     _initDB();
-    my $uid = $db{$topicObject->getPath()};
-    return unless (defined $uid);
-    delete $db{$topicObject->getPath()};
-    foreach my $k (split(",", $db{"${uid}_V"} || '')) {
-        delete $db{"${uid}V$k"}
+    my $uid = $db{ $topicObject->getPath() };
+    return unless ( defined $uid );
+    delete $db{ $topicObject->getPath() };
+    foreach my $k ( split( ",", $db{"${uid}_V"} || '' ) ) {
+        delete $db{"${uid}V$k"};
     }
-    foreach my $k (split(",", $db{"${uid}_L"} || '')) {
-        delete $db{"${uid}L$k"}
+    foreach my $k ( split( ",", $db{"${uid}_L"} || '' ) ) {
+        delete $db{"${uid}L$k"};
     }
     delete $db{"${uid}_V"};
     delete $db{"${uid}_L"};
@@ -96,19 +99,19 @@ sub invalidate {
 sub _initDB {
     unless ($db) {
         my $dbfile = $Foswiki::cfg{Store}{BackendBDB};
-        unless( -d $dbfile ) {
+        unless ( -d $dbfile ) {
             mkdir($dbfile) || die "Failed to make $dbfile for prefs DB: $!";
         }
         $env = new BerkeleyDB::Env(
-            -Home   => $dbfile,
-            -Flags  => DB_CREATE | DB_INIT_CDB | DB_INIT_MPOOL)
-          || die "cannot open prefs DB environment: $BerkeleyDB::Error\n";
+            -Home  => $dbfile,
+            -Flags => DB_CREATE | DB_INIT_CDB | DB_INIT_MPOOL
+        ) || die "cannot open prefs DB environment: $BerkeleyDB::Error\n";
         $db = tie(
             %db, 'BerkeleyDB::Hash',
             -Filename => $dbfile . '/DB',
             -Flags    => DB_CREATE,
             -Env      => $env
-           );
+        );
         die "cannot open prefs DB: $BerkeleyDB::Error" unless $db;
     }
 }

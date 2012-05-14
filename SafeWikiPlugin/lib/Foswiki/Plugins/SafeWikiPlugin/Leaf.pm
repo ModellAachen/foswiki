@@ -5,7 +5,7 @@ package Foswiki::Plugins::SafeWikiPlugin::Leaf;
 use strict;
 
 sub new {
-    my( $class, $text ) = @_;
+    my ( $class, $text ) = @_;
 
     my $this = {};
 
@@ -15,12 +15,12 @@ sub new {
 }
 
 sub stringify {
-    my( $this ) = @_;
+    my ($this) = @_;
     return $this->{text};
 }
 
 sub generate {
-    my( $this ) = @_;
+    my ($this) = @_;
     return $this->{text};
 }
 

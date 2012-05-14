@@ -1,4 +1,4 @@
-%META:TOPICINFO{author="WikiGuest" date="1137100620" format="1.1" version="1.2"}%
+%META:TOPICINFO{author="ProjectContributor" date="1137100620" format="1.1" version="1.2"}%
 ---+!! <nop>%TOPIC%
 
 %TOC%
@@ -437,7 +437,7 @@ lines to the .htaccess file:
 |  Feedback: | Foswiki:Plugins/BibtexPluginDev |
 |  Appraisal: | Foswiki:Plugins/%TOPIC%Appraisal |
 
-%META:FILEATTACHMENT{name="style.css" attr="" autoattached="1" comment="" date="1134157744" path="style.css" size="1221" user="UnknownUser" version=""}%
-%META:FILEATTACHMENT{name="bibtoolrsc" attr="" autoattached="1" comment="" date="1136505651" path="bibtoolrsc" size="1905" user="UnknownUser" version=""}%
-%META:FILEATTACHMENT{name="sample.bib" attr="" autoattached="1" comment="" date="1066305348" path="sample.bib" size="1713" user="UnknownUser" version=""}%
+%META:FILEATTACHMENT{name="style.css" attr="" autoattached="1" comment="" date="1134157744" path="style.css" size="1221" user="ProjectContributor" version="1"}%
+%META:FILEATTACHMENT{name="bibtoolrsc" attr="" autoattached="1" comment="" date="1136505651" path="bibtoolrsc" size="1905" user="ProjectContributor" version="1"}%
+%META:FILEATTACHMENT{name="sample.bib" attr="" autoattached="1" comment="" date="1066305348" path="sample.bib" size="1713" user="ProjectContributor" version="1"}%
 

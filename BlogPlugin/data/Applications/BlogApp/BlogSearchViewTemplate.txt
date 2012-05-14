@@ -1,23 +1,40 @@
 %META:TOPICINFO{author="ProjectContributor" comment="reprev" date="1305298837" format="1.1" reprev="4" version="4"}%
 %META:TOPICPARENT{name="TopicView"}%
 %{<verbatim class="tml">}%
-%TMPL:INCLUDE{"SolrSearchView"}%
+%TMPL:INCLUDE{"SolrAjaxSearchView"}%
 %{</verbatim>}%
 
 %{<verbatim class="tml">}%
 %TMPL:DEF{"solr::defaultweb"}%%BASEWEB%%TMPL:END%
-%TMPL:DEF{"solr::hierarchystep"}%<!-- -->%TMPL:END%
-%TMPL:DEF{"solr::input::checkboxes"}%<!-- -->%TMPL:END%
-%TMPL:DEF{"solr::displayas"}%<!-- -->%TMPL:END%
+%TMPL:DEF{"solr::input::checkboxes"}%%TMPL:END%
+%TMPL:DEF{"solr::displayas"}%%TMPL:END%
 %{</verbatim>}%
 
 %{<verbatim class="tml">}%
-%TMPL:DEF{"solr::facets"}%
-  %MAKETEXT{"Category"}%=category,
-  %MAKETEXT{"Tags"}%=tag,
-  %MAKETEXT{"Date"}%=createdate,
-  %MAKETEXT{"Author"}%=createauthor
-%TMPL:END%
+%TMPL:DEF{"solr::dictionary"}%<literal>
+<div class="solrDictionary solrJsonData">
+{
+  "Dummy":"Dummy"%HIERARCHY{
+    web="%BASEWEB%"
+    separator=",$n"
+    top="TopCategory"
+    exclude="TopCategory"
+    header=",$n"
+    format="  \"$name\": \"$title\"$children"
+}%,
+  "published": "%MAKETEXT{"published"}%",
+  "unpublished": "%MAKETEXT{"unpublished"}%",
+  "field_State_s": "%MAKETEXT{"State"}%",
+  "createdate": "%MAKETEXT{"Date"}%",
+  "category": "%MAKETEXT{"Category"}%",
+  "Filed in": "%MAKETEXT{"Filed in [_1]"}%",
+  "Tagged": "%MAKETEXT{"Tagged [_1]"}%",
+  "tagged": "%MAKETEXT{"tagged [_1]"}%",
+  "keyword": "%MAKETEXT{"keyword"}%",
+  "tag": "%MAKETEXT{"tag"}%"
+}
+</div>
+</literal>%TMPL:END%
 %{</verbatim>}%
 
 %{<verbatim class="tml">}%
@@ -26,11 +43,11 @@
   <tr>
     <th>%MAKETEXT{"Sort by"}%:&nbsp;</th>
     <td>
-      <select class='foswikiSelect' id='solrSorting'>
-        <option class='foswikiOption' value='score desc' %IF{"$'URLPARAM{sort}'='sort desc'" then="selected"}%>%MAKETEXT{"Relevance"}%</option>
-        <option class='foswikiOption' value='date desc' %IF{"$'URLPARAM{sort}'='date desc'" then="selected"}%>%MAKETEXT{"Last changed"}%</option>
-        <option class='foswikiOption' value='createdate desc' %IF{"$'URLPARAM{sort}'='createdate desc'" then="selected"}%>%MAKETEXT{"Create date"}%</option>
-        <option class='foswikiOption' value='title_sort asc' %IF{"$'URLPARAM{sort}'='title_sort asc'" then="selected"}%>%MAKETEXT{"Name"}%</option>
+      <select class='foswikiSelect' id='solrSorting' data-default-sort="%TMPL:P{"solr::defaultsort"}%">
+        <option class='foswikiOption' value='score desc'>%MAKETEXT{"Relevance"}%</option>
+        <option class='foswikiOption' value='date desc'>%MAKETEXT{"Last changed"}%</option>
+        <option class='foswikiOption' value='createdate desc'>%MAKETEXT{"Create date"}%</option>
+        <option class='foswikiOption' value='title_sort asc'>%MAKETEXT{"Name"}%</option>
       </select>
     </td>
   </tr>
@@ -48,44 +65,66 @@
 %{</verbatim>}%
 
 %{<verbatim class="tml">}%
-%TMPL:DEF{"solr::sidebar"}%<!-- solr::sidebar -->
+%TMPL:DEF{"solr::sidebar"}%<!-- -->
 <noautolink>
 %TMPL:P{"solr::selection"}%
-%TMPL:P{"solr::sidebar::hierarchy"}%
-%SOLRFORMAT{"solr1"
-  hidesingle="on"
-  %TMPL:P{"solr::facet"
-    id="createdate"
-    value="%id%:[$key/MONTH TO $key/MONTH+1MONTH]"
-    input="checkbox"
-    format="$date($mon $year)&nbsp;($count)"
-    title="$date($mon $year)"
-    include=""
-    exclude=""
-    extraclass=""
-    pageropts=""
-  }%
-  %TMPL:P{"solr::facet"
-    id="createauthor"
-    format="$percntSPACEOUT{$key}$percnt&nbsp;($count)"
-    title="$percntSPACEOUT{$key}$percnt"
-    value="$id:$key"
-    input="checkbox"
-    include="%TMPL:P{"solr::facet::include::contributor"}%"
-    exclude="%TMPL:P{"solr::facet::exclude::contributor"}%"
-    extraclass=""
-    pageropts=""
-  }%
-}%<!-- -->
 </noautolink>
-<!-- //solr::sidebar -->%TMPL:END%
+%TMPL:P{"solr::facet"
+  id="category" 
+  sort="index" 
+  multivalue="true"
+  title="%MAKETEXT{"Category"}%"
+}%
+%TMPL:P{"solr::facetrange"
+  id="createdate"
+  title="%MAKETEXT{"Date"}%"
+  start="1970-01-01T00:00:00Z"
+  gap="+1MONTH"
+  hidesingle="false"
+  dateformat="MM yy"
+}%
+%TMPL:P{"solr::facet"
+  id="createauthor"
+  title="%MAKETEXT{"Author"}%"
+}%
+%TMPL:P{"solr::facet"
+  id="field_State_s"
+  title="%MAKETEXT{"State"}%"
+}%
+<!-- -->%TMPL:END%
 %{</verbatim>}%
 
 %{<verbatim class="tml">}%
-%TMPL:DEF{"solr::format::list::topic"}%%DBCALL{
-  "%web%.%topic%->RenderSolrSearchItem"
-  HILITE="%hilite%"
-}%%TMPL:END%
+%TMPL:DEF{"solr::templates::hits"}%<!-- -->
+%TMPL:PREV%
+%TMPL:P{"solr::templates::hits::BlogEntry"}%
+<!-- -->%TMPL:END%
+%{</verbatim>}%
+
+%{<verbatim class="tml">}%
+%TMPL:DEF{"solr::templates::hits::BlogEntry"}%<script id="solrHitTemplate_BlogEntry" type="text/x-jquery-tmpl">
+<div class='solrSearchHit solrTopicHit clearfix'>
+  <h2 style='margin-bottom:0'><a href='${url}'>${title}</a>
+  </h2>
+  {{if thumbnail}}
+    <div class="foswikiRight foswikiImage">
+      <img src='%SCRIPTURL{"rest"}%/ImagePlugin/resize?topic=${web}.${topic};file=${encodeURIComponent(thumbnail)};size=80x80>;crop=on' alt="${title}"  />
+    </div>
+  {{/if}}
+  <div class='foswikiTopicInfo' style='margin:0.5em 0'>
+    ${$item.formatDate(createdate)} | ${author} 
+    {{if field_Category_flat_lst}}
+      | ${$item.renderList("field_Category_flat_lst", ", ", 10)}
+    {{/if}}
+    {{if tag}} 
+      | ${$item.renderList("tag", ", ", 10)}
+    {{/if}}
+  </div>
+  <div class='solrHilite'>
+    {{html $item.getHilite(id)}}
+  </div>
+</div>
+</script>%TMPL:END%
 %{</verbatim>}%
 
 %META:FORM{name="Applications.ApplicationTopic"}%

@@ -13,109 +13,52 @@
 package Foswiki::Plugins::NatEditPlugin;
 
 use strict;
-use Foswiki::Func;
+use warnings;
 
+use Foswiki::Func       ();
+use Foswiki::Plugins    ();
+use Foswiki::Validation ();
 
-use vars qw( 
-  $VERSION $RELEASE $SHORTDESCRIPTION $NO_PREFS_IN_TOPIC
-  $baseWeb $baseTopic 
-);
+our $VERSION           = '$Rev$';
+our $RELEASE           = '6.04';
+our $NO_PREFS_IN_TOPIC = 1;
+our $SHORTDESCRIPTION  = 'A Wikiwyg Editor';
+our $baseWeb;
+our $baseTopic;
+our $doneNonce;
 
-$VERSION = '$Rev$';
-$RELEASE = '5.20';
-
-$NO_PREFS_IN_TOPIC = 1;
-$SHORTDESCRIPTION = 'A Wikiwyg Editor';
-
-use constant DEBUG => 0; # toggle me
-use Foswiki::Func ();
-use Foswiki::Plugins::JQueryPlugin ();
+use constant DEBUG => 0;    # toggle me
 
 ###############################################################################
 sub writeDebug {
-  return unless DEBUG;
-  print STDERR "- NatEditPlugin - " . $_[0] . "\n";
-  #Foswiki::Func::writeDebug("- NatEditPlugin - $_[0]");
-}
+    return unless DEBUG;
+    print STDERR "- NatEditPlugin - " . $_[0] . "\n";
 
+    #Foswiki::Func::writeDebug("- NatEditPlugin - $_[0]");
+}
 
 ###############################################################################
 sub initPlugin {
-  ($baseTopic, $baseWeb) = @_;
+    ( $baseTopic, $baseWeb ) = @_;
 
-  Foswiki::Func::registerTagHandler('FORMBUTTON', \&handleFORMBUTTON);
-  Foswiki::Func::registerTagHandler('NATFORMLIST', \&handleNATFORMLIST);
+    Foswiki::Func::registerTagHandler(
+        'NATFORMBUTTON',
+        sub {
+            require Foswiki::Plugins::NatEditPlugin::FormButton;
+            return Foswiki::Plugins::NatEditPlugin::FormButton::handle(@_);
+        }
+    );
+    Foswiki::Func::registerTagHandler(
+        'NATFORMLIST',
+        sub {
+            require Foswiki::Plugins::NatEditPlugin::FormList;
+            return Foswiki::Plugins::NatEditPlugin::FormList::handle(@_);
+        }
+    );
 
-  # register the natedit jquery plugin
-  Foswiki::Plugins::JQueryPlugin::registerPlugin("NatEdit",
-    'Foswiki::Plugins::NatEditPlugin::NATEDIT');
+    $doneNonce = 0;
 
-  return 1;
-}
-
-###############################################################################
-# render a button to add/change the form while editing
-# returns 
-#    * the empty string if there's no WEBFORM
-#    * or "Add form" if there is no form attached to a topic yet
-#    * or "Change form" otherwise
-#
-# there are no native means besides the "addform" template being used
-# to render the FORMFIELDS. but this is not what we need here at all. infact
-# we need an empty addform.nat.tmp to switch off this feature of FORMFIELDS
-sub handleFORMBUTTON {
-  my ($session, $params, $theTopic, $theWeb) = @_;
-
-  Foswiki::Plugins::JQueryPlugin::createPlugin("natedit");
-
-  my $saveCmd = '';
-  my $request = Foswiki::Func::getCgiQuery();
-  $saveCmd = $request->param('cmd') || '' if $request;
-  return '' if $saveCmd eq 'repRev';
-
-  my $form = $request->param('formtemplate') || '';
-
-  unless ($form) {
-    my ($meta, $dumy) = Foswiki::Func::readTopic($theWeb, $theTopic);
-    my $formMeta = $meta->get('FORM'); 
-    $form = $formMeta->{"name"} if $formMeta;
-  }
-
-  $form = '' if $form eq 'none';
-
-  my $action;
-  my $actionTitle;
-  my $actionText;
-
-  if ($form) {
-    $action = 'replaceform';
-  } else {
-    $action = 'addform';
-  }
-
-  if ($form) {
-    $actionText = $session->{i18n}->maketext("Change form");
-    $actionTitle = $session->{i18n}->maketext("Change the current form of <nop>[_1]", "$theWeb.$theTopic");
-  } elsif (Foswiki::Func::getPreferencesValue('WEBFORMS', $theWeb)) {
-    $actionText = $session->{i18n}->maketext("Add form");
-    $actionTitle = $session->{i18n}->maketext("Add a new form to <nop>[_1]", "$theWeb.$theTopic");
-  } else {
-    return '';
-  }
-  $actionText =~ s/&&/\&/g;
-  $actionTitle =~ s/&&/\&/g;
-  
-  my $theFormat = $params->{_DEFAULT} || $params->{format} || '$link';
-  $theFormat =~ s/\$link/<a href='\$url' accesskey='f' title='\$title'><span>\$acton<\/span><\/a>/g;
-  $theFormat =~ s/\$url/javascript:\$script/g;
-  $theFormat =~ s/\$script/submitEditForm('save', '$action');/g;
-  $theFormat =~ s/\$title/$actionTitle/g;
-  $theFormat =~ s/\$action/$actionText/g;
-  $theFormat =~ s/\$id/$action/g;
-  $theFormat = Foswiki::Func::expandCommonVariables($theFormat, $theTopic, $theWeb)
-    if escapeParameter($theFormat);
-
-  return $theFormat;
+    return 1;
 }
 
 ###############################################################################
@@ -123,159 +66,128 @@ sub handleFORMBUTTON {
 # part of the DataForm of this topic. In a way, we do the reverse of
 # WebDB::onReload() where the TopicTitle is extracted and put into the cache.
 sub beforeSaveHandler {
-  my ($text, $topic, $web, $meta) = @_;
+    my ( $text, $topic, $web, $meta ) = @_;
 
-  writeDebug("called beforeSaveHandler");
-  # find out if we received a TopicTitle 
-  my $request = Foswiki::Func::getCgiQuery();
-  my $topicTitle = $request->param('TopicTitle');
+    writeDebug("called beforeSaveHandler");
 
-  unless (defined $topicTitle) {
-    writeDebug("didn't get a TopicTitle, nothing do here");
-    return;
-  }
+    # find out if we received a TopicTitle
+    my $request    = Foswiki::Func::getCgiQuery();
+    my $topicTitle = $request->param('TopicTitle');
 
-  my $fieldTopicTitle = $meta->get('FIELD', 'TopicTitle');
-  writeDebug("topic=$web.$topic, topicTitle=$topicTitle");
-
-  if ($topicTitle eq $topic) {
-    writeDebug("same as topic name ... nulling");
-    $request->param("TopicTitle", "");
-    $topicTitle = '';
-    if (defined $fieldTopicTitle) {
-      $fieldTopicTitle->{value} = "";
+    unless ( defined $topicTitle ) {
+        writeDebug("didn't get a TopicTitle, nothing do here");
+        return;
     }
-  }
 
-  # find out if this topic can store the TopicTitle in its metadata
-  if (defined $fieldTopicTitle) {
-    writeDebug("can deal with TopicTitles by itself");
+    my $fieldTopicTitle = $meta->get( 'FIELD', 'TopicTitle' );
+    writeDebug("topic=$web.$topic, topicTitle=$topicTitle");
 
-    # however, check if we've got a TOPICTITLE preference setting
-    # if so remove it. this happens if we stored a topic title but
-    # then added a form that now takes the topic title instead
-    if (defined $meta->get('PREFERENCE', 'TOPICTITLE')) {
-      writeDebug("removing redundant TopicTitles in preferences");
-      $meta->remove('PREFERENCE', 'TOPICTITLE');
+    if ( $topicTitle eq $topic ) {
+        writeDebug("same as topic name ... nulling");
+        $request->param( "TopicTitle", "" );
+        $topicTitle = '';
+        if ( defined $fieldTopicTitle ) {
+            $fieldTopicTitle->{value} = "";
+        }
     }
-    return;
-  } 
 
-  writeDebug("we need to store the TopicTitle in the preferences");
+    # find out if this topic can store the TopicTitle in its metadata
+    if ( defined $fieldTopicTitle ) {
+        writeDebug("can deal with TopicTitles by itself");
 
-
-  # if it is a topic setting, override it.
-  my $topicTitleHash = $meta->get('PREFERENCE', 'TOPICTITLE');
-  if (defined $topicTitleHash) {
-    writeDebug("found old TopicTitle in preference settings: $topicTitleHash->{value}");
-    if ($topicTitle) {
-      # set the new value
-      $topicTitleHash->{value} = $topicTitle; 
-    } else {
-      # remove the value if the new TopicTitle is an empty string
-      $meta->remove('PREFERENCE', 'TOPICTITLE');
+        # however, check if we've got a TOPICTITLE preference setting
+        # if so remove it. this happens if we stored a topic title but
+        # then added a form that now takes the topic title instead
+        if ( defined $meta->get( 'PREFERENCE', 'TOPICTITLE' ) ) {
+            writeDebug("removing redundant TopicTitles in preferences");
+            $meta->remove( 'PREFERENCE', 'TOPICTITLE' );
+        }
+        return;
     }
-    return;
-  } 
 
-  writeDebug("no TopicTitle in preference settings");
+    writeDebug("we need to store the TopicTitle in the preferences");
 
-  # if it is a bullet setting, replace it.
-  if ($text =~ s/((?:^|[\n\r])(?:\t|   )+\*\s+(?:Set|Local)\s+TOPICTITLE\s*=\s*)(.*)((?:$|[\r\n]))/$1$topicTitle$3/o) {
-    writeDebug("found old TopicTitle defined as a bullet setting: $2");
-    $_[0] = $text;
-    return;
-  }
+    # if it is a topic setting, override it.
+    my $topicTitleHash = $meta->get( 'PREFERENCE', 'TOPICTITLE' );
+    if ( defined $topicTitleHash ) {
+        writeDebug(
+"found old TopicTitle in preference settings: $topicTitleHash->{value}"
+        );
+        if ($topicTitle) {
 
-  writeDebug("no TopicTitle stored anywhere. creating a new preference setting");
+            # set the new value
+            $topicTitleHash->{value} = $topicTitle;
+        }
+        else {
 
-  if ($topicTitle) { # but only if we don't set it to the empty string
-    $meta->putKeyed('PREFERENCE', {
-      name=>'TOPICTITLE', 
-      title=>'TOPICTITLE', 
-      type=>'Local', 
-      value=>$topicTitle
-    });
-  }
+            # remove the value if the new TopicTitle is an empty string
+            $meta->remove( 'PREFERENCE', 'TOPICTITLE' );
+        }
+        return;
+    }
+
+    writeDebug("no TopicTitle in preference settings");
+
+    # if it is a bullet setting, replace it.
+    if ( $text =~
+s/((?:^|[\n\r])(?:\t|   )+\*\s+(?:Set|Local)\s+TOPICTITLE\s*=\s*)(.*)((?:$|[\r\n]))/$1$topicTitle$3/o
+      )
+    {
+        writeDebug("found old TopicTitle defined as a bullet setting: $2");
+        $_[0] = $text;
+        return;
+    }
+
+    writeDebug(
+        "no TopicTitle stored anywhere. creating a new preference setting");
+
+    if ($topicTitle) {    # but only if we don't set it to the empty string
+        $meta->putKeyed(
+            'PREFERENCE',
+            {
+                name  => 'TOPICTITLE',
+                title => 'TOPICTITLE',
+                type  => 'Local',
+                value => $topicTitle
+            }
+        );
+    }
 }
 
 ###############################################################################
-# taken from Foswiki::UI::ChangeForm and leveraged to normal formatting standards
-sub handleNATFORMLIST {
-  my ($session, $params, $theTopic, $theWeb) = @_;
+sub beforeEditHandler {
+    my ( $text, $topic, $web, $error, $meta ) = @_;
 
-  my $theFormat = $params->{_DEFAULT} || $params->{format} 
-    || '<label><input type="radio" name="formtemplate" id="formtemplateelem$index" $checked value="$name">'.
-       '&nbsp;$formTopic</input></label>';
+    return if $doneNonce;
+    $doneNonce = 1;
 
-  $theWeb = $params->{web} if defined $params->{web};
-  $theTopic = $params->{topic} if defined $params->{topic};
-  my $theSeparator = $params->{separator};
-  my $theHeader = $params->{header} || '';
-  my $theFooter = $params->{footer} || '';
-  my $theSelected = $params->{selected};
-  
-  my $request = Foswiki::Func::getCgiQuery();
-  $theSelected = $request->param('formtemplate') unless defined $theSelected;
-  $theSeparator = '<br />' unless defined $theSeparator;
+    my $session  = $Foswiki::Plugins::SESSION;
+    my $response = $session->{response};
+    my $request  = $session->{request};
+    my $cgis     = $session->getCGISession();
+    my $context = $request->url( -full => 1, -path => 1, -query => 1 ) . time();
+    my $useStrikeOne = ( $Foswiki::cfg{Validation}{Method} eq 'strikeone' );
+    my $nonce;
 
-  unless ($theSelected) {
-    my ($meta) = Foswiki::Func::readTopic($theWeb, $theTopic);
-    my $form = $meta->get( 'FORM' );
-    $theSelected = $form->{name} if $form;
-  }
-  $theSelected = 'none' unless $theSelected;
+    if ( Foswiki::Validation->can('generateValidationKey') ) {
 
-  my $legalForms = Foswiki::Func::getPreferencesValue('WEBFORMS', $theWeb);
-  $legalForms =~ s/^\s*//;
-  $legalForms =~ s/\s*$//;
-  my %forms = map {$_ => 1} split( /[,\s]+/, $legalForms );
-  my @forms = sort keys %forms;
-  push @forms, 'none';
+        # newer foswikis have a proper api for things like this
+        $nonce = Foswiki::Validation::generateValidationKey( $cgis, $context,
+            $useStrikeOne );
+    }
+    else {
 
-  my @formList = '';
-  my $index = 0;
-  foreach my $form (@forms) {
-      $index++;
-      my $text = $theFormat;
-      my $checked = '';
-      $checked = 'checked' if $form eq $theSelected;
-      my ($formWeb, $formTopic) = $session->normalizeWebTopicName($theWeb, $form);
+        # older ones get a quick and dirty approach
+        my $result = Foswiki::Validation::addValidationKey( $cgis, $context,
+            $useStrikeOne );
+        if ( $result =~ /value='(.*)'/ ) {
+            $nonce = $1;
+        }
+    }
 
-      $text =~ s/\$index/$index/g;
-      $text =~ s/\$checked/$checked/g;
-      $text =~ s/\$name/$form/g;
-      $text =~ s/\$formWeb/$formWeb/g;
-      $text =~ s/\$formTopic/$formTopic/g;
-      
-      push @formList, $text;
-  }
-  my $result = $theHeader.join($theSeparator, @formList).$theFooter;
-  $result =~ s/\$count/$index/g;
-  $result =~ s/\$web/$theWeb/g;
-  $result =~ s/\$topic/$theTopic/g;
-  $result = Foswiki::Func::expandCommonVariables($result, $theTopic, $theWeb)
-    if escapeParameter($result);
+    #print STDERR "nonce=$nonce\n";
 
-  return $result;
-}
-
-###############################################################################
-sub escapeParameter {
-
-  return 0 unless $_[0];
-
-  my $found = 0;
-
-  $found = 1 if $_[0] =~ s/\$percnt/%/g;
-  $found = 1 if $_[0] =~ s/\$nop//g;
-  $found = 1 if $_[0] =~ s/\\n/\n/g;
-  $found = 1 if $_[0] =~ s/\$n/\n/g;
-  $found = 1 if $_[0] =~ s/\\%/%/g;
-  $found = 1 if $_[0] =~ s/\\"/"/g;
-  $found = 1 if $_[0] =~ s/\$dollar/\$/g;
-
-  return $found;
+    $response->pushHeader( 'X-Foswiki-Nonce', $nonce ) if defined $nonce;
 }
 
 1;

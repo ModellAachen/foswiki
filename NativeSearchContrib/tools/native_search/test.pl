@@ -11,5 +11,5 @@ Try:
 perl test.pl -i -l FoswikiNativeSearch test.pl Makefile.PL FoswikiNativeSearch.xs
 If it returns at least 3 filenames and doesn't crash, it worked.
 MOAN
-my $result = FoswikiNativeSearch::cgrep(\@ARGV);
-print "RESULT\n".join("\n", @$result)."\n";
+my $result = FoswikiNativeSearch::cgrep( \@ARGV );
+print "RESULT\n" . join( "\n", @$result ) . "\n";

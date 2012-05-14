@@ -23,15 +23,15 @@ sub new {
     my $this = bless( \%args, $class );
 
     #    writeDebug("args: " . Dumper(\%args), 'new', 4);
-    ASSERT( defined $this->{webtopic} );
+    ASSERT( defined $this->{webtopic} ) if DEBUG;
     ( $this->{web}, $this->{topic} ) =
       Foswiki::Func::normalizeWebTopicName( '', $this->{webtopic} );
-    ASSERT( $this->{web} and $this->{topic} );
+    ASSERT( $this->{web} and $this->{topic} ) if DEBUG;
 
     $this->{superNode} = $superNode;
     $this->{rootNode}  = $rootNode;
     if ( not defined $this->{rootNode} ) {
-        ASSERT( not defined $this->{superNode} );
+        ASSERT( not defined $this->{superNode} ) if DEBUG;
         $this->{rootNode}     = $this;
         $this->{superNode}    = $this;
         $this->{isRoot}       = 1;
@@ -41,9 +41,9 @@ sub new {
         $this->{siblingindex} = 0;
     }
     else {
-        ASSERT( defined $this->{superNode} );
+        ASSERT( defined $this->{superNode} ) if DEBUG;
         $this->{isRoot} = 0;
-        ASSERT( not defined $this->{nodecount} );
+        ASSERT( not defined $this->{nodecount} ) if DEBUG;
         $this->{nodeindex} = $this->{rootNode}->{nodecount};
         $this->{rootNode}->{nodecount} += 1;
         $this->{depth} ||= $this->{superNode}->{depth} + 1;
@@ -58,24 +58,24 @@ sub new {
 $this->{superNode}->{webtopic} now has child \@depth,siblingindex,nodeindex=$this->{depth},$this->{siblingindex},$this->{nodeindex}:\t$this->{webtopic}
 HERE
     if ( $this->{isRoot} ) {
-        ASSERT( $this->{query} );
-        ASSERT( defined $this->{queryArgs} );
-        ASSERT( defined $this->{nodecount} );
+        ASSERT( $this->{query} )             if DEBUG;
+        ASSERT( defined $this->{queryArgs} ) if DEBUG;
+        ASSERT( defined $this->{nodecount} ) if DEBUG;
         ASSERT(
             not( $this->{depth} or $this->{nodeindex} or $this->{siblingindex} )
         );
     }
     else {
-        ASSERT( not defined $this->{query} );
-        ASSERT( not defined $this->{queryArgs} );
-        ASSERT( not defined $this->{nodecount} );
-        ASSERT( $this->{depth} > 0 );
-        ASSERT( defined $this->{nodeindex} );
-        ASSERT( defined $this->{siblingindex} );
+        ASSERT( not defined $this->{query} )     if DEBUG;
+        ASSERT( not defined $this->{queryArgs} ) if DEBUG;
+        ASSERT( not defined $this->{nodecount} ) if DEBUG;
+        ASSERT( $this->{depth} > 0 )             if DEBUG;
+        ASSERT( defined $this->{nodeindex} )     if DEBUG;
+        ASSERT( defined $this->{siblingindex} )  if DEBUG;
     }
-    ASSERT( not defined $this->{childnodes} );
+    ASSERT( not defined $this->{childnodes} ) if DEBUG;
     $this->{childNodes} = [];
-    ASSERT( not defined $this->{childCursor} );
+    ASSERT( not defined $this->{childCursor} ) if DEBUG;
 
     # -1 because we have to ->next() to populate the first child
     $this->{childCursor} = 0 - 1;
@@ -125,7 +125,7 @@ sub hasNext {
     my $haveNext          = 0;
     my $populatedChildren = scalar( @{ $this->{childNodes} } );
 
-    ASSERT( $this->{childCursor} < $populatedChildren );
+    ASSERT( $this->{childCursor} < $populatedChildren ) if DEBUG;
 
     # Are we at the end of our copy of the query resultset already?
     if ( $this->{childCursor} == $populatedChildren - 1 ) {
@@ -180,14 +180,14 @@ sub next {
     my $populatedChildren = scalar( @{ $this->{childNodes} } );
     my $nextNode;
 
-    ASSERT( $this->{childCursor} < $populatedChildren );
+    ASSERT( $this->{childCursor} < $populatedChildren ) if DEBUG;
 
     # We work on the assumption that there is a next node either in our list or
     # in the query iterator. So, do we need to add to list from query iterator?
     if ( $this->{childCursor} == $populatedChildren - 1 ) {
         my $nextWebTopic = $this->getQueryIterator()->next();
 
-        ASSERT($nextWebTopic);
+        ASSERT($nextWebTopic) if DEBUG;
         $this->{childCursor} += 1;
         $nextNode = Foswiki::Plugins::TopicRecursePlugin::Node->new(
             $this->{rootNode},
@@ -197,8 +197,9 @@ sub next {
             depth        => $this->{depth} + 1
         );
         push( @{ $this->{childNodes} }, $nextNode );
-        ASSERT( ( $this->{childCursor} + 1 ) ==
-              scalar( @{ $this->{childNodes} } ) );
+        ASSERT(
+            ( $this->{childCursor} + 1 ) == scalar( @{ $this->{childNodes} } ) )
+          if DEBUG;
     }
     else {
 
@@ -208,7 +209,7 @@ sub next {
         writeDebug( "$this->{webtopic} already had child $nextNode->{webtopic}",
             'next', 4 );
     }
-    ASSERT($nextNode);
+    ASSERT($nextNode) if DEBUG;
 
     return $nextNode;
 }
@@ -232,7 +233,7 @@ sub getQueryString {
     if ( not $this->{ourQuery} ) {
         my $query = $rootNode->{query};
 
-        ASSERT($query);
+        ASSERT($query) if DEBUG;
         $query =~ s/\$root\b/$rootNode->{webtopic}/g;
         $query =~ s/\$rootweb\b/$rootNode->{web}/g;
         $query =~ s/\$roottopic\b/$rootNode->{topic}/g;
@@ -246,7 +247,7 @@ sub getQueryString {
         writeDebug( "$this->{webtopic} now has query: '$this->{ourQuery}'",
             'getQueryString', 4 );
     }
-    ASSERT( $this->{ourQuery} );
+    ASSERT( $this->{ourQuery} ) if DEBUG;
 
     return $this->{ourQuery};
 }
@@ -263,7 +264,7 @@ sub getQueryIterator {
         writeDebug( "$this->{webtopic} created queryIterator",
             'getQueryIterator', 4 );
     }
-    ASSERT( $this->{queryIterator} );
+    ASSERT( $this->{queryIterator} ) if DEBUG;
 
     return $this->{queryIterator};
 }
