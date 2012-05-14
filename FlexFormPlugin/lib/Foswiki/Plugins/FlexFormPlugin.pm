@@ -86,4 +86,3 @@ sub handleRENDERFIELD {
 
 1;
 
->>>>>>> foswiki/master
