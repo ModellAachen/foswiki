@@ -69,7 +69,7 @@ toolbar_Basic : [
 ],
 toolbar_Basic_Provis : [
 	{ name: 'save',		items : [ 'Provis_Save', 'Provisarea' ] },
-	{ name: 'undoredo',	items : [ 'Provis_Undo', 'Provis_Redo' ] },
+//	{ name: 'undoredo',	items : [ 'Provis_Undo', 'Provis_Redo' ] },
 	{ name: 'provis_tools',	items : [ 'Provis_NewSwimlane', 'Provis_Nodes' ] },
 	{ name: 'provis_size',		items : [ 'Provis_Size' ] }
 ],
