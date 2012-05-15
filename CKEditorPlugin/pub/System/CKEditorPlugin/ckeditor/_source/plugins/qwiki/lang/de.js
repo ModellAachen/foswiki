@@ -13,6 +13,7 @@ CKEDITOR.plugins.setLang( 'qwiki', 'de',
 	qwiki :
 	{
 		toolbarFlowchart : 'Flussdiagramm erstellen',
+		flowchartType : 'Flussdiagramm',
 		localFile : 'Lokale Datei',
 		qwikiFileName : 'Dateiname im Q.Wiki',
 		validateWidth : 'Breite muss eine ganze Zahl sein.',

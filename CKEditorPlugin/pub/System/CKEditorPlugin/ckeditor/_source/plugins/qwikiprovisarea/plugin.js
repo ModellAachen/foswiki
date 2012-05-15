@@ -31,6 +31,7 @@ var updateCommandsMode = function( editor, namensraum, ein )
 			}
 		}
 };
+var flowchart = null;
 
 CKEDITOR.plugins.add( 'qwikiprovisarea',
 {
@@ -57,9 +58,6 @@ CKEDITOR.plugins.add( 'qwikiprovisarea',
 		textSize,
 		resizeHorizontal = 1,
 		resizeVertical = 0;
-		
-		var flowchart;
-		var saveflag;
 		
 		/*
 		 * Watch auch für Internet Explorer etc
@@ -367,30 +365,36 @@ CKEDITOR.plugins.add( 'qwikiprovisarea',
 				});
 		}
 		
-		editor.on( 'saveprovis', function(event)
+		editor.on( 'doubleclick', function( evt )
 				{
-					//TODO: Alex muss das tun!
-					//Alex: Saveprovis: ProVis Tag muss auch geupdated werden!
-					editor = event.editor;
-					this.saveflag = true;
+					var element = CKEDITOR.plugins.link.getSelectedLink( editor ) || evt.data.element;
+
+					if ( element.getAttribute( 'data-cke-real-element-type' ) == 'provis' )
+					{
+						editor.execCommand('provisarea');
+					}
 				});
 		
+
+
 		editor.on( 'closeprovis', function(event)
 				{
-					//Alex: Saveprovis: ProVis Tag muss auch geupdated werden!
 					editor = event.editor;
 					
 					//Provis Attribute auslesen
 					var name = flowchart.getAttribute( '_cke_provis_name' );
 					var type = flowchart.getAttribute( '_cke_provis_type' ) || Swimlane;
-					//Richtig so? Dann muss am Anfang 0 gesetzt sein!
-					var rev = flowchart.getAttribute( '_cke_provis_rev' ) || 1;
-					
-					if (this.saveflag == true)
-					{
-						//TODO: AjaxRequest oder ähnliches
-						rev++;
-					}
+					// If we don't even have a legacy revision, use the newest
+					// revision instead... there are probably worse choices
+					var rev = flowchart.getAttribute( '_cke_provis_rev' ) || 0;
+
+					// Fall back to legacy revision if no specific revision specified
+					// The only situation in which this fallback should happen
+					// is if a user deleted the attributes or the tag was
+					// created by an old version of this plugin.
+					var aqmRev = flowchart.getAttribute( '_cke_provis_aqmrev' ) || rev;
+					var mapRev = flowchart.getAttribute( '_cke_provis_maprev' ) || rev;
+					var pngRev = flowchart.getAttribute( '_cke_provis_pngrev' ) || rev;
 					
 					// Unblock editor UI
 					//SMELL: should un-hardcode ID
@@ -399,7 +403,10 @@ CKEDITOR.plugins.add( 'qwikiprovisarea',
 					ibody[0].contentEditable = "true";
 
 					// Neues Element kreiieren und ersetzen
-					var element = CKEDITOR.dom.element.createFromHtml('<span class="WYSIWYG_PROTECTED">%PROCESS{name=&quot;' + name + '&quot; type=&quot;' + type + '&quot; rev=&quot;' + rev + '&quot;}%</span>' );
+					var element = CKEDITOR.dom.element.createFromHtml('<span class="WYSIWYG_PROTECTED">%PROCESS{'+
+						'name=&quot;'+ name +'&quot; type=&quot;'+ type +'&quot; '+
+						'aqmrev=&quot;'+ aqmRev +'&quot; maprev=&quot;'+ mapRev +'&quot; pngrev=&quot;'+ pngRev +'&quot;}%</span>'
+					);
 					element.replace(flowchart);
 					
 					var holderElement = editor.getThemeSpace("contents");
@@ -412,7 +419,8 @@ CKEDITOR.plugins.add( 'qwikiprovisarea',
 					editor.fire( 'close_provistoolbar' );
 					//Tristate wieder rausnehmen
 					updateCommandsMode(editor, "provis", false);
-					this.saveflag = false;
+
+					flowchart = null;
 					
 					//TODO: Was ist wenn die Var nicht gesetzt ist?
 					try {
@@ -429,11 +437,10 @@ CKEDITOR.plugins.add( 'qwikiprovisarea',
 		
 		editor.on( 'openprovis', function(event)
 				{
-					this.saveflag = false;
-					
 					var selection = editor.getSelection();
 					
 					var element = selection.getSelectedElement();
+					var topic, name, type, rev;
 					flowchart = element;
 					
 					// Block editor UI
@@ -455,7 +462,8 @@ CKEDITOR.plugins.add( 'qwikiprovisarea',
 						topic = element.getAttribute( '_cke_provis_topic' ) || FoswikiCKE.getFoswikiVar("WEB") + "." + FoswikiCKE.getFoswikiVar("TOPIC");
 						name = element.getAttribute( '_cke_provis_name' );
 						type = element.getAttribute( '_cke_provis_type' ) || swimlane;
-						rev = element.getAttribute( '_cke_provis_rev' ) || 1;
+						rev = element.getAttribute( '_cke_provis_aqmrev' ) ||
+							element.getAttribute( '_cke_provis_rev' ) || 1;
 					}
 					else
 						return false;
@@ -730,17 +738,27 @@ CKEDITOR.plugins.provisarea =
 		{
 			exec : function( editor )
 			{
-				//Zuerst Editor speichern - dann Provis speichern - dann Editor neu laden
-				
 				var iframe = document.getElementById("iframe_provis");
 				$.blockUI({ 
 		            centerY: 0, 
-		            css: { top: '10px', left: '10px', right: '' } 
+					css: { top: '20px', 'left': '20px' }
 		        });
-				iframe.contentWindow.saveProvis();
-				editor.fire('saveprovis');
+				setTimeout(function() {
+					iframe.contentWindow.saveProvis({
+						success: function(data, textStatus, xhr) {
+							flowchart.setAttribute('_cke_provis_aqmrev', data.aqmrev);
+							flowchart.setAttribute('_cke_provis_maprev', data.maprev);
+							flowchart.setAttribute('_cke_provis_pngrev', data.pngrev);
+							flowchart.setAttribute('_cke_provis_name', data.name);
 				$.unblockUI();
 				editor.execCommand( 'provisarea' );
+			},
+						error: function(xhr, textStatus, errorThrown) {
+							alert(editor.lang.qwikiflowchart.saveerror + (errorThrown || textStatus));
+							$.unblockUI();
+						}
+					});
+				}, 500);
 			},
 			canUndo : false
 		},

@@ -7,6 +7,7 @@ CKEDITOR.plugins.setLang( 'qwiki', 'en',
 {
 	qwiki: {
 		toolbarFlowchart : 'Create Flowchart',
+		flowchartType : 'Flowchart',
 		localFile : 'Local File',
 		qwikiFileName : 'Filename in Q.Wiki',
 		validateWidth : 'Width must be a whole number.',

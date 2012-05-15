@@ -1,89 +1,52 @@
-
-
-// Modac : RegEx um Foswiki Code zu filtern	
-var provisRegex = /%PROCESS/g,
-	getProvisRegex = /%PROCESS\{"([^"]*)"[\s\S]*(rev="([^"]*)")\}%$/ig,
-	numberRegex = /^\d+(?:\.\d+)?$/,
-	code1Regex = /%.*\{.*\}%$/g,
-	codeRegex = /^%[\s\S]*%$/ig;
-
-// Modac : Keine Ahnung was das macht
-var cssifyLength = function( length )
-	{
-		if ( numberRegex.test( length ) )
-			return length + 'px';
-		return length;
-	};
-
 // Modac : RegEx um ProVis Diagramme zu filtern
 var isProVis = function( element )
 	{
 		var provisRegex = new RegExp("%PROCESS\{[^}]*\}%$", "ig");
 		var wert = provisRegex.test( element );
-		//alert(element + "und ist  :" + wert);
 		return wert;
-		//return ( wert );
 	};
 
-// Modac : Funktion um Links zu erkennen und richtig darzustellen	
-var getLink = function( element )
-	{
-		//var linkRegex = new RegExp("\[\[([^\]]*)\]\[([^\]]*)\]\]", "ig");
-		//var linkRegex = new RegExp("\[\[([\s\S]*)", "ig");
-		
-		var ausdruck1 = /([\s\S]*)/g;
-		if (ausdruck1.test(element))
-		{
-			var result = ausdruck1.exec(element);
-			alert(result);
-			var name = result[0] || 'fehler';
-			var href = result[0] || 'fehler';
-		}
-		
-		var attributes = { name: name || 'fehler', href: href || 'fehler' };
-		return attributes;
-	};
-	
 // Modac : Funktion um ProVis Elemente auszulesen und darzustellen
-var getProVis = function( element )
-	{
-		// RegExen um ProVis Informationen auszulesen
-		var ausdruck1 = /name="([^"]*)"/g;
-		var ausdruck2 = /\{"([^"]*)"/g;
-		var ausdruck3 = /rev="([^"]*)"/g;
-		var ausdruck4 = /type="([^"]*)"/g;
-		var name = '';
-		var rev = 1;
-		var type = "swimlane";
+var getProVis = function( value )
+		{
+	var name, type,
+		aqmrev = 0, maprev = 0, pngrev = 0;
 		
-		// Name
-		if (ausdruck1.test(element))
-		{
-			ausdruck1.exec(element);
-			name = RegExp.$1;
-		}
-		// Name wenn ProVis noch leer ist ( %PROCESS{"test"}% )
-		else if (ausdruck2.test(element))
-		{
-			ausdruck2.exec(element);
-			name = RegExp.$1;
+	// Modac : ProVis Flowchart per regulärem Ausdruck auslesen
+	var rev = 0, type;
+	
+	var m_name_legacy = value.match(/\{"(.+?)"/);
+	if (m_name_legacy !== null) {
+		name = m_name_legacy[1];
+	} else {
+		var m_name = value.match(/\bname="(.+?)"/);
+		if (m_name !== null) name = m_name[1];
 		}	
-		// Revision
-		if (ausdruck3.test(element))
-		{
-			ausdruck3.exec(element);
-			rev = RegExp.$1 || 1;
+
+	var m_rev_legacy = value.match(/\brev="(\d+)"/);
+	if (m_rev_legacy !== null) {
+		rev = m_rev_legacy[1];
+	} else {
+		var m_aqmrev = value.match(/\baqmrev="(\d+)"/);
+		var m_maprev = value.match(/\bmaprev="(\d+)"/);
+		var m_pngrev = value.match(/\bpngrev="(\d+)"/);
+		aqmrev = m_aqmrev ? m_aqmrev[1] : rev;
+		maprev = m_maprev ? m_maprev[1] : rev;
+		pngrev = m_pngrev ? m_pngrev[1] : rev;
 		}
-		// Type - Standard ist swimlane
-		if (ausdruck4.test(element))
-		{
-			ausdruck4.exec(element);
-			type = RegExp.$1 || 'swimlane';
+
+	var m_type = value.match(/\btype="(.+?)"/);
+	if (m_type !== null) {
+		type = m_type[1];
 		}
 	    
-	    // Übergabe der Attribute
-		var attributes = { name: name, rev: rev, type: type };
-		return attributes;
+	return {
+		name: name || "",
+		type: type || "swimlane",
+		aqmrev: aqmrev,
+		maprev: maprev,
+		pngrev: pngrev
+	};
 	};
 
 // Modac : Funktion um Code Elemente auszulesen
@@ -129,19 +92,7 @@ CKEDITOR.plugins.add('qwiki',
 			});
 	    CKEDITOR.dialog.add( 'provis', this.path + 'dialogs/provis.js' );
 	    
-	    //TODO: Warum hier?
-		editor.on( 'doubleclick', function( evt )
-				{
-					var element = CKEDITOR.plugins.link.getSelectedLink( editor ) || evt.data.element;
-
-					if ( element.getAttribute( 'data-cke-real-element-type' ) == 'provis' )
-					{
-						editor.execCommand('provisarea');
-					}
-				});
-
 		// Code Einbinden
-		// Modac : Anpassen
 		editor.addCommand( 'code', new CKEDITOR.dialogCommand( 'code' ) );
 		editor.ui.addButton( 'Code',
 			{
@@ -216,9 +167,9 @@ CKEDITOR.plugins.add('qwiki',
 	afterInit : function( editor )
 	{
 		var dataProcessor = editor.dataProcessor,
-			dataFilter = dataProcessor && dataProcessor.dataFilter,
-			htmlFilter = dataProcessor && dataProcessor.htmlFilter;
+			dataFilter = dataProcessor && dataProcessor.dataFilter;
 		
+		editor.lang.fakeobjects.provis = editor.lang.qwiki.flowchartType;
 		
 		if ( dataFilter )
 		{
@@ -247,16 +198,16 @@ CKEDITOR.plugins.add('qwiki',
 									{
 										var attributes = getProVis(value);
 										var host = FoswikiCKE.getFoswikiVar("ATTACHURL");
-										var name = attributes.name + ".png" + "?rev=" + attributes.rev;
+										var name = attributes.name + ".png" + "?rev=" + attributes.pngrev;
 										var url = host + "/" + name;
-										
-										//TODO: AjaxRequest? oder andere Möglichkeit?
 										
 										el = editor.createFakeParserElement( element, 'cke_provis', 'provis', false );
 										
 										el.attributes._cke_provis_name = attributes.name;
 										el.attributes._cke_provis_type = attributes.type;
-										el.attributes._cke_provis_rev = attributes.rev;
+										el.attributes._cke_provis_aqmrev = attributes.aqmrev;
+										el.attributes._cke_provis_maprev = attributes.maprev;
+										el.attributes._cke_provis_pngrev = attributes.pngrev;
 										el.attributes.src = url;
 										
 										return el;
@@ -276,82 +227,6 @@ CKEDITOR.plugins.add('qwiki',
 					}
 				});
 		}
-		
-		if ( htmlFilter )
-		{
-			htmlFilter.addRules(
-				{
-					elements :
-					{
-						// Modac : Hier werden alle Span´s gefiltert und nach Code bzw. ProVis durchsucht
-					    span : function( element )
-						{
-							// Modac : Due to lovely Internet Explorer
-							var attr = '';							
-							attr = element.attributes["class"];
-							
-							// TODO : Wofür ist der Html Filter da??
-							if (attr == "WYSIWYG_PROTECTED")
-							{
-								for ( var i = 0 ; i < element.children.length ; i++ )
-								{
-									var value = element.children[ i ].value;
-									value = value.replace(/\n/, '');
-
-									if ( isProVis(value) )
-									{
-									}
-									else if ( isCode(value) )
-									{
-									}
-									return element;
-
-								}
-							}		
-						}
-					}
-				});
-		}
 	}
 } );
-
-CKEDITOR.editor.prototype.createFakeParserElement = function( realElement, className, realElementType, isResizable, imgSrc )
-{
-var lang = this.lang.fakeobjects,
-	html;
-
-var writer = new CKEDITOR.htmlParser.basicWriter();
-realElement.writeHtml( writer );
-html = writer.getHtml();
-
-
-var attributes =
-{
-	'class' : className,
-	src : CKEDITOR.getUrl( 'images/spacer.gif' ) ,
-	'data-cke-realelement' : encodeURIComponent( html ),
-		'data-cke-real-node-type' : realElement.type,
-		alt : lang[ realElementType ] || lang.unknown,
-		align : realElement.attributes.align || ''
-};
- 
-	if ( realElementType )
-		attributes['data-cke-real-element-type'] = realElementType;
-
-	if ( isResizable )
-		attributes['data-cke-resizable'] = isResizable;
-	
-	if ( imgSrc )
-	{
-		// Modac : Hier muss gecheckt werden, ob das einwandfrei funzt, oder ob der Name noch überprüft werden muss
-		attributes.src = CKEDITOR.getUrl( imgSrc );
-		//alert(attributes.src);
-	}
-
-	return new CKEDITOR.htmlParser.element( 'img', attributes );
-};
-
-
-
-
 

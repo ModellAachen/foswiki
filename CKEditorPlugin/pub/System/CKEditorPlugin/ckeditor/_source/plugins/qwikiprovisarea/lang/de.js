@@ -14,8 +14,14 @@ CKEDITOR.plugins.setLang( 'qwikiprovisarea', 'de',
 	{
 		title			: 'Flussdiagramm',
 		contextmenu		: 'Flussdiagramm bearbeiten',
-		name			: 'Flussdiagramm-Name',
+		name			: 'Interner Name',
 		type			: 'Flussdiagramm-Typ',
+		specialCharsHint: 'Sie k\u00F6nnen hier nur Buchstaben (keine Sonderzeichen) und Ziffern benutzen.',
+		autoGenerateHint: 'Wenn Sie das Feld leer lassen, wird automatisch ein Name generiert.',
+		invalidName		: 'Der angegebene interne Name für das Flussdiagramm ist ung\u00FCltig. Bitte verwenden Sie nur Buchstaben (ohne Sonderzeichen) und Ziffern.',
+		warnOverwriteMayLose : 'Achtung: es sind bereits Dateianh\u00E4nge mit entsprechenden Namen vorhanden. Wenn Sie fortfahren, werden folgende Dateien \u00FCberschrieben: ',
+		warnOverwrite	: 'Es ist bereits ein Flussdiagram mit diesem Namen vorhanden. Wenn Sie fortfahren, wird es hier eingebunden. \u00C4nderung daran betreffen auch andere Orte, an denen das Flussdiagramm eingebunden wurde.',
+		warnCouldNotCheckName : 'Achtung: Es konnte nicht \u00FCberpr\u00FCft werden, ob der Name noch frei ist. Bitte versuchen Sie es noch einmal. Interner Fehlercode: ',
 		swimlane		: 'Flussdiagramm',
 		process1		: 'Prozessschaubild',
 		organigram		: 'Organigramm',
@@ -29,6 +35,7 @@ CKEDITOR.plugins.setLang( 'qwikiprovisarea', 'de',
 		nodes			: 'Prozesstypen',
 		resize			: 'ProVis Fenstergr\u00F6\u00DFe',
 		saveoptions		: 'Darstellungsmodus',
-		cancelmsg		: 'Sie verlassen nun ProVis, ohne zu speichern'
+		cancelmsg		: 'Sie verlassen nun ProVis, ohne zu speichern',
+		saveerror		: 'Beim Speichern des Diagramms sind folgende Fehler aufgetreten: '
 	}
 });
