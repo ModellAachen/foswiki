@@ -1,100 +1,190 @@
-%META:TOPICINFO{author="ProjectContributor" date="1101979980" format="1.0" version="1.1"}%
+%META:TOPICINFO{author="ProjectContributor" date="1336870795" format="1.0" version="1.1"}%
 %META:TOPICPARENT{name="BibtexPlugin"}%
----+!! <nop>%TOPIC%
-%STARTINCLUDE% <form action="%SCRIPTURLPATH%/bibsearch/%INCLUDINGWEB%/%INCLUDINGTOPIC%" method="post">
-<input type="hidden" name="errors" value="%BIBERRORS%" />
-<input type="hidden" name="form" value="%BIBFORM%" />
-<input type="hidden" name="bibtopic" value="%BIBTOPIC%" />
-<input type="hidden" name="keywords" value="%BIBKEYWORDS%" />
-<input type="hidden" name="total" value="%BIBTOTAL%" />
-<table width="100%" cellspacing="0" cellpadding="0" ><tr><td>
-<table class="bibsearch" cellspacing="0" cellpadding="0" width="100%" style="margin-bottom:0px; border-bottom:0px;">
-  <tr>
-	 <th width="100%" style="border-bottom:0px;">Filter</th>
-	 <th style="border-bottom:0px;"><span id="bibfiltertoggle" class="bibtoggle"><a href="javascript:toggleElement('bibfilter')">hide</a></span></th>
- </tr>
-</table>
-<table id="bibfilter" class="bibsearch" cellspacing="0" cellpadding="0" width="100%">
-<tr>
-	 <td style="padding-top:5px" align="right"><b>Author:</b></td>
-	 <td style="padding-top:5px"><input type="text" name="author" size="50" value=""/></td>
-	 <td style="padding-top:5px">&nbsp;
-		<input type="submit" class="submit" value="Submit" />&nbsp;
-		<input type="button" class="reset" value="Reset" onclick="window.location.href='%SCRIPTURL%/view/%INCLUDINGWEB%/%INCLUDINGTOPIC%';" />
-	 </td>
-  </tr> <tr>
-	 <td align="right"><b>Year:</b></td>
-	 <td><input type="text" name="year" size="50" value=""/></td>
-	 <td width="100%" rowspan="6" valign="top">
-	 <table class="biboptions" cellspacing="0" cellpadding="0">
+---+!! Bibtex search template
+%ADDTOZONE{
+	"head"
+	id="BIBSTYLE"
+	text="<link rel='stylesheet' type='text/css' href='%PUBURLPATH%/%SYSTEMWEB%/BibtexPlugin/style.css' media='all' />"
+}%%STARTINCLUDE% <form action="%SCRIPTURLPATH%/bibsearch/%INCLUDINGWEB%/%INCLUDINGTOPIC%" method="post">
+	<input type="hidden" name="errors" value="%BIBERRORS%" />
+	<input type="hidden" name="form" value="%BIBFORM%" />
+	<input type="hidden" name="bibtopic" value="%BIBTOPIC%" />
+	<input type="hidden" name="keywords" value="%BIBKEYWORDS%" />
+	<input type="hidden" name="total" value="%BIBTOTAL%" />
+	<table >
 		<tr>
-		  <td align="right"><b>Match:</b></td>
-		  <td><input type="radio" name="match" value="all" checked="checked" />all</td>
-		  <td><input type="radio" name="match" value="any" />any</td>
-		  <td>&nbsp;</td>
-		</tr><tr>
-		  <td align="right"><b>Format:</b></td>
-		  <td><input type="radio" name="format" value="bibtool" checked="checked" />html</td>
-		  <td><input type="radio" name="format" value="raw" />bibtex</td>
-		  <td><input type="radio" name="format" value="mix" />both</td>
-		</tr><tr>
-		  <td align="right"><b>Sort:</b></td>
-		  <td><input type="radio" name="sort" value="year" checked="checked" />year</td>
-		  <td><input type="radio" name="sort" value="author" />author</td>
-		  <td>&nbsp;</td>
-		</tr><tr>
-		  <td align="right"><b>Reverse:</b></td>
-		  <td><input type="radio" name="rev" value="on" checked="checked" />on</td>
-		  <td><input type="radio" name="rev" value="off" />off</td>
-		  <td>&nbsp;</td>
-		</tr><tr>
-		  <td alin="right"><b>Abstracts:</b></td>
-		  <td><input type="radio" name="abstracts" value="on"/>on</td>
-		  <td><input type="radio" name="abstracts" value="off"  checked="checked" />off</td>
-		  <td>&nbsp;</td>
-	 </table></td>
-  </tr> <tr>
-	 <td align="right"><b>Title:</b></td>
-	 <td><input type="text" name="title" size="50"  value="" /></td>
-  </tr>
-  <tr>
-	 <td align="right"><b>In:</b></td>
-	 <td><input type="text" name="inside" size="50"  value="" /></td>
-  </tr>
-  <tr>
-	 <td align="right"><b>Key:</b></td>
-	 <td><input type="text" name="key" size="50"  value="" /></td>
-  </tr>
-  <tr>
-	 <td align="right"><b>Type:</b></td>
-	 <td><input type="text" name="type" size="50" value="" /> </td>
-  </tr>
-  <tr>
-	 <td align="right"><b>Phrase:</b></td>
-	 <td><input type="text" name="phrase" size="50" value="" /></td>
-  </tr>
-  <tr>
-    <td align="right"><b>Bibliography output style:</b></td>
-<td>
-<select name="bibstyle" width="50">
-<option value="">Any type</option>
-<option value="ieeetr">IEEE Transactions (ieeetr2)</option>
-<option value="siam">SIAM (siam)</option>
-<option value="amsplain">AMS (amsplain)</option>
-<option value="abbrvnat">Natural (abbrvnat)</option>
-<option value="abbrv">Abbreviated (abbrv)</option>
-<option value="plain">Plain (plain)</option>
-</select>
-</td>
-  </tr>
-  <tr>
-
-    <td align="right"><b>Phrase:</b></td>
-    <td><input type="text" name="phrase" size="50" value="" /></td>
-  </tr>
-
-</table>
-</td></tr>
-<tr><td>%BIBTEXRESULT%</td></tr>
-</table>
-</form> %STOPINCLUDE%
+			<td>
+				<table class="bibsearch">
+					<tr>
+						<th style="border-bottom:0px;">Filter</th>
+						<th style="border-bottom:0px;"></th>
+					</tr>
+				</table>
+				<table id="bibfilter" class="bibsearch">
+					<tr>
+						<td class="biblabel">
+							<b>Author:</b>
+						</td>
+						<td>
+							<input type="text" class="foswikiInputField" name="author" size="50" value=""/>
+						</td>
+						<td>
+							&nbsp;<input type="submit" class="foswikiSubmit" value="Submit" />&nbsp;<input type="button" class="foswikiButton" value="Reset" onclick="window.location.href='%SCRIPTURL%/view/%INCLUDINGWEB%/%INCLUDINGTOPIC%';" />
+						</td>
+					</tr>
+					<tr>
+						<td class="biblabel">
+							<b>Year:</b>
+						</td>
+						<td>
+							<input type="text" class="foswikiInputField" name="year" size="50" value=""/>
+						</td>
+						<td rowspan="6" valign="top">
+							<table class="biboptions" cellspacing="0" cellpadding="0">
+								<tr>
+									<td class="biblabel">
+										<b>Match:</b>
+									</td>
+									<td>
+										<input type="radio" name="match" value="all" checked="checked" />all
+									</td>
+									<td>
+										<input type="radio" name="match" value="any" />any
+									</td>
+									<td>
+										&nbsp;
+									</td>
+								</tr>
+								<tr>
+									<td class="biblabel">
+										<b>Format:</b>
+									</td>
+									<td>
+										<input type="radio" name="format" value="bibtool" checked="checked" />html
+									</td>
+									<td>
+										<input type="radio" name="format" value="raw" />bibtex
+									</td>
+									<td>
+										<input type="radio" name="format" value="mix" />both
+									</td>
+								</tr>
+								<tr>
+									<td class="biblabel">
+										<b>Sort:</b>
+									</td>
+									<td>
+										<input type="radio" name="sort" value="year" checked="checked" />year
+									</td>
+									<td>
+										<input type="radio" name="sort" value="author" />author
+									</td>
+									<td>
+										&nbsp;
+									</td>
+								</tr>
+								<tr>
+									<td class="biblabel">
+										<b>Reverse:</b>
+									</td>
+									<td>
+										<input type="radio" name="rev" value="on" checked="checked" />on
+									</td>
+									<td>
+										<input type="radio" name="rev" value="off" />off
+									</td>
+									<td>
+										&nbsp;
+									</td>
+								</tr>
+								<tr>
+									<td class="biblabel">
+										<b>Abstracts:</b>
+									</td>
+									<td>
+										<input type="radio" name="abstracts" value="on"/>on
+									</td>
+									<td>
+										<input type="radio" name="abstracts" value="off"  checked="checked" />off
+									</td>
+									<td>
+										&nbsp;
+									</td>
+								</tr>
+							</table>
+						</td>
+					</tr>
+					<tr>
+						<td class="biblabel">
+							<b>Title:</b>
+						</td>
+						<td>
+							<input type="text" class="foswikiInputField" name="title" size="50" value="" />
+						</td>
+					</tr>
+					<tr>
+						<td class="biblabel">
+							<b>In:</b>
+						</td>
+						<td>
+							<input type="text" class="foswikiInputField" name="inside" size="50" value="" />
+						</td>
+					</tr>
+					<tr>
+						<td class="biblabel">
+							<b>Key:</b>
+						</td>
+						<td>
+							<input type="text" class="foswikiInputField" name="key" size="50" value="" />
+						</td>
+					</tr>
+					<tr>
+						<td class="biblabel">
+							<b>Type:</b>
+						</td>
+						<td>
+							<input type="text" class="foswikiInputField" name="type" size="50" value="" />
+						</td>
+					</tr>
+					<tr>
+						<td class="biblabel">
+							<b>Phrase:</b>
+						</td>
+						<td>
+							<input type="text" class="foswikiInputField" name="phrase" size="50" value="" />
+						</td>
+					</tr>
+					<tr>
+						<td class="biblabel">
+							<b>Bibliography output style:</b>
+						</td>
+						<td>
+							<select name="bibstyle" width="50">
+								<option value="">Any type</option>
+								<option value="ieeetr">IEEE Transactions (ieeetr2)</option>
+								<option value="siam">SIAM (siam)</option>
+								<option value="amsplain">AMS (amsplain)</option>
+								<option value="abbrvnat">Natural (abbrvnat)</option>
+								<option value="abbrv">Abbreviated (abbrv)</option>
+								<option value="plain">Plain (plain)</option>
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<td class="biblabel">
+							<b>Phrase:</b>
+						</td>
+						<td>
+							<input type="text" class="foswikiInputField" name="phrase" size="50" value="" />
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				%BIBTEXRESULT%
+			</td>
+		</tr>
+	</table>
+</form>%STOPINCLUDE%

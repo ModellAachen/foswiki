@@ -1,30 +1,41 @@
 %META:TOPICPARENT{name="TagMePlugin"}%
-%STARTSECTION{"tagquery"}%
-%FORMATLIST{
-   "%TAGME{tpaction="showalltags" separator=","}%"
-   format="$1$n"
-   separator=" "
-   include=".*%URLPARAM{"q"}%.*"
-}%
-%ENDSECTION{"tagquery"}%
-%STARTSECTION{"jqui"}%%JQREQUIRE{"textboxlist"}%%JQREQUIRE{"autocomplete"}%%JQREQUIRE{"simplemodal"}%%JQREQUIRE{"hoverintent"}%%JQREQUIRE{"queryobject"}%%ADDTOZONE{"head" 
-  tag="TAGMEPLUGIN::JQUI:CSS" 
-  text="<meta name='foswiki.TagMePlugin.jquitags' content='%TAGME{tpaction="%URLPARAM{"tpaction" default="showalltags"}%" tag="%URLPARAM{"tptag"}%" web="%BASEWEB%" topic="%BASETOPIC%" separator=","}%' />
-     <meta name='foswiki.TagMePlugin.remove' content='%IF{"($TAGMEPLUGIN_JQUIREMOVEALL='everybody') OR ($TAGMEPLUGIN_JQUIREMOVEALL='topicchange' AND '%BASEWEB%.%BASETOPIC%' allows 'CHANGE') OR ('%USERNAME%' ingroup 'AdminGroup')" then="all"}%' />
-     <link rel='stylesheet' href='%PUBURLPATH%/%SYSTEMWEB%/TagMeAjaxHelper/jquery.tagmeui.css' type='text/css' media='all'/>" 
-  requires="JQUERYPLUGIN::TEXTBOXLIST, JQUERYPLUGIN::AUTOCOMPLETE, JQUERYPLUGIN::SIMPLEMODAL, JQUERYPLUGIN::HOVERINTENT, JQUERYPLUGIN::QUERYOBJECT, JQUERYPLUGIN"
+---+!! Tag-me Plugin AJAX helper
+This topic contains =INCLUDE= sections. See TagMePlugin for instructions.
+
+<verbatim>
+%STARTSECTION{"tagquery"}%<noautolink>%FORMATLIST{
+	"%TAGME{tpaction="showalltags" separator=","}%"
+	format="$1$n"
+	split="\s*,\s*"
+	header="["
+	format="\"$1\""
+	footer="]"
+	separator=",$n"
+	include="%URLPARAM{"term"}%.*"
+}%</noautolink>%ENDSECTION{"tagquery"}%
+
+%STARTSECTION{"jqui"}%%JQREQUIRE{"textboxlist"}%%JQREQUIRE{"simplemodal"}%%JQREQUIRE{"hoverintent"}%%JQREQUIRE{"queryobject"}%%ADDTOZONE{"head" 
+	tag="TAGMEPLUGIN::JQUI:META" 
+	text="<meta name='foswiki.TagMePlugin.jquitags' content='%TAGME{tpaction="%URLPARAM{"tpaction" default="showalltags"}%" tag="%URLPARAM{"tptag"}%" web="%BASEWEB%" topic="%BASETOPIC%" separator=","}%' />
+<meta name='foswiki.TagMePlugin.remove' content='%IF{"($TAGMEPLUGIN_JQUIREMOVEALL='everybody') OR ($TAGMEPLUGIN_JQUIREMOVEALL='topicchange' AND '%BASEWEB%.%BASETOPIC%' allows 'CHANGE') OR ('%USERNAME%' ingroup 'AdminGroup')" then="all"}%' />" 
+	requires=""
+}%%ADDTOZONE{"head" 
+	tag="TAGMEPLUGIN::JQUI:CSS" 
+	text="<link rel='stylesheet' href='%PUBURLPATH%/%SYSTEMWEB%/TagMeAjaxHelper/jquery.tagmeui.css' type='text/css' media='all'/>"
 }%%ADDTOZONE{"script"
-  tag="TAGMEPLUGIN::JQUI::JS" 
-  text="<script type='text/javascript' src='%PUBURLPATH%/%SYSTEMWEB%/%TOPIC%/jquery.tagmeui.js'></script>" 
-  requires="JQUERYPLUGIN::TEXTBOXLIST, JQUERYPLUGIN::AUTOCOMPLETE, JQUERYPLUGIN::SIMPLEMODAL, JQUERYPLUGIN::HOVERINTENT, JQUERYPLUGIN::QUERYOBJECT, JQUERYPLUGIN"
-}%<div id='tagmejqcontainer'>
-<div id="tagmejqcloud" style="display:none"></div>
-<form id="tagmejqtaglistform" name="tagmeshow" method="post" action="%SCRIPTURLPATH{"viewauth"}%/%WEB%/%TOPIC%">
-<span id="tagmejqtagstatus">&nbsp;</span>
-<span id="tagmejqtagbutton" title="%MAKETEXT{"Click for tag cloud pop-up"}%">
-%MAKETEXT{"Tags"}%&nbsp;</span>
-   <input type="text" name="add" id="tagmejqinputfield" title="%MAKETEXT{"Enter a tag name to apply to this topic"}%" size="15" value="%TAGME{ tpaction="showalltags" web="%BASEWEB%" topic="%BASETOPIC%"}%"/> 
-</form></div>%ENDSECTION{"jqui"}%%STARTSECTION{"ajax"}%%TAGME{
+	tag="TAGMEPLUGIN::JQUI::JS" 
+	text="<script type='text/javascript' src='%PUBURLPATH%/%SYSTEMWEB%/%TOPIC%/jquery.tagmeui.js'></script>" 
+	requires="JQUERYPLUGIN::TEXTBOXLIST, JQUERYPLUGIN::SIMPLEMODAL, JQUERYPLUGIN::QUERYOBJECT, JQUERYPLUGIN"
+}%<div id='tagmejqcontainer'><noautolink>
+<div id='tagmejqcloud' style='display:none'></div>
+<form id='tagmejqtaglistform' name='tagmeshow' method='post' action='%SCRIPTURLPATH{"viewauth"}%/%WEB%/%TOPIC%'>
+<span id='tagmejqtagbutton' class='foswikiEmulatedLink' title="%MAKETEXT{"View tag cloud"}%">%MAKETEXT{"Tags"}%</span>
+<span id='tagmejqtagstatus'></span>
+   <input type='text' name='add' class='foswikiInputField' placeholder='%MAKETEXT{"Add..."}%' id='tagmejqinputfield' title='%MAKETEXT{"Enter a tag name to apply to this topic"}%' size='6' value='%TAGME{ tpaction="showalltags" web="%BASEWEB%" topic="%BASETOPIC%"}%'/> 
+</form>
+</noautolink></div>%ENDSECTION{"jqui"}%
+
+%STARTSECTION{"ajax"}%%TAGME{
   tpaction="%URLPARAM{"tpaction"}%"
   tag="%URLPARAM{"tptag"}%"
   web="%URLPARAM{"qWeb"}%"
@@ -34,28 +45,31 @@
 }%%ENDSECTION{"ajax"}%
 
 %STARTSECTION{"cloud"}%
----+++ %MAKETEXT{"Tag Cloud for"}% %IF{"'%URLPARAM{"tpweb"}%'=''" 
-  then="%MAKETEXT{"all webs"}%"
-  else="%MAKETEXT{"[[[_1].WebHome][[_1]]] web" args="%URLPARAM{"tpweb"}%"}%"
+---+++ %IF{"'%URLPARAM{"tpweb"}%'=''" 
+  then="%MAKETEXT{"Tags in all webs"}%"
+  else="%MAKETEXT{"Tags in [_1] web" args="<nop>%URLPARAM{"tpweb"}%"}%"
 }%
-<br/>
-<form id="tagmejqWebSelect" method="post" action="%SCRIPTURLPATH{"view"}%/%WEB%/%TOPIC%">
-  <input type="checkbox" id="tagmejqCheckboxJustThisWeb" name="tpweb"\
-    value="%URLPARAM{"tpweb"}%" %IF{"'%URLPARAM{"tpweb"}%'=''" then="checked='checked'"}%\
-	title="%MAKETEXT{"Show tags from all webs"}%"\
+<form id='tagmejqWebSelect' method='post' action='%SCRIPTURLPATH{"view"}%/%WEB%/%TOPIC%'>
+  <input type='checkbox' id='tagmejqCheckboxJustThisWeb' name='tpweb'\
+    value='%URLPARAM{"tpweb"}%' %IF{
+    "'%URLPARAM{"tpweb"}%'=''"
+    then="checked='checked'"
+}% title='%MAKETEXT{"Show tags from all webs"}%'\
   />
-  <label for="tpweb">%MAKETEXT{"all webs"}%</label> |
-  <input type="checkbox" id="tagmejqCheckboxJustMe" name="tpuser" value="me" \
-    %IF{"'%URLPARAM{"tpuser"}%'='me'" then="checked='checked'"}%\
-	title="%MAKETEXT{"Show tags used by me"}%"\
+  <label for='tpweb'>%MAKETEXT{"all webs"}%</label> |
+  <input type='checkbox' id='tagmejqCheckboxJustMe' name='tpuser' value='me' \
+%IF{
+	"'%URLPARAM{"tpuser"}%'='me'"
+	then="checked='checked'"
+}% title='%MAKETEXT{"Show tags used by me"}%'\
   />
-  <label for="tpuser">%MAKETEXT{"set by me"}%</label> |
-  <a href="%SCRIPTURLPATH{"view"}%/%SYSTEMWEB%/TagMeRenameTag"\
-    title="%MAKETEXT{"Rename tags"}%">%MAKETEXT{"rename..."}%</a> |
-  <a href="%SCRIPTURLPATH{"view"}%/%SYSTEMWEB%/TagMeDeleteTag"\
-    title="%MAKETEXT{"Delete tags"}%">%MAKETEXT{"delete..."}%</a>
+  <label for='tpuser'>%MAKETEXT{"set by me"}%</label> |
+  <a href='%SCRIPTURLPATH{"view"}%/%SYSTEMWEB%/TagMeRenameTag'\
+    title='%MAKETEXT{"Rename tags"}%'>%MAKETEXT{"rename..."}%</a> |
+  <a href='%SCRIPTURLPATH{"view"}%/%SYSTEMWEB%/TagMeDeleteTag'\
+    title='%MAKETEXT{"Delete tags"}%'>%MAKETEXT{"delete..."}%</a>
 </form>
-<div id="tagmejqTagCloud" style="line-height:2em;">
+<div id='tagmejqTagCloud'>
 %TAGME{tpaction="showalltags"
   web="%URLPARAM{"tpweb"}%"
   by="%URLPARAM{"tpuser"}%"
@@ -66,6 +80,7 @@
 }%
 </div>%ENDSECTION{"cloud"}%
 
+</verbatim>
 <!--
    * Set NOWYSIWYG = 1
 -->

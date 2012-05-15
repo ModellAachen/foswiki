@@ -1,34 +1,37 @@
-%META:TOPICINFO{author="ProjectContributor" date="1101475243" format="1.0" version="1.1"}%
----+!! <nop>%TOPIC%
+%META:TOPICINFO{author="ProjectContributor" date="1336870795" format="1.0" version="1.1"}%
+%META:TOPICPARENT{name="BibtexPlugin"}%
+---+!! Bibtex select template
+%ADDTOZONE{
+	"head"
+	id="BIBSTYLE"
+	text="<link rel='stylesheet' type='text/css' href='%PUBURLPATH%/%SYSTEMWEB%/BibtexPlugin/style.css' media='all' />"
+}%
 %STARTINCLUDE% <form action="%SCRIPTURLPATH%/bibsearch/%INCLUDINGWEB%/%INCLUDINGTOPIC%" method="post">
-<input type="hidden" name="errors" value="%BIBERRORS%" />
-<input type="hidden" name="form" value="%BIBFORM%" />
-<input type="hidden" name="bibtopic" value="%BIBTOPIC%" />
-<input type="hidden" name="keywords" value="%BIBKEYWORDS%" />
-<input type="hidden" name="total" value="%BIBTOTAL%" />
-<table width="100%" cellspacing="0" cellpadding="0" ><tr><td>
-<table class="bibsearch" cellspacing="0" cellpadding="0" width="100%">
-<tr>
-	<th>Select:</th>
-	<th style="width:100%">
-		<input type="text" name="select" value="" style="width:100%"/></th>
-	<th><nobr>
-		 <input type="submit" class="submit" value="Submit" />&nbsp;
-		 <input type="button" class="reset" value="Reset" onclick="window.location.href='%SCRIPTURL%/view/%INCLUDINGWEB%/%INCLUDINGTOPIC%';" />
-		 </nobr>
-	</th>
-  </tr> 
-</table>
-</td></tr>
-<tr><td>%BIBTEXRESULT%</td></tr>
-</table>
-</form> 
-<style type="text/css">
-.bibsearch th {
-  border-bottom:0px;
-  padding-top:5px;
-  padding-bottom:5px;
-}
-</style>
-%STOPINCLUDE%
-
+	<input type="hidden" name="errors" value="%BIBERRORS%" />
+	<input type="hidden" name="form" value="%BIBFORM%" />
+	<input type="hidden" name="bibtopic" value="%BIBTOPIC%" />
+	<input type="hidden" name="keywords" value="%BIBKEYWORDS%" />
+	<input type="hidden" name="total" value="%BIBTOTAL%" />
+	<table>
+		<tr>
+			<td>
+				<table class="bibsearch">
+					<tr>
+						<th>Select:</th>
+						<th>
+							<input type="text" class='foswikiInputField' name="select" value="" size='80'/></th>
+						<th><nobr>
+							<input type="submit" class="foswikiSubmit" value="Submit" />&nbsp;
+							<input type="button" class="foswikiButton" value="Reset" onclick="window.location.href='%SCRIPTURL%/view/%INCLUDINGWEB%/%INCLUDINGTOPIC%';" />
+						</nobr></th>
+					</tr> 
+				</table>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				%BIBTEXRESULT%
+			</td>
+		</tr>
+	</table>
+</form>%STOPINCLUDE%

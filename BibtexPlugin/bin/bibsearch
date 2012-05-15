@@ -1,29 +1,10 @@
 #!/usr/bin/perl -wT
-###############################################################################
-# Foswiki - The Free and Open Source Wiki, http://foswiki.org/
-#
-# Copyright (C) 2003 Michael Daum <micha@nats.informatik.uni-hamburg.de>
-#
-# ported to Foswiki:
-# Copyright (C) 2008-2009 Foswiki Contributors.
-#
-# This program is free software; you can redistribute it and/or
-# modify it under the terms of the GNU General Public License
-# as published by the Free Software Foundation; either version 2
-# of the License, or (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details, published at 
-# http://www.gnu.org/copyleft/gpl.html
-###############################################################################
-
+# See bottom of file for license and copyright information
 use strict;
 use warnings;
 
 BEGIN {
-    if ( defined $ENV{GATEWAY_INTERFACE} ) {
+    if ( defined $ENV{GATEWAY_INTERFACE} || defined $ENV{MOD_PERL} ) {
         $Foswiki::cfg{Engine} = 'Foswiki::Engine::CGI';
         use CGI::Carp qw(fatalsToBrowser);
         $SIG{__DIE__} = \&CGI::Carp::confess;
@@ -34,13 +15,27 @@ BEGIN {
         $SIG{__DIE__} = \&Carp::confess;
     }
     $ENV{FOSWIKI_ACTION} = 'bibsearch';
-    @INC = ('.', grep { $_ ne '.' } @INC);
+    @INC = ( '.', grep { $_ ne '.' } @INC );
     require 'setlib.cfg';
 }
 
-use Foswiki;
-use Foswiki::UI;
+use Foswiki     ();
+use Foswiki::UI ();
 $Foswiki::engine->run();
-# Note: to run this script in Foswiki, it needs to be registered with the SwitchBoard.
-#       add the following line to LocalSite.cfg:
-# $Foswiki::cfg{SwitchBoard}{bibsearch} = [ "Foswiki::Plugins::BibtexPlugin::CgiBibSearch", "cgibibsearch", { bibsearch => 1 } ];
+
+# Copyright (C) 2012 Foswiki Contributors
+# Copyright (C) 2003 Michael Daum <micha@nats.informatik.uni-hamburg.de>
+#
+# Based on parts of the EmbedBibPlugin by TWiki:Main/DonnyKurniawan
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details, published at
+# http://www.gnu.org/copyleft/gpl.html
+
