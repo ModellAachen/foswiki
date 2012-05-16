@@ -1217,7 +1217,7 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 									dialog = this.getDialog()
 									var fname = dialog.getContentElement('upload', 'filepath').getInputElement().getValue();
 									// We're not terribly interested in Windows paths
-									fname = fname.replace(/^.:\\(.+)\\/, '');
+									fname = fname.replace(/^.:(.*)\\/, '');
 									this.setValue(fname);
 								}
 							}
