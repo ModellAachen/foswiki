@@ -553,7 +553,7 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 											{
 												dialog = this.getDialog();
 												dialog.getContentElement('info', 'txtUrl').qwikiautosuggest('init', {
-													source: CKEDITOR.qwikiautosuggest.attachmentURLs,
+													source: CKEDITOR.qwikiautosuggest.attachmentImages,
 													minLength: 2,
 													select: function() {
 														// Need to delay this so that it only runs after the field has been updated
