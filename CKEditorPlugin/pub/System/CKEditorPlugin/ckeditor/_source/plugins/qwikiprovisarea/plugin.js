@@ -401,6 +401,8 @@ CKEDITOR.plugins.add( 'qwikiprovisarea',
 					var ibody = $('#cke_contents_topic iframe').first().contents().find('body');
 					ibody.find('#cke_provis_block_overlay').remove();
 					ibody[0].contentEditable = "true";
+					// Restore save/cancel buttons
+					$('.patternBorder').show();
 
 					// Neues Element kreiieren und ersetzen
 					var element = CKEDITOR.dom.element.createFromHtml('<span class="WYSIWYG_PROTECTED">%PROCESS{'+
@@ -442,7 +444,9 @@ CKEDITOR.plugins.add( 'qwikiprovisarea',
 					var element = selection.getSelectedElement();
 					var topic, name, type, rev;
 					flowchart = element;
-					
+
+					// Remove save/cancel buttons for now
+					$('.patternBorder').hide();
 					// Block editor UI
 					// Must happen after getting selected element because IE is prone to forgetting the selection -jk
 					//SMELL: should un-hardcode ID
