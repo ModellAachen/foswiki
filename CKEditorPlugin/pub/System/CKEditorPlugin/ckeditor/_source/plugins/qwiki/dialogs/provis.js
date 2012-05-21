@@ -5,6 +5,14 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 
 CKEDITOR.dialog.add( 'provis', function( editor )
 {
+	var hasJava = true;
+	if (typeof navigator.javaEnabled == 'function') {
+		if (!navigator.javaEnabled()) hasJava = false;
+	} else if (typeof window.clientInformation.javaEnabled == 'function') {
+		if (!window.clientInformation.javaEnabled()) hasJava = false;
+	}
+	var javaHint = hasJava ? '' : '<div style="margin-top:1em;">'+editor.lang.qwiki.flowchartJavaWarning+'</div>';
+
 	return {
 		title : editor.lang.qwikiflowchart.title,
 		minWidth : 350,
@@ -120,7 +128,7 @@ CKEDITOR.dialog.add( 'provis', function( editor )
 										id : 'name_expl',
 										type : 'html',
 										html : '<div style="font-weight:bold;">'+ editor.lang.qwikiflowchart.specialCharsHint +
-											'</div><div>'+ editor.lang.qwikiflowchart.autoGenerateHint +'</div>'
+											'</div><div>'+ editor.lang.qwikiflowchart.autoGenerateHint +'</div>'+ javaHint
 									}
 								],
 								setup : function( data )

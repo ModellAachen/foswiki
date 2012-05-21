@@ -371,7 +371,14 @@ CKEDITOR.plugins.add( 'qwikiprovisarea',
 
 					if ( element.getAttribute( 'data-cke-real-element-type' ) == 'provis' )
 					{
-						editor.execCommand('provisarea');
+						var hasJava = true;
+						if (typeof navigator.javaEnabled == 'function') {
+							if (!navigator.javaEnabled()) hasJava = false;
+						} else if (typeof window.clientInformation.javaEnabled == 'function') {
+							if (!window.clientInformation.javaEnabled()) hasJava = false;
+						}
+						if (hasJava) return editor.execCommand('provisarea');
+						alert(editor.lang.qwikiflowchart.javaDisabled);
 					}
 				});
 		

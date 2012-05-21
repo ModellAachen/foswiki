@@ -30,6 +30,7 @@ CKEDITOR.plugins.setLang( 'qwikiprovisarea', 'en',
 		resize			: 'ProVis Window Size',
 		saveoptions		: 'Save Options',
 		cancelmsg		: 'You are leaving ProVis without saving',
-		saveerror		: 'The following errors occurred while trying to save the diagram: '
+		saveerror		: 'The following errors occurred while trying to save the diagram: ',
+		javaDisabled		: 'Editing flowcharts requires Java, but it seems to be missing or disabled in your browser.'
 	}
 });

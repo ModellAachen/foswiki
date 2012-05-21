@@ -36,6 +36,7 @@ CKEDITOR.plugins.setLang( 'qwikiprovisarea', 'de',
 		resize			: 'ProVis Fenstergr\u00F6\u00DFe',
 		saveoptions		: 'Darstellungsmodus',
 		cancelmsg		: 'Sie verlassen nun ProVis, ohne zu speichern',
-		saveerror		: 'Beim Speichern des Diagramms sind folgende Fehler aufgetreten: '
+		saveerror		: 'Beim Speichern des Diagramms sind folgende Fehler aufgetreten: ',
+		javaDisabled		: 'In Ihrem Browser ist Java nicht aktiviert. Ohne Java k\u00F6nnen Sie keine Flussdiagramme bearbeiten.'
 	}
 });
