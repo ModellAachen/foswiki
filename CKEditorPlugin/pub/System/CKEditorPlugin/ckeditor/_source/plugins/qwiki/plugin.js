@@ -197,7 +197,9 @@ CKEDITOR.plugins.add('qwiki',
 									if ( isProVis(value) )
 									{
 										var attributes = getProVis(value);
-										var host = FoswikiCKE.getFoswikiVar("ATTACHURL");
+										var host = FoswikiCKE.getFoswikiVar("SCRIPTURL") +'/viewfile/'+
+											FoswikiCKE.getFoswikiVar('WEB') +'/'+
+											FoswikiCKE.getFoswikiVar('TOPIC') + '/';
 										var name = attributes.name + ".png" + "?rev=" + attributes.pngrev;
 										var url = host + "/" + name;
 										
