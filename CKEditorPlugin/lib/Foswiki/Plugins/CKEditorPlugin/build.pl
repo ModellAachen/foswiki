@@ -122,7 +122,7 @@ sub _minify {
 
 sub new {
 	my $class = shift;
-	return bless( $class->SUPER::new( $pname, $class ));
+	return bless( $class->SUPER::new( $pname ));
 }
 
 # Override build target to do CKEditor-specific preprocessing
