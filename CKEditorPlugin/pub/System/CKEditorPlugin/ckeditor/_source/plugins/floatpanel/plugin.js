@@ -288,7 +288,7 @@ CKEDITOR.plugins.add( 'floatpanel',
 									// Flip to show on left.
 									// Q.Wiki: just move slightly to the left; looks better
 									if ( spaceBefore > rectWidth )
-										left -= spaceAfter + 1;
+										left -= (rectWidth - spaceAfter);
 									// Align to window right.
 									else if ( viewportSize.width > rectWidth )
 										left = left - rect.right + viewportSize.width;
