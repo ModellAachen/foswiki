@@ -69,7 +69,8 @@ CKEDITOR.plugins.add('qwiki',
 		// Make combo boxes wide enough so nothing gets truncated
 		$('head').append('<style type="text/css">\n'+
 			'.cke_panel { min-width: 200px; }\n'+
-			'.cke_rcombo { min-width: 10em; }\n'+
+			'.cke_rcombo .cke_text { width: auto !important; min-width: 60px; }\n'+
+			'.cke_rcombo .cke_inline_label { padding-right: 4px; }\n'+
 		'</style>');
 
 		// Dokumente Verlinken
