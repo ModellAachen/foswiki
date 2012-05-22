@@ -186,11 +186,15 @@ BANNER
 		if ($entry =~ m(/$)) {
 			find({no_chdir => 1, wanted => sub {
 				my $target = $_;
+				# Temporarily add trailing slash so that substitution works
+				$target .= '/' if -d;
 				$target =~ s(^$entry)($preprocess_files{$entry});
+				$target =~ s(/$)();
 				for my $ign (@preprocess_ignore) {
 					return if ($_ =~ /$ign/);
 				}
 				my @parts = split('/', $target);
+				# Only show "major components"
 				print " $target" if @parts < 3 && $target !~ m(^core/|^_source/);
 				if (-d) {
 					if (!-d $target && $target !~ m(^core/)) {
