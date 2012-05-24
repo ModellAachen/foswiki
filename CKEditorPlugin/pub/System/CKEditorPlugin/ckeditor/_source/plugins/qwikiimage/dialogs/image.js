@@ -1201,7 +1201,7 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 							size : 38,
 							onChange : function()
 							{
-								//Alex: Hier sollte eine onChange Funktionalität hin
+								this.getDialog().getContentElement('upload', 'filename').onFocus();
 							}
 						},
 						{
@@ -1218,7 +1218,9 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 									var fname = dialog.getContentElement('upload', 'filepath').getInputElement().getValue();
 									// We're not terribly interested in Windows paths
 									fname = fname.replace(/^.:(.*)\\/, '');
-									this.setValue(fname);
+									var prefix = editor.config.upload_image_filename_prefix || '';
+									prefix = prefix.replace("$WEB", FoswikiCKE.getWeb()).replace("$TOPIC", FoswikiCKE.getTopic());
+									this.setValue(prefix + fname);
 								}
 							}
 						},
