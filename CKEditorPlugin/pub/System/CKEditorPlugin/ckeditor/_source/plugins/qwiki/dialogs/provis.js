@@ -5,6 +5,15 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 
 CKEDITOR.dialog.add( 'provis', function( editor )
 {
+	var types = editor.config.provis_types || ['swimlane'];
+	var typesList = [];
+	$.each(types, function(_idx, el) {
+		el = el.toLowerCase();
+		if (el == 'swimlane') typesList.push([editor.lang.qwikiflowchart.swimlane, 'swimlane']);
+		else if (el == 'flex') typesList.push([editor.lang.qwikiflowchart.process1, 'flex']);
+		else if (el == 'orglane') typesList.push([editor.lang.qwikiflowchart.organigram, 'orglane']);
+	});
+
 	var hasJava = true;
 	if (typeof navigator.javaEnabled == 'function') {
 		if (!navigator.javaEnabled()) hasJava = false;
@@ -38,18 +47,17 @@ CKEDITOR.dialog.add( 'provis', function( editor )
 										id : 'flowchartType',
 										type : 'select',
 										label : editor.lang.qwikiflowchart.type,
-										'default' : 'swimlanes',
-										hidden : 'true',
-										items :
-										[
-											[ editor.lang.qwikiflowchart.swimlane, 'Swimlane' ],
-											[ editor.lang.qwikiflowchart.process1, 'Flex' ],
-											[ editor.lang.qwikiflowchart.organigram, 'Orglane' ]
-										],
+										'default' : editor.config.provis_defaultType || 'swimlane',
+										hidden : types.length <= 1,
+										items : typesList,
 										setup : function( data )
 										{
 											if ( data.type )
 												this.setValue( data.type );
+										},
+										onShow : function()
+										{
+											this.onChange();
 										},
 										onChange : function()
 										{
@@ -57,15 +65,15 @@ CKEDITOR.dialog.add( 'provis', function( editor )
 											var previewImage = document.getElementById("previewImage2");
 
 											switch (wert) {
-											case "Swimlane":
+											case "swimlane":
 												previewImage.setAttribute( 'src', CKEDITOR.plugins.getPath( 'qwiki' ) + 'images/03_schwimmbahn.gif' );
 												//data.type = "swimlane";
 												break;
-											case "Flex":
+											case "flex":
 												previewImage.setAttribute( 'src', CKEDITOR.plugins.getPath( 'qwiki' ) + 'images/01_chevron.gif' );
 												//data.type = "process";
 												break;
-											case "Orglane":
+											case "orglane":
 												previewImage.setAttribute( 'src', CKEDITOR.plugins.getPath( 'qwiki' ) + 'images/02_organigramm.gif' );
 												//data.type = "organigram";
 												break;
@@ -147,7 +155,7 @@ CKEDITOR.dialog.add( 'provis', function( editor )
 							{
 								type : 'vbox',
 								height : '250px',
-								hidden : true,
+								hidden : types.length <= 1,
 								children :
 								[
 									{
@@ -185,7 +193,7 @@ CKEDITOR.dialog.add( 'provis', function( editor )
 				this.commitContent( data );
 
 				var name = data.name || "ProVis_";
-					var type = data.type || "Swimlane";
+					var type = data.type || "swimlane";
 					var rev = data.rev || 1;
 				var aqmrev = data.aqmrev || rev,
 					maprev = data.maprev || rev,
@@ -201,13 +209,13 @@ CKEDITOR.dialog.add( 'provis', function( editor )
 				// Insert a new anchor.
 				var imgSrc;
 				switch (type) {
-					case "Swimlane":
+					case "swimlane":
 						imgSrc = CKEDITOR.plugins.getPath( 'qwiki' ) + 'images/diagramm_swimlane.png';
 						break;
-					case "Flex":
+					case "flex":
 						imgSrc = CKEDITOR.plugins.getPath( 'qwiki' ) + 'images/diagramm_swimlane.png';
 						break;
-					case "Orglane":
+					case "orglane":
 						imgSrc = CKEDITOR.plugins.getPath( 'qwiki' ) + 'images/diagramm_swimlane.png';
 						break;
 					default:
