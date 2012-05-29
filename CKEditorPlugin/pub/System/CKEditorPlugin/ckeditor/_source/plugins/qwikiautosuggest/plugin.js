@@ -125,8 +125,14 @@ CKEDITOR.plugins.add( 'qwikiautosuggest',
 				}
 			}
 		});
+		var topicsExclude = editor.config.qwikiautosuggest_topics_exclude_webs || [];
+		if (topicsExclude.length > 0) {
+			$.each(topicsExclude, function(idx, val) { topicsExclude[idx] = '-'+ val; });
+			topicsExclude = ','+ topicsExclude.join(',');
+		} else
+			topicsExclude = '';
 		CKEDITOR.qwikiautosuggest = {
-			topics: FoswikiCKE.getFoswikiVar("VIEWSCRIPTURL") + "/System/AjaxHelper?section=topic;contenttype=text/plain;skin=text;baseweb=all,-Trash*,-System,-TWiki,-Sandbox;input=$query",
+			topics: FoswikiCKE.getFoswikiVar("VIEWSCRIPTURL") + "/System/AjaxHelper?section=topic;contenttype=text/plain;skin=text;baseweb=all,-Trash,-System,-TWiki,-Sandbox"+ topicsExclude +";input=$query",
 			attachments: FoswikiCKE.getFoswikiVar("VIEWSCRIPTURL") + "/System/AjaxHelper?section=attachment;contenttype=text/plain;skin=text;input=$query",
 			attachmentImages: FoswikiCKE.getFoswikiVar("VIEWSCRIPTURL") + "/System/AjaxHelper?section=attachmentimage;contenttype=text/plain;skin=text;input=$query"
 		};

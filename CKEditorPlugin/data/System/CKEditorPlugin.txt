@@ -80,6 +80,7 @@ advancedFeatures : {
 // provis_types : [ "swimlane", "orglane" ],
 // provis_nodes : [ "start", "process", "decision", "comment", "join", "database", "document", "end" ],
 // provis_defaultnode : "process",
+// qwikiautosuggest_topics_exclude_webs : [ "WebToExclude" ],
 // qwikilink_name : "Wiki Link",
 // qwikilink_extra_protocols : [ "notes://" ],
 ckefilebrowserUploadUrl : "%SCRIPTURL%/rest/WysiwygPlugin/upload",
