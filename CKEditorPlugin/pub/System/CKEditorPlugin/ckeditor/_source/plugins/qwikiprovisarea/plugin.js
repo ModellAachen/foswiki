@@ -129,11 +129,9 @@ CKEDITOR.plugins.add( 'qwikiprovisarea',
 
 			if ( element && element.getAttribute( 'data-cke-real-element-type' ) && element.getAttribute( 'data-cke-real-element-type' ) == 'provis' )
 			{
-				//Alex: Topic??
-				
 				topic = element.getAttribute( '_cke_provis_topic' ) || FoswikiCKE.getFoswikiVar("WEB") + "." + FoswikiCKE.getFoswikiVar("TOPIC");
 				name = element.getAttribute( '_cke_provis_name' );
-				type = element.getAttribute( '_cke_provis_type' ) || 'swimlane';
+				type = element.getAttribute( '_cke_provis_type' ).toLowerCase() || 'swimlane';
 				rev = element.getAttribute( '_cke_provis_aqmrev' ) ||
 					element.getAttribute( '_cke_provis_rev' ) || 1;
 			}
