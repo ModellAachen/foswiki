@@ -8,7 +8,7 @@ use warnings;
 use Assert;
 
 our $VERSION           = '$Rev$';
-our $RELEASE           = '1.9.5';
+our $RELEASE           = '1.9.6';
 our $SHORTDESCRIPTION  = 'Integration of the CKEditor WYSIWYG Editor';
 our $NO_PREFS_IN_TOPIC = 1;
 
