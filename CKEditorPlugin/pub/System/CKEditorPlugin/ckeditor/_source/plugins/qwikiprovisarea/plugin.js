@@ -35,7 +35,6 @@ CKEDITOR.plugins.add( 'qwikiprovisarea',
 		maybeSetConfig('provis_defaultsize', '66%');
 
 		maybeSetConfig('provis_saveoptions', ['frame', 'line', 'noframe']);
-		maybeSetConfig('provis_defaultsaveoption', 'frame');
 
 		var container = null,
 		textcontainer = null,
@@ -179,11 +178,12 @@ CKEDITOR.plugins.add( 'qwikiprovisarea',
 				framewin.subscribeEvent('change_shape', function(value) {
 					editor.fire("provis_shape", value);
 				});
-				editor.fire("provis_shape", config.provis_defaultnode);
 				framewin.subscribeEvent('change_savestyle', function(value) {
 					editor.fire("provis_save", value);
 				});
-				editor.fire("provis_save", config.provis_defaultsaveoption);
+				framewin.subscribeEvent('applet_loaded', function() {
+					editor.fire("provis_shape", config.provis_defaultnode);
+				});
 			});
 		});
 
@@ -277,7 +277,8 @@ CKEDITOR.plugins.add( 'qwikiprovisarea',
 				onClick: function(value) {
 					var label = value;
 					var langVal = params.langBase && lang[params.langBase + value];
-					if (langVal) this.setValue(value, langVal);
+					var combo = this;
+					if (langVal) setTimeout(function() { combo.setValue(value, langVal); });
 					if (typeof params.onClick == "function") params.onClick(this, value);
 				},
 
@@ -287,8 +288,6 @@ CKEDITOR.plugins.add( 'qwikiprovisarea',
 			});
 		};
 
-		var updatingValue = false;
-
 		addCombo({
 			name: 'Provis_Nodes',
 			title: lang.nodes,
@@ -297,13 +296,11 @@ CKEDITOR.plugins.add( 'qwikiprovisarea',
 			langBase: 'nodes_',
 			imageNameFormat: 'nodeicon_%.gif',
 			onClick: function(_c, value) {
-				updatingValue = true;
-				document.getElementById('iframe_provis').contentWindow.setShape(value);
-				updatingValue = false;
+				document.getElementById('iframe_provis').contentWindow.setShape(value, false);
 			},
 			onRender: function(combo) {
 				editor.on( 'provis_shape', function(ev) {
-					if (!updatingValue) this.onClick(ev.data);
+					this.onClick(ev.data);
 				}, combo);
 			}
 		});
@@ -323,16 +320,13 @@ CKEDITOR.plugins.add( 'qwikiprovisarea',
 			name: 'Provis_Saveoptions',
 			title: lang.saveoptions,
 			entries: config.provis_saveoptions,
-			defaultValue: config.provis_defaultsaveoption,
 			langBase: 'saveoptions_',
 			onClick: function(_c, value) {
-				updatingValue = true;
-				document.getElementById('iframe_provis').contentWindow.setSaveStyleMapper(value);
-				updatingValue = false;
+				document.getElementById('iframe_provis').contentWindow.setSaveStyle(value, false);
 			},
 			onRender: function(combo) {
 				editor.on('provis_save', function(ev) {
-					if (!updatingValue) this.onClick(ev.data);
+					this.onClick(ev.data);
 				}, combo);
 			}
 		});
