@@ -80,6 +80,8 @@ advancedFeatures : {
 // provis_types : [ "swimlane", "orglane" ],
 // provis_nodes : [ "start", "process", "decision", "comment", "join", "database", "document", "end" ],
 // provis_defaultnode : "process",
+// qwikilink_name : "Wiki Link",
+// qwikilink_extra_protocols : [ "notes://" ],
 ckefilebrowserUploadUrl : "%SCRIPTURL%/rest/WysiwygPlugin/upload",
 // upload_filename_prefix : "Anhang_$TOPIC_",
 // upload_image_filename_prefix : "Bild_$TOPIC_",
