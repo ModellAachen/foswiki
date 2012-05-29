@@ -3,5 +3,5 @@
 # Time::ParseDate,>=2003.0211,cpan,Required.
 # Foswiki::Plugins,>=1.2,perl,Requires version 1.2 of handler API.
 Foswiki::Plugins::JQueryPlugin,>=4.33,perl,JQueryPlugin required.
-Foswiki::Plugins::ProVisPlugin,>=1.2,perl,ProVisPlugin required.
+Foswiki::Plugins::ProVisPlugin,>=1.3,perl,ProVisPlugin required.
 Foswiki::Plugins::WysiwygPlugin,>=1.1.4,perl,WysiwygPlugin required.
