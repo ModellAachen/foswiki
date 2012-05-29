@@ -79,6 +79,7 @@ advancedFeatures : {
 },
 // provis_types : [ "swimlane", "orglane" ],
 // provis_nodes : [ "start", "process", "decision", "comment", "join", "database", "document", "end" ],
+// provis_defaultnode : "process",
 ckefilebrowserUploadUrl : "%SCRIPTURL%/rest/WysiwygPlugin/upload",
 // upload_filename_prefix : "Anhang_$TOPIC_",
 // upload_image_filename_prefix : "Bild_$TOPIC_",
