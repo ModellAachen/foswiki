@@ -31,6 +31,8 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 		}
 
 		var dialogadvtab = editor.plugins.dialogadvtab;
+		var tableClasses = editor.config.table_classes || ['Modac_Standard', 'Modac_Standard_Ohne', 'Modac_Standard_Leer'];
+		var tableRegex = tableClasses.join('|');
 
 		return {
 			title : editor.lang.table.title,
@@ -70,7 +72,7 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 					});
 				classes.on( 'change', function( evt )
 					{
-						var check = this.getValue().match(/Modac_Standard_Leer|Modac_Standard_Ohne|Modac_Standard/);
+						var check = this.getValue().match(new RegExp(tableRegex));
 						if(check){
 							dialog.getContentElement('info', 'tableType').setValue(this.getValue());
 							dialog.hidePage('advanced');
@@ -296,12 +298,12 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 									type : 'select',
 									id : 'tableType',
 									label : 'Tabellen Typus',
-									'default' : 'Modac_Standard',
+									'default' : tableClasses[0],
 									items :
 										[
-											[ editor.lang.qwikitable.type_standard, 'Modac_Standard' ],
-											[ editor.lang.qwikitable.type_standard_noheaders, 'Modac_Standard_Ohne' ],
-											[ editor.lang.qwikitable.type_invisible, 'Modac_Standard_Leer' ],
+											[ editor.lang.qwikitable.type_standard, tableClasses[0] ],
+											[ editor.lang.qwikitable.type_standard_noheaders, tableClasses[1] ],
+											[ editor.lang.qwikitable.type_invisible, tableClasses[2] ],
 											[ editor.lang.qwikitable.type_none, '' ]
 										],
 									onChange : function( data, table )
