@@ -72,13 +72,17 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 					});
 				classes.on( 'change', function( evt )
 					{
-						var check = this.getValue().match(new RegExp(tableRegex));
+						var value = evt.data ? evt.data.value : this.getValue();
+						// Legacy handling: MA_table is deprecated
+						if (value == "MA_table") value = tableClasses[0];
+
+						var check = value.match(new RegExp(tableRegex));
+						var elem = dialog.getContentElement('info', 'tableType');
 						if(check){
-							dialog.getContentElement('info', 'tableType').setValue(this.getValue());
+							elem.setValue(value, true);
 							dialog.hidePage('advanced');
-						}
-						else {
-							dialog.getContentElement('info', 'tableType').setValue('');
+						} else {
+							elem.setValue('', true);
 							dialog.showPage('advanced');
 						}
 					});
@@ -311,8 +315,9 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 										if (alreadyChangingType) return;
 										// Modac : Stylesheet Klassen setzen
 										alreadyChangingType = true;
+										var value = data.data ? data.data.value : this.getValue();
 										var classes = this.getDialog().getContentElement('advanced', 'advCSSClasses');
-										classes.setValue(this.getValue());
+										classes.setValue(value);
 										alreadyChangingType = false;
 									}
 								}
