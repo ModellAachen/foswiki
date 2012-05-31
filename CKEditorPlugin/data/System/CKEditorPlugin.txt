@@ -58,7 +58,7 @@ toolbar_Basic : [
      { name: 'save',        items : [ 'Save', 'Cancel' ] },
      { name: 'wikitext',    items : [ 'WikiText' ] },
      { name: 'undoredo',    items : [ 'Undo','Redo' ] },
-     { name: 'links',       items : [ 'Link','Unlink','Anchor' ] },
+     { name: 'links',       items : [ 'Link','Unlink' ] },
      { name: 'qwiki',       items : [ 'ProVis','Document','QWikiImage','Table' ] },
      { name: 'tools',       items : [ 'RemoveFormat','ShowBlocks','Maximize' ] },
      '/',
