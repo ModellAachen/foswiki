@@ -133,7 +133,7 @@ CKEDITOR.plugins.add( 'qwikiprovisarea',
 				name = element.getAttribute( '_cke_provis_name' );
 				type = element.getAttribute( '_cke_provis_type' ).toLowerCase() || 'swimlane';
 				rev = element.getAttribute( '_cke_provis_aqmrev' ) ||
-					element.getAttribute( '_cke_provis_rev' ) || 1;
+					element.getAttribute( '_cke_provis_rev' ) || 0;
 			}
 			else
 				return false;
