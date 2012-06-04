@@ -139,22 +139,10 @@ CKEDITOR.dialog.add( 'provis', function( editor )
 											'</div><div>'+ editor.lang.qwikiflowchart.autoGenerateHint +'</div>'+ javaHint
 									}
 								],
-								setup : function( data )
-								{
-									if ( !this.getDialog().getContentElement( 'info', 'linkType' ) )
-										this.getElement().show();
-								}
-							},
-							{
-								type : 'button',
-								id : 'browse',
-								hidden : 'true',
-								filebrowser : 'info:url',
-								label : editor.lang.common.browseServer
 							},
 							{
 								type : 'vbox',
-								height : '250px',
+								height : '230px',
 								hidden : types.length <= 1,
 								children :
 								[
