@@ -96,12 +96,12 @@ pasteFromWordRemoveFontStyles : true,
 foswiki_vars : { PUBURLPATH : "%PUBURLPATH%", PUBURL : "%PUBURL%", WEB : "%BASEWEB%", TOPIC : "%BASETOPIC%", ATTACHURL : "%PUBURL%/%BASEWEB%/%BASETOPIC%", ATTACHURLPATH : "%PUBURLPATH%/%BASEWEB%/%BASETOPIC%", VIEWSCRIPTURL : "%SCRIPTURL{view}%", SCRIPTSUFFIX: "%SCRIPTSUFFIX%", SCRIPTURL : "%SCRIPTURL%", SYSTEMWEB: "%SYSTEMWEB%", HTTP_HOST: "%HTTP_HOST%" },
 height : "400",
 contentsCss : [
-  "%PUBURLPATH%/%SYSTEMWEB%/CKEditorPlugin/ckeditor/contents.css",
-  "%PUBURLPATH%/%SYSTEMWEB%/CKEditorPlugin/ckeditor/modacContents%IF{"$CKEditorPlugin_DEBUG='1'" then="_source"}%.css",
   "%PUBURLPATH%/%SYSTEMWEB%/SkinTemplates/base.css",
   "%FOSWIKI_STYLE_URL%",
   "%FOSWIKI_COLORS_URL%",
-  "%FOSWIKI_PROJECT_URL%"
+  "%FOSWIKI_PROJECT_URL%",
+  "%PUBURLPATH%/%SYSTEMWEB%/CKEditorPlugin/ckeditor/contents.css",
+  "%PUBURLPATH%/%SYSTEMWEB%/CKEditorPlugin/ckeditor/modacContents%IF{"$CKEditorPlugin_DEBUG='1'" then="_source"}%.css"
 ]
 %ENDSECTION{"CKEPLUGIN_INIT"}%
 </verbatim>
