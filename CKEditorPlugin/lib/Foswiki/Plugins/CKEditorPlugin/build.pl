@@ -63,6 +63,8 @@ my @include_files = qw(
 	ckeditor_basic.js ckeditor_basic_source.js
 	contents.css
 	config.js
+	images/bullet.gif
+	images/spacer.gif
 );
 
 # Other files to be included in package, relative to plugin root
