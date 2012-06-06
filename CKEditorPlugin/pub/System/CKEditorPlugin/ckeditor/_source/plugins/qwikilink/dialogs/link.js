@@ -1386,8 +1386,9 @@ CKEDITOR.dialog.add( 'link', function( editor )
 					{
 						case 'topicurl':
 							var protocol = '',
-									url = ( data.qwiki.topicurl && data.qwiki.topicurl ) || '';
-							attributes['data-cke-saved-href'] = ( url.indexOf( '/' ) === 0 ) ? url : protocol + url;
+								url = ( data.qwiki.topicurl && data.qwiki.topicurl ) || '',
+								filteredUrl = url.replace(/\s+/g, '');
+							attributes['data-cke-saved-href'] = ( url.indexOf( '/' ) === 0 ) ? filteredUrl : protocol + filteredUrl;
 							break;
 						case 'anchorOptions':
 							var name = ( data.anchor && data.anchor.name ),
