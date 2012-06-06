@@ -150,8 +150,17 @@ CKEDITOR.plugins.add('qwiki',
 			// Modac : provis contextmenu
 			editor.contextMenu.addListener( function( element, selection )
 				{
-					if ( element && element.is( 'img' ) && element.getAttribute( 'data-cke-real-element-type' ) == 'provis' )
+					if ( element && element.is( 'img' ) && element.getAttribute( 'data-cke-real-element-type' ) == 'provis' ) {
+						// Disable clipboard menu items to prevent accidents
+						var items = [ 'cut', 'copy', 'paste' ];
+						$.each(items, function(_idx, menuitem) {
+							var mi = editor.getMenuItem( menuitem );
+							if (!mi) return;
+							mi.state = CKEDITOR.TRISTATE_DISABLED;
+						});
+						editor.getMenuItem( 'cut' )
 						return { provis : CKEDITOR.TRISTATE_OFF };
+					}
 				});
 			
 			// Modac : code contextmenu
