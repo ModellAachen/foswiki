@@ -138,7 +138,7 @@ CKEDITOR.dialog.add( 'provis', function( editor )
 										html : '<div style="font-weight:bold;">'+ editor.lang.qwikiflowchart.specialCharsHint +
 											'</div><div>'+ editor.lang.qwikiflowchart.autoGenerateHint +'</div>'+ javaHint
 									}
-								],
+								]
 							},
 							{
 								type : 'vbox',
