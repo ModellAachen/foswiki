@@ -1420,37 +1420,7 @@ sub _handleA {
         if ( $this->{context} && $this->{context}->{rewriteURL} ) {
             $href = $this->{context}->{rewriteURL}->( $href, $this->{context} );
         }
-        $reww = Foswiki::Func::getRegularExpression('wikiWordRegex')
-          unless $reww;
         my $nop = ( $options & $WC::NOP_ALL ) ? '<nop>' : '';
-        if ( $href =~ /^(\w+\.)?($reww)(#\w+)?$/ ) {
-            my $web       = $1 || '';
-            my $topic     = $2;
-            my $anchor    = $3 || '';
-            my $cleantext = $text;
-            $cleantext =~ s/<nop>//g;
-            $cleantext =~ s/^$this->{context}->{web}\.//;
-
-            # if the clean text is the known topic we can ignore it
-            if ( ( $cleantext eq $href || $href =~ /\.$cleantext$/ )
-                && !$forceTML )
-            {
-                return ( 0,
-                        $WC::CHECK1 
-                      . $nop 
-                      . $web 
-                      . $topic 
-                      . $anchor
-                      . $WC::CHECK2 );
-            }
-        }
-        #Modac: Do not allow Web.Topic Links
-        #if (   $href =~ /${WC::PROTOCOL}[^?]*$/
-        #    && $text eq $href
-        #    && !$forceTML )
-        #{
-        #    return ( 0, $WC::CHECK1 . $nop . $text . $WC::CHECK2 );
-        #}
         if ( $text eq $href ) {
             return ( 0, $WC::CHECKw . '[' . $nop . '[' . $href . ']]' );
         }
