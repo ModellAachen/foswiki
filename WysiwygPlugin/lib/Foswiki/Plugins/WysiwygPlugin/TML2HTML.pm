@@ -440,7 +440,7 @@ s/<([A-Za-z]+[^>]*?)((?:\s+\/)?)>/"<" . $this->_appendClassToTag($1, 'TMLhtml') 
       _getNamedColour($1, $2)#oge;
 
     # let WYSIWYG-editable A tags untouched for the editor
-    $text =~ s/\<a
+    $text =~ s/(\<a
         (?:\s+
             (?: href|target|title|class )=
             (?: \'[^\']*\' | \"[^\"]*\" | [^\'\"\s]+ )+
