@@ -7,7 +7,7 @@ CKEDITOR.dialog.add( 'qwikisymbol', function( editor )
 {
 	var config = editor.config,
 		lang = editor.lang.qwikisymbol,
-		images = config.qwikisymbol_images,
+		images = config.qwikisymbol_images || [],
 		columns = config.qwikisymbol_columns || 8,
 		i;
 
@@ -169,8 +169,8 @@ CKEDITOR.dialog.add( 'qwikisymbol', function( editor )
 					' aria-labelledby="' + smileyLabelId + '"',
 					' class="cke_smile cke_hand" tabindex="-1" onkeydown="CKEDITOR.tools.callFunction( ', onKeydown, ', event, this );">',
 					'<img class="cke_hand" title="', config.smiley_descriptions[i], '"' +
-						' cke_src="', CKEDITOR.tools.htmlEncode( config.smiley_path + images[ i ] ), '" alt="', config.smiley_descriptions[i], '"',
-						' src="', CKEDITOR.tools.htmlEncode( config.smiley_path + images[ i ] ), '"',
+						' cke_src="', CKEDITOR.tools.htmlEncode( config.qwikisymbol_path + images[ i ] ), '" alt="', config.smiley_descriptions[i], '"',
+						' src="', CKEDITOR.tools.htmlEncode( config.qwikisymbol_path + images[ i ] ), '"',
 						// IE BUG: Below is a workaround to an IE image loading bug to ensure the image sizes are correct.
 						( CKEDITOR.env.ie ? ' onload="this.setAttribute(\'width\', 2); this.removeAttribute(\'width\');" ' : '' ),
 					'>' +
