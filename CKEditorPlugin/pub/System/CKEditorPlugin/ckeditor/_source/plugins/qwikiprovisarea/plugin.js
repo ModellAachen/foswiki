@@ -120,7 +120,7 @@ CKEDITOR.plugins.add( 'qwikiprovisarea',
 			//SMELL: should un-hardcode ID
 			var iframe = $('#cke_contents_topic iframe').first();
 			var ibody = iframe.contents().find('body');
-			ibody.append('<div id="cke_provis_block_overlay" style="left: 0; top: 0; background: black; -ms-filter:\'progid:DXImageTransform.Microsoft.Alpha(Opacity=50)\'; filter: alpha(opacity=50); opacity: .5; z-index: 15000; position: fixed;"></div>');
+			ibody.append('<div id="cke_provis_block_overlay" style="left: 0; top: 0; background: black; -ms-filter:\'progid:DXImageTransform.Microsoft.Alpha(Opacity=30)\'; filter: alpha(opacity=30); opacity: .3; z-index: 15000; position: fixed;"></div>');
 			ibody.find('#cke_provis_block_overlay').height(iframe.innerHeight()).width(iframe.innerWidth());
 			if (ibody[0]) ibody[0].contentEditable = "false";
 			// Make IE7 deselect flowchart element in editor, so that users
