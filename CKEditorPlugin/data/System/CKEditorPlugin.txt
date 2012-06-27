@@ -51,7 +51,7 @@ Below is the default configuration. If it is to be modified, it should be copied
 <verbatim class="js">
 %STARTSECTION{"CKEPLUGIN_INIT"}%
 extraPlugins : "qwikistyles,qwikiprovisarea,qwiki,qwikiajax,qwikifilebrowser,qwikiimage,qwikiautosuggest,qwikilink,qwikisave,qwikitoolbar,qwikiwikitext,qwikitable,tableresize,ajax,xml",
-removePlugins : "toolbar,save,link,image,table",
+removePlugins : "toolbar,save,link,image,table,forms",
 enterMode : "1",
 menu_groups : "clipboard,form,tablecell,tablecellproperties,tablerow,tablecolumn,table,anchor,link,image,flash,checkbox,radio,textfield,hiddenfield,imagebutton,button,select,textarea,provis,code,removeformat",
 toolbar: "Basic",
@@ -67,6 +67,22 @@ toolbar_Basic : [
      { name: 'basicstyles', items : [ 'Bold','Italic','Underline' ] },
      { name: 'paragraph',   items : [ 'NumberedList','BulletedList','-','Outdent','Indent' ] },
      { name: 'styles',      items : [ 'Styles' ] }
+],
+toolbar_Full : [
+     { name: 'save',        items : [ 'Save', 'Cancel' ] },
+     { name: 'source',      items : [ 'WikiText', '-', 'Source' ] },
+     { name: 'undoredo',    items : [ 'Undo','Redo' ] },
+     { name: 'paste',       items : ['Cut','Copy','Paste','PasteText','PasteFromWord','-','Print','SpellChecker','Scayt'] },
+     { name: 'find',        items : ['Find','Replace','-','SelectAll','RemoveFormat'] },
+     { name: 'display',     items : ['Maximize','ShowBlocks','-','About'] },
+     '/',
+     { name: 'basicstyles', items : ['Bold','Italic','Underline','Strike','-','Subscript','Superscript'] },
+     { name: 'paragraph',   items : ['NumberedList','BulletedList','-','Outdent','Indent','Blockquote','CreateDiv'] },
+     { name: 'alignment',   items : ['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'] },
+     { name: 'links',       items : ['wbdroplets','wblink','Link','Unlink','Anchor'] },
+     { name: 'qwiki',       items : ['Code','ProVis','Document','QWikiImage','Table','HorizontalRule','QWikiSymbol','SpecialChar','PageBreak'] },
+     '/',
+     { name: 'advstyles',   items : ['Styles','Format','Font','FontSize'] }
 ],
 toolbar_Basic_Provis : [
 	{ name: 'save',		items : [ 'Provis_Save', 'Provisarea' ] },

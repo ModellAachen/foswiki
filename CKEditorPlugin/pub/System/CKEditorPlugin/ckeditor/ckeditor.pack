@@ -152,7 +152,7 @@ packages :
 					'_source/plugins/flash/plugin.js',
 					'_source/plugins/font/plugin.js',
 					'_source/plugins/format/plugin.js',
-					'_source/plugins/forms/plugin.js',
+//					'_source/plugins/forms/plugin.js',
 					'_source/plugins/horizontalrule/plugin.js',
 					'_source/plugins/htmldataprocessor/plugin.js',
 					'_source/plugins/iframe/plugin.js',
