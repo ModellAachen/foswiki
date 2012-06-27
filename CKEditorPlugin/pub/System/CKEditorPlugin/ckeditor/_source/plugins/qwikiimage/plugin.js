@@ -44,7 +44,7 @@ CKEDITOR.plugins.add( 'qwikiimage',
 					image :
 					{
 						label : editor.lang.image.menu,
-						command : 'image',
+						command : 'qwikiimage',
 						group : 'image'
 					}
 				});
