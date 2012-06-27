@@ -153,7 +153,7 @@ CKEDITOR.dialog.add( 'code', function( editor )
 			var selection = editor.getSelection();
 			
 			var element = selection.getSelectedElement();
-			if ( element && element.getAttribute( '_cke_real_element_type' ) && element.getAttribute( '_cke_real_element_type' ) == 'code' )
+			if ( element && element.getAttribute( 'data-cke-real-element-type' ) && element.getAttribute( 'data-cke-real-element-type' ) == 'code' )
 			{
 				this.fakeObj = element;
 				element = editor.restoreRealElement( this.fakeObj );
