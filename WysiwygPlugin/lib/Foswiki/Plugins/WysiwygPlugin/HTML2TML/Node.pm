@@ -271,7 +271,9 @@ s/$WC::CHECKw(($WC::PON|$WC::POFF)?[$WC::CHECKn$WC::CHECKs$WC::NBSP $WC::NBBR])/
     $text =~ s/$WC::CHECKs( |$WC::NBSP)/$1/go;
     $text =~ s/($WC::CHECKs)+/$WC::NBSP/go;
 
-    $text =~ s/<br( \/)?>$WC::NBBR/$WC::NBBR/g;    # Remove BR before P
+    # SMELL:   Removed per Item11859.   This was done because TMCE used to
+    # insert a <br /> before <p>  ...   It doesn't do that in 3.4.9
+    #$text =~ s/<br( \/)?>$WC::NBBR/$WC::NBBR/g;    # Remove BR before P
 
     #die "Converted ",WC::debugEncode($text),"\n";
     #print STDERR "Conv2     [",WC::debugEncode($text),"]\n";
@@ -346,10 +348,12 @@ s/$WC::CHECKw(($WC::PON|$WC::POFF)?[$WC::CHECKn$WC::CHECKs$WC::NBSP $WC::NBBR])/
         $tml =~ s/$WC::CHECK1/ /go;
         $tml =~ s/$WC::CHECK2/ /go;
 
+        # SMELL:   Removed per Item11859.   This was done because TMCE used to
+        # insert a <br /> before <p>  ...   It doesn't do that in 3.4.9
         # Item5127: Remove BR just before EOLs
-        unless ($protect) {
-            $tml =~ s/<br( \/)?>\n/\n/g;
-        }
+        #unless ($protect) {
+        #    $tml =~ s/<br( \/)?>\n/\n/g;
+        #}
 
         #print STDERR " -> [",WC::debugEncode($tml),"]\n";
         $text .= $tml;
@@ -360,7 +364,7 @@ s/$WC::CHECKw(($WC::PON|$WC::POFF)?[$WC::CHECKn$WC::CHECKs$WC::NBSP $WC::NBBR])/
     # because the previous opening verbatim tag might have different
     # class from the next one.
     foreach my $tag (qw(noautolink literal)) {
-        $text =~ s#</$tag>(\h*)<$tag>#$1#gs;
+        $text =~ s#</$tag>(\s*)<$tag>#$1#gs;
     }
 
     # Top and tail, and terminate with a single newline
@@ -1409,59 +1413,26 @@ sub _handleA {
           (      $this->{attrs}->{class}
               && $this->{attrs}->{class} =~ m/\bTMLlink\b/ );
 
-        # decode URL params in the href
-        $href =~ s/%([0-9A-F]{2})/chr(hex($1))/gei;
+# SMELL:  Item11814 - this corrupts URL's that must be encoded,  ex. embedded Newline
+# decode URL params in the href
+#$href =~ s/%([0-9A-F]{2})/chr(hex($1))/gei;
+
         if ( $this->{context} && $this->{context}->{rewriteURL} ) {
             $href = $this->{context}->{rewriteURL}->( $href, $this->{context} );
         }
-        $reww = Foswiki::Func::getRegularExpression('wikiWordRegex')
-          unless $reww;
         my $nop = ( $options & $WC::NOP_ALL ) ? '<nop>' : '';
-        if ( $href =~ /^(\w+\.)?($reww)(#\w+)?$/ ) {
-            my $web       = $1 || '';
-            my $topic     = $2;
-            my $anchor    = $3 || '';
-            my $cleantext = $text;
-            $cleantext =~ s/<nop>//g;
-            $cleantext =~ s/^$this->{context}->{web}\.//;
-
-            # if the clean text is the known topic we can ignore it
-            if ( ( $cleantext eq $href || $href =~ /\.$cleantext$/ )
-                && !$forceTML )
-            {
-                return ( 0,
-                        $WC::CHECK1 
-                      . $nop 
-                      . $web 
-                      . $topic 
-                      . $anchor
-                      . $WC::CHECK2 );
-            }
-        }
-        #Modac: Do not allow Web.Topic Links
-        #if (   $href =~ /${WC::PROTOCOL}[^?]*$/
-        #    && $text eq $href
-        #    && !$forceTML )
-        #{
-        #    return ( 0, $WC::CHECK1 . $nop . $text . $WC::CHECK2 );
-        #}
         if ( $text eq $href ) {
-            return ( 0,
-                $WC::CHECKw . '[' . $nop . '[' . $this->{attrs}{href} . ']]' );
+            return ( 0, $WC::CHECKw . '[' . $nop . '[' . $href . ']]' );
         }
 
         # we must quote square brackets in [[...][...]] notation
-        $text                =~ s/[[]/&#91;/g;
-        $text                =~ s/[]]/&#93;/g;
-        $this->{attrs}{href} =~ s/[[]/%5B/g;
-        $this->{attrs}{href} =~ s/[]]/%5D/g;
+        $text =~ s/[[]/&#91;/g;
+        $text =~ s/[]]/&#93;/g;
+        $href =~ s/[[]/%5B/g;
+        $href =~ s/[]]/%5D/g;
 
         return ( 0,
-                $WC::CHECKw . '[' 
-              . $nop . '['
-              . $this->{attrs}{href} . ']['
-              . $text
-              . ']]' );
+            $WC::CHECKw . '[' . $nop . '[' . $href . '][' . $text . ']]' );
     }
     elsif ( $this->{attrs}->{name} ) {
 

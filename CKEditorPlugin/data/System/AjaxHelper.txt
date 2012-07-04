@@ -23,7 +23,7 @@ Der folgende Bereich gibt Attachments für den Ajax Client zurück
 %ATTACHMENTLIST{web="*" excludeweb="System, Sandbox, Trash, TWiki" topic="*" sort="$fileName" format="{\"label\":\"$fileName\",\"sublabel\":\"<strong>$fileTopic</strong> ($fileWeb)\",\"value\":\"$fileWeb/$fileTopic/$fileName\"}" separator="," includefilepattern="(?i)%URLPARAM{"input" default="Keine Suchergebnisse"}%"}%]
 %ENDSECTION{"attachment"}%
 
-%STARTSECTION{"attachmenturl"}%[
-%ATTACHMENTLIST{web="*" excludeweb="System, Sandbox, Trash, TWiki" topic="*" sort="$fileName" format="{\"label\":\"$fileName\",\"sublabel\":\"<strong>$fileTopic</strong> ($fileWeb)\",\"value\":\"%PUBURLPATH%/$fileWeb/$fileTopic/$fileName\"}" separator="," includefilepattern="(?i)%URLPARAM{"input" default="Keine Suchergebnisse"}%"}%]
-%ENDSECTION{"attachmenturl"}%
+%STARTSECTION{"attachmentimage"}%[
+%ATTACHMENTLIST{web="*" excludeweb="System, Sandbox, Trash, TWiki" topic="*" sort="$fileName" format="{\"label\":\"$fileName\",\"sublabel\":\"<strong>$fileTopic</strong> ($fileWeb)\",\"value\":\"%PUBURLPATH%/$fileWeb/$fileTopic/$fileName\"}" separator="," includefilepattern="(?i)%URLPARAM{"input" default="Keine Suchergebnisse"}%" extension="gif, jpg, jpeg, png"}%]
+%ENDSECTION{"attachmentimage"}%
 

@@ -1,16 +1,16 @@
-bin/bibsearch 
-data/System/BibtexPlugin.txt 
-data/System/BibtexSearchTemplate.txt 
-data/System/BibtexSelectTemplate.txt 
-data/System/BibtexSimpleSearchTemplate.txt 
-lib/Foswiki/Plugins/BibtexPlugin.pm 
-lib/Foswiki/Plugins/BibtexPlugin/CgiBibSearch.pm 
-pub/System/BibtexPlugin/bibtoolrsc 
-pub/System/BibtexPlugin/sample.bib 
-pub/System/BibtexPlugin/style.css 
-pub/System/BibtexPlugin/bibtex-cite-ex.png
-pub/System/BibtexPlugin/bibtex-inline-ex.png
-pub/System/BibtexPlugin/bibtex-ref-ex.png
-pub/System/BibtexPlugin/bibtex-select-ex.png
-tools/render.pl 
-tools/render.sh 
+bin/bibsearch 0755
+data/System/BibtexPlugin.txt 0644
+data/System/BibtexSearchTemplate.txt 0644
+data/System/BibtexSelectTemplate.txt 0644
+data/System/BibtexSimpleSearchTemplate.txt 0644
+lib/Foswiki/Plugins/BibtexPlugin.pm 0644
+lib/Foswiki/Plugins/BibtexPlugin/CgiBibSearch.pm 0644
+lib/Foswiki/Plugins/BibtexPlugin/Config.spec 0644
+pub/System/BibtexPlugin/bibtex-cite-ex.png 0644
+pub/System/BibtexPlugin/bibtex-inline-ex.png 0644
+pub/System/BibtexPlugin/bibtex-ref-ex.png 0644
+pub/System/BibtexPlugin/bibtex-select-ex.png 0644
+pub/System/BibtexPlugin/bibtoolrsc 0644
+pub/System/BibtexPlugin/sample.bib 0644
+pub/System/BibtexPlugin/style.css 0644
+tools/bibtex_render.sh 0644

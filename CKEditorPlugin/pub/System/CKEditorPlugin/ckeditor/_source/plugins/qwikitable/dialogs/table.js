@@ -31,6 +31,8 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 		}
 
 		var dialogadvtab = editor.plugins.dialogadvtab;
+		var tableClasses = editor.config.table_classes || ['Modac_Standard', 'Modac_Standard_Ohne', 'Modac_Standard_Leer'];
+		var tableRegex = tableClasses.join('|');
 
 		return {
 			title : editor.lang.table.title,
@@ -70,13 +72,17 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 					});
 				classes.on( 'change', function( evt )
 					{
-						var check = this.getValue().match(/Modac_Standard_Leer|Modac_Standard_Ohne|Modac_Standard/);
+						var value = evt.data ? evt.data.value : this.getValue();
+						// Legacy handling: MA_table is deprecated
+						if (value == "MA_table") value = tableClasses[0];
+
+						var check = value.match(new RegExp(tableRegex));
+						var elem = dialog.getContentElement('info', 'tableType');
 						if(check){
-							dialog.getContentElement('info', 'tableType').setValue(this.getValue());
+							elem.setValue(value, true);
 							dialog.hidePage('advanced');
-						}
-						else {
-							dialog.getContentElement('info', 'tableType').setValue('');
+						} else {
+							elem.setValue('', true);
 							dialog.showPage('advanced');
 						}
 					});
@@ -296,12 +302,12 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 									type : 'select',
 									id : 'tableType',
 									label : 'Tabellen Typus',
-									'default' : 'Modac_Standard',
+									'default' : tableClasses[0],
 									items :
 										[
-											[ editor.lang.qwikitable.type_standard, 'Modac_Standard' ],
-											[ editor.lang.qwikitable.type_standard_noheaders, 'Modac_Standard_Ohne' ],
-											[ editor.lang.qwikitable.type_invisible, 'Modac_Standard_Leer' ],
+											[ editor.lang.qwikitable.type_standard, tableClasses[0] ],
+											[ editor.lang.qwikitable.type_standard_noheaders, tableClasses[1] ],
+											[ editor.lang.qwikitable.type_invisible, tableClasses[2] ],
 											[ editor.lang.qwikitable.type_none, '' ]
 										],
 									onChange : function( data, table )
@@ -309,8 +315,9 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 										if (alreadyChangingType) return;
 										// Modac : Stylesheet Klassen setzen
 										alreadyChangingType = true;
+										var value = data.data ? data.data.value : this.getValue();
 										var classes = this.getDialog().getContentElement('advanced', 'advCSSClasses');
-										classes.setValue(this.getValue());
+										classes.setValue(value);
 										alreadyChangingType = false;
 									}
 								}

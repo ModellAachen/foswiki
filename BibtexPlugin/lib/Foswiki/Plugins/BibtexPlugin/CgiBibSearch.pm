@@ -153,22 +153,11 @@ sub cgibibsearch {
     my $tmpl = &Foswiki::Func::readTemplate( "view", $skin );
 
     $tmpl = Foswiki::Func::expandCommonVariables( $tmpl, $topic, $web );
-    if ( $Foswiki::Plugins::VERSION >= 1.1 ) {
-
-        # Dakar interface
-    }
-    else {
-
-        # Cairo interface
-        $tmpl = &Foswiki::handleMetaTags( $web, $topic, $tmpl, $meta, 1 );
-    }
-
     $tmpl = Foswiki::Func::renderText($tmpl);
 
     $tmpl =~ s/%SEARCHSTRING%//go;
     $tmpl =~ s/%REVINFO%//go;
-    $tmpl =~ s/%REVTITLE%(<nop>)?/bibsearch /go;
-    $tmpl =~ s/%REVTITLE%(<nop>)?/bibsearch /go;
+    $tmpl =~ s/%REVTITLE%/bibsearch /go;
     $tmpl =~ s/%REVARG%//go;
 
     ##
@@ -192,16 +181,10 @@ sub cgibibsearch {
     $text = Foswiki::Func::expandCommonVariables( $text, $topic, $web );
     $text = Foswiki::Func::renderText($text);
 
-    if (0) {
-
-        # Cairo interface
-        $text = &Foswiki::handleCommonTags( $text, $topic );
-        $text = &Foswiki::getRenderedVersion($text);
-    }
     $tmpl =~ s/%TEXT%/$text/go;
 
     ##
-    # repalce query strings
+    # replace query strings
     ##
     if ($theForm) {
         foreach my $fieldName (@textFields) {

@@ -3,7 +3,7 @@
 #
 # Author: Crawford Currie http://c-dot.co.uk
 #
-# Copyright (C) 2008-2011 FoswikiContributors. All rights reserved.
+# Copyright (C) 2008-2012 FoswikiContributors. All rights reserved.
 # FoswikiContributors are listed in the AUTHORS file in the root of
 # the distribution.
 #
@@ -87,6 +87,7 @@ my $fileset = {
     "$modPath/MANIFEST" => {
         template   => "lib/Foswiki/$def{STUBS}/$templateModule/MANIFEST",
         expand     => \&manifest,
+        extract    => \&manifestExtract,
         unmanifest => 1
     },
     "data/System/$def{MODULE}.txt" => {
@@ -158,24 +159,6 @@ foreach my $k ( keys %$fileset ) {
         $data = &{ $v->{extract} }($data);
     }
     writeFile( "$def{MODULE}/$k", expandVars($data), $v->{mask} );
-}
-
-# Kludge to fix Item11716
-
-my $fh;
-my $newcontent = '';
-
-if ( open( $fh, "<$def{MODULE}/lib/Foswiki/Plugins/$def{MODULE}/MANIFEST" ) ) {
-    while (<$fh>) {
-        s/EmptyPlugin/$def{MODULE}/g;
-        $newcontent = $newcontent . $_;
-    }
-    close($fh);
-}
-
-if ( open( $fh, ">$def{MODULE}/lib/Foswiki/Plugins/$def{MODULE}/MANIFEST" ) ) {
-    print $fh $newcontent;
-    close($fh);
 }
 
 ### Utility subs.
@@ -335,6 +318,7 @@ sub manifest {
         $v->{mask}  = 0444 unless defined $v->{mask};
         $s .= "$k $v->{mask} $v->{extra}\n";
     }
+
     return $s;
 }
 
@@ -345,7 +329,8 @@ sub add2Manifest {
         my $fn = "${1}EmptyExtract";
         $rw = eval "\\&$fn" if ( defined(&$fn) );
     }
-    print STDERR "$f ======= $rw\n";
+
+    #print STDERR "$f ======= $rw\n";
     my $to = expandVars( manifestExtract($f) );
     $fileset->{$to} = {
         template   => $f,
@@ -363,13 +348,19 @@ sub add2Manifest {
 sub commonEmptyExtract {
     my $s = shift;
     die unless defined $s;
-    $s =~ s/$templateModule/'%$MODULE%'/ge;
+    $s =~ s/$templateModule/'%\$MODULE%'/g;
     return $s;
 }
 
-# Special case for renaming
 sub manifestExtract {
-    my $s = commonEmptyExtract(shift);
+    my $s = shift;
+
+    # Rename templatemodule to this module
+    $s =~ s/$templateModule/$def{MODULE}/gs;
+
+    $s = commonEmptyExtract($s);
+
+    # Special case for renaming
     $s =~ s/your\.(\w+)$/'%$JQUERYPLUGINMODULELC%'.$1/e;
     $s =~ s/Your\.(\w+)$/'%$JQUERYPLUGIN%'..$1/e;
     $s =~ s/YOUR\.(\w+)$/'%$JQUERYPLUGINMODULE%'.$1/e;

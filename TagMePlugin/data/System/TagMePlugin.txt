@@ -1,5 +1,4 @@
 ---+!! Tag-me Plugin
-
 Plugin to tag wiki content collectively in order to find content by tags and to get a meaningful page ranking.
 
 %TOC%
@@ -59,7 +58,7 @@ will see:
 
 <div class="foswikiImage"><img src="%ATTACHURLPATH%/topictags_styleblog_open.gif" alt="Screenshot of tags on a topic, style=blog"  width="489" height="464" /></div>
 
----++++ "jqui"
+---++++ "jqui": an AJAX interface
 An experimental interactive user interface is also provided, implemented using the latest version of JQueryPlugin in TagMeAjaxHelper.
 
 All features work without having to re-load the topic:
@@ -74,7 +73,7 @@ All features work without having to re-load the topic:
      from the originating web (avoids reliance on browser back button
      when exploring a web via tag cloud)
    * Removing a tag may optionally clear the tag from the current topic
-     regardless of vote count (default for members of Main.AdminGroup). 
+     regardless of vote count (default for members of %USERSWEB%.AdminGroup). 
       * =Set TAGMEPLUGIN_JQUIREMOVEALL &#61; everybody= <br/>
         will allow any logged-in user to remove a tag, or
       * =Set TAGMEPLUGIN_JQUIREMOVEALL &#61; topicchange= <br/>to only give this
@@ -84,12 +83,15 @@ All features work without having to re-load the topic:
       * %ICON{"warning"}%
         jqui uses an undocumented feature of TagMePlugin to access the
         removeall feature, which does not appear to follow any access
-        controls internally.
+        controls internally. This function is 
 
-Include it into your WebTopBar (See WebTopBarExample) or any part of your skin that has horizontal space to spare, as follows:
-<verbatim class="tml">%INCLUDE{"%SYSTEMWEB%.TagMeAjaxHelper" section="jqui"}%</verbatim>
+To use the AJAX insterface, add to the skin path: =tagmeajax=,<br />
+or include it into the top bar (See WebTopBarExample) or any part of your skin that has horizontal space to spare, as follows:
+<verbatim class="tml">
+%INCLUDE{"%SYSTEMWEB%.TagMeAjaxHelper" section="jqui"}%
+</verbatim>
 
-<div class="foswikiImage"><img src="%ATTACHURLPATH%/jquery.tagmeui.png" alt="Screenshot of experimental jQuery UI"  width="493" height="205" /></div>
+<div class="foswikiImage"><img src="%ATTACHURLPATH%/jquery.tagmeui.png" alt="Screenshot of experimental jQuery UI" width="493" height="205" /></div>
 
 Dependencies:
    * JQueryPlugin
@@ -371,7 +373,7 @@ topic. Use the standard preference setting topics, such as
 | =TAGMEPLUGIN_LOGACTION= | Log add/create actions | 1 |
 | =TAGMEPLUGIN_NORMALIZE_TAG_INPUT= | Optionally normalize tag names. Set to 1 to translate international characters to their latin match (&uuml; to ue, &aring; to aa, etcetera), and to convert spaces to underscores. %BR%	Set to 0 to allow any user input, except for the reserved characters =,#'"|*=. %BR%Setting to 0 also sorts tags case insensitive: 'U' comes after 't'. | 0 |
 | =TAGMEPLUGIN_ALWAYS_REFINE= | If 1, then the =refine= parameter is always added to TAGME queries. | 1 |
-| =TAGMEPLUGIN_ALLOW_TAG_CHANGE= | List of users and groups that are allowed to change (rename and delete) tags (names separated by commas). %BR%	Users that are not allowed to change post their change requests to TagMeChangeRequests. %BR%	If not set anyone can change tags. | Main.AdminGroup |
+| =TAGMEPLUGIN_ALLOW_TAG_CHANGE= | List of users and groups that are allowed to change (rename and delete) tags (names separated by commas). %BR%	Users that are not allowed to change post their change requests to TagMeChangeRequests. %BR%	If not set anyone can change tags. | %USERSWEB%.AdminGroup |
 | =Set TAGMEPLUGIN_BUNDLES= | Bundles are groups of tags that are presented as menus for convenience. It is a list of space-separated (or comma-separated if your tags may contain spaces) prefixed by bundle labels terminated by colon (":"). e.g:<ol><li>* Set TAGMEPLUGIN_BUNDLES = Rating: * ** ** Todo: to_blog to_read</li><li>* Set BUNDLES = Rating:, *, **, **, Todo:, to_blog, to_read</li></ol> | |
 | =TAGMEPLUGIN_DEBUG= | Generate debug trace in foswiki debug log |
 
@@ -381,8 +383,8 @@ To index !TagMePlugin tags for use in !SolrPlugins's faceted search, your Foswik
 This can be done from the Extensions | !TagMePlugin tab - tick the ={Plugins}{TagMePlugin}{SolrPluginIndex}= option and save.
 		
 ---++ Plugin Installation Instructions
-
 %$INSTALL_INSTRUCTIONS%
+
    * Change the Plugin settings as needed:
       * Determine who will be allowed to rename and delete tags.
       * For international character support: set =TAGMEPLUGIN_NORMALIZE_TAG_INPUT= to 0.
@@ -392,13 +394,13 @@ This can be done from the Extensions | !TagMePlugin tab - tick the ={Plugins}{Ta
       * Go to [[TagMeCreateNewTag]] and add a tag
 
 ---++ Plugin Info
-
-|  Plugin Author: | Peter Thoeny, Arthur Clemens |
-|  Copyright: | &copy; 2006-2011, Foswiki Contributors, &copy; 2006-2007, Peter Thoeny |
+|  Plugin Author: | Arthur Clemens |
+|  Copyright: | &copy; 2006-2012, Foswiki Contributors, &copy; 2006-2007, Peter Thoeny |
 |  License: | GPL ([[http://www.gnu.org/copyleft/gpl.html][GNU General Public License]]) |
 |  Version: | %$VERSION% |
 |  Release: | %$RELEASE% |
 |  Change History: | <!-- versions below in reverse order -->&nbsp; |
+|  13 May 2012: | 2.0.1: Foswiki:Main.ArthurClemens: fixes to AJAX interface plus cosmetic update. |
 |  29 Jun 2011: | Foswiki:Main.SvenDowideit: add a command line resthandler to allow larger scale importing of tags |
 |  26 Jun 2011: | Foswiki:Main.SvenDowideit: add Foswiki:Main.SolrPlugin indexing and facet support to TagMePlugin (Foswiki:Tasks.Item10917), fix some bugs - Foswiki:Tasks.Item4628,  |
 |  08 Jun 2011: | Foswiki:Main.PaulHarvey: Minimal fix to experimental jqui to work with jQuery > 1.3 |

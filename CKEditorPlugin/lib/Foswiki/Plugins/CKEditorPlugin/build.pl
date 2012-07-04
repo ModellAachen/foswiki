@@ -63,6 +63,8 @@ my @include_files = qw(
 	ckeditor_basic.js ckeditor_basic_source.js
 	contents.css
 	config.js
+	images/bullet.gif
+	images/spacer.gif
 );
 
 # Other files to be included in package, relative to plugin root
@@ -122,7 +124,7 @@ sub _minify {
 
 sub new {
 	my $class = shift;
-	return bless( $class->SUPER::new( $pname, $class ));
+	return bless( $class->SUPER::new( $pname ));
 }
 
 # Override build target to do CKEditor-specific preprocessing
@@ -186,11 +188,15 @@ BANNER
 		if ($entry =~ m(/$)) {
 			find({no_chdir => 1, wanted => sub {
 				my $target = $_;
+				# Temporarily add trailing slash so that substitution works
+				$target .= '/' if -d;
 				$target =~ s(^$entry)($preprocess_files{$entry});
+				$target =~ s(/$)();
 				for my $ign (@preprocess_ignore) {
 					return if ($_ =~ /$ign/);
 				}
 				my @parts = split('/', $target);
+				# Only show "major components"
 				print " $target" if @parts < 3 && $target !~ m(^core/|^_source/);
 				if (-d) {
 					if (!-d $target && $target !~ m(^core/)) {
@@ -228,6 +234,15 @@ COMPL_MSG
 	open(my $fh, '>', "prebuild.stamp") or die "Could not stamp prebuild: $!";
 	print $fh time();
 	exit;
+}
+
+# Create MANIFEST file if none exists yet
+use File::Spec;
+my ($spec_vol, $spec_path) = File::Spec->splitpath(__FILE__);
+my $mani_path = File::Spec->catfile($spec_vol.$spec_path, 'MANIFEST');
+if (!-f $mani_path) {
+	open(MANI, '>', $mani_path) or die "Cannot create $mani_path: $!";
+	close(MANI);
 }
 
 # Create the build object

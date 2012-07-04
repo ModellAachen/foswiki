@@ -13,6 +13,8 @@ CKEDITOR.plugins.setLang( 'qwiki', 'de',
 	qwiki :
 	{
 		toolbarFlowchart : 'Flussdiagramm erstellen',
+		flowchartType : 'Flussdiagramm',
+		flowchartJavaWarning : '<strong>Achtung:</strong> Sie haben Java deaktiviert oder nicht installiert. Ohne Java k\u00F6nnen Sie keine Flussdiagramme bearbeiten.',
 		localFile : 'Lokale Datei',
 		qwikiFileName : 'Dateiname im Q.Wiki',
 		validateWidth : 'Breite muss eine ganze Zahl sein.',

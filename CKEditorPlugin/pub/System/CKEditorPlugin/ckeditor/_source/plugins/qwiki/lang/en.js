@@ -7,6 +7,8 @@ CKEDITOR.plugins.setLang( 'qwiki', 'en',
 {
 	qwiki: {
 		toolbarFlowchart : 'Create Flowchart',
+		flowchartType : 'Flowchart',
+		flowchartJavaWarning : '<strong>Warning:</strong> Java is disabled or not installed in your browser. You will not be able to edit flowcharts without it.',
 		localFile : 'Local File',
 		qwikiFileName : 'Filename in Q.Wiki',
 		validateWidth : 'Width must be a whole number.',

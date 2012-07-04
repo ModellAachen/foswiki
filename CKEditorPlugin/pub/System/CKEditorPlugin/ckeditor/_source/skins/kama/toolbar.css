@@ -398,11 +398,5 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 
 .cke_skin_kama .cke_browser_ie .cke_toolbox
 {
-	padding-bottom: 5px;
-	_padding-bottom: 6px;
-}
-
-.cke_shared .cke_skin_kama .cke_browser_ie .cke_toolbox
-{
-	padding-bottom: 0;
+	margin-bottom: 5px;
 }

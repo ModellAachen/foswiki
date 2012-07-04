@@ -22,7 +22,6 @@ pub/System/TagMeAjaxHelper/jquery.tagmeui.js.gz 0644
 pub/System/TagMeAjaxHelper/spinner.gif 0644 From http://www.ajaxload.info
 pub/System/TagMeAjaxHelper/tag.png 0644 From FamFamFamSilkIcons
 pub/System/TagMePlugin/alltagcloud.gif 0644
-#pub/System/TagMePlugin/buttons_gradient.psd 0644
 pub/System/TagMePlugin/jquery.tagmeui.png 0644
 pub/System/TagMePlugin/tag_add.gif 0644
 pub/System/TagMePlugin/tag_addnew.gif 0644
@@ -34,4 +33,5 @@ pub/System/TagMePlugin/topictags_styleblog_open.gif 0644
 templates/view.tagme.tmpl 0644
 templates/view.tagme_styleblog.tmpl 0644
 templates/view.tagme_styleblogbutton.tmpl 0644
-templates/view.tagmejquiajax.tmpl 0644
+templates/view.tagmejquiajax.tmpl 0644 Deprecated template
+templates/view.tagmeajax.tmpl 0644

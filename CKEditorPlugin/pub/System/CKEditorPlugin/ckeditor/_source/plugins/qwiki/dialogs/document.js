@@ -90,8 +90,10 @@ CKEDITOR.dialog.add( 'document', function( editor )
 								dialog = this.getDialog()
 								var fname = dialog.getContentElement('upload', 'filepath').getInputElement().getValue();
 								// We're not terribly interested in Windows paths
-								fname = fname.replace(/^.:\\(.+)\\/, '');
-								this.setValue(fname);
+								fname = fname.replace(/^.:(.*)\\/, '');
+								var prefix = editor.config.upload_filename_prefix || '';
+								prefix = prefix.replace("$WEB", FoswikiCKE.getWeb()).replace("$TOPIC", FoswikiCKE.getTopic());
+								this.setValue(prefix + fname);
 							}
 						}
 					},

@@ -1,24 +1,5 @@
-# Plugin for Foswiki - The Free and Open Source Wiki, http://foswiki.org/
-#
-# Copyright (C) 2006 Peter Thoeny, peter@thoeny.org
-# Copyright (c) 2006 Fred Morris, m3047-twiki@inwa.net
-# Copyright (c) 2007-2011 Sven Dowideit, SvenDowideit@fosiki.com
-# Copyright (c) 2007 Arthur Clemens, arthur@visiblearea.com
-# Copyright (c) 2007-2009 Crawford Currie, http://c-dot.co.uk
-#
-# This program is free software; you can redistribute it and/or
-# modify it under the terms of the GNU General Public License
-# as published by the Free Software Foundation; either version 2
-# of the License, or (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details, published at
-# http://www.gnu.org/copyleft/gpl.html
-#
-# =========================
-#
+# See bottom of file for license and copyright information
+
 # This Plugin implements tags in Foswiki.
 
 # =========================
@@ -35,7 +16,7 @@ use vars qw(
 );
 
 our $VERSION           = '$Rev$';
-our $RELEASE           = '29 Jun 2011';
+our $RELEASE           = '2.0.1';
 our $NO_PREFS_IN_TOPIC = 1;
 our $SHORTDESCRIPTION =
   'Tag wiki content collectively to find content by keywords';
@@ -1306,7 +1287,7 @@ sub _removeTag {
 }
 
 # =========================
-# Force remove tag  from topic (clear all users votes)
+# Force remove tag from topic (clear all users votes)
 sub _removeAllTag {
     my ($attr) = @_;
 
@@ -1815,3 +1796,25 @@ sub indexTopicHandler {
 }
 
 1;
+
+__DATA__
+
+# Plugin for Foswiki - The Free and Open Source Wiki, http://foswiki.org/
+#
+# Copyright (C) 2011-2012 Foswiki Contributors
+# Copyright (c) 2007-2011 Sven Dowideit, SvenDowideit@fosiki.com
+# Copyright (c) 2007 Arthur Clemens, arthur@visiblearea.com
+# Copyright (c) 2007-2009 Crawford Currie, http://c-dot.co.uk
+# Copyright (c) 2006 Fred Morris, m3047-twiki@inwa.net
+# Copyright (C) 2006 Peter Thoeny, peter@thoeny.org
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details, published at
+# http://www.gnu.org/copyleft/gpl.html

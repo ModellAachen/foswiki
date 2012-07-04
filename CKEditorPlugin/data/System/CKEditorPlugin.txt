@@ -12,14 +12,15 @@ One line description, required for extensions repository catalog.
 <img alt="screenshot" src="%ATTACHURLPATH%/screenshot.png"/>
 
 %TOC%
+
 This is an integration of the [[http://ckeditor.com/][CKEditor]] WYSIWYG editor. It supports a wide range of browsers, including Firefox, IE, Safari, Opera and Google Chrome. At the time of writing it doesn't work with Konqueror.
 
 The integration uses the Foswiki:Extensions.WysiwygPlugin to translate text to and from a format that !CKEditor can edit.
 
-This plugin is able to swap out _standard_ text areas and replace them with WYSIWYG editors. This means you get WYSIWYG editors for textareas in forms, as well as for the main text of the topic. It can also co-exist alongside other WYSIWYG editors.
+This plugin is able to swap out _standard_ text areas and replace them with WYSIWYG editors. This means you can get WYSIWYG editors for textareas in forms, as well as for the main text of the topic. It can also co-exist alongside other WYSIWYG editors.
 
 ---++ Editor Notes
-The editor uses a translator module to convert from Foswiki Topic Markup Language (TML) to HTML and back. The translator converts special macros - such as %<nop>MACROS% - to plain text, and encloses them within HTML spans using a special style called =WYSIWYG_PROTECTED=. In this way the editor can detect text that is not meant to be HTML formatted. This style is _also_ used to protect special text you enter into the editor from being interpreted when the topic is translated back into TML. If you want to add any special features that are sensitive to formatting, such as =Set= statements, then you should format those regions using 'Protect on save' or 'Protect forever'.
+The editor uses a translator module to convert from Foswiki Topic Markup Language (TML) to HTML and back. The translator converts special macros - such as %<nop>MACROS% - to plain text, and encloses them within HTML spans using a special style class called =WYSIWYG_PROTECTED=. In this way the editor can detect text that is not meant to be HTML formatted. This style is _also_ used to protect special text you enter into the editor from being interpreted when the topic is translated back into TML. If you want to add any special features that are sensitive to formatting, such as =Set= statements, then you should format those regions using 'Protect on save' or 'Protect forever'.
 
 ---++ Installation Instructions
 
@@ -36,10 +37,10 @@ First follow the installation instructions to install the Plugin:
    * *Click* on edit of any topic.
 
 ---++ Preferences
-The default configuration of CKEditorPlugin should prove sufficient for most users. The !CKEditor editor itself is customised through a Javascript object holding a substantial number of initialisation parameters. In previous versions of CKEditorPlugin, a text string making up the Javascript object was held in an ordinary Foswiki [[PreferenceSettings][preference variable]] =CKEPLUGIN_INIT= which should be removed and replaced with =CKEPLUGIN_INIT_TOPIC= (described below) in most circumstances.
+The default configuration of CKEditorPlugin should prove sufficient for most users. The !CKEditor editor itself is customised through a Javascript object holding a substantial number of initialisation parameters.
 
 ---+++ CKEPLUGIN_INIT_TOPIC
-To make configuration easier and less error-prone, configuration is held in a topic section. The name of the topic is set in the [[PreferenceSettings][preference variable]] =CKEPLUGIN_INIT_TOPIC=, from which the [[VarSTARTSECTION][section]] named =CKEPLUGIN_INIT= is used. =CKEPLUGIN_INIT_TOPIC= is currently set to %=CKEPLUGIN_INIT_TOPIC%.
+Configuration is held in a topic section. The name of the topic is set in the [[PreferenceSettings][preference variable]] =CKEPLUGIN_INIT_TOPIC=, from which the [[VarSTARTSECTION][section]] named =CKEPLUGIN_INIT= is used. =CKEPLUGIN_INIT_TOPIC= is currently set to =%CKEPLUGIN_INIT_TOPIC%=.
 
 For a full explanation and guidance on configuration of available !CKEditor options, see the [[http://docs.cksource.com/ckeditor_api/symbols/CKEDITOR.config.html][CKEditor API documentation]]. 
 
@@ -50,7 +51,7 @@ Below is the default configuration. If it is to be modified, it should be copied
 <verbatim class="js">
 %STARTSECTION{"CKEPLUGIN_INIT"}%
 extraPlugins : "qwikistyles,qwikiprovisarea,qwiki,qwikiajax,qwikifilebrowser,qwikiimage,qwikiautosuggest,qwikilink,qwikisave,qwikitoolbar,qwikiwikitext,qwikitable,tableresize,ajax,xml",
-removePlugins : "toolbar,save,link,image,table",
+removePlugins : "toolbar,save,link,image,table,forms",
 enterMode : "1",
 menu_groups : "clipboard,form,tablecell,tablecellproperties,tablerow,tablecolumn,table,anchor,link,image,flash,checkbox,radio,textfield,hiddenfield,imagebutton,button,select,textarea,provis,code,removeformat",
 toolbar: "Basic",
@@ -58,7 +59,7 @@ toolbar_Basic : [
      { name: 'save',        items : [ 'Save', 'Cancel' ] },
      { name: 'wikitext',    items : [ 'WikiText' ] },
      { name: 'undoredo',    items : [ 'Undo','Redo' ] },
-     { name: 'links',       items : [ 'Link','Unlink','Anchor' ] },
+     { name: 'links',       items : [ 'Link','Unlink' ] },
      { name: 'qwiki',       items : [ 'ProVis','Document','QWikiImage','Table' ] },
      { name: 'tools',       items : [ 'RemoveFormat','ShowBlocks','Maximize' ] },
      '/',
@@ -67,9 +68,25 @@ toolbar_Basic : [
      { name: 'paragraph',   items : [ 'NumberedList','BulletedList','-','Outdent','Indent' ] },
      { name: 'styles',      items : [ 'Styles' ] }
 ],
+toolbar_Full : [
+     { name: 'save',        items : [ 'Save', 'Cancel' ] },
+     { name: 'source',      items : [ 'WikiText', '-', 'Source' ] },
+     { name: 'undoredo',    items : [ 'Undo','Redo' ] },
+     { name: 'paste',       items : ['Cut','Copy','Paste','PasteText','PasteFromWord','-','Print','SpellChecker','Scayt'] },
+     { name: 'find',        items : ['Find','Replace','-','SelectAll','RemoveFormat'] },
+     { name: 'display',     items : ['Maximize','ShowBlocks','-','About'] },
+     '/',
+     { name: 'basicstyles', items : ['Bold','Italic','Underline','Strike','-','Subscript','Superscript'] },
+     { name: 'paragraph',   items : ['NumberedList','BulletedList','-','Outdent','Indent','Blockquote','CreateDiv'] },
+     { name: 'alignment',   items : ['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'] },
+     { name: 'links',       items : ['wbdroplets','wblink','Link','Unlink','Anchor'] },
+     { name: 'qwiki',       items : ['Code','ProVis','Document','QWikiImage','Table','HorizontalRule','QWikiSymbol','SpecialChar','PageBreak'] },
+     '/',
+     { name: 'advstyles',   items : ['Styles','Format','Font','FontSize'] }
+],
 toolbar_Basic_Provis : [
 	{ name: 'save',		items : [ 'Provis_Save', 'Provisarea' ] },
-	{ name: 'undoredo',	items : [ 'Provis_Undo', 'Provis_Redo' ] },
+//	{ name: 'undoredo',	items : [ 'Provis_Undo', 'Provis_Redo' ] },
 	{ name: 'provis_tools',	items : [ 'Provis_NewSwimlane', 'Provis_Nodes' ] },
 	{ name: 'provis_size',		items : [ 'Provis_Size' ] }
 ],
@@ -77,7 +94,16 @@ advancedFeatures : {
 	qwikitable_advancedtab : 0,
 	qwikitable_cellproperties : 0
 },
+// provis_types : [ "swimlane", "orglane" ],
+// provis_nodes : [ "start", "process", "decision", "comment", "join", "database", "document", "end" ],
+// provis_defaultnode : "process",
+// qwikiautosuggest_topics_exclude_webs : [ "WebToExclude" ],
+// qwikilink_name : "Wiki Link",
+// qwikilink_extra_protocols : [ "notes://" ],
 ckefilebrowserUploadUrl : "%SCRIPTURL%/rest/WysiwygPlugin/upload",
+// upload_filename_prefix : "Anhang_$TOPIC_",
+// upload_image_filename_prefix : "Bild_$TOPIC_",
+// table_classes : [ "Modac_Standard", "Modac_Standard_Ohne", "Modac_Standard_Leer" ],
 foswiki_secret_id : "%WYSIWYG_SECRET_ID%",
 stylesSet : "modellaachen",
 templates_files : [ "CKEDITOR.getUrl('plugins/qwiki/templates/modellaachen.js')" ],
@@ -86,12 +112,12 @@ pasteFromWordRemoveFontStyles : true,
 foswiki_vars : { PUBURLPATH : "%PUBURLPATH%", PUBURL : "%PUBURL%", WEB : "%BASEWEB%", TOPIC : "%BASETOPIC%", ATTACHURL : "%PUBURL%/%BASEWEB%/%BASETOPIC%", ATTACHURLPATH : "%PUBURLPATH%/%BASEWEB%/%BASETOPIC%", VIEWSCRIPTURL : "%SCRIPTURL{view}%", SCRIPTSUFFIX: "%SCRIPTSUFFIX%", SCRIPTURL : "%SCRIPTURL%", SYSTEMWEB: "%SYSTEMWEB%", HTTP_HOST: "%HTTP_HOST%" },
 height : "400",
 contentsCss : [
-  "%PUBURLPATH%/%SYSTEMWEB%/CKEditorPlugin/ckeditor/contents.css",
-  "%PUBURLPATH%/%SYSTEMWEB%/CKEditorPlugin/ckeditor/modacContents%IF{"$CKEditorPlugin_DEBUG='1'" then="_source"}%.css",
   "%PUBURLPATH%/%SYSTEMWEB%/SkinTemplates/base.css",
   "%FOSWIKI_STYLE_URL%",
   "%FOSWIKI_COLORS_URL%",
-  "%FOSWIKI_PROJECT_URL%"
+  "%FOSWIKI_PROJECT_URL%",
+  "%PUBURLPATH%/%SYSTEMWEB%/CKEditorPlugin/ckeditor/contents.css",
+  "%PUBURLPATH%/%SYSTEMWEB%/CKEditorPlugin/ckeditor/modacContents%IF{"$CKEditorPlugin_DEBUG='1'" then="_source"}%.css"
 ]
 %ENDSECTION{"CKEPLUGIN_INIT"}%
 </verbatim>
@@ -101,6 +127,34 @@ Example:
    * Create <nop>Main.CKEditorPlugin, copying the text above
    * Update the =CKEPLUGIN_INIT_TOPIC= variable to point to the newly created topic, Eg. in Main.SitePreferences or <nop>MyWeb.WebPreferences:%BR%\
    <verbatim class="tml">   * Set CKEPLUGIN_INIT_TOPIC = Main.CKEditorPlugin</verbatim>
+
+---+++ Q.Wiki-specific settings in the CKEPLUGIN_INIT object
+
+Extra elements that can be used in toolbar definitions:
+
+   * =QWikiImage=: Q.Wiki custom dialog for inserting images
+   * =ProVis=: create new flowchart diagrams
+   * =ProVis_Save=: save currently edited flowchart
+   * =Provisarea=: abort editing of flowchart
+   * =Provis_NewDiagram=: clears diagram
+   * =Provis_NewSwimlane=: creates new lane (swim/org/...) in flowchart
+   * =Provis_Nodes=: select type of node to create
+   * =Provis_Size=: change size of ProVis editor panel
+
+Settings fields in the init object:
+
+   * =advancedFeatures=: an object with boolean values to enable/disable certain UI elements that control advanced options and features (all disabled by default). Object keys are:
+      * =qwikitable_cellproperties=: allow editing cell properties (spacing etc.)
+   * =qwikiautosuggest_topics_exclude_webs=: an array of web names that will be excluded in the autocomplete list of topics
+   * =qwikilink_name=: in the link dialog, a replacement name for the "Q.Wiki" combobox value, e.g. for branding
+   * =qwikilink_extra_protocols=: extra protocol prefixes to list and support in the link dialog
+   * =ckefilebrowserUploadUrl=: the URL of the handler used for uploading attachments/images
+   * =upload_filename_prefix=: an automatic prefix to give filenames during uploading
+   * =upload_image_filename_prefix=: an automatic prefix used when uploading images
+   * =table_classes=: an array of table classes to replace (in order) Modac_Standard, Modac_Standard_Ohne and Modac_Standard_Leer (mostly for legacy installations)
+   * =provis_types=: enabled ProVis dialog types. Currently supported values are "swimlane" and "orglane".
+   * =provis_nodes=: enabled ProVis node types. Currently supported values are "start", "process" (normal step), "decision", "comment", "join" (junction), "database", "document" and "end".
+   * =provis_defaultnode=: default ProVis node type. Default value: "process"
 
 ---+++ Settings
 | *Variable* | *Default* | *Description* |
@@ -133,7 +187,7 @@ See WysiwygPluginSettings for more information
 
 This plugin is based on TinyMCEPlugin.
 
-|  Author: | Alexander Stoffers |
+|  Author: | Foswiki:Main.AlexanderStoffers, Foswiki:Main.JanKrueger |
 |  Copyright: | &copy; 2007-2010 Crawford Currie http://c-dot.co.uk %BR%\
                 &copy; 2010-2012 [[%SYSTEMWEB%.ProjectContributor][Foswiki Contributors]] %BR%\
                 &copy; 2010-2012 Modell Aachen UG http://modell-aachen.de/ |

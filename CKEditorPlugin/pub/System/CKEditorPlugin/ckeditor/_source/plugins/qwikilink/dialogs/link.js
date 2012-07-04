@@ -88,10 +88,13 @@ CKEDITOR.dialog.add( 'link', function( editor )
 		anchorRegex = /^#(.*)$/,
 		qwikiRegex = /^(http|(?:%PUBURL%|%ATTACHURL%)?\/)?(.*)$/,
 		qwikiurlRegex = /^((?:http|https|file|ftp|news):\/\/)(.*)$/,
-		urlRegex = /^((?:http|https|ftp|news):\/\/)?(.*)$/,
 		selectableTargets = /^(_(?:self|top|parent|blank))$/,
 		encodedEmailLinkRegex = /^javascript:void\(location\.href='mailto:'\+String\.fromCharCode\(([^)]+)\)(?:\+'(.*)')?\)$/,
 		functionCallProtectedEmailLinkRegex = /^javascript:([^(]+)\(([^)]+)\)$/;
+
+	var extraProtocols = editor.config.qwikilink_extra_protocols || [];
+	var extraProtocolRegex;
+	if (extraProtocols.length > 0) extraProtocolRegex = new RegExp("^("+ extraProtocols.join("|") +")(.*)$");
 
 	var popupRegex =
 		/\s*window.open\(\s*this\.href\s*,\s*(?:'([^']*)'|null)\s*,\s*'([^']*)'\s*\)\s*;\s*return\s*false;*\s*/;
@@ -177,7 +180,13 @@ CKEDITOR.dialog.add( 'link', function( editor )
 				retval.url.protocol = urlMatch[1];
 				retval.url.url = urlMatch[2];
 			}
-
+			else if (  href && extraProtocolRegex && ( urlMatch = href.match( extraProtocolRegex ) ) )
+			{
+				retval.type = 'url';
+				retval.url = {};
+				retval.url.protocol = urlMatch[1];
+				retval.url.url = urlMatch[2];
+			}
 			else if (  href && ( urlMatch = href.match( qwikiRegex ) ) )
 			{
 				retval.type = 'qwiki';
@@ -428,6 +437,20 @@ CKEDITOR.dialog.add( 'link', function( editor )
 		linkLang = editor.lang.link,
 		qlinkLang = editor.lang.qwikilink;
 
+	var qwikilinktitle = editor.config.qwikilink_name || qlinkLang.toQwiki;
+	var protocols = [
+		// Force 'ltr' for protocol names in BIDI. (#5433)
+		['file:///\u200E', 'file:///'],
+		['http://\u200E', 'http://'],
+		['https://\u200E', 'https://'],
+		['ftp://\u200E', 'ftp://'],
+		['news://\u200E', 'news://'],
+	];
+	if (editor.config.qwikilink_extra_protocols) $.each(editor.config.qwikilink_extra_protocols, function(_idx, val) {
+		protocols.push([val+"\u200E", val]);
+	});
+	protocols.push([linkLang.other , '']);
+
 	return {
 		title : linkLang.title,
 		minWidth : 350,
@@ -446,7 +469,7 @@ CKEDITOR.dialog.add( 'link', function( editor )
 						'default' : 'qwiki',
 						items :
 						[
-							[ qlinkLang.toQwiki, 'qwiki' ],
+							[ qwikilinktitle, 'qwiki' ],
 							[ linkLang.toUrl, 'url' ],
 							[ linkLang.toEmail, 'email' ]
 						],
@@ -729,16 +752,7 @@ CKEDITOR.dialog.add( 'link', function( editor )
 										label : commonLang.protocol,
 										'default' : 'http://',
 										style : 'width : 100%;',
-										items :
-										[
-											// Force 'ltr' for protocol names in BIDI. (#5433)
-											[ 'file:///\u200E', 'file:///' ],
-											[ 'http://\u200E', 'http://' ],
-											[ 'https://\u200E', 'https://' ],
-											[ 'ftp://\u200E', 'ftp://' ],
-											[ 'news://\u200E', 'news://' ],
-											[ linkLang.other , '' ]
-										],
+										items : protocols,
 										setup : function( data )
 										{
 											if ( data.url )
@@ -1372,8 +1386,9 @@ CKEDITOR.dialog.add( 'link', function( editor )
 					{
 						case 'topicurl':
 							var protocol = '',
-									url = ( data.qwiki.topicurl && data.qwiki.topicurl ) || '';
-							attributes['data-cke-saved-href'] = ( url.indexOf( '/' ) === 0 ) ? url : protocol + url;
+								url = ( data.qwiki.topicurl && data.qwiki.topicurl ) || '',
+								filteredUrl = url.replace(/\s+/g, '');
+							attributes['data-cke-saved-href'] = ( url.indexOf( '/' ) === 0 ) ? filteredUrl : protocol + filteredUrl;
 							break;
 						case 'anchorOptions':
 							var name = ( data.anchor && data.anchor.name ),

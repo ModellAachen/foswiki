@@ -15,6 +15,21 @@
   As per the GPL, removal of this notice is prohibited.
 */
 
+// URL composer that includes the plugin's version/release to force reloading
+// of CSS/JS files upon updates
+CKEDITOR_GETURL = function(resource)
+{
+	// If this is not a full or absolute path.
+	if (resource.indexOf(':/') == -1 && resource.indexOf( '/' ) !== 0)
+		resource = CKEDITOR.basePath + resource;
+
+	// Add the timestamp, except for directories.
+	if (FoswikiCKE.ckeditor_timestamp && resource.charAt(resource.length - 1) != '/' && !(/[&?]t=/).test(resource))
+		resource += ( resource.indexOf('?') >= 0 ? '&' : '?' ) + 't=' + FoswikiCKE.ckeditor_timestamp;
+
+	return resource;
+};
+
 // The FoswikiCKE class object
 var FoswikiCKE = {
 

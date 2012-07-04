@@ -1,31 +1,55 @@
-#tagmejqTagCloud {
-  padding-top: 1em;
-}
 .jqTextboxListContainer {
-  display: inline;
+	display: inline;
 }
 #tagmejqtagbutton {
-	text-decoration: underline;
-}
-#tagmejqtagbutton:hover {
-  color: #C0FFC0; 
-	background-color: #778899;
+	text-decoration: none;
 	cursor: pointer;
 }
 #tagmejqtagstatus {
+	display: inline-block;
+	vertical-align: text-bottom;
+	margin: 0 .25em 0 0;
 	width: 16px;
+	height: 16px;
+	background-image: url(tag.png);
+	background-repeat: no-repeat;
 }
 #tagmejqtagstatus.spinning {
-	background-image: url('spinner.gif');
-  background-repeat: no-repeat;
+	background-image: url(spinner.gif);
+}
+.jqTextboxListContainer .foswikiInputField {
+	border-width: 1px;
+	border-color: transparent;
+	line-height: inherit;
+	display: inline-block;
+	padding: 1px 5px;
+	margin: 2px 5px 2px 0;
+	vertical-align: baseline;
+	width: 4em;
+}
+.jqTextboxListContainer .foswikiInputField:focus {
+	outline: none;
+	background: #f8f8f8;
+	width: 10em;
+}
+
+/*
+tag cloud contents
+*/
+#tagmejqcloud {
+	padding: 15px;
+}
+#tagmejqTagCloud {
+	padding: 2em 0 0 0;
+	line-height: 2em;
+}
+#tagmejqcloud h3 {
+	margin-top: 0;
+	padding-top: 0;
+}
+#tagmejqTagCloud a {
+	margin: 0 0 0 5px;
 }
 #tagmejqtag.spinning {
-  background-image: url('cloudspinner.gif');
-}
-#tagmejqtagbutton {
-	background-image: url('tag.png');
-	background-position: right;
-  background-repeat: no-repeat;
-	padding-right: 16px;
-	margin-right: 0.5em;
+	background-image: url(cloudspinner.gif);
 }

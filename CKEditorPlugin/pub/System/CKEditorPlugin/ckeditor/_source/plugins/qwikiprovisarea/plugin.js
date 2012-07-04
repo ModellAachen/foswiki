@@ -3,34 +3,8 @@ Copyright (c) 2003-2010, CKSource - Frederico Knabben. All rights reserved.
 For licensing, see LICENSE.html or http://ckeditor.com/license
 */
 
-/**
- * @fileOverview The "sourcearea" plugin. It registers the "source" editing
- *		mode, which displays the raw data being edited in the editor.
- */
-
-/* Hier wird der Modus der Commands gesetzt (Buttons ausgegraut) */
-var updateCommandsMode = function( editor, namensraum, ein )
-{
-		var command,
-			commands = editor._.commands;
-
-		for ( var name in commands )
-		{
-			if (ein)
-			{
-				if (name.indexOf(namensraum) != 0)
-				{
-					command = commands[ name ];
-					command[ 'disable' ]();
-				}
-			}
-			else
-			{
-				command = commands[ name ];
-				command[ 'enable' ]();
-			}
-		}
-};
+var flowchart = null;
+var lang;
 
 CKEDITOR.plugins.add( 'qwikiprovisarea',
 {
@@ -42,12 +16,26 @@ CKEDITOR.plugins.add( 'qwikiprovisarea',
 		var provisarea = CKEDITOR.plugins.provisarea,
 			win = CKEDITOR.document.getWindow(),
 			iframe,
-			provisframe,
-			config = editor.config;
-		
-		config.provis_maxWidth = "800";
-		config.provis_minWidth = "300";
-		
+			config = editor.config,
+			provisframe;
+
+		var maybeSetConfig = function(name, value) {
+			if (config[name] === undefined) config[name] = value;
+		};
+
+		lang = editor.lang.qwikiflowchart;
+
+		maybeSetConfig('provis_maxWidth', '800');
+		maybeSetConfig('provis_minWidth', '300');
+
+		maybeSetConfig('provis_nodes', ['start', 'process', 'decision', 'comment', 'join', 'database', 'document', 'end']);
+		maybeSetConfig('provis_defaultnode', 'process');
+
+		maybeSetConfig('provis_sizes', ['25%', '33%', '50%', '66%', '100%']);
+		maybeSetConfig('provis_defaultsize', '66%');
+
+		maybeSetConfig('provis_saveoptions', ['frame', 'line', 'noframe']);
+
 		var container = null,
 		textcontainer = null,
 		proviscontainer = null,
@@ -57,490 +45,146 @@ CKEDITOR.plugins.add( 'qwikiprovisarea',
 		textSize,
 		resizeHorizontal = 1,
 		resizeVertical = 0;
-		
-		var flowchart;
-		var saveflag;
-		
-		/*
-		 * Watch auch für Internet Explorer etc
-		 * 
-		 */
-		function watchIt(o, p,f) {
-		    if(!o.watchNEU) {canDo(o, p, f);} 
-		    else {o.watch(p,f);}
-		};
 
-		function unwatchIt(o, p) {
-		    if(!o.unwatchNEU) {unDo(o, p);} 
-		    else {o.unwatch(p);}
-		};
+		editor.on('doubleclick', function(evt) {
+			var element = CKEDITOR.plugins.link.getSelectedLink( editor ) || evt.data.element;
 
-		function unDo(o, p) {
-		    eval('clearInterval(o.'+p+'timerID);'); 
-		};
-
-		function canDo(o, p, f){
-			this.obj = o; this.prop = p; this.func = f;
-		    var state=this.obj[this.prop]; 
-			var control=function(){
-				if(o[p]!=state)
-				{
-					state=f(p,state,o[p]);
+			if ( element.getAttribute( 'data-cke-real-element-type' ) == 'provis' ) {
+				var hasJava = true;
+				if (typeof navigator.javaEnabled == 'function') {
+					if (!navigator.javaEnabled()) hasJava = false;
+				} else if (typeof window.clientInformation.javaEnabled == 'function') {
+					if (!window.clientInformation.javaEnabled()) hasJava = false;
 				}
-				};
-		    eval('o.'+p+'timerID = setInterval(' + control + ', 100);');
-		};
-		
-		function setDynRunvar(eventname, variable)
-		{
-			editor.fire( eventname, variable );
-		};
-		
-		function saveMapper(saveStyle)
-		{
-			switch (saveStyle)
-			{
-			case "line": 	
-				return "Einfache Trennlinien";
-				break;
-			case "frame": 	
-				return "Rahmen";
-				break;
-			case "noframe": 		
-				return "Ohne Rahmen";
-				break;
-			default:			
-				return "Rahmen";
-				break;
+				if (hasJava) return editor.execCommand('provisarea');
+				alert(lang.javaDisabled);
 			}
-		};
-		
-		function addComboSize( editor, comboName, styleType, lang, entries, defaultLabel, styleDefinition )
-		{
-			var config = editor.config;
+		});
 
-			// Gets the list of fonts from the settings.
-			var names = entries.split( ';' ),
-				values = [];
-
-			// Create style objects for all ProViiis.
-			var styles = {};
-			for ( var i = 0 ; i < names.length ; i++ )
-			{
-				var parts = names[ i ];
-
-				if ( parts )
-				{
-					parts = parts.split( '/' );
-
-					var vars = {},
-						name = names[ i ] = parts[ 0 ];
-
-					vars[ styleType ] = values[ i ] = name || name;
-
-					styles[ name ] = new CKEDITOR.style( styleDefinition, vars );
-					styles[ name ]._.definition.name = name;
-				}
-				else
-					names.splice( i--, 1 );
-			}
-
-			editor.ui.addRichCombo( comboName,
-				{
-					label : editor.lang.qwikiflowchart.resize,
-					title : editor.lang.qwikiflowchart.resize,
-					className : 'cke_provis_size',
-					panel :
-					{
-						css : editor.skin.editor.css.concat( config.contentsCss ),
-						multiSelect : false,
-						attributes : { 'aria-label' : lang.panelTitle }
-					},
-
-					init : function()
-					{
-						this.startGroup( editor.lang.qwikiflowchart.resize );
-						for ( var i = 0 ; i < names.length ; i++ )
-						{
-							var name = names[ i ];
-
-							// Add the tag entry to the panel list.
-							this.add( name , styles[ name ].buildPreview(), name );
-						}
-						
-					},
-
-					onClick : function( value )
-					{
-						editor.execCommand( 'provisresize', value );
-					},
-
-					onRender : function()
-					{
-						editor.on( 'selectionChange', function( ev )
-								{
-									var currentValue = this.getValue();
-
-									var elementPath = ev.data.path,
-										elements = elementPath.elements;
-
-									// For each element into the elements path.
-									for ( var i = 0, element ; i < elements.length ; i++ )
-									{
-										element = elements[i];
-
-										// Check if the element is removable by any of
-										// the styles.
-										for ( var value in styles )
-										{
-											if ( styles[ value ].checkElementRemovable( element, true ) )
-											{
-												if ( value != currentValue )
-													this.setValue( value );
-												return;
-											}
-										}
-									}
-
-									// If no styles match, just empty it.
-									this.setValue( '', defaultLabel );
-								},
-								this);
-					}
-				});
-		}
-		
-		function addCombo( editor, comboName, styleType, lang, entries, defaultLabel, styleDefinition )
-		{
-			var config = editor.config;
+		editor.on( 'closeprovis', function(event) {
+			editor = event.editor;
 			
-			// Gets the list of fonts from the settings.
-			var names = entries.split( ';' ),
-				values = [];
+			//Provis Attribute auslesen
+			var name = flowchart.getAttribute( '_cke_provis_name' );
+			var type = flowchart.getAttribute( '_cke_provis_type' ) || 'swimlane';
+			// If we don't even have a legacy revision, use the newest
+			// revision instead... there are probably worse choices
+			var rev = flowchart.getAttribute( '_cke_provis_rev' ) || 0;
 
-			// Create style objects for all ProViiis.
-			var styles = {};
-			for ( var i = 0 ; i < names.length ; i++ )
-			{
-				var parts = names[ i ];
-
-				if ( parts )
-				{
-					parts = parts.split( '/' );
-					
-					var url =  CKEDITOR.plugins.getPath( 'provisarea' ) + 'images/' + parts[1];
-
-					var vars = {},
-						name = names[ i ] = parts[ 0 ];
-
-					vars[ styleType ] = values[ i ] = parts[1] || name;
-
-					styles[ name ] = new CKEDITOR.style( styleDefinition, vars );
-					styles[ name ]._.definition.name = name;
-				}
-				else
-					names.splice( i--, 1 );
-			}
-
-			editor.ui.addRichCombo( comboName,
-				{
-					label : editor.lang.qwikiflowchart.nodes,
-					title : editor.lang.qwikiflowchart.nodes,
-					className : 'cke_provis',
-					panel :
-					{
-						css : editor.skin.editor.css.concat( config.contentsCss ),
-						multiSelect : false,
-						attributes : { 'aria-label' : lang.panelTitle }
-					},
-
-					init : function()
-					{						
-						this.startGroup(editor.lang.qwikiflowchart.nodes);
-
-						for ( var i = 0 ; i < names.length ; i++ )
-						{
-							var name = names[ i ];
-
-							// Add the tag entry to the panel list.
-							this.add( name , styles[ name ].buildPreview(), name );
-						}
-						
-					},
-
-					onClick : function( value )
-					{
-						document.getElementById("iframe_provis").contentWindow.setShape(value);
-						//alert(document.getElementById("iframe_provis").contentWindow.DynRunVar.activeShape);
-					},
-
-					onRender : function()
-					{
-						//TODO: Checken ob Wert vorhanden!
-						editor.on( 'provis_shape', function( ev )
-								{
-									var currentValue = this.getValue();
-									var wert = ev.data;
-									this.setValue( wert );
-								},
-								this);
-					}
-				});
-		}
-		
-		function addComboSave( editor, comboName, styleType, lang, entries, defaultLabel, styleDefinition )
-		{
-			var config = editor.config;
+			// Fall back to legacy revision if no specific revision specified
+			// The only situation in which this fallback should happen
+			// is if a user deleted the attributes or the tag was
+			// created by an old version of this plugin.
+			var aqmRev = flowchart.getAttribute( '_cke_provis_aqmrev' ) || rev;
+			var mapRev = flowchart.getAttribute( '_cke_provis_maprev' ) || rev;
+			var pngRev = flowchart.getAttribute( '_cke_provis_pngrev' ) || rev;
 			
-			// Gets the list of fonts from the settings.
-			var names = entries.split( ';' ),
-				values = [];
+			// Unblock editor UI
+			//SMELL: should un-hardcode ID
+			var ibody = $('#cke_contents_topic iframe').first().contents().find('body');
+			ibody.find('#cke_provis_block_overlay').remove();
+			ibody[0].contentEditable = "true";
+			// Restore save/cancel buttons
+			$('.patternBorder').show();
 
-			// Create style objects for all ProViiis.
-			var styles = {};
-			for ( var i = 0 ; i < names.length ; i++ )
+			// Neues Element kreiieren und ersetzen
+			var element = CKEDITOR.dom.element.createFromHtml('<span class="WYSIWYG_PROTECTED">%PROCESS{'+
+				'name=&quot;'+ name +'&quot; type=&quot;'+ type +'&quot; '+
+				'aqmrev=&quot;'+ aqmRev +'&quot; maprev=&quot;'+ mapRev +'&quot; pngrev=&quot;'+ pngRev +'&quot;}%</span>'
+			);
+			element.replace(flowchart);
+			
+			var holderElement = editor.getThemeSpace("contents");
+			holderElement.getChild(2).remove();
+			holderElement.getChild(1).remove();
+			holderElement.getChild(0).setStyle('width', '100%');
+			
+			var data = editor.getData();
+			editor.setData(data);
+			editor.fire( 'close_provistoolbar' );
+
+			flowchart = null;
+		});
+
+		editor.on( 'openprovis', function(event) {
+			var selection = editor.getSelection();
+			
+			var element = selection.getSelectedElement();
+			var topic, name, type, rev;
+			flowchart = element;
+
+			// Remove save/cancel buttons for now
+			$('.patternBorder').hide();
+			// Block editor UI
+			// Must happen after getting selected element because IE is prone to forgetting the selection -jk
+			//SMELL: should un-hardcode ID
+			var iframe = $('#cke_contents_topic iframe').first();
+			var ibody = iframe.contents().find('body');
+			ibody.append('<div id="cke_provis_block_overlay" style="left: 0; top: 0; background: black; -ms-filter:\'progid:DXImageTransform.Microsoft.Alpha(Opacity=30)\'; filter: alpha(opacity=30); opacity: .3; z-index: 15000; position: fixed;"></div>');
+			ibody.find('#cke_provis_block_overlay').height(iframe.innerHeight()).width(iframe.innerWidth());
+			if (ibody[0]) ibody[0].contentEditable = "false";
+			// Make IE7 deselect flowchart element in editor, so that users
+			// cannot accidentally delete it
+			iframe.blur();
+
+			if ( element && element.getAttribute( 'data-cke-real-element-type' ) && element.getAttribute( 'data-cke-real-element-type' ) == 'provis' )
 			{
-				var parts = names[ i ];
-
-				if ( parts )
-				{
-					parts = parts.split( '/' );
-					
-					var url =  CKEDITOR.plugins.getPath( 'provisarea' ) + 'images/' + parts[1];
-
-					var vars = {},
-						name = names[ i ] = parts[ 0 ];
-
-					vars[ styleType ] = values[ i ] = parts[1] || name;
-
-					styles[ name ] = new CKEDITOR.style( styleDefinition, vars );
-					styles[ name ]._.definition.name = name;
-				}
-				else
-					names.splice( i--, 1 );
+				topic = element.getAttribute( '_cke_provis_topic' ) || FoswikiCKE.getFoswikiVar("WEB") + "." + FoswikiCKE.getFoswikiVar("TOPIC");
+				name = element.getAttribute( '_cke_provis_name' );
+				type = element.getAttribute( '_cke_provis_type' ).toLowerCase() || 'swimlane';
+				rev = element.getAttribute( '_cke_provis_aqmrev' ) ||
+					element.getAttribute( '_cke_provis_rev' ) || 0;
 			}
+			else
+				return false;
 
-			editor.ui.addRichCombo( comboName,
-				{
-					label : editor.lang.qwikiflowchart.saveoptions,
-					title : editor.lang.qwikiflowchart.saveoptions,
-					className : 'cke_provis',
-					panel :
-					{
-						css : editor.skin.editor.css.concat( config.contentsCss ),
-						multiSelect : false,
-						attributes : { 'aria-label' : lang.panelTitle }
-					},
+			var holderElement = editor.getThemeSpace("contents");
 
-					init : function()
-					{
-						
-						this.startGroup( "Speicheroptionen" );
+			startSize = { width : holderElement.$.offsetWidth || 0, height : holderElement.$.offsetHeight || 0 };
+			config.provis_maxWidth = startSize.width;
+			
+			//Rest URL
+			var srcScript = FoswikiCKE.getFoswikiVar('SCRIPTURL') + "/rest/ProVisPlugin/edit?topic=" + topic + 
+			";drawingName=" + name +
+			";drawingRevision=" + rev +
+			";drawingType=" + type + ";";
+			
+			//Sizer
+			var div = CKEDITOR.dom.element.createFromHtml( '<div class="cke_provis_resizer"' +
+				' style="position: absolute; display: inline; height: ' + startSize.height + 'px; width: 15px; background-color: #d3d3d3;"' +
+				'></div>');
+			
+			//ProVis IFrame
+			iframe = CKEDITOR.dom.element.createFromHtml( '<iframe' +
+					' style="width:' + startSize.width + 'px; height:100%; position:relative;"' +
+					' frameBorder="0"' +
+					' id="iframe_provis"' +
+					' src="' + srcScript + '"' +
+					' tabIndex="' + editor.tabIndex + '"' +
+					' allowTransparency="true"' +
+					'></iframe>' );
+			
+			//Append both divs
+			holderElement.append(div);
+			holderElement.append(iframe);
 
-						for ( var i = 0 ; i < names.length ; i++ )
-						{
-							var name = names[ i ];
+			editor.fire('load_provistoolbar');
+			editor.execCommand('provisresize', editor.config.provis_defaultsize);
 
-							// Add the tag entry to the panel list.
-							this.add( name , styles[ name ].buildPreview(), name );
-						}
-						
-					},
-
-					onClick : function( value )
-					{
-						document.getElementById("iframe_provis").contentWindow.setSaveStyleMapper(value);
-						//alert(document.getElementById("iframe_provis").contentWindow.DynRunVar.saveStyle);
-					},
-
-					onRender : function()
-					{
-						//TODO: Checken ob Wert vorhanden!
-						editor.on( 'provis_save', function( ev )
-								{
-									var currentValue = this.getValue();
-									var wert = saveMapper(ev.data);
-									this.setValue( wert );
-								},
-								this);
-					}
+			$(iframe.$).one('load', function(ev) {
+				var framewin = document.getElementById("iframe_provis").contentWindow;
+				framewin.subscribeEvent('change_shape', function(value) {
+					editor.fire("provis_shape", value);
 				});
-		}
-		
-		editor.on( 'saveprovis', function(event)
-				{
-					//TODO: Alex muss das tun!
-					//Alex: Saveprovis: ProVis Tag muss auch geupdated werden!
-					editor = event.editor;
-					this.saveflag = true;
+				framewin.subscribeEvent('change_savestyle', function(value) {
+					editor.fire("provis_save", value);
 				});
-		
-		editor.on( 'closeprovis', function(event)
-				{
-					//Alex: Saveprovis: ProVis Tag muss auch geupdated werden!
-					editor = event.editor;
-					
-					//Provis Attribute auslesen
-					var name = flowchart.getAttribute( '_cke_provis_name' );
-					var type = flowchart.getAttribute( '_cke_provis_type' ) || Swimlane;
-					//Richtig so? Dann muss am Anfang 0 gesetzt sein!
-					var rev = flowchart.getAttribute( '_cke_provis_rev' ) || 1;
-					
-					if (this.saveflag == true)
-					{
-						//TODO: AjaxRequest oder ähnliches
-						rev++;
-					}
-					
-					// Unblock editor UI
-					//SMELL: should un-hardcode ID
-					var ibody = $('#cke_contents_topic iframe').first().contents().find('body');
-					ibody.find('#cke_provis_block_overlay').remove();
-					ibody[0].contentEditable = "true";
-
-					// Neues Element kreiieren und ersetzen
-					var element = CKEDITOR.dom.element.createFromHtml('<span class="WYSIWYG_PROTECTED">%PROCESS{name=&quot;' + name + '&quot; type=&quot;' + type + '&quot; rev=&quot;' + rev + '&quot;}%</span>' );
-					element.replace(flowchart);
-					
-					var holderElement = editor.getThemeSpace("contents");
-					holderElement.getChild(2).remove();
-					holderElement.getChild(1).remove();
-					holderElement.getChild(0).setStyle('width', '100%');
-					
-					var data = editor.getData();
-					editor.setData(data);
-					editor.fire( 'close_provistoolbar' );
-					//Tristate wieder rausnehmen
-					updateCommandsMode(editor, "provis", false);
-					this.saveflag = false;
-					
-					//TODO: Was ist wenn die Var nicht gesetzt ist?
-					try {
-						//TODO: Dynamische Runtime Variable setzen
-						var frame = document.getElementById("iframe_provis")
-						var dynrunvar = frame.contentWindow.DynRunVar;
-										
-						unwatchIt(dynrunvar, "activeShape");
-						unwatchIt(dynrunvar, "saveStyle");
-					}
-					catch (e){
-					}
+				framewin.subscribeEvent('applet_loaded', function() {
+					editor.fire("provis_shape", config.provis_defaultnode);
 				});
-		
-		editor.on( 'openprovis', function(event)
-				{
-					this.saveflag = false;
-					
-					var selection = editor.getSelection();
-					
-					var element = selection.getSelectedElement();
-					flowchart = element;
-					
-					// Block editor UI
-					// Must happen after getting selected element because IE is prone to forgetting the selection -jk
-					//SMELL: should un-hardcode ID
-					var iframe = $('#cke_contents_topic iframe').first();
-					var ibody = iframe.contents().find('body');
-					ibody.append('<div id="cke_provis_block_overlay" style="left: 0; top: 0; background: black; -ms-filter:\'progid:DXImageTransform.Microsoft.Alpha(Opacity=50)\'; filter: alpha(opacity=50); opacity: .5; z-index: 15000; position: fixed;"></div>');
-					ibody.find('#cke_provis_block_overlay').height(iframe.innerHeight()).width(iframe.innerWidth());
-					if (ibody[0]) ibody[0].contentEditable = "false";
-					// Make IE7 deselect flowchart element in editor, so that users
-					// cannot accidentally delete it
-					iframe.blur();
+			});
+		});
 
-					if ( element && element.getAttribute( 'data-cke-real-element-type' ) && element.getAttribute( 'data-cke-real-element-type' ) == 'provis' )
-					{
-						//Alex: Topic??
-						
-						topic = element.getAttribute( '_cke_provis_topic' ) || FoswikiCKE.getFoswikiVar("WEB") + "." + FoswikiCKE.getFoswikiVar("TOPIC");
-						name = element.getAttribute( '_cke_provis_name' );
-						type = element.getAttribute( '_cke_provis_type' ) || swimlane;
-						rev = element.getAttribute( '_cke_provis_rev' ) || 1;
-					}
-					else
-						return false;
-					
-					//Alex: Standard Verteilung ProVis / Text
-					var share = 0.7;
-					//Alex: Was passiert, wenn der Themespace während der Bearbeitung größer / kleiner wird?
-				
-					editor = event.editor;
-					var holderElement = editor.getThemeSpace("contents");
-					
-					startSize = { width : holderElement.$.offsetWidth || 0, height : holderElement.$.offsetHeight || 0 };
-					provisSize = { width : (startSize.width * share) || "70%", height : holderElement.$.offsetHeight || "100%" };
-					textSize = { width : startSize.width * (1 - share) || "30%", height : holderElement.$.offsetHeight || "100%" };
-					
-					config.provis_maxWidth = startSize.width;
-					
-					//Bestehendes Textfeld auf 30% reduzieren
-					holderElement.getChild(0).setStyle( 'width', textSize.width + "px" );
-					holderElement.getChild(0).setAttribute( 'id', 'iframe_text' );
-					
-					//Rest URL
-					var srcScript = FoswikiCKE.getFoswikiVar('SCRIPTURL') + "/rest/ProVisPlugin/edit?topic=" + topic + 
-					";drawingName=" + name +
-					";drawingRevision=" + rev +
-					";drawingType=" + type + ";";
-					
-					//Sizer					
-					var div = CKEDITOR.dom.element.createFromHtml( '<div class="cke_provis_resizer"' +
-						' style="position: absolute; display: inline; height: ' + startSize.height + 'px; width: 15px; background-color: #d3d3d3;"' +
-						'></div>');
-					
-					//ProVis IFrame
-					iframe = CKEDITOR.dom.element.createFromHtml( '<iframe' +
-							' style="width:' + provisSize.width + 'px; height:100%; position:relative;"' +
-							' frameBorder="0"' +
-							' id="iframe_provis"' +
-							' src="' + srcScript + '"' +
-							' tabIndex="' + editor.tabIndex + '"' +
-							' allowTransparency="true"' +
-							'></iframe>' );
-					
-					//Append both divs
-					holderElement.append(div);
-					holderElement.append(iframe);
-
-					editor.fire( 'load_provistoolbar' );
-					updateCommandsMode(editor, "provis", true);
-
-					$(iframe.$).one( 'load', function( ev )
-						{
-								//TODO: Dynamische Runtime Variable setzen
-								var frame = document.getElementById("iframe_provis")
-								var dynrunvar = frame.contentWindow.DynRunVar;
-
-								watchIt(dynrunvar, "activeShape",
-										function (id,oldvalue,newvalue) {
-											if( newvalue ){
-												setDynRunvar("provis_shape", newvalue );
-												return newvalue;
-											}
-										});
-										
-								editor.fire("provis_shape", dynrunvar.activeShape );
-								
-								watchIt(dynrunvar, "saveStyle",
-										function (id,oldvalue,newvalue) {
-											if( newvalue ){
-												setDynRunvar("provis_save", newvalue );
-												return newvalue;
-											}
-										});
-								editor.fire("provis_save", dynrunvar.saveStyle );
-						});
-				});
-		
-		editor.on( 'mode', function()
-				{
-					editor.getCommand( 'provisarea' ).setState(
-						editor.mode == 'provisarea' ?
-								CKEDITOR.TRISTATE_ON :
-								CKEDITOR.TRISTATE_OFF );
-								
-				});
-	
 		//Alex: Hier neue Commands hinzufügen
 		editor.addCommand( 'provisarea', provisarea.commands.provisarea );
 		editor.addCommand( 'provisnewdiagram', provisarea.commands.provisnewdiagram );
@@ -557,84 +201,134 @@ CKEDITOR.plugins.add( 'qwikiprovisarea',
 		{
 			editor.ui.addButton( 'Provis_Save',
 				{
-					label : editor.lang.qwikiflowchart.save,
+					label : lang.save,
 					command : 'provissave',
 					className : 'cke_button_save'
 				});
-		}
-		
-		if ( editor.ui.addButton )
-		{
 			editor.ui.addButton( 'Provis_NewDiagram',
 				{
-					label : editor.lang.qwikiflowchart.newdiagram,
+					label : lang.newdiagram,
 					command : 'provisnewdiagram',
 					className : 'cke_button_newpage'
 				});
-		}
-		
-		if ( editor.ui.addButton )
-		{
 			editor.ui.addButton( 'Provis_NewSwimlane',
 				{
-					label : editor.lang.qwikiflowchart.newswimlane,
+					label : lang.newswimlane,
 					command : 'provisnewswimlane',
 					icon	: this.path + 'images/swimlane_new.gif'
 				});
-		}
-		
-		if ( editor.ui.addButton )
-		{
 			editor.ui.addButton( 'Provis_Undo',
 				{
-					label : editor.lang.qwikiflowchart.undo,
+					label : lang.undo,
 					command : 'provisundo',
 					className : 'cke_button_undo'
 				});
-		}
-		
-		if ( editor.ui.addButton )
-		{
 			editor.ui.addButton( 'Provis_Redo',
 				{
-					label : editor.lang.qwikiflowchart.redo,
+					label : lang.redo,
 					command : 'provisredo',
 					className : 'cke_button_redo'
 				});
-		}
-		
-		if ( editor.ui.addButton )
-		{
 			editor.ui.addButton( 'Provis_DeleteSwimlane',
 				{
 					label : "Ausgewählte Swimlane löschen",
 					command : 'provisdeleteswimlane',
 					icon	: this.path + 'images/swimlane_new.gif'
 				});
-		}
-		
-		if ( editor.ui.addButton )
-		{
 			editor.ui.addButton( 'Provisarea',
 				{
-					label : editor.lang.qwikiflowchart.cancel,
+					label : lang.cancel,
 					command : 'provisabort',
 					icon	: this.path + 'images/icon_close.gif'
 				});
 		}
-		
-		//Combos:
-		//ProVis Nodes
-		addCombo( editor, 'Provis_Nodes', 'imageurl', 'ProVis', config.provis_nodes, config.provis_defaultLabel, config.Prozessschritt_style );
 
-		
-		//Modac: Flowchart Window Size
-		addComboSize( editor, 'Provis_Size', 'imageurl', 'ProVis_Size', config.provis_size, config.provis_sizedefaultLabel, config.Size_style );
-		
-		
-		//Modac: Save Options
-		addComboSave( editor, 'Provis_Saveoptions', 'imageurl', 'ProVis_Saveoptions', config.provis_saveoptions, config.provis_saveoptionsdefaultLabel, config.Saveoptions_style );
-		
+		var addCombo = function(params) {
+			editor.ui.addRichCombo( params.name, {
+				label: params.title,
+				title: params.title,
+				className: params.className || 'cke_provis',
+				'default': params.defaultValue,
+				panel: {
+					css: editor.skin.editor.css.concat(config.contentsCss),
+					multiSelect: false,
+					attributes: { 'aria-label' : lang.panelTitle }
+				},
+
+				init: function() {
+					this.startGroup(params.title);
+
+					var combo = this;
+					$.each(params.entries, function(_idx, value) {
+						var label = value;
+						var langVal = params.langBase && lang[params.langBase + value];
+						if (langVal) label = langVal;
+						var style = 'padding-left: 28px; background-repeat: no-repeat; background-position: left center;';
+						if (params.imageNameFormat) style = style + ' background-image:url(\''+
+							CKEDITOR.plugins.getPath('qwikiprovisarea') +'images/'+
+							params.imageNameFormat.replace('%', value)
+							+'\');';
+						combo.add(value, '<span style="'+ style +'">'+ label +'</span>', null);
+					});
+				},
+
+				onClick: function(value) {
+					var label = value;
+					var langVal = params.langBase && lang[params.langBase + value];
+					var combo = this;
+					if (langVal) setTimeout(function() { combo.setValue(value, langVal); });
+					if (typeof params.onClick == "function") params.onClick(this, value);
+				},
+
+				onRender: function() {
+					if (typeof params.onRender == "function") params.onRender(this);
+				}
+			});
+		};
+
+		addCombo({
+			name: 'Provis_Nodes',
+			title: lang.nodes,
+			entries: config.provis_nodes,
+			defaultValue: config.provis_defaultnode,
+			langBase: 'nodes_',
+			imageNameFormat: 'nodeicon_%.gif',
+			onClick: function(_c, value) {
+				document.getElementById('iframe_provis').contentWindow.setShape(value, false);
+			},
+			onRender: function(combo) {
+				editor.on( 'provis_shape', function(ev) {
+					this.onClick(ev.data);
+				}, combo);
+			}
+		});
+
+		addCombo({
+			name: 'Provis_Size',
+			title: lang.resize,
+			entries: config.provis_sizes,
+			className: 'cke_provis_size',
+			defaultValue: config.provis_defaultsize,
+			onClick: function(_c, value) {
+				editor.execCommand('provisresize', value);
+			}
+		});
+
+		addCombo({
+			name: 'Provis_Saveoptions',
+			title: lang.saveoptions,
+			entries: config.provis_saveoptions,
+			langBase: 'saveoptions_',
+			onClick: function(_c, value) {
+				document.getElementById('iframe_provis').contentWindow.setSaveStyle(value, false);
+			},
+			onRender: function(combo) {
+				editor.on('provis_save', function(ev) {
+					this.onClick(ev.data);
+				}, combo);
+			}
+		});
+
 		// CSS for Sizing Combo
 		// +IE7 hack for combo panel height
 		$(document).find('head').append('<style type="text/css">\n'+
@@ -686,7 +380,7 @@ CKEDITOR.plugins.provisarea =
 			exec : function( editor )
 			{
 				var iframe = document.getElementById("iframe_provis");
-				iframe.contentWindow.setNewDiagram();
+				iframe.contentWindow.initDiagram(null, true);
 			},
 			canUndo : false
 		},
@@ -695,16 +389,7 @@ CKEDITOR.plugins.provisarea =
 			exec : function( editor )
 			{
 				var iframe = document.getElementById("iframe_provis");
-				iframe.contentWindow.AddSwim();
-			},
-			canUndo : false
-		},
-		provisdeleteswimlane :
-		{
-			exec : function( editor )
-			{
-				var iframe = document.getElementById("iframe_provis");
-				//iframe.contentWindow.AddSwim();
+				iframe.contentWindow.makeNewLane();
 			},
 			canUndo : false
 		},
@@ -730,17 +415,27 @@ CKEDITOR.plugins.provisarea =
 		{
 			exec : function( editor )
 			{
-				//Zuerst Editor speichern - dann Provis speichern - dann Editor neu laden
-				
 				var iframe = document.getElementById("iframe_provis");
 				$.blockUI({ 
-		            centerY: 0, 
-		            css: { top: '10px', left: '10px', right: '' } 
-		        });
-				iframe.contentWindow.saveProvis();
-				editor.fire('saveprovis');
-				$.unblockUI();
-				editor.execCommand( 'provisarea' );
+					centerY: 0, 
+					css: { top: '20px', left: '20px' }
+				});
+				setTimeout(function() {
+					iframe.contentWindow.saveProvis({
+						success: function(data, textStatus, xhr) {
+							flowchart.setAttribute('_cke_provis_aqmrev', data.aqmrev);
+							flowchart.setAttribute('_cke_provis_maprev', data.maprev);
+							flowchart.setAttribute('_cke_provis_pngrev', data.pngrev);
+							flowchart.setAttribute('_cke_provis_name', data.name);
+							$.unblockUI();
+							editor.execCommand( 'provisarea' );
+						},
+						error: function(xhr, textStatus, errorThrown) {
+							alert(lang.saveerror + (errorThrown || textStatus));
+							$.unblockUI();
+						}
+					});
+				}, 500);
 			},
 			canUndo : false
 		},
@@ -748,7 +443,7 @@ CKEDITOR.plugins.provisarea =
 		{
 			exec : function( editor )
 			{
-				if (confirm(editor.lang.qwikiflowchart.cancelmsg))
+				if (confirm(lang.cancelmsg))
 					editor.execCommand( 'provisarea' );
 				else
 					// IE7 somehow selects the flowchart element in the editor here,
@@ -763,13 +458,12 @@ CKEDITOR.plugins.provisarea =
 			exec : function( editor, data )
 			{
 				var holderElement = editor.getThemeSpace("contents");
-				data = data.substr(0,data.indexOf("%")) || 50;
+				data = data.substr(0,data.indexOf("%")) || 66;
 				data = parseFloat(data);
 				
 				var provisSize = data;
 				var textSize = (100 - data);
-				//alert(textSize);
-				
+
 				//Bestehendes Textfeld auf 30% reduzieren
 				holderElement.getChild(0).setStyle( 'width', textSize + "%");
 				holderElement.getChild(2).setStyle( 'width', provisSize + "%")
@@ -778,143 +472,4 @@ CKEDITOR.plugins.provisarea =
 		}
 	}
 };
-
-
-
-/**
- * TODO: Neu schreiben und kommentieren
- * The list of fonts names to be displayed in the Font combo in the toolbar.
- * Entries are separated by semi-colons (;), while it's possible to have more
- * than one font for each entry, in the HTML way (separated by comma).
- *
- * A display name may be optionally defined by prefixing the entries with the
- * name and the slash character. For example, "Arial/Arial, Helvetica, sans-serif"
- * will be displayed as "Arial" in the list, but will be outputted as
- * "Arial, Helvetica, sans-serif".
- * @type String
- * @example
- * config.font_names =
- *     'Arial/Arial, Helvetica, sans-serif;' +
- *     'Times New Roman/Times New Roman, Times, serif;' +
- *     'Verdana';
- * @example
- * config.font_names = 'Arial;Times New Roman;Verdana';
- */
-CKEDITOR.config.provis_nodes =
-	'Start/prozesse_start.gif;' +
-	'Prozessschritt/prozesse_prozess.gif;' +
-	'Entscheidung/prozesse_entscheidung.gif;' +
-	'Kommentar/prozesse_prozess.gif;' +
-	'Knotenpunkt/prozesse_prozess.gif;' +
-	'Datenbank/prozesse_datenbank.gif;' +	
-	'Dokument/prozesse_dokument.gif;' +	
-	'Ende/prozesse_ende.gif;';
-
-
-/**
- * The text to be displayed in the Font combo is none of the available values
- * matches the current cursor position or text selection.
- * @type String
- * @example
- * // If the default site font is Arial, we may making it more explicit to the end user.
- * config.font_defaultLabel = 'Arial';
- */
-CKEDITOR.config.provis_defaultLabel = 'Prozessschritt';
-
-/**
- * The style definition to be used to apply the font in the text.
- * @type Object
- * @example
- * // This is actually the default value for it.
- * CKEDITOR.config.Prozessschritt_style =
- *     {
-		element		: 'span',
-		styles		: { 'padding-left' : '28px', 'background-repeat' : 'no-repeat', 'background-image' : 'url(#imageurl)', 'padding-right' : '28px' }
-		};
- */
-CKEDITOR.config.Prozessschritt_style =
-	{
-		element		: 'span',
-		styles		: { 'background-repeat' : 'no-repeat'}
-	};
-
-/**
- * TODO: Beschreibung
- * 
- */
-
-CKEDITOR.config.provis_size =
-	'25%;' +
-	'33%;' +
-	'50%;' +
-	'66%;' +
-	'100%;';
-
-
-/**
- * The text to be displayed in the Font combo is none of the available values
- * matches the current cursor position or text selection.
- * @type String
- * @example
- * // If the default site font is Arial, we may making it more explicit to the end user.
- * config.font_defaultLabel = 'Arial';
- */
-CKEDITOR.config.provis_sizedefaultLabel = '66%';
-
-/**
- * The style definition to be used to apply the font in the text.
- * @type Object
- * @example
- * // This is actually the default value for it.
- * config.font_style =
- *     {
- *         element		: 'span',
- *         styles		: { 'font-family' : '#(family)' },
- *         overrides	: [ { element : 'font', attributes : { 'face' : null } } ]
- *     };
- */
-CKEDITOR.config.Size_style =
-	{
-		element		: 'span',
-		styles		: { 'padding-left' : '2px' }
-	};
-
-
-
-CKEDITOR.config.provis_saveoptions =
-	'Rahmen;' +
-	'Einfache Trennlinien;' +
-	'Ohne Rahmen;';
-
-
-/**
- * The text to be displayed in the Font combo is none of the available values
- * matches the current cursor position or text selection.
- * @type String
- * @example
- * // If the default site font is Arial, we may making it more explicit to the end user.
- * config.font_defaultLabel = 'Arial';
- */
-CKEDITOR.config.provis_saveoptionsdefaultLabel = 'Rahmen';
-
-/**
- * The style definition to be used to apply the font in the text.
- * @type Object
- * @example
- * // This is actually the default value for it.
- * config.font_style =
- *     {
- *         element		: 'span',
- *         styles		: { 'font-family' : '#(family)' },
- *         overrides	: [ { element : 'font', attributes : { 'face' : null } } ]
- *     };
- */
-CKEDITOR.config.Saveoptions_style =
-	{
-		element		: 'span',
-		styles		: { 'padding-left' : '2px' }
-	};
-
-
-
 

@@ -1,13 +1,15 @@
-%META:TOPICINFO{author="ProjectContributor" date="1137100620" format="1.1" version="1.2"}%
----+!! <nop>%TOPIC%
+%META:TOPICINFO{author="ProjectContributor" date="1336870795" format="1.1" version="1.2"}%
+---+!! <nop>BibtexPlugin
+<!--
+   * Set SHORTDESCRIPTION = %$SHORTDESCRIPTION%
+-->
+%SHORTDESCRIPTION%
+
+The word "BibTeX" stands for a tool and a file format which are used to describe and process lists of references, mostly in conjunction with <nop>LaTeX documents.
+
+More info: Wikipedia:BibTeX
 
 %TOC%
-
----++ Disclaimer
-This plugin is fork from the TWiki:Plugins/EmbedBibPlugin by TWiki:Main/DonnyKurniawan. As it has been rewritten in major parts and stuff has been renamed.   BTW, the new name seems more appropriate.
-
----++ Synopsis
-This is a plugin that you can use to embed <nop>BibTeX entries in Foswiki. It uses [[http://www.gerd-neugebauer.de/software/TeX/BibTool.en.html][BibTool]] (by Gerd Neugebauer) and [[http://www.lri.fr/~filliatr/bibtex2html/][Bib2bib and Bibtex2html]]
 
 ---++ Preview
 You type 
@@ -16,10 +18,10 @@ You type
 </verbatim>
 you get
 
-(simulated) %BR%
+simulated: <br />
 <img src="%ATTACHURL%/bibtex-select-ex.png" alt="bibtex select example">
 
-(if installed)
+if installed:
 %BIBTEX{select="author:'Moresi'"}%
 
 You type
@@ -73,10 +75,10 @@ You type
 </verbatim>
 you get
 
-(simulated) %BR%
+simulated: <br />
 <img src="%ATTACHURL%/bibtex-inline-ex.png" alt="bibtex inline example">
 
-(if installed)
+if installed:
 %STARTBIBTEX{abstracts="on" keywords="on"}%
 @Article{DeLange:EPODD-6-3-241,
   author =		 "Rudi W. De Lange and Hendry L. Esterhuizen and Derek
@@ -130,9 +132,9 @@ You type
 </verbatim>
 you get (simulated) <img src="%ATTACHURL%/bibtex-cite-ex.png" alt="bibtex select example"> (if installed) %CITE{BahrSimpson02}%
 
-The text within the citation is dictated by the results of the %<nop>BIBTEXREF% declaration in the topic (see below).
+The text within the citation is dictated by the results of the =%<nop>BIBTEXREF%= declaration in the topic (see below).
 
-_Note: The %<nop>CITE% macro is also defined by the TWiki:Plugins.BibliographyPlugin.  If both plugins are installed, one must use the alternate declaration, %<nop>BIBCITE{...}%, to access the !BibtexPlugin functionality._
+*Note:* The =%<nop>CITE%= macro is also defined by the Foswiki:Extensions.BibliographyPlugin. If both plugins are installed, one must use the alternate declaration, =%<nop>BIBCITE{...}%=, to access the !BibtexPlugin functionality.
 
 ---++ Syntax
 	* =%<nop>BIBTEX{&lt;attributes&gt;}%= - render a set of bibtex files attached to some topic 
@@ -141,12 +143,10 @@ _Note: The %<nop>CITE% macro is also defined by the TWiki:Plugins.BibliographyPl
 	* =%<nop>BIBTEXREF{key, topic}%= - generate a list of references based on the declared =CITE= keys
 
 ---++ Attributes
-
-All attributes for %<nop>BIBTEX% and %<nop>STARTBIBTEX% are optional. The attributes =topic= and =bibfile=
-are not valid in the %<nop>STARBIBTEX% tag as the bibtex database is given inline and not as an attachment.
-%<nop>CITE% has one obligatory attribute, that is =key= refering to the bibtex entry that is to be
-cited. =topic= is optional here and defaults to the recently used bibtex database location in a %<nop>BIBTEX%
-tag on the same topic (see [[#Tips][Tips]]).
+All attributes for =%<nop>BIBTEX%= and =%<nop>STARTBIBTEX%= are optional. The attributes =topic= and =bibfile=
+are not valid in the =%<nop>STARBIBTEX%= tag as the bibtex database is given inline and not as an attachment.
+=%<nop>CITE%= has one obligatory attribute, that is =key= refering to the bibtex entry that is to be
+cited. =topic= is optional here and defaults to the recently used bibtex database location in a =%<nop>BIBTEX%= tag on the same topic (see [[#Tips][Tips]]).
 
 | *option* | *value*	  | *description* |
 | topic | =(webName.)topicName= | a valid topic where bibtex files are attached. |
@@ -173,32 +173,25 @@ tag on the same topic (see [[#Tips][Tips]]).
   </ul> |
 
 ---++ Citations and Automated Reference Lists
-
-As of release v1.3, the %TOPIC% has functionality similar to the TWiki:Plugins.BibliographyPlugin.  Specifically, if a topic has =%<nop>CITE{key}%= declarations through out, the use of =%<nop>BIBTEXREF{...}%= will generate a list of references based on the citations declared.  The output of the reference list is dictated by <nop>BibTeX.  Thus, the HTML output can use all of the flexibility of bibtex, including custom bibtex style templates and string macros.
+As of release v1.3, !BibtexPlugin has functionality similar to the Foswiki:Extensions.BibliographyPlugin.  Specifically, if a topic has =%<nop>CITE{key}%= declarations through out, the use of =%<nop>BIBTEXREF{...}%= will generate a list of references based on the citations declared.  The output of the reference list is dictated by <nop>BibTeX.  Thus, the HTML output can use all of the flexibility of bibtex, including custom bibtex style templates and string macros.
 
 The citation keys _must refer to the output key produced by this plugin_, which may differ from the entries in the associated .bib files according to the bibtool resource file in use.  Simply use the output key produced by [[#SearchTemplates][<nop>BibtexPlugin search template]] query results.
 
-Again, if both the TWiki:Plugins.BibliographyPlugin and Foswiki:BibtexPlugin are installed, one must use %<nop>BIBCITE{...}% inplace of %<nop>CITE% for the <nop>BibtexPlugin functionality to work.
+Again, if both the Foswiki:Extensions.BibliographyPlugin and Foswiki:BibtexPlugin are installed, one must use =%<nop>BIBCITE{...}%= inplace of =%<nop>CITE%= for the !BibtexPlugin functionality to work.
 
 ---+++ Example
-
-You type
-
+You type:
 <verbatim>
-<table border=1><tr><td>
-     %BIBTEXREF{bibstyle="alpha"}%
-</table>
+%BIBTEXREF{bibstyle="alpha"}%
 </verbatim>
 
 you get
 
-(simulated) %BR%
+simulated: <br />
 <img src="%ATTACHURL%/bibtex-ref-ex.png" alt="bibtex reference example">
 
-(if installed)
-<table border=1><tr><td>
+if installed:
 %BIBTEXREF{ bibstyle="alpha" }%
-</table>
 
 #QueryAnchor
 ---++ The Query Language
@@ -240,23 +233,23 @@ for the meaning of the special characters:
 | regexp1 \&Iota; regexp2 | alternative between two regular expressions, this operator has low priority against *, + and ? |
 | \( regexp \) | grouping regular expression |
 
----++ Customizing Look &amp; Feel
 #CustomizingAnchor
+---++ Customizing Look &amp; Feel
 The BibtexPlugin is customizable in several ways:
 	* manipulate the cascading style sheets sitewide or derived on one topic
-	* implementing an different BibtexSearchTemplate used with the =form= attribute of the %<nop>BIBTEX% command
+	* implementing an different BibtexSearchTemplate used with the =form= attribute of the =%<nop>BIBTEX%= command
 	* rewriting the bibtool resourcefile shipped with the BibtexPlugin
 
 ---+++ Cascading Stylesheets
 Here's the list of used styles:
 | *class* | *description* |
 | bibtex | division (&lt;div...&gt;) surrounding the complete bibtex. \
-			  The entries are rendered using a definition list: %BR% \
-			 &lt;dl&gt; %BR% \
-			 ... %BR% \
-			 &nbsp;&nbsp;&nbsp;&lt;dt&gt; =keyA= &lt;/dt&gt; %BR% \
-			 &nbsp;&nbsp;&nbsp;&lt;dd&gt; =entry= &lt;/dd&gt; %BR% \
-			 ... %BR% \
+			  The entries are rendered using a definition list: <br /> \
+			 &lt;dl&gt; <br /> \
+			 ... <br /> \
+			 &nbsp;&nbsp;&nbsp;&lt;dt&gt; =keyA= &lt;/dt&gt; <br /> \
+			 &nbsp;&nbsp;&nbsp;&lt;dd&gt; =entry= &lt;/dd&gt; <br /> \
+			 ... <br /> \
 			 &lt;/dl&gt; |
 | bibabstract | division surrounding the abstract |
 | bibcomment | division surrounding the comment |
@@ -267,11 +260,10 @@ See [[#Tips][Tips]] for an example on how to modify the look easily.
 
 #SearchTemplates
 ---+++ !BibtexPlugin search templates
-
 The !BibteXPlugin search templates provide an interactive query interface to
 the bibtex files present on a wiki.  As an example of their use, one can declare
 <verbatim>
-   %BIBTEX{form="only"}%
+%BIBTEX{form="only"}%
 </verbatim>
 in a topic to which .bib files are attached.  The resulting rendered form
 (defined by DEFAULTSEARCHTEMPLATE above) can then be used to query the .bib
@@ -288,15 +280,14 @@ resource file for bibtool. This contains an own (default) style of citation keys
 have a look at the bibtool manual page and dig into the =bibtoolrcs= file yourself.
 
 ---++ Examples
-	* %<nop>BIBTEX% %BR%
-	  Render all bibtex entries in the bibtex files attached to the =DEFAULTWEB=.=DEFAULTTOPIC= in the
-	  =DEFAULTSTYLE= with the =DEFAULTSORT=.
+	* =%<nop>BIBTEX%= <br />
+	  Render all bibtex entries in the bibtex files attached to the =DEFAULTWEB.DEFAULTTOPIC= in the =DEFAULTSTYLE= with the =DEFAULTSORT=.
 
-	* %<nop>BIBTEX{web="Sandbox" topic="BibTest" file="cite.bib" select="author : 'Einstein'"}% %BR%
+	* =%<nop>BIBTEX{web="Sandbox" topic="BibTest" file="cite.bib" select="author : 'Einstein'"}%= <br />
 	  Use cite.bib which is attached in <nop>Sandbox under the topic <nop>BibTest as the <nop>BibTeX file.
 	  Embeds all of the references from the <nop>BibTeX file which have Einstein in the author field
 
-	* %<nop>BIBTEX{file="cite.bib" select="author : 'Einstein|Fermi' and year=2003"}%
+	* =%<nop>BIBTEX{file="cite.bib" select="author : 'Einstein|Fermi' and year=2003"}%=
 		* Use cite.bib which is attached to the =DEFAULTWEB= under the topic =DEFAULTTOPIC=
 		  as the <nop>BibTeX file
 		* Embeds all of the references from the <nop>BibTeX file which have Einstein or Fermi in the author field and
@@ -305,106 +296,84 @@ have a look at the bibtool manual page and dig into the =bibtoolrcs= file yourse
 
 	* Selecting entries of a given year
 		* select only entries that appeared in 1999 : <b><tt>select="year=1999"</tt></b>
-		* select references appearing after and/or before a given year, e.g. references after 1997: %BR%
+		* select references appearing after and/or before a given year, e.g. references after 1997: <br />
 		 <b><tt>select="year>1997"</tt></b>
-		* references between 1990 and 1995: %BR%
+		* references between 1990 and 1995: <br />
 		 <b><tt>select="year&gt;=1990 and year&lt;=1995"</tt></b>
 
 	* Selecting references of a given author
-		* select only entries whose (co)author is Donald Knuth: %BR%
+		* select only entries whose (co)author is Donald Knuth: <br />
 		  <b><tt>select="author : 'Knuth'"</tt></b>
-		* if you would like to have only the references whose author is Knuth only, you may try: %BR%
+		* if you would like to have only the references whose author is Knuth only, you may try: <br />
 		  <b><tt>select="author : '^\(Donald \(E. \)?Knuth\|Knuth, Donald \(E.\)?\)$'"</tt></b>
-		* or equivalently but missing the possible E.: %BR%
+		* or equivalently but missing the possible E.: <br />
 		  <b><tt>select="author = 'Donald Knuth or author = 'Knuth, Donald'"</tt></b>
 
 	* Other examples
 		* extract the references that appeared since 1995 and have lambda-calculus in their title, with anything between
-		  "lambda" and "calculus": %BR%
+		  "lambda" and "calculus": <br />
 		  <b><tt>select="year >= 1995 and title : 'lambda.*calculus'"</tt></b>
-		* select entries for Wolfgang Menzel since year 2000: %BR%
+		* select entries for Wolfgang Menzel since year 2000: <br />
 		  <b><tt>select="author : 'Wolfgang Menzel' or author = 'Menzel, Wolfgang' and year>=2000"</tt></b>
 
 ---++ Tips
-	* Setting the current bibtex database for citations:%BR%
-	  Having a set of citations %<nop>CITE{keyA}% ... %<nop>CITE{keyZ}%
+	* Setting the current bibtex database for citations:<br />
+	  Having a set of citations =%<nop>CITE{keyA}%= ... =%<nop>CITE{keyZ}%=
 	  refering to the same database is achievable in several ways:
-		* by attaching _all_ your bibtex files at a common place and set the =DEFAULTTOPIC= in the
-		  [[#Global_Settings][Global Settings]] section to that topic, or
-		* by declaring the current database in the first %<nop>CITE% tag: %CITE{"keyA" topic="Main.BibtexDatabase"}, or
-		* by setting the current database with %<nop>BIBTEX{topic="BibtexDatabase" display="off"}%, or
-		* by specifying the bibtex database in every %<nop>CITE% tag (not seriously)
-	* Merging bibtex databases from different sources: %BR%
+		* by attaching _all_ your bibtex files at a common place and set the =DEFAULTTOPIC= in the [[#Global_Settings][Global Settings]] section to that topic, or
+		* by declaring the current database in the first =%<nop>CITE%= tag: =%<nop>CITE{"keyA" topic="Main.BibtexDatabase"}%=, or
+		* by setting the current database with =%<nop>BIBTEX{topic="BibtexDatabase" display="off"}%=, or
+		* by specifying the bibtex database in every =%<nop>CITE%= tag (not seriously)
+	* Merging bibtex databases from different sources: <br />
 	  If there are lots of databases all over your Foswiki site, you might want to merge them or extend them
 	  with some extra entries you don't want in the main database. Example: the main database contains all
 	  publications of your division but not the crossrefering presentation slides. You might want to keep 
-	  them separate on your home-topic. You do that by _nesting_ one or several %<nop>;BIBTEX{...bibstyle="raw"...}% 
-	  commands inside a %<nop>STARBIBTEX% ... %<nop>STOPBIBTEX% section.
+	  them separate on your home-topic. You do that by _nesting_ one or several =%<nop>BIBTEX{...bibstyle="raw"...}%= 
+	  commands inside a =%<nop>STARBIBTEX% ... %<nop>STOPBIBTEX%= section.
 <verbatim>
-		%STARTBIBTEX%
-		%BIBTEX{select="author:'YourName'" bibstyle="raw"}%
-		@Misc{YourName02Slides,
-			crossref = {YourName02},
-			note = {slides of oral presentation},
-		}
-		%STOPBIBTEX%
+	%STARTBIBTEX%
+	%BIBTEX{select="author:'YourName'" bibstyle="raw"}%
+	@Misc{YourName02Slides,
+		crossref = {YourName02},
+		note = {slides of oral presentation},
+	}
+	%STOPBIBTEX%
 </verbatim>
-	* Manipulating the Cascading Style Sheet: %BR%
+	* Manipulating the Cascading Style Sheet: <br />
 	  You possibly don't like the default stylesheet for bibtexing installed on your Foswiki site. Or you just
 	  want to render a bibtex database differently on a single topic. Then add a stylesheet section in the topic:
 	  &lt;style type="text/css"&gt; ... &lt;/style&gt;. Section [[#CustomizingAnchor][Customizing Look &amp; Feel]]
 	  lists the styles used.
 	  Here's a small example of how to get a different look easily. Just put it on some topic and see:
 <verbatim>
-		<style type="text/css">
-		.bibtex {
-		  background:transparent;
-		  border:0px;
-		}
-		.bibtex dd {
-		  margin-left:30px;
-		  margin-right:30px;
-		}
-		</style>
+<style type="text/css">
+	.bibtex {
+		background:transparent;
+		border:0px;
+	}
+	.bibtex dd {
+		margin-left:30px;
+		margin-right:30px;
+	}
+</style>
 </verbatim>
 
 
 ---++ Global Settings
-	* One line description, shown in the %SYSTEMWEB%.TextFormattingRules topic:
-		* Set SHORTDESCRIPTION = Embeds <nop>BibTeX entries in a Foswiki page
-
 	* Default topic name for <nop>BibTeX files:
 		* Set DEFAULTTOPIC = System.BibtexPlugin
 
 	* Default search template
 		* Set DEFAULTSEARCHTEMPLATE = System.BibtexSearchTemplate
 
-
 ---++ Plugin Installation Instructions
+%$INSTALL_INSTRUCTIONS%
 
-	* Download the .zip or .tgz file from the Extensions web (see below)
-	* extract the plugin files in your foswiki installation directory. Content:
-	  | *File:* | *Description:* |
-	  | ==data/System/%TOPIC%.txt== | Plugin topic |
-	  | ==data/System/BibtexSearchTemplate.txt== | default query template |
-	  | ==data/System/BibtexSimpleSearchTemplate.txt== | simple query template |
-	  | ==data/System/BibtexSelectTemplate.txt== | expert query template |
-	  | ==lib/System/Plugins/%TOPIC%.pm== | Plugin Perl module |
-	  | ==pub/System/BibtexPlugin/sample.bib== | Plugin sample <nop>BibTeX file |
-	  | ==pub/System/BibtexPlugin/style.css== | default style definitions |
-	  | ==pub/System/BibtexPlugin/bibtoolrsc== | bibtool resource file |
-	  | ==bin/bibsearch== | cgi query script |
-	  | ==tools/render.sh== | bibtex to html/raw rendering script |
-	* modify the =render.sh= script to point to the installed versions of =bibtool=, =bib2bib=, =bibtex2html=, and =bibtex=.
-	* set =$Foswiki::cfg{Plugins}{BibtexPlugin}{render}= to declare the full path to =render.sh= in !LocalSite.cfg
-	* register the bibsearch script in !LocalSite.cfg, by adding the following line:
-<verbatim>
-$Foswiki::cfg{SwitchBoard}{bibsearch} = [ "Foswiki::Plugins::BibtexPlugin::CgiBibSearch", "cgibibsearch", { bibsearch => 1 } ];
-</verbatim>
+Test if the installation was successful: See if above examples work
 
 If access control is managed at the web-server level, be sure to add
 =bibsearch= to the authorization list. E.g., for Apache, add the following
-lines to the .htaccess file: 
+lines to the =.htaccess= or Apache =conf= file: 
 <verbatim>
 <Files "bibsearch">
        require valid-user
@@ -413,31 +382,36 @@ lines to the .htaccess file:
 
 ---++ Plugin Info
 |  Plugin Author: | Foswiki:Main/MichaelDaum, Foswiki:Main/ScottHoge |
-|  16 Okt 2003: | Initial version |
-|  Plugin Version: | v2.0 |
-|  Change History: | &nbsp; |
-|  2009/01/14: | (v2.0) ported to Foswiki |
-|  2008/01/31: | (v1.5) updated to operate with TWiki 4.2 |
-|  2006/12/02: | minor bug fix: removed space requirement of render path |
-|  2006/08/29: | (v1.4) minor bug fixes: =bibstyle= replaces =style=, CITE/BIBCITE cleanup |
-|  2006/05/19: | (v1.3) twiki.org release |
-|  2006/01/06: | added code to generate automatic reference lists, based on declared citations |
-|  2005/12/09: | reworked to use the TWiki:DakarContrib on cairo and beijing |
-|  2004/11/26: | added simple and expert search forms, added select option to cgi-script; \
+|  License: | GPL ([[http://www.gnu.org/copyleft/gpl.html][GNU General Public License]]) |
+|  Version: | %$VERSION% |
+|  Release: | %$RELEASE% |
+|  Change History: | <!-- versions below in reverse order -->&nbsp; |
+|  12 May 2012: | (v2.1) various bug fixes; path settings moved to Configure; made available on foswiki.org |
+|  14 Jan 2009: | (v2.0) ported to Foswiki |
+|  31 Jan 2008: | (v1.5) updated to operate with TWiki 4.2 |
+|  02 Dec 2006: | minor bug fix: removed space requirement of render path |
+|  29 Aug 2006: | (v1.4) minor bug fixes: =bibstyle= replaces =style=, CITE/BIBCITE cleanup |
+|  19 May 2006: | (v1.3) twiki.org release |
+|  06 Jan 2006: | added code to generate automatic reference lists, based on declared citations |
+|  09 Dec 2005: | reworked to use the TWiki:DakarContrib on Cairo and Beijing |
+|  26 Nov 2004: | added simple and expert search forms, added select option to cgi-script; \
 		added configurable default search template |
-|  2004/11/25: | allow inline databases to be queried also, added forgotten bibsearch cgi-script |
-|  2004/10/01: | added cascading style sheets |
-|  2004/09/16: | added tar ball |
-|  2003/10/16: | renamed to BibtexPlugin, formerly known as <nop>EmbedBibPlugin |
+|  25 Nov 2004: | allow inline databases to be queried also, added forgotten bibsearch cgi-script |
+|  01 Oct 2004: | added cascading style sheets |
+|  16 Sep 2004: | added tar ball |
+|  16 Oct 2003: | renamed to BibtexPlugin, formerly known as <nop>EmbedBibPlugin |
+|  16 Okt 2003: | Initial version |
 |  CPAN Dependencies: | none |
-|  Other Dependencies: | [[http://lml.ls.fi.upm.es/manuales/bibtool/][BibTool]], \
+|  Other Dependencies: | [[http://www.gerd-neugebauer.de/software/TeX/BibTool/index.en.html][BibTool]], \
 		[[http://www-sop.inria.fr/epidaure/personnel/malandain/codes/bibtex2html.html][Bibtex2html]] |
 |  Perl Version: | >=5.6.1 |
-|  Plugin Home: | Foswiki:Plugins/BibtexPlugin |
-|  Feedback: | Foswiki:Plugins/BibtexPluginDev |
-|  Appraisal: | Foswiki:Plugins/%TOPIC%Appraisal |
+|  Plugin Home: | Foswiki:Extensions/BibtexPlugin |
+|  Support: | Foswiki:Support/%TOPIC% |
 
-%META:FILEATTACHMENT{name="style.css" attr="" autoattached="1" comment="" date="1134157744" path="style.css" size="1221" user="ProjectContributor" version="1"}%
-%META:FILEATTACHMENT{name="bibtoolrsc" attr="" autoattached="1" comment="" date="1136505651" path="bibtoolrsc" size="1905" user="ProjectContributor" version="1"}%
-%META:FILEATTACHMENT{name="sample.bib" attr="" autoattached="1" comment="" date="1066305348" path="sample.bib" size="1713" user="ProjectContributor" version="1"}%
-
+%META:FILEATTACHMENT{name="style.css" attr="" autoattached="1" comment="" date="1336870795" path="style.css" size="1083" user="ProjectContributor" version=""}%
+%META:FILEATTACHMENT{name="bibtoolrsc" attr="" autoattached="1" comment="" date="1136505651" path="bibtoolrsc" size="1905" user="ProjectContributor" version=""}%
+%META:FILEATTACHMENT{name="sample.bib" attr="" autoattached="1" comment="" date="1066305348" path="sample.bib" size="1713" user="ProjectContributor" version=""}%
+%META:FILEATTACHMENT{name="bibtex-cite-ex.png" attachment="bibtex-cite-ex.png" attr="" comment="" date="1336874137" path="bibtex-cite-ex.png" size="1222" user="ProjectContributor" version="1"}%
+%META:FILEATTACHMENT{name="bibtex-inline-ex.png" attachment="bibtex-inline-ex.png" attr="" comment="" date="1336874150" path="bibtex-inline-ex.png" size="52989" user="ProjectContributor" version="1"}%
+%META:FILEATTACHMENT{name="bibtex-ref-ex.png" attachment="bibtex-ref-ex.png" attr="" comment="" date="1336874175" path="bibtex-ref-ex.png" size="8732" user="ProjectContributor" version="1"}%
+%META:FILEATTACHMENT{name="bibtex-select-ex.png" attachment="bibtex-select-ex.png" attr="" comment="" date="1336874188" path="bibtex-select-ex.png" size="26604" user="ProjectContributor" version="1"}%
