@@ -361,7 +361,7 @@ CKEDITOR.plugins.provisarea =
 					editor.fire( 'openprovis' );
 					editor.getCommand( 'provisarea' ).setState( CKEDITOR.TRISTATE_ON );
 					editor.config.toolbar = "Basic_Provis";
-					newtoolbox = editor.fire("expandieren", {space:'top',html:''}).html;
+					newtoolbox = editor.fire("themeSpace", {space:'top',html:''}).html;
 					top.setHtml(newtoolbox);
 				}
 				else if ( editor.getCommand( 'provisarea' ).state == 1 )
@@ -369,7 +369,7 @@ CKEDITOR.plugins.provisarea =
 					editor.fire( 'closeprovis' );
 					editor.getCommand( 'provisarea' ).setState( CKEDITOR.TRISTATE_OFF );
 					editor.config.toolbar = "Basic";
-					newtoolbox = editor.fire("expandieren", {space:'top',html:''}).html;
+					newtoolbox = editor.fire("themeSpace", {space:'top',html:''}).html;
 					top.setHtml(newtoolbox);
 				}
 			},
