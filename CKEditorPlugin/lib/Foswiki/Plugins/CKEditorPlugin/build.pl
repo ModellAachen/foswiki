@@ -64,6 +64,7 @@ my @include_files = qw(
 	contents.css
 	config.js
 	images/bullet.gif
+	images/profi.gif
 	images/spacer.gif
 );
 

@@ -165,21 +165,18 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 				return true;
 			};
 
-			editor.on( 'themeSpace', function( event )
+			var collapserId = "ckeToolbarCollapse";
+			var themeSpaceHandler = function( event )
 				{
 					if ( event.data.space == editor.config.toolbarLocation )
 					{
 						editor.toolbox = new toolbox();
 						
-						collapserId = "xxx";
 
 						var labelId = CKEDITOR.tools.getNextId();
 
-						var output = [ '<div class="cke_toolbox" role="group" aria-labelledby="', labelId, '" onmousedown="return false;"' ],
-							expanded =  editor.config.toolbarStartupExpanded !== false,
+						var output = [ '<div class="cke_toolbox" role="group" aria-labelledby="', labelId, '" onmousedown="return false;">' ],
 							groupStarted;
-
-						output.push( expanded ? '>' : ' style="display:none">' );
 
 						// Sends the ARIA label.
 						output.push( '<span id="', labelId, '" class="cke_voice_label">', editor.lang.toolbars, '</span>' );
@@ -243,7 +240,8 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 										toolbarName = row.name && ( editor.lang.toolbarGroups[ row.name ] || row.name );
 
 										// Output the toolbar opener.
-										output.push( '<span id="', toolbarId, '" class="cke_toolbar"',
+										output.push( '<span id="', toolbarId, '" class="cke_toolbar ',
+											( toolbarName ? 'cke_toolbar_'+toolbarName : ''), '"',
 											( toolbarName ? ' aria-labelledby="'+ toolbarId +  '_label"' : '' ),
 											' role="toolbar">' );
 
@@ -312,207 +310,35 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 								output.push( '<span class="cke_toolbar_end"></span></span>' );
 						}
 
-						output.push( '</div>' );
-
-						if ( editor.config.toolbarCanCollapse )
+						if ( editor.config.toolbarCanCollapse && !editor.config.toolbar.match(/Provis/) )
 						{
-							var collapserFn = CKEDITOR.tools.addFunction(
-								function()
-								{
-									editor.execCommand( 'toolbarCollapse' );
-								});
+							var collapserFn = CKEDITOR.tools.addFunction(function() {
+								editor.execCommand( 'toolbarCollapse' );
+							});
 
-							// Alex: Der neue Expand Button:
-							output.push( '<span id="' + collapserId + '" class="cke_expertenmodus">' );
-							
-							// var itemObj = item.render( editor, output );
-							output.push( '<a title="' + editor.lang.toolbarExpand
-													  + '" tabIndex="-1"' );
-
-							
-							
-							//if ( !expanded )
-							//	output.push( ' cke_toolbox_collapser_min' );
-
-							output.push( '" onclick="CKEDITOR.tools.callFunction(' + collapserFn + ')">',
+							output.push( '<span id="' + collapserId + '" class="cke_expertenmodus cke_button">' );
+							output.push( '<a title="' + editor.lang.toolbarExpand + '" tabIndex="-1"' );
+							output.push( ' onclick="CKEDITOR.tools.callFunction(' + collapserFn + ')">',
 									'<span class="cke_expertenicon_expand"></span></a></span>' );
-									
-							
 						}
+
+						output.push( '</div>' );
 
 						event.data.html += output.join( '' );
 					}
-				});
-			
-			editor.on( 'expandieren', function( event )
-					{
-						editor.toolbox = new toolbox();
-						
-						var labelId = 'cke_' + CKEDITOR.tools.getNextId();
+				};
+			editor.on( 'themeSpace', themeSpaceHandler );
+			// Have to re-add it because the theme code feels like removing all handlers
+			// even though we still need this one
+			editor.on( 'themeLoaded', function( event ) {
+				editor.on( 'themeSpace', themeSpaceHandler );
+			} );
 
-						var output = [ '<div class="cke_toolbox" role="group" aria-labelledby="', labelId, '"' ],
-							expanded =  editor.config.toolbarStartupExpanded !== false,
-							groupStarted;
-
-						output.push( expanded ? '>' : ' style="display:none">' );
-
-						// Sends the ARIA label.
-						output.push( '<span id="', labelId, '" class="cke_voice_label">', editor.lang.toolbar, '</span>' );
-
-						var toolbars = editor.toolbox.toolbars,
-							toolbar =
-									( editor.config.toolbar instanceof Array ) ?
-										editor.config.toolbar
-									:
-										editor.config[ 'toolbar_' + editor.config.toolbar ];
-
-						for ( var r = 0 ; r < toolbar.length ; r++ )
-						{
-							var toolbarId,
-								toolbarObj = 0,
-								toolbarName,
-								row = toolbar[ r ],
-								items;
-
-							// It's better to check if the row object is really
-							// available because it's a common mistake to leave
-							// an extra comma in the toolbar definition
-							// settings, which leads on the editor not loading
-							// at all in IE. (#3983)
-							if ( !row )
-								continue;
-
-							if ( groupStarted )
-							{
-								output.push( '</div>' );
-								groupStarted = 0;
-							}
-
-							if ( row === '/' )
-							{
-								output.push( '<div class="cke_break"></div>' );
-								continue;
-							}
-
-							items = row.items || row;
-
-							// Create all items defined for this toolbar.
-							for ( var i = 0 ; i < items.length ; i++ )
-							{
-								var item,
-									itemName = items[ i ],
-									canGroup;
-
-								item = editor.ui.create( itemName );
-
-								if ( item )
-								{
-									canGroup = item.canGroup !== false;
-
-									// Initialize the toolbar first, if needed.
-									if ( !toolbarObj )
-									{
-										// Create the basic toolbar object.
-										toolbarId = CKEDITOR.tools.getNextId();
-										toolbarObj = { id : toolbarId, items : [] };
-										toolbarName = row.name && ( editor.lang.toolbarGroups[ row.name ] || row.name );
-
-										// Output the toolbar opener.
-										output.push( '<span id="', toolbarId, '" class="cke_toolbar ',
-											( toolbarName ? 'cke_toolbar_'+toolbarName : '' ), '"',
-											( toolbarName ? ' aria-labelledby="'+ toolbarId +  '_label"' : '' ),
-											' role="toolbar">' );
-
-										// If a toolbar name is available, send the voice label.
-										toolbarName && output.push( '<span id="', toolbarId, '_label" class="cke_voice_label">', toolbarName, '</span>' );
-
-										output.push( '<span class="cke_toolbar_start"></span>' );
-
-										// Add the toolbar to the "editor.toolbox.toolbars"
-										// array.
-										var index = toolbars.push( toolbarObj ) - 1;
-
-										// Create the next/previous reference.
-										if ( index > 0 )
-										{
-											toolbarObj.previous = toolbars[ index - 1 ];
-											toolbarObj.previous.next = toolbarObj;
-										}
-									}
-
-									if ( canGroup )
-									{
-										if ( !groupStarted )
-										{
-											output.push( '<span class="cke_toolgroup" role="presentation">' );
-											groupStarted = 1;
-										}
-									}
-									else if ( groupStarted )
-									{
-										output.push( '</span>' );
-										groupStarted = 0;
-									}
-
-									var itemObj = item.render( editor, output );
-									index = toolbarObj.items.push( itemObj ) - 1;
-
-									if ( index > 0 )
-									{
-										itemObj.previous = toolbarObj.items[ index - 1 ];
-										itemObj.previous.next = itemObj;
-									}
-
-									itemObj.toolbar = toolbarObj;
-									itemObj.onkey = itemKeystroke;
-
-									/*
-									 * Fix for #3052:
-									 * Prevent JAWS from focusing the toolbar after document load.
-									 */
-									itemObj.onfocus = function()
-									{
-										if ( !editor.toolbox.focusCommandExecuted )
-											editor.focus();
-									};
-								}
-							}
-
-							if ( groupStarted )
-							{
-								output.push( '</span>' );
-								groupStarted = 0;
-							}
-
-							if ( toolbarObj )
-								output.push( '<span class="cke_toolbar_end"></span></span>' );
-						}
-
-						output.push( '</div>' );
-
-						if ( editor.config.toolbarCanCollapse && !(editor.config.toolbar == "Basic_Provis" ))
-						{
-							var collapserId = 'cke_' + CKEDITOR.tools.getNextNumber();
-							
-							var collapserFn = CKEDITOR.tools.addFunction(
-								function()
-								{
-									editor.execCommand( 'toolbarCollapse' );
-								});
-
-							output.push( '<span id="' + collapserId + '" class="cke_expertenmodus">' );
-							
-							output.push( '<a title="' + editor.lang.toolbarCollapse
-													  + '" tabIndex="-1"' );
-
-							output.push( '" onclick="CKEDITOR.tools.callFunction(' + collapserFn + ')">',
-									'<span class="cke_expertenicon_collapse"></span></a></span>' );
-									
-						}
-						
-						
-						event.data.html += output.join( '' );
-					});
+			// Style for expand button
+			$('head').append('<style type="text/css">\n'+
+				'.cke_expertenmodus { float: right; }\n'+
+				'.cke_expertenicon_expand { background: url('+CKEDITOR.basePath+'images/profi.gif) no-repeat; cursor: pointer; display: block; height: 16px; width: 16px; margin: 3px 4px 0 4px; }\n'+
+			'</style>');
 
 			editor.addCommand( 'toolbarFocus', commands.toolbarFocus );
 			
@@ -520,8 +346,8 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 					{
 						exec : function( editor, data )
 						{
-							var collapserId = data;
-							var collapser = CKEDITOR.document.getById( collapserId );
+							var myCollapserId = data || collapserId;
+							var collapser = CKEDITOR.document.getById( myCollapserId );
 							var toolbox = collapser.getPrevious();
 							var toolboxContainer = toolbox.getParent();
 							//alert(toolboxContainer.getHtml());
@@ -533,21 +359,25 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 							
 							switch (editor.config.toolbar) {
 							    case "Basic": 
+								if (!editor.config.toolbar_Full) break;
 							    	editor.config.toolbar = 'Full';
 							    	collapser.setAttribute( 'title', editor.lang.toolbarExpand );
-									newtoolbox = editor.fire("expandieren", {space:'top',html:''}).html;
+									newtoolbox = editor.fire("themeSpace", {space:'top',html:''}).html;
 							        break;
 							    case "Basic_Provis": 
+								if (!editor.config.toolbar_Full_Provis) break;
 							    	editor.config.toolbar = "Full_Provis";
 							    	collapser.setAttribute( 'title', editor.lang.toolbarExpand );
-									newtoolbox = editor.fire("expandieren", {space:'top',html:''}).html;
+									newtoolbox = editor.fire("themeSpace", {space:'top',html:''}).html;
 							        break;
 							    case "Full_Provis":
+								if (!editor.config.toolbar_Basic_Provis) break;
 							    	editor.config.toolbar = "Basic_Provis";
 							    	collapser.setAttribute( 'title', editor.lang.toolbarExpand );
 									newtoolbox = editor.fire("themeSpace", {space:'top',html:''}).html;
 							        break;
 							    case "Full": 
+								if (!editor.config.toolbar_Basic) break;
 							    	editor.config.toolbar = "Basic";
 							    	collapser.setAttribute( 'title', editor.lang.toolbarExpand );
 									newtoolbox = editor.fire("themeSpace", {space:'top',html:''}).html;
@@ -558,8 +388,7 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 							    	newtoolbox = editor.fire("themeSpace", {space:'top',html:''}).html;
 							        break;
 							}
-
-			editor.addCommand( 'toolbarFocus', commands.toolbarFocus );
+							editor.getThemeSpace('top').setHtml(newtoolbox);
 
 						},
 

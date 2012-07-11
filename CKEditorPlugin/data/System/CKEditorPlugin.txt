@@ -90,6 +90,7 @@ toolbar_Basic_Provis : [
 	{ name: 'provis_tools',	items : [ 'Provis_NewSwimlane', 'Provis_Nodes' ] },
 	{ name: 'provis_size',		items : [ 'Provis_Size' ] }
 ],
+toolbarCanCollapse : true,
 advancedFeatures : {
 	qwikitable_advancedtab : 0,
 	qwikitable_cellproperties : 0
